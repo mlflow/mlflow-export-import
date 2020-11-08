@@ -2,6 +2,10 @@
 
 Tools to export and import MLflow runs, experiments or registered models from one tracking server to another.
 
+## Architecture
+
+<img src="export_import_architecture.png" height="220" >
+
 ## Overview
 
 ### Experiments
