@@ -67,11 +67,12 @@ mlflow_tools.metadata.tracking_uri    http://localhost:5000
 
 ## Setup
 
-**Conda environment**
+Requires python>=3.7.
 
 ```
-conda env create conda.yaml
-source activate mlflow-export-import
+python -m venv mlflow-export-import
+source mlflow-export-import/bin/activate
+pip install -e .
 ```
 
 ## Experiments
