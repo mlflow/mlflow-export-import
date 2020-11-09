@@ -70,8 +70,8 @@ mlflow_tools.metadata.tracking_uri    http://localhost:5000
 Requires python>=3.7.
 
 ```
-python -m venv mlflow-export-import
-source mlflow-export-import/bin/activate
+python -m venv mlflow-export-import-env
+source mlflow-export-import-env/bin/activate
 pip install -e .
 ```
 
