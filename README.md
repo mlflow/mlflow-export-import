@@ -69,18 +69,22 @@ mlflow_tools.metadata.tracking_uri    http://localhost:5000
 
 Requires python>=3.7.
 
+### Local setup
+
 ```
 python -m venv mlflow-export-import-env
 source mlflow-export-import-env/bin/activate
 pip install -e .
 ```
 
-### Build wheel
+### Databricks setup
+
+If you want to run mlflow-export-import scripts on Databricks, you need to build a wheel artifact, push it up to DBFS and then install it on your cluster.
+
 ```
 python setup.py bdist_wheel
+databricks fs cp dist/mlflow_export_import-1.0.0-py3-none-any.whl {MY_DBFS_PATH}
 ```
-
-The wheel artifact can be found at: `dist/mlflow_export_import-1.0.0-py3-none-any.whl`.
 
 ## Experiments
 
