@@ -75,6 +75,13 @@ source mlflow-export-import-env/bin/activate
 pip install -e .
 ```
 
+### Build wheel
+```
+python setup.py bdist_wheel
+```
+
+The wheel artifact can be found at: `dist/mlflow_export_import-1.0.0-py3-none-any.whl`.
+
 ## Experiments
 
 ### Export Experiments
