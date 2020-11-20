@@ -21,12 +21,14 @@ def get_mlflow_host_token():
     if uri is not None and uri != "databricks":
         return (uri,None)
     try:
-        from common import databricks_cli_utils
+        from mlflow_export_import.common import databricks_cli_utils
         profile = os.environ.get('MLFLOW_PROFILE',None)
         host_token = databricks_cli_utils.get_host_token(profile)
         return databricks_cli_utils.get_host_token(profile)
     #except databricks_cli.utils.InvalidConfigurationError as e:
-    except Exception as e:
+    except Exception as e: # TODO: make more specific
+        #import traceback
+        #traceback.print_exc()
         print("WARNING:",e)
         return (None,None)
 
