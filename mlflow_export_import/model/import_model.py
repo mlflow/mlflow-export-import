@@ -5,7 +5,7 @@ Import a registered model and all the experiment runs associated with its latest
 import os
 import click
 import mlflow
-from mlflow_export_import.run.export_import.import_run import RunImporter
+from mlflow_export_import.run.import_run import RunImporter
 from mlflow_export_import import utils
 from mlflow_export_import.common import model_utils
 from mlflow_export_import.common import filesystem as _filesystem
@@ -15,7 +15,6 @@ class ModelImporter():
         self.fs = filesystem or _filesystem.get_filesystem()
         self.client = mlflow.tracking.MlflowClient()
         self.run_importer = RunImporter(self.client)
-        #self.run_importer = RunImporter(client, use_src_user_id=False, import_mlflow_tags=False)
 
     def import_model(self, input_dir, model_name, experiment_name, delete_model=False):
         path = os.path.join(input_dir,"model.json")
@@ -31,7 +30,7 @@ class ModelImporter():
         if delete_model:
             model_utils.delete_model(self.client, model_name)
 
-        tags = { e["key"]:e["value"] for e in dct.get("tags") }
+        tags = { e["key"]:e["value"] for e in dct.get("tags", {}) }
         self.client.create_registered_model(model_name, tags, dct.get("description"))
         mlflow.set_experiment(experiment_name)
 
