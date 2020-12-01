@@ -3,8 +3,6 @@ Import a registered model and all the experiment runs associated with its latest
 """
 
 import os
-import yaml
-import tempfile
 import click
 import mlflow
 from mlflow_export_import.run.import_run import RunImporter
@@ -16,7 +14,7 @@ class ModelImporter():
     def __init__(self, filesystem=None):
         self.fs = filesystem or _filesystem.get_filesystem()
         self.client = mlflow.tracking.MlflowClient()
-        self.run_importer = RunImporter(self.client)
+        self.run_importer = RunImporter(self.client, mlmodel_fix=True)
 
     def import_model(self, input_dir, model_name, experiment_name, delete_model=False):
         path = os.path.join(input_dir,"model.json")
@@ -61,26 +59,6 @@ class ModelImporter():
             version = self.client.create_model_version(model_name, source, run_id)
             model_utils.wait_until_version_is_ready(self.client, model_name, version, sleep_time=2)
             self.client.transition_model_version_stage(model_name, version.version, current_stage)
-        self._update_mlmodel_file(run_id, model_path)
-
-
-    def _update_mlmodel_file(self, run_id, model_path):
-        """ Update the run_id in the model's MLmodel file """
-
-        # Download MLmodel file
-        local_path = self.client.download_artifacts(run_id, f"{model_path}/MLmodel")
-        with open(local_path, "r") as f:
-            mlmodel = yaml.safe_load(f)
-
-        # Update the run_id
-        mlmodel["run_id"] = run_id
-
-        # Upload MLmodel file
-        with tempfile.TemporaryDirectory() as dir:
-            output_path = os.path.join(dir, "MLmodel")
-            with open(output_path, "w") as f:
-                yaml.dump(mlmodel,f) 
-            self.client.log_artifact(run_id, output_path,  f"{model_path}")
 
 
 @click.command()

@@ -5,6 +5,7 @@ Imports a run from a directory of zip file.
 import os
 import time
 import yaml
+import tempfile
 import click
 import mlflow
 from mlflow.utils.file_utils import TempDir
@@ -48,23 +49,23 @@ class RunImporter():
             path = os.path.join(src_run_id,"artifacts")
             mlflow.log_artifacts(mk_local_path(path))
         if self.mlmodel_fix:
-            self.fix_dst_mlmodel_(run.info.run_id)
+            self.update_mlmodel_run_id(run.info.run_id)
         return (run_id, src_run_dct["tags"].get(utils.TAG_PARENT_ID,None))
 
-    # Hacky expensive way to fix the run_id in the destination MLmodel file since there is no API to get all model artifacts of a run.
-    def fix_dst_mlmodel_(self, run_id):
+    # Patch to fix the run_id in the destination MLmodel file since there is no API to get all model artifacts of a run.
+    def update_mlmodel_run_id(self, run_id):
         mlmodel_paths = find_artifacts(run_id, "", "MLmodel")
         for mlmodel_path in mlmodel_paths:
+            model_path = mlmodel_path.replace("/MLmodel","")
             local_path = self.client.download_artifacts(run_id, mlmodel_path)
             with open(local_path, "r") as f:
-                dct = yaml.load(f)
-            #print(f"MLmodel run_id: {dct['run_id']}  artifact: {mlmodel_path}")
-            dct["run_id"] = run_id
-            with TempDir() as tmp:
-                new_local_path = os.path.join(tmp.path(),"MLmodel")
-                with open(new_local_path, "w") as f:
-                    yaml.dump(dct,f)
-
+                mlmodel = yaml.safe_load(f)
+            mlmodel["run_id"] = run_id
+            with tempfile.TemporaryDirectory() as dir:
+                output_path = os.path.join(dir, "MLmodel")
+                with open(output_path, "w") as f:
+                    yaml.dump(mlmodel, f)
+                self.client.log_artifact(run_id, output_path,  f"{model_path}")
 
     def dump_tags(self, tags, msg=""):
         print(f"Tags {msg} - {len(tags)}:")
