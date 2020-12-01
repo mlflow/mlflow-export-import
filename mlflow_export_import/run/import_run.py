@@ -85,10 +85,10 @@ class RunImporter():
 
         tags = [ RunTag(k,str(v)) for k,v in tags.items() ]
 
-        self.dump_tags(tags,"1")
+        #self.dump_tags(tags,"1") # debug
         if not self.in_databricks:
             utils.set_dst_user_id(tags, src_user_id, self.use_src_user_id)
-        self.dump_tags(tags,"2")
+        #self.dump_tags(tags,"2") # debug
         self.client.log_batch(run_id, metrics, params, tags)
 
 @click.command()
