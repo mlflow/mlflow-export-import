@@ -109,4 +109,4 @@ def nested_tags(dst_client, run_ids_mapping):
             dst_client.set_tag(dst_run_id, "mlflow.parentRunId", dst_parent_run_id)
 
 def importing_into_databricks():
-    return mlflow.tracking.get_tracking_uri() == "databricks"
+    return mlflow.tracking.get_tracking_uri().startswith("databricks")
