@@ -291,7 +291,7 @@ Experiment manifest.json.
 
 Run manifest.json: see below.
 
-### Import Experiments XXX
+### Import Experiments
 
 Import experiments from a directory. Reads the manifest file to import expirements and their runs.
 
