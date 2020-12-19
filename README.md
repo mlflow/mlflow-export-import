@@ -53,7 +53,7 @@ The [workspace/export](https://docs.databricks.com/dev-tools/api/latest/workspac
 
 `use-src-user-id` -  Set the destination user ID to the source user ID. Source user ID is ignored when importing into Databricks since the user is automatically picked up from your Databricks access token.
 
-`export-metadata-tags` - Creates metadata tags (starting with `mlflow_tools.metadata`) containing export information. Contains the source `mlflow` tags in addition to other information. This is useful for auditing purposes in regulated industries.
+`export-metadata-tags` - Creates metadata tags (starting with `mlflow_tools.metadata`) containing export information. Contains the source `mlflow` tags in addition to other information. This is useful for provenance and auditing purposes in regulated industries.
 
 ```
 Name                                  Value
@@ -308,12 +308,18 @@ Imports one experiment.
 
 ##### Usage
 ```
+python -u -m mlflow_export_import.experiment.import_experiment --help \
+
 Options:
-  --experiment TEXT               Experiment name or ID.  [required]
-  --output-dir TEXT               Output directory.  [required]
-  --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: False]
-  --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
-                                  JUPYTER or DBC.  [default: SOURCE]
+  --input-dir TEXT                Input path - directory  [required]
+  --experiment-name TEXT          Destination experiment name  [required]
+  --just-peek BOOLEAN             Just display experiment metadata - do not import
+  --use-src-user-id BOOLEAN       Set the destination user ID to the source
+                                  user ID. Source user ID is ignored when
+                                  importing into Databricks since setting it
+                                  is not allowed.
+  --import-mlflow-tags BOOLEAN    Import mlflow tags
+  --import-metadata-tags BOOLEAN  Import mlflow_export_import tags
 ```
 
 ##### Import examples

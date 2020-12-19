@@ -7,7 +7,7 @@ import click
 import mlflow
 from mlflow_export_import.common.http_client import HttpClient
 from mlflow_export_import.common import filesystem as _filesystem
-from mlflow_export_import.run .export_run import RunExporter
+from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils
 
 class ModelExporter():

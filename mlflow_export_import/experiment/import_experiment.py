@@ -5,7 +5,7 @@ Exports an experiment to a directory.
 import os
 import mlflow
 import click
-
+from mlflow_export_import import click_doc
 from mlflow_export_import import peek_at_experiment
 from mlflow_export_import.run.import_run import RunImporter
 from mlflow_export_import import utils
@@ -45,7 +45,7 @@ class ExperimentImporter():
 @click.option("--input-dir", help="Input path - directory", required=True, type=str)
 @click.option("--experiment-name", help="Destination experiment name", required=True, type=str)
 @click.option("--just-peek", help="Just display experiment metadata - do not import", type=bool, default=False)
-@click.option("--use-src-user-id", help="Use source user ID", type=bool, default=False)
+@click.option("--use-src-user-id", help=click_doc.use_src_user_id, type=bool, default=False)
 @click.option("--import-mlflow-tags", help="Import mlflow tags", type=bool, default=True)
 @click.option("--import-metadata-tags", help="Import mlflow_export_import tags", type=bool, default=False)
 
