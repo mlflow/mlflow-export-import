@@ -67,7 +67,7 @@ mlflow_tools.metadata.tracking_uri    http://localhost:5000
 
 ## Setup
 
-Requires python>=3.7.
+Built with python 3.7.6.
 
 ### Local setup
 
@@ -86,15 +86,85 @@ python setup.py bdist_wheel
 databricks fs cp dist/mlflow_export_import-1.0.0-py3-none-any.whl {MY_DBFS_PATH}
 ```
 
-## Experiments
+## Experiments 
 
 ### Export Experiments
 
+There are two main programs to export experiments:
+* export_experiment - exports one experiment
+* export_experiment_list - exports a list of  experiments
+
+Both accept either an experiment ID or name.
+
+#### export_experiment
+
+Export one experiment to a directory.
+
+##### Usage
+
+```
+python -u -m mlflow_export_import.experiment.export_experiment --help
+
+Options:
+  --experiment TEXT               Experiment name or ID.  [required]
+  --output-dir TEXT               Output directory.  [required]
+  --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: False]
+
+  --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
+                                  JUPYTER or DBC.  [default: SOURCE]
+```
+
+##### Export examples
+
+Export experiment by experiment ID.
+```
+python -u -m mlflow_export_import.experiment.export_experiment_list \
+  --experiment 2 --output-dir out
+```
+
+Export experiment by experiment name.
+```
+python -u -m mlflow_export_import.experiment.export_experiment_list \
+  --experiment sklearn-wine --output-dir out
+```
+
+##### Databricks export examples
+
+See the [Access the MLflow tracking server from outside Databricks](https://docs.databricks.com/applications/mlflow/access-hosted-tracking-server.html).
+```
+export MLFLOW_TRACKING_URI=databricks
+export DATABRICKS_HOST=https://mycompany.cloud.databricks.com
+export DATABRICKS_TOKEN=MY_TOKEN
+
+python -u -m mlflow_export_import.experiment.export_experiment \
+  --experiment /Users/me@mycompany.com/SklearnWine \
+  --output-dir out \
+  --notebook-formats DBC,SOURCE 
+```
+
+##### Export directory structure
+
+The output directory contains a manifest file and a subdirectory for each run (by run ID).
+The run directory contains a run.json file containing run metadata and an artifact hierarchy.
+
+```
++-manifest.json
++-441985c7a04b4736921daad29fd4589d/
+| +-artifacts/
+|   +-plot.png
+|   +-sklearn-model/
+|     +-model.pkl
+|     +-conda.yaml
+|     +-MLmodel
+```
+
+#### export_experiment_list
+
 Export several (or all) experiments to a directory.
 
-#### Usage
+##### Usage
 ```
-python -u -m mlflow_export_import.experiment.export_experiments --help
+python -u -m mlflow_export_import.experiment.export_experiment_list --help
 
   --experiments TEXT              Experiment names or IDs (comma delimited).
                                   'all' will export all experiments.  [required]
@@ -106,41 +176,27 @@ python -u -m mlflow_export_import.experiment.export_experiments --help
                                   JUPYTER or DBC.  [default: SOURCE]
 ```
 
-#### Export examples
+##### Export examples
 
-Export experiments by ID.
+Export experiments by experiment ID.
 ```
-python -u -m mlflow_export_import.experiment.export_experiments \
+python -u -m mlflow_export_import.experiment.export_experiment_list \
   --experiments 2,3 --output-dir out
 ```
 
-Export experiments by name.
+Export experiments by experiment name.
 ```
-python -u -m mlflow_export_import.experiment.export_experiments \
+python -u -m mlflow_export_import.experiment.export_experiment_list \
   --experiments sklearn,sparkml --output-dir out
 ```
 
 Export all experiments.
 ```
-python -u -m mlflow_export_import.experiment.export_experiments \
+python -u -m mlflow_export_import.experiment.export_experiment_list \
   --experiments all --output-dir out
 ```
 
-#### Databricks export examples
-
-See the [Access the MLflow tracking server from outside Databricks](https://docs.databricks.com/applications/mlflow/access-hosted-tracking-server.html).
-```
-export MLFLOW_TRACKING_URI=databricks
-export DATABRICKS_HOST=https://mycompany.cloud.databricks.com
-export DATABRICKS_TOKEN=MY_TOKEN
-
-python -u -m mlflow_export_import.experiment.export_experiments \
-  --experiments /Users/me@mycompany.com/SklearnWine \
-  --output-dir out \
-  --notebook-formats DBC,SOURCE 
-```
-
-#### Export directory format
+##### Export directory structure
 
 The output directory contains a manifest file and a subdirectory for each experiment (by experiment ID).
 
@@ -235,45 +291,73 @@ Experiment manifest.json.
 
 Run manifest.json: see below.
 
-### Import Experiments
+### Import Experiments XXX
 
-Import experiments from a directory. Reads the manifest file to import expirements.
+Import experiments from a directory. Reads the manifest file to import expirements and their runs.
 
-The Experiment name will be created if it does not exist in the destination tracking server. If the experiment already exists, the source runs will be added to it.
+The experiment will be created if it does not exist in the destination tracking server. 
+If the experiment already exists, the source runs will be added to it.
 
-**Usage**
+There are two main programs to import experiments:
+* import_experiment - imports one experiment
+* import_experiment_list - imports a list of experiments
 
+#### import_experiment
+
+Imports one experiment.
+
+##### Usage
 ```
-python -m mlflow_export_import.experiment.import_experiments --help
-
 Options:
-  --input-dir TEXT                Input directory.  [required]
-  --experiment-name-prefix TEXT   If specified, added as prefix to experiment
-                                  name.
-
-  --use-src-user-id BOOLEAN       Set the destination user ID to the source
-                                  user ID. Source user ID is ignored when
-                                  importing into Databricks since setting it
-                                  is not allowed.  [default: False]
-
-  --import-mlflow-tags BOOLEAN    Import mlflow tags.  [default: True]
-  --import-metadata-tags BOOLEAN  Import mlflow_tools tags.  [default: False]
+  --experiment TEXT               Experiment name or ID.  [required]
+  --output-dir TEXT               Output directory.  [required]
+  --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: False]
+  --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
+                                  JUPYTER or DBC.  [default: SOURCE]
 ```
 
-**Import examples**
+##### Import examples
 
 ```
-python -u -m mlflow_export_import.experiment.import_experiments \
+python -u -m mlflow_export_import.experiment.import_experiment \
   --experiment-name imported_sklearn \
-  --input-dir out 
+  --input-dir out
 ```
 
-**Databricks import examples**
+##### Databricks import examples
 
 ```
 python -u -m mlflow_export_import.experiment.import_experiment \
   --experiment-name /Users/me@mycompany.com/imported/SklearnWine \
   --input-dir exported_experiments/3532228
+```
+
+#### import_experiment_list
+
+Import a list of experiments.
+
+##### Usage
+
+```
+python -m mlflow_export_import.experiment.import_experiment_list --help
+
+Options:
+  --input-dir TEXT                Input directory.  [required]
+  --experiment-name-prefix TEXT   If specified, added as prefix to experiment name.
+  --use-src-user-id BOOLEAN       Set the destination user ID to the source
+                                  user ID. Source user ID is ignored when
+                                  importing into Databricks since setting it
+                                  is not allowed.  [default: False]
+  --import-mlflow-tags BOOLEAN    Import mlflow tags.  [default: True]
+  --import-metadata-tags BOOLEAN  Import mlflow_tools tags.  [default: False]
+```
+
+##### Import examples
+
+```
+python -u -m mlflow_export_import.experiment.import_experiment_list \
+  --experiment-name-prefix imported_ \
+  --input-dir out 
 ```
 
 ### Copy experiment from one tracking server to another
