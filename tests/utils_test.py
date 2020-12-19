@@ -36,6 +36,9 @@ def compare_dirs(d1, d2):
     from filecmp import dircmp
     def _compare_dirs(dcmp):
         if len(dcmp.diff_files) > 0 or len(dcmp.left_only) > 0 or len(dcmp.right_only) > 0:
+            if len(dcmp.diff_files) == 1:
+                 if dcmp.diff_files[0] == "MLmodel": # run_id differs because we changed it to the imported run_id
+                     return True
             return False
         for sub_dcmp in dcmp.subdirs.values():
             if not _compare_dirs(sub_dcmp):
