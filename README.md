@@ -176,7 +176,7 @@ python -u -m mlflow_export_import.experiment.export_experiment_list --help
                                   JUPYTER or DBC.  [default: SOURCE]
 ```
 
-##### Export examples
+##### Export list examples
 
 Export experiments by experiment ID.
 ```
@@ -333,6 +333,7 @@ python -u -m mlflow_export_import.experiment.import_experiment \
 ##### Databricks import examples
 
 ```
+export MLFLOW_TRACKING_URI=databricks
 python -u -m mlflow_export_import.experiment.import_experiment \
   --experiment-name /Users/me@mycompany.com/imported/SklearnWine \
   --input-dir exported_experiments/3532228
@@ -481,33 +482,44 @@ Sample run.json
 
 Imports a run from a directory or zip file.
 
-**Usage**
+#### Usage
 
 ```
 python -m mlflow_export_import.run.import_run  --help
 
 Options:
 
-  --input TEXT                    Input path - directory or zip file.
-                                  [required]
-
+  --input TEXT                    Input path - directory or zip file.  [required]
   --experiment-name TEXT          Destination experiment name.  [required]
   --use-src-user-id BOOLEAN       Set the destination user ID to the source
                                   user ID. Source user ID is ignored when
                                   importing into Databricks since setting it
                                   is not allowed.  [default: False]
-
   --import-mlflow-tags BOOLEAN    Import mlflow tags.  [default: True]
   --import-metadata-tags BOOLEAN  Import mlflow_tools tags.  [default: False]
 ```
 
-**Run examples**
+#### Import examples
+
+Directory `out` is where you exported your run.
+
+##### Local import example
 ```
 python -u -m mlflow_export_import.run.import_run \
   --run-id 50fa90e751eb4b3f9ba9cef0efe8ea30 \
   --input out \
   --experiment-name sklearn_wine_imported
 ```
+
+##### Databricks import example
+```
+export MLFLOW_TRACKING_URI=databricks
+python -u -m mlflow_export_import.run.import_run \
+  --run-id 50fa90e751eb4b3f9ba9cef0efe8ea30 \
+  --input out \
+  --experiment-name /Users/me@mycompany.com/imported/SklearnWine \
+```
+
 
 ### Copy run from one tracking server to another
 
@@ -549,6 +561,7 @@ python -u -m mlflow_export_import.run.copy_run \
   --src-uri http://localhost:5000 \
   --dst-uri http://localhost:5001
 ```
+
 
 ## Registered Models
 
