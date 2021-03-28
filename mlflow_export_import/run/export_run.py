@@ -57,16 +57,14 @@ class RunExporter():
         # copy artifacts
         dst_path = os.path.join(run_dir,"artifacts")
         try:
-            src_path = self.client.download_artifacts(run.info.run_id,"")
-            self.fs.cp(src_path, dst_path,True)
+            artifacts = self.client.list_artifacts(run.info.run_id)
+            if len(artifacts) > 0: # Because of https://github.com/mlflow/mlflow/issues/2839
+                src_path = self.client.download_artifacts(run.info.run_id,"")
+                self.fs.cp(src_path, dst_path,True)
             notebook = tags.get("mlflow.databricks.notebookPath", None)
             if notebook is not None:
                 self.export_notebook(run_dir, notebook)
             return True
-        except OSError as e: # NOTE: Fails if there are no artifacts for a run - "No such file or directory"
-            print("WARNING: Probably because there are no artifacts for run. run_id:",run.info.run_id,"Exception:",e)
-            traceback.print_exc()
-            return False
         except Exception as e:
             print("ERROR: run_id:",run.info.run_id,"Exception:",e)
             traceback.print_exc()
