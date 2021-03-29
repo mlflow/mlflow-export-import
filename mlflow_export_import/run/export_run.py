@@ -10,6 +10,7 @@ import mlflow
 import click
 
 from mlflow_export_import.common import filesystem as _filesystem
+from mlflow_export_import.common.filesystem import mk_local_path
 from mlflow_export_import.common.http_client import DatabricksHttpClient
 from mlflow_export_import.common import MlflowToolsException
 from mlflow_export_import import utils, click_doc
@@ -59,8 +60,8 @@ class RunExporter():
         try:
             artifacts = self.client.list_artifacts(run.info.run_id)
             if len(artifacts) > 0: # Because of https://github.com/mlflow/mlflow/issues/2839
-                src_path = self.client.download_artifacts(run.info.run_id,"")
-                self.fs.cp(src_path, dst_path,True)
+                self.fs.mkdirs(dst_path)
+                self.client.download_artifacts(run.info.run_id,"", dst_path=mk_local_path(dst_path))
             notebook = tags.get("mlflow.databricks.notebookPath", None)
             if notebook is not None:
                 self.export_notebook(run_dir, notebook)
