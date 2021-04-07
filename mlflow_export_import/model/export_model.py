@@ -22,11 +22,18 @@ class ModelExporter():
         model = self.client2.get(f"registered-models/get?name={model_name}")
         for v in model["registered_model"]["latest_versions"]:
             run_id = v["run_id"] 
+            run_id = "58eaff7ffb394c2096baca1b28b90edc_foo"
             opath = os.path.join(output_dir,run_id)
-            self.run_exporter.export_run(run_id, opath)
-            opath = opath.replace("dbfs:","/dbfs")
-            run = self.client.get_run(run_id)
-            v["artifact_uri"] = run.info.artifact_uri
+            try:
+                self.run_exporter.export_run(run_id, opath)
+                opath = opath.replace("dbfs:","/dbfs")
+                run = self.client.get_run(run_id)
+                v["artifact_uri"] = run.info.artifact_uri
+            except mlflow.exceptions.RestException as e:
+                if "RESOURCE_DOES_NOT_EXIST: Run" in str(e):
+                    print("WARNING: Run backing the registered model does not exist.",e)
+                else:
+                    raise(e)
         utils.write_json_file(self.fs, path, model)
 
 @click.command()
