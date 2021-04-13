@@ -22,7 +22,6 @@ class ModelExporter():
         model = self.client2.get(f"registered-models/get?name={model_name}")
         for v in model["registered_model"]["latest_versions"]:
             run_id = v["run_id"] 
-            run_id = "58eaff7ffb394c2096baca1b28b90edc_foo"
             opath = os.path.join(output_dir,run_id)
             try:
                 self.run_exporter.export_run(run_id, opath)
