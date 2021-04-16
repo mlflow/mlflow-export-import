@@ -42,13 +42,13 @@ class ModelImporter():
             artifact_uri = v["artifact_uri"]
             run_dir = os.path.join(input_dir,run_id)
             print(f"  Version {v['version']}:")
-            print(f"    current_stage: {v['current_stage']}:")
+            print(f"    current_stage: {current_stage}:")
             print("    Run to import:")
             print("      run_id:", run_id)
             print("      artifact_uri:", artifact_uri)
             print("      source:      ", source)
             model_path = source.replace(artifact_uri+"/","")
-            print("      model_path:", model_path)
+            print("       model_path:", model_path)
             run_id,_ = self.run_importer.import_run(experiment_name, run_dir)
             run = self.client.get_run(run_id)
             print("    Imported run:")
@@ -58,7 +58,8 @@ class ModelImporter():
             print("      source:      ", source)
             version = self.client.create_model_version(model_name, source, run_id)
             model_utils.wait_until_version_is_ready(self.client, model_name, version, sleep_time=2)
-            self.client.transition_model_version_stage(model_name, version.version, current_stage)
+            if current_stage != "None":
+                self.client.transition_model_version_stage(model_name, version.version, current_stage)
 
 
 @click.command()
