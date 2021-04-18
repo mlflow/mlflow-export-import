@@ -37,7 +37,7 @@ def dump_run_info(info, indent=""):
     if exp is None:
         print(f"ERROR: Cannot find experiment ID '{info.experiment_id}'")
         return 
-    print("{}  experiment_name: {}".format(indent,exp.name))
+    print("{}  name: {}".format(indent,exp.name))
     for k,v in sorted(info.__dict__.items()):
         if not k.endswith("_time"):
             print("{}  {}: {}".format(indent,k[1:],v))
