@@ -40,6 +40,12 @@ def create_tags_for_metadata(src_client, run, export_metadata_tags):
         tags[TAG_PREFIX_METADATA+".user_id"] = run.info.user_id
         tags[TAG_PREFIX_METADATA+".run_id"] =  str(run.info.run_id)
         tags[TAG_PREFIX_METADATA+".experiment_id"] = run.info.experiment_id
+        tags[TAG_PREFIX_METADATA+".artifact_uri"] = run.info.artifact_uri
+        tags[TAG_PREFIX_METADATA+".status"] = run.info.status
+        tags[TAG_PREFIX_METADATA+".lifecycle_stage"] = run.info.lifecycle_stage
+        tags[TAG_PREFIX_METADATA+".start_time"] = run.info.start_time
+        tags[TAG_PREFIX_METADATA+".end_time"] = run.info.end_time
+        #tags[TAG_PREFIX_METADATA+".status"] = run.info.status
         exp = src_client.get_experiment(run.info.experiment_id)
         tags[TAG_PREFIX_METADATA+".experiment_name"] = exp.name
     tags = { k:v for k,v in sorted(tags.items()) }
