@@ -11,10 +11,10 @@ from mlflow_export_import.common import model_utils
 from mlflow_export_import.common import filesystem as _filesystem
 
 class ModelImporter():
-    def __init__(self, filesystem=None):
+    def __init__(self, filesystem=None, run_importer=None):
         self.fs = filesystem or _filesystem.get_filesystem()
         self.client = mlflow.tracking.MlflowClient()
-        self.run_importer = RunImporter(self.client, mlmodel_fix=True)
+        self.run_importer = run_importer if run_importer else RunImporter(self.client, mlmodel_fix=True, import_mlflow_tags=True)
 
     def import_model(self, input_dir, model_name, experiment_name, delete_model=False):
         path = os.path.join(input_dir,"model.json")
@@ -43,15 +43,15 @@ class ModelImporter():
             run_dir = os.path.join(input_dir,run_id)
             print(f"  Version {v['version']}:")
             print(f"    current_stage: {current_stage}:")
-            print("    Run to import:")
+            print("    Source run - run to import:")
             print("      run_id:", run_id)
             print("      artifact_uri:", artifact_uri)
             print("      source:      ", source)
             model_path = source.replace(artifact_uri+"/","")
-            print("       model_path:", model_path)
+            print("      model_path:", model_path)
             run_id,_ = self.run_importer.import_run(experiment_name, run_dir)
             run = self.client.get_run(run_id)
-            print("    Imported run:")
+            print("    Destination run - imported run:")
             print("      run_id:", run_id)
             print("      artifact_uri:", run.info.artifact_uri)
             source = os.path.join(run.info.artifact_uri,model_path)
