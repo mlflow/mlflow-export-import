@@ -10,6 +10,7 @@ import click
 
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import mlflow_utils
+from mlflow_export_import.common.search_runs_iterator import SearchRunsIterator
 from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils, click_doc
 
@@ -35,18 +36,17 @@ class ExperimentExporter():
     def export_experiment_to_dir(self, exp_id, exp_dir):
         exp = self.client.get_experiment(exp_id)
         dct = {"experiment": utils.strip_underscores(exp)}
-        infos = self.client.list_run_infos(exp_id)
-        dct["export_info"] = { "export_time": utils.get_now_nice(), "num_runs": len(infos) }
         run_ids = []
         failed_run_ids = []
-        for j,info in enumerate(infos):
-            run_dir = os.path.join(exp_dir, info.run_id)
-            print(f"Exporting run {j+1}/{len(infos)}: {info.run_id}")
-            res = self.run_exporter.export_run(info.run_id, run_dir)
+        for j,run in enumerate(SearchRunsIterator(self.client, exp_id)):
+            run_dir = os.path.join(exp_dir, run.info.run_id)
+            print(f"Exporting run {j+1}: {run.info.run_id}")
+            res = self.run_exporter.export_run(run.info.run_id, run_dir)
             if res:
-                run_ids.append(info.run_id)
+                run_ids.append(run.info.run_id)
             else:
-                failed_run_ids.append(info.run_id)
+                failed_run_ids.append(run.info.run_id)
+        dct["export_info"] = { "export_time": utils.get_now_nice(), "num_runs": (j) }
         dct["run_ids"] = run_ids
         dct["failed_run_ids"] = failed_run_ids
         path = os.path.join(exp_dir,"manifest.json")

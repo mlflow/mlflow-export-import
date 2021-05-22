@@ -4,6 +4,7 @@ Copies an experiment from one MLflow server to another.
 
 import click
 from mlflow_export_import.common import mlflow_utils
+from mlflow_export_import.common.search_runs_iterator import SearchRunsIterator
 from mlflow_export_import.run.copy_run import RunCopier
 from mlflow_export_import import BaseCopier, create_client
 from mlflow_export_import import utils, click_doc
@@ -21,12 +22,10 @@ class ExperimentCopier(BaseCopier):
         dst_exp = self.get_experiment(self.dst_client, dst_exp_name)
         print("src_experiment_name:",src_exp.name)
         print("src_experiment_id:",src_exp.experiment_id)
-        src_infos = self.src_client.list_run_infos(src_exp.experiment_id)
         run_ids_mapping = {}
-        for j,info in enumerate(src_infos):
-            print(f"Copying run {j+1}/{len(src_infos)}: {info.run_id}")
-            dst_run_id, src_parent_run_id = self.run_copier._copy_run(info.run_id, dst_exp.experiment_id)
-            run_ids_mapping[info.run_id] = (dst_run_id,src_parent_run_id)
+        for j,run in enumerate(SearchRunsIterator(self.src_client, src_exp.experiment_id)):
+            dst_run_id, src_parent_run_id = self.run_copier._copy_run(run.info.run_id, dst_exp.experiment_id)
+            run_ids_mapping[run.info.run_id] = (dst_run_id,src_parent_run_id)
         utils.nested_tags(self.dst_client, run_ids_mapping)
 
 @click.command()
