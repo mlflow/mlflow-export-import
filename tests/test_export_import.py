@@ -1,22 +1,20 @@
 import mlflow
 import os, shutil
-import numpy as np
-from sklearn.linear_model import LinearRegression
-
-from utils_test import create_experiment, compare_dirs, dump_tags
-from mlflow_export_import.common.dump_run import dump_run
-
+#from mlflow_export_import.common.dump_run import dump_run
 from mlflow_export_import.run.export_run import RunExporter
-from mlflow_export_import.run.import_run import RunImporter
 from mlflow_export_import.run.import_run import RunImporter
 from mlflow_export_import.experiment.export_experiment import ExperimentExporter
 from mlflow_export_import.experiment.import_experiment import ExperimentImporter
 from mlflow_export_import.run.copy_run import RunCopier
 from mlflow_export_import.experiment.copy_experiment import ExperimentCopier
+from utils_test import create_experiment, dump_tags
+from sklearn_utils import create_sklearn_model
+from compare_utils import *
 
 # == Setup
 
 client = mlflow.tracking.MlflowClient()
+#mlflow.sklearn.autolog()
 output = "out"
 mlmodel_fix = True
 
@@ -24,20 +22,18 @@ mlmodel_fix = True
 
 def create_simple_run():
     exp = create_experiment()
-    mlflow.sklearn.autolog()
-    X = np.array([[1, 1], [1, 2], [2, 2], [2, 3]])
-    y = np.dot(X, np.array([1, 2])) + 3
-    model = LinearRegression()
+    max_depth = 4
+    model = create_sklearn_model(max_depth)
     with mlflow.start_run(run_name="my_run") as run:
-        mlflow.log_param("p1","0.1")
-        mlflow.log_metric("m1", 0.1)
+        mlflow.log_param("max_depth",max_depth)
+        mlflow.log_metric("rmse",.789)
         mlflow.set_tag("my_tag","my_val")
+        mlflow.sklearn.log_model(model, "model")
         with open("info.txt", "w") as f:
             f.write("Hi artifact")
         mlflow.log_artifact("info.txt")
         mlflow.log_artifact("info.txt","dir2")
-        model.fit(X, y)
-        mlflow.sklearn.log_model(model, "sklearn-model")
+        mlflow.log_metric("m1", 0.1)
     return exp, run
 
 def init_output_dir():
@@ -46,12 +42,6 @@ def init_output_dir():
     os.makedirs(output)
     os.makedirs(os.path.join(output,"run1"))
     os.makedirs(os.path.join(output,"run2"))
-
-def dump_runs(run1, run2):
-    print("======= Run1")
-    dump_run(run1)
-    print("======= Run2")
-    dump_run(run2)
 
 # == Export/import Run tests
 
@@ -70,16 +60,16 @@ def init_run_test(exporter, importer, verbose=False):
     return run1, run2
 
 def test_run_basic():
-    run1, run2 = init_run_test(RunExporter(), RunImporter(mlmodel_fix=mlmodel_fix))
-    compare_runs(run1, run2)
+    run1, run2 = init_run_test(RunExporter(), RunImporter(mlmodel_fix=mlmodel_fix, import_mlflow_tags=True))
+    compare_runs(client, output, run1, run2)
 
 def test_run_no_import_mlflow_tags():
     run1, run2 = init_run_test(RunExporter(), RunImporter(mlmodel_fix=mlmodel_fix, import_mlflow_tags=False))
-    compare_run_no_import_mlflow_tags(run1, run2)
+    compare_run_no_import_mlflow_tags(client, output, run1, run2)
 
 def test_run_import_metadata_tags():
-    run1, run2 = init_run_test(RunExporter(export_metadata_tags=True), RunImporter(mlmodel_fix=mlmodel_fix, import_metadata_tags=True), verbose=False)
-    compare_run_import_metadata_tags(run1, run2)
+    run1, run2 = init_run_test(RunExporter(export_metadata_tags=True), RunImporter(mlmodel_fix=mlmodel_fix, import_metadata_tags=True, import_mlflow_tags=True), verbose=False)
+    compare_run_import_metadata_tags(client, output, run1, run2)
 
 # == Export/import Experiment tests
 
@@ -100,15 +90,15 @@ def init_exp_test(exporter, importer, verbose=False):
 
 def test_exp_basic():
     run1, run2 = init_exp_test(ExperimentExporter(), ExperimentImporter(), True)
-    compare_runs(run1, run2)
+    compare_runs(client, output, run1, run2)
 
 def test_exp_no_import_mlflow_tags():
     run1, run2 = init_exp_test(ExperimentExporter(), ExperimentImporter(import_mlflow_tags=False))
-    compare_run_no_import_mlflow_tags(run1, run2)
+    compare_run_no_import_mlflow_tags(client, output, run1, run2)
 
 def test_exp_import_metadata_tags():
     run1, run2 = init_exp_test(ExperimentExporter(export_metadata_tags=True), ExperimentImporter(import_metadata_tags=True), verbose=False)
-    compare_run_import_metadata_tags(run1, run2)
+    compare_run_import_metadata_tags(client, output, run1, run2)
 
 # == Copy run tests
 
@@ -126,11 +116,11 @@ def init_run_copy_test(copier, verbose=False):
 
 def test_copy_run_basic():
     run1, run2 = init_run_copy_test(RunCopier(client, client), verbose=False)
-    compare_runs(run1, run2)
+    compare_runs(client, output, run1, run2)
 
 def test_copy_run_import_metadata_tags():
     run1, run2 = init_run_copy_test(RunCopier(client, client, export_metadata_tags=True))
-    compare_run_import_metadata_tags(run1, run2)
+    compare_run_import_metadata_tags(client, output, run1, run2)
 
 # == Copy experiment tests
 
@@ -149,46 +139,9 @@ def init_exp_copy_test(copier, verbose=False):
 
 def test_copy_exp_basic():
     run1, run2 = init_exp_copy_test(ExperimentCopier(client, client), verbose=False)
-    compare_runs(run1, run2)
+    compare_runs(client, output, run1, run2)
 
 def test_copy_exp_import_metadata_tags():
     run1, run2 = init_exp_copy_test(ExperimentCopier(client, client, export_metadata_tags=True))
-    compare_run_import_metadata_tags(run1, run2)
+    compare_run_import_metadata_tags(client, output, run1, run2)
 
-# == Compare runs
-
-def compare_run_no_import_mlflow_tags(run1, run2):
-    compare_runs_no_tags(run1, run2) # AMM
-    assert "mlflow.runName" in run1.data.tags
-    assert not "mlflow.runName" in run2.data.tags
-    run1.data.tags.pop("mlflow.runName")
-    compare_tags(run1.data.tags, run2.data.tags)
-
-def compare_run_import_metadata_tags(run1, run2):
-    #dump_tags(run1.data.tags,"Run1")
-    #dump_tags(run2.data.tags,"Run2")
-    compare_runs_no_tags(run1, run2)
-    metadata_tags = { k:v for k,v in run2.data.tags.items() if k.startswith("mlflow_export_import.metadata") }
-    assert len(metadata_tags) > 0
-    #metadata_tags = { k.replace("mlflow_export_import.metadata.",""):v for k,v in run2.data.tags.items() if k.startswith("mlflow_export_import.metadata") }
-    #assert run1.data.tags == metadata_tags
-
-def compare_runs_no_tags(run1, run2):
-    assert run1.info.lifecycle_stage == run2.info.lifecycle_stage
-    assert run1.info.status == run2.info.status
-    assert run1.data.params == run2.data.params
-    assert run1.data.metrics == run2.data.metrics
-    path1 = client.download_artifacts(run1.info.run_id, ".", dst_path=os.path.join(output,"run1"))
-    path2 = client.download_artifacts(run2.info.run_id, ".", dst_path=os.path.join(output,"run2"))
-    assert compare_dirs(path1, path2)
-
-def compare_runs(run1, run2):
-    compare_runs_no_tags(run1, run2) # TODO: fails here
-    compare_tags(run1.data.tags, run2.data.tags)
-
-def compare_tags(tags1, tags2):
-    tags1 = tags1.copy()
-    tags1.pop("mlflow.log-model.history",None) # sklearn.autolog adds this. TODO: Semantics? To copy this tag to dst run maybe and tweak run ID?
-    dump_tags(tags1,"Run1")
-    dump_tags(tags2,"Run2")
-    ##assert tags1 == tags2 # TODOL fail
