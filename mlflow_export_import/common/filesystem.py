@@ -13,7 +13,7 @@ class DatabricksFileSystem(object):
         self.dbutils = IPython.get_ipython().user_ns["dbutils"]
 
     def ls(self, path):
-        return self.dbutils.fs.ls(path)
+        return self.dbutils.fs.ls(mk_dbfs_path(path))
 
     def cp(self, src, dst, recursive=False):
         self.dbutils.fs.cp(mk_dbfs_path(src), mk_dbfs_path(dst), recursive)
@@ -22,10 +22,10 @@ class DatabricksFileSystem(object):
         self.dbutils.fs.rm(mk_dbfs_path(path), recurse)
 
     def mkdirs(self, path):
-        self.dbutils.fs.mkdirs(path)
+        self.dbutils.fs.mkdirs(mk_dbfs_path(path))
 
     def write(self, path, content):
-        self.dbutils.fs.put(path, content, True)
+        self.dbutils.fs.put(mk_dbfs_path(path), content, True)
             
 
 class LocalFileSystem(object):
