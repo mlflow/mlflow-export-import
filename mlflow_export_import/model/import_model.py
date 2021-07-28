@@ -54,12 +54,19 @@ class ModelImporter():
             print("    Destination run - imported run:")
             print("      run_id:", run_id)
             print("      artifact_uri:", run.info.artifact_uri)
-            source = os.path.join(run.info.artifact_uri,model_path)
+            source = path_join(run.info.artifact_uri,model_path)
             print("      source:      ", source)
             version = self.client.create_model_version(model_name, source, run_id)
             model_utils.wait_until_version_is_ready(self.client, model_name, version, sleep_time=2)
             if current_stage != "None":
                 self.client.transition_model_version_stage(model_name, version.version, current_stage)
+
+def path_join(x,y):
+    """ Account for DOS backslash """
+    path = os.path.join(x,y)
+    if path.startswith("dbfs:"):
+        path = path.replace("\\","/") 
+    return path
 
 
 @click.command()
