@@ -6,8 +6,7 @@ import os
 import click
 from mlflow_export_import.common.http_client import HttpClient
 
-#api_prefix = "api/2.0/mlflow"
-api_prefix = "api/2.0/preview/mlflow" # still experimental
+api_prefix = "api/2.0/mlflow"
 resource = "registered-models/list"
 
 @click.command()

@@ -14,7 +14,7 @@ class ModelExporter():
     def __init__(self, export_metadata_tags=False, notebook_formats=["SOURCE"], filesystem=None):
         self.fs = filesystem or _filesystem.get_filesystem()
         self.client = mlflow.tracking.MlflowClient()
-        self.client2 = HttpClient("api/2.0/preview/mlflow")
+        self.client2 = HttpClient("api/2.0/mlflow")
         self.run_exporter = RunExporter(self.client, export_metadata_tags=export_metadata_tags, notebook_formats=notebook_formats, filesystem=filesystem)
 
     def export_model(self, output_dir, model_name):
