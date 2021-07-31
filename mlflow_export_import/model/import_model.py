@@ -47,8 +47,9 @@ class ModelImporter():
             print("      run_id:", run_id)
             print("      artifact_uri:", artifact_uri)
             print("      source:      ", source)
-            model_path = source.replace(artifact_uri+"/","")
-            print("      model_path:", model_path)
+            #model_path = extract_model_path(source, run_id)
+            model_path = source[1+source.find(run_id)+len(run_id):]
+            print("      model_path:  ", model_path)
             run_id,_ = self.run_importer.import_run(experiment_name, run_dir)
             run = self.client.get_run(run_id)
             print("    Destination run - imported run:")
