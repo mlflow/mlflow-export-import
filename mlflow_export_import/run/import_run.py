@@ -15,7 +15,7 @@ from mlflow_export_import import mk_local_path
 from mlflow_export_import.common.find_artifacts import find_artifacts
 
 class RunImporter():
-    def __init__(self, mlflow_client=None, mlmodel_fix=True, use_src_user_id=False, import_mlflow_tags=True, import_metadata_tags=False):
+    def __init__(self, mlflow_client=None, mlmodel_fix=True, use_src_user_id=False, import_mlflow_tags=False, import_metadata_tags=False):
         self.client = mlflow_client or mlflow.tracking.MlflowClient()
         self.mlmodel_fix = mlmodel_fix
         self.use_src_user_id = use_src_user_id
@@ -98,7 +98,7 @@ class RunImporter():
 @click.option("--experiment-name", help="Destination experiment name.", required=True, type=str)
 @click.option("--mlmodel-fix", help="Add correct run ID in destination MLmodel artifact. Can be expensive for deeply nested artifacts.", type=bool, default=True, show_default=True)
 @click.option("--use-src-user-id", help=click_doc.use_src_user_id, type=bool, default=False, show_default=True)
-@click.option("--import-mlflow-tags", help=click_doc.import_mlflow_tags, type=bool, default=True, show_default=True)
+@click.option("--import-mlflow-tags", help=click_doc.import_mlflow_tags, type=bool, default=False, show_default=True)
 @click.option("--import-metadata-tags", help=click_doc.import_metadata_tags, type=bool, default=False, show_default=True)
 
 def main(input, experiment_name, mlmodel_fix, use_src_user_id, import_mlflow_tags, import_metadata_tags): # pragma: no cover

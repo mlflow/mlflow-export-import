@@ -14,7 +14,7 @@ class ModelImporter():
     def __init__(self, filesystem=None, run_importer=None):
         self.fs = filesystem or _filesystem.get_filesystem()
         self.client = mlflow.tracking.MlflowClient()
-        self.run_importer = run_importer if run_importer else RunImporter(self.client, mlmodel_fix=True, import_mlflow_tags=True)
+        self.run_importer = run_importer if run_importer else RunImporter(self.client, mlmodel_fix=True, import_mlflow_tags=False)
 
     def import_model(self, input_dir, model_name, experiment_name, delete_model=False):
         path = os.path.join(input_dir,"model.json")
@@ -56,6 +56,8 @@ class ModelImporter():
             print("      artifact_uri:", run.info.artifact_uri)
             source = path_join(run.info.artifact_uri,model_path)
             print("      source:      ", source)
+            if not source.startswith("dbfs:") and not os.path.exists(source):
+                raise Exception(f"'source' argument for MLflowClient.create_model_version does not exist: {source}")
             version = self.client.create_model_version(model_name, source, run_id)
             model_utils.wait_until_version_is_ready(self.client, model_name, version, sleep_time=2)
             if current_stage != "None":
