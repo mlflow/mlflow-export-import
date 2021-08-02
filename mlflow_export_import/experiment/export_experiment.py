@@ -38,6 +38,7 @@ class ExperimentExporter():
         dct = {"experiment": utils.strip_underscores(exp)}
         run_ids = []
         failed_run_ids = []
+        j = 0
         for j,run in enumerate(SearchRunsIterator(self.client, exp_id)):
             run_dir = os.path.join(exp_dir, run.info.run_id)
             print(f"Exporting run {j+1}: {run.info.run_id}")
