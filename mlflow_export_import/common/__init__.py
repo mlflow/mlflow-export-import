@@ -1,2 +1,2 @@
-class MlflowToolsException(Exception):
+class MlflowExportImportException(Exception):
     pass

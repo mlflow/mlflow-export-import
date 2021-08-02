@@ -46,16 +46,19 @@ class ExperimentExporter():
                 run_ids.append(run.info.run_id)
             else:
                 failed_run_ids.append(run.info.run_id)
-        dct["export_info"] = { "export_time": utils.get_now_nice(), "num_runs": (j) }
-        dct["run_ids"] = run_ids
-        dct["failed_run_ids"] = failed_run_ids
-        path = os.path.join(exp_dir,"manifest.json")
-        utils.write_json_file(self.fs, path, dct)
-        if len(failed_run_ids) == 0:
-            print(f"All {len(run_ids)} runs succesfully exported")
-        else:
-            print(f"{len(run_ids)}/{len(infos)} runs succesfully exported")
-            print(f"{len(failed_run_ids)}/{len(infos)} runs failed")
+        have_runs = 'j' in vars()
+        print(">> have_runs:",have_runs)
+        if have_runs: 
+            dct["export_info"] = { "export_time": utils.get_now_nice(), "num_runs": (j) }
+            dct["run_ids"] = run_ids
+            dct["failed_run_ids"] = failed_run_ids
+            path = os.path.join(exp_dir,"manifest.json")
+            utils.write_json_file(self.fs, path, dct)
+            if len(failed_run_ids) == 0:
+                print(f"All {len(run_ids)} runs succesfully exported")
+            else:
+                print(f"{len(run_ids)}/{len(infos)} runs succesfully exported")
+                print(f"{len(failed_run_ids)}/{len(infos)} runs failed")
 
     def export_experiment_to_zip(self, exp_id, zip_file):
         temp_dir = tempfile.mkdtemp()

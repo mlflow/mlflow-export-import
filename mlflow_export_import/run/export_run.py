@@ -12,7 +12,7 @@ import click
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common.filesystem import mk_local_path
 from mlflow_export_import.common.http_client import DatabricksHttpClient
-from mlflow_export_import.common import MlflowToolsException
+from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import import utils, click_doc
 
 print("MLflow Version:", mlflow.version.VERSION)
@@ -83,7 +83,7 @@ class RunExporter():
             nb_path = os.path.join(run_dir,nb_name)
             utils.write_file(nb_path, rsp.content)
             #self.fs.write(nb_path, rsp.content) # Bombs for DBC because dbutils.fs.put only writes strings!
-        except MlflowToolsException as e:
+        except MlflowExportImportException as e:
             print(f"WARNING: Cannot save notebook '{notebook}'. {e}")
 
 @click.command()
