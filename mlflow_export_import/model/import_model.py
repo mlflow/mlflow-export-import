@@ -47,8 +47,7 @@ class ModelImporter():
             print("      run_id:", run_id)
             print("      artifact_uri:", artifact_uri)
             print("      source:      ", source)
-            #model_path = extract_model_path(source, run_id)
-            model_path = source[1+source.find(run_id)+len(run_id):]
+            model_path = extract_model_path(source, run_id)
             print("      model_path:  ", model_path)
             run_id,_ = self.run_importer.import_run(experiment_name, run_dir)
             run = self.client.get_run(run_id)
@@ -61,6 +60,15 @@ class ModelImporter():
             model_utils.wait_until_version_is_ready(self.client, model_name, version, sleep_time=2)
             if current_stage != "None":
                 self.client.transition_model_version_stage(model_name, version.version, current_stage)
+
+def extract_model_path(source, run_id):
+    idx = source.find(run_id)
+    model_path = source[1+idx+len(run_id):]
+    print(">>>> model_path:",model_path)
+    if model_path.startswith("artifacts/"): # Bizarre - sometimes there is no 'artifacts' after run_id
+        model_path = model_path.replace("artifacts/","")
+    print(">>>> model_path:",model_path)
+    return model_path
 
 def path_join(x,y):
     """ Account for DOS backslash """
