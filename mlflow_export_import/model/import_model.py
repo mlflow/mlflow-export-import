@@ -64,10 +64,8 @@ class ModelImporter():
 def extract_model_path(source, run_id):
     idx = source.find(run_id)
     model_path = source[1+idx+len(run_id):]
-    print(">>>> model_path:",model_path)
     if model_path.startswith("artifacts/"): # Bizarre - sometimes there is no 'artifacts' after run_id
         model_path = model_path.replace("artifacts/","")
-    print(">>>> model_path:",model_path)
     return model_path
 
 def path_join(x,y):
