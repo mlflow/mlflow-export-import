@@ -30,7 +30,11 @@ def main(input_dir, experiment_name_prefix, use_src_user_id, import_mlflow_tags,
     for exp in dct["experiments"]:
         exp_input = os.path.join(input_dir,exp["id"])
         exp_name = experiment_name_prefix + exp["name"] if experiment_name_prefix else exp["name"]
-        importer.import_experiment(exp_name, exp_input)
+        try:
+            importer.import_experiment(exp_name, exp_input)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
 
 if __name__ == "__main__":
     main()
