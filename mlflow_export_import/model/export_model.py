@@ -20,23 +20,18 @@ class ModelExporter():
     def export_model(self, output_dir, model_name):
         path = os.path.join(output_dir,"model.json")
         model = self.client2.get(f"registered-models/get?name={model_name}")
-        for v in model["registered_model"]["latest_versions"]:
-            run_id = v["run_id"] 
+        model["registered_model"]["latest_versions"] = []
+        for v2 in self.client.search_model_versions(f"name='{model_name}'"):
+            run_id = v2.run_id
             opath = os.path.join(output_dir,run_id)
+            opath = opath.replace("dbfs:","/dbfs")
+            print(f"Exporting version {v2.version} with run_id {run_id} to {opath}")
             try:
                 self.run_exporter.export_run(run_id, opath)
-                opath = opath.replace("dbfs:","/dbfs")
                 run = self.client.get_run(run_id)
-                v["artifact_uri"] = run.info.artifact_uri
-                model["registered_model"]["latest_versions"] = []
-                for mv in self.client.search_model_versions(f"name='{model_name}'"):
-                    run_id = mv.run_id
-                    opath = os.path.join(output_dir,run_id)
-                    self.run_exporter.export_run(run_id, opath)
-                    run = self.client.get_run(run_id)
-                    dmv = dict(mv)
-                    dmv["artifact_uri"] = run.info.artifact_uri
-                    model["registered_model"]["latest_versions"].append(dmv)
+                dct = dict(v2)
+                dct["artifact_uri"] = run.info.artifact_uri
+                model["registered_model"]["latest_versions"].append(dct)
             except mlflow.exceptions.RestException as e:
                 if "RESOURCE_DOES_NOT_EXIST: Run" in str(e):
                     print("WARNING: Run backing the registered model does not exist.",e)
