@@ -21,22 +21,23 @@ class ModelExporter():
         path = os.path.join(output_dir,"model.json")
         model = self.client2.get(f"registered-models/get?name={model_name}")
         model["registered_model"]["latest_versions"] = []
-        for v2 in self.client.search_model_versions(f"name='{model_name}'"):
-            run_id = v2.run_id
+        for vr in self.client.search_model_versions(f"name='{model_name}'"):
+            run_id = vr.run_id
             opath = os.path.join(output_dir,run_id)
             opath = opath.replace("dbfs:","/dbfs")
-            print(f"Exporting version {v2.version} with run_id {run_id} to {opath}")
+            print(f"Exporting version {vr.version} with run_id {run_id} to {opath}")
             try:
                 self.run_exporter.export_run(run_id, opath)
                 run = self.client.get_run(run_id)
-                dct = dict(v2)
+                dct = dict(vr)
                 dct["artifact_uri"] = run.info.artifact_uri
                 model["registered_model"]["latest_versions"].append(dct)
             except mlflow.exceptions.RestException as e:
                 if "RESOURCE_DOES_NOT_EXIST: Run" in str(e):
-                    print("WARNING: Run backing the registered model does not exist.",e)
+                    print(f"WARNING: Run for version {vr.version} does not exist. {e}")
                 else:
-                    raise(e)
+                    import traceback
+                    traceback.print_exc()
         utils.write_json_file(self.fs, path, model)
 
 @click.command()
