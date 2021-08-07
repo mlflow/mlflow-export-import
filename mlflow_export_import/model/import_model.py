@@ -26,6 +26,7 @@ class ModelImporter():
         print(f"  Description: {dct.get('description','')}")
         print(f"  Tags: {dct.get('tags','')}")
         print(f"  {len(dct['latest_versions'])} latest versions")
+        print(f"  path: {path}")
 
         if delete_model:
             model_utils.delete_model(self.client, model_name)
