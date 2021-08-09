@@ -2,6 +2,11 @@
 
 Tools to export and import MLflow runs, experiments or registered models from one tracking server to another.
 
+There are two ways to run the tool:
+* As a normal Python package - this page.
+* [Databricks notebooks](databricks_notebooks/README.md) accessing the wheel library.
+
+
 ## Architecture
 
 <img src="export_import_architecture.png" height="220" >
@@ -708,9 +713,3 @@ cat registered_models.json
           "status": "READY",
           "run_link": ""
         },
-
-```
-
-## Databricks Notebooks
-
-To export and import within a Databricks workspace, you can use the following [notebooks](databricks_notebooks).
