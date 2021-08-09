@@ -9,9 +9,12 @@
 # MAGIC   * Can't do this today.
 # MAGIC   * Customer experiment data is currently locked into a workspace and not portable.
 # MAGIC * These notebooks are an unofficial tool that address this problem.
+# MAGIC * You will need to set up a common cloud bucket mounted on DBFS in your source and destination workspaces.
 # MAGIC * For details see:
 # MAGIC   * [MLflow Export Import](https://databricks.atlassian.net/wiki/spaces/UN/pages/800754006/MLflow+Export+Import) - wiki page
-# MAGIC   * https://github.com/amesar/mlflow-export-import
+# MAGIC   * Github code:
+# MAGIC     * Source code: https://github.com/amesar/mlflow-export-import
+# MAGIC     * Databricks notebooks: https://github.com/amesar/mlflow-export-import/tree/master/databricks_notebooks
 # MAGIC   
 # MAGIC #### Architecture
 # MAGIC 
@@ -41,4 +44,4 @@
 # MAGIC * Attach to your cluster (demo shard): `dbfs:/home/andre.mesarovic@databricks.com/lib/wheels/mlflow_export_import-1.0.0-py3-none-any.whl`
 # MAGIC * Source: https://github.com/amesar/mlflow-export-import
 # MAGIC 
-# MAGIC Last Updated: 2021-08-05
+# MAGIC Last Updated: 2021-08-08
