@@ -52,7 +52,7 @@ python setup.py bdist_wheel
 
 databricks fs cp \
   dist/mlflow_export_import-1.0.0-py3-none-any.whl  \
-  dbfs:/home/me@mycompany.com/lib/wheels/$file 
+  dbfs:/home/me@mycompany.com/lib/wheels/mlflow_export_import-1.0.0-py3-none-any.whl
 ```
 
 Then attach the library to your cluster.
