@@ -1,31 +1,16 @@
 """ 
-Exports an experiment to a directory.
+Exports a list of experiments to a directory.
 """
 
 import os
 import json
 import mlflow
-import shutil
-import tempfile
 import click
-
-from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import mlflow_utils
-from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils, click_doc
 from mlflow_export_import.experiment.export_experiment import ExperimentExporter
 
-@click.command()
-@click.option("--experiments", help="Experiment names or IDs (comma delimited). 'all' will export all experiments. ", required=True, type=str)
-@click.option("--output-dir", help="Output directory.", required=True)
-@click.option("--export-metadata-tags", help=click_doc.export_metadata_tags, type=bool, default=False, show_default=True)
-@click.option("--notebook-formats", help=click_doc.notebook_formats, default="SOURCE", show_default=True)
-
-def main(experiments, output_dir, export_metadata_tags, notebook_formats): # pragma: no cover
-    print("Options:")
-    for k,v in locals().items():
-        print(f"  {k}: {v}")
-
+def export_experiment_list(experiments, output_dir, export_metadata_tags, notebook_formats):
     client = mlflow.tracking.MlflowClient()
 
     if experiments == "all":
@@ -44,7 +29,7 @@ def main(experiments, output_dir, export_metadata_tags, notebook_formats): # pra
         try:
             lst.append( { "id" : exp.experiment_id, "name": exp.name } )
             exporter.export_experiment(exp.experiment_id, exp_output)
-        except Exception as e:
+        except Exception:
             import traceback
             traceback.print_exc()
 
@@ -58,6 +43,18 @@ def main(experiments, output_dir, export_metadata_tags, notebook_formats): # pra
     }
     with open(os.path.join(output_dir, "manifest.json"), "w") as f:
         f.write(json.dumps(dct,indent=2)+"\n")
+
+@click.command()
+@click.option("--experiments", help="Experiment names or IDs (comma delimited). 'all' will export all experiments. ", required=True, type=str)
+@click.option("--output-dir", help="Output directory.", required=True)
+@click.option("--export-metadata-tags", help=click_doc.export_metadata_tags, type=bool, default=False, show_default=True)
+@click.option("--notebook-formats", help=click_doc.notebook_formats, default="SOURCE", show_default=True)
+
+def main(experiments, output_dir, export_metadata_tags, notebook_formats): # pragma: no cover
+    print("Options:")
+    for k,v in locals().items():
+        print(f"  {k}: {v}")
+    export_experiment_list(experiments, output_dir, export_metadata_tags, notebook_formats)
 
 if __name__ == "__main__":
     main()
