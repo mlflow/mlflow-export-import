@@ -18,7 +18,7 @@ class DatabricksFileSystem(object):
     def cp(self, src, dst, recursive=False):
         self.dbutils.fs.cp(mk_dbfs_path(src), mk_dbfs_path(dst), recursive)
 
-    def rm(self, src, dst, recurse=False):
+    def rm(self, path, recurse=False):
         self.dbutils.fs.rm(mk_dbfs_path(path), recurse)
 
     def mkdirs(self, path):

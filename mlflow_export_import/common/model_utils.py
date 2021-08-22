@@ -3,7 +3,7 @@ from mlflow.exceptions import RestException
 from mlflow.entities.model_registry.model_version_status import ModelVersionStatus
 
 def delete_model(client, model_name):
-    """ Delete a model and all its versions """
+    """ Delete a model and all its versions. """
     try:
         versions = client.get_latest_versions(model_name)
         print(f"Deleting {len(versions)} versions for model '{model_name}'")
@@ -16,7 +16,7 @@ def delete_model(client, model_name):
         pass
 
 def wait_until_version_is_ready(client, model_name, model_version, sleep_time=1, iterations=100):
-    """ Due to blob eventual consistency, wait until a newly created version is in READY state """
+    """ Due to blob eventual consistency, wait until a newly created version is in READY state. """
     start = time.time()
     for _ in range(iterations):
         version = client.get_model_version(model_name, model_version.version)

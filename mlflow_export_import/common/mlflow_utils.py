@@ -27,8 +27,6 @@ def get_mlflow_host_token():
         return databricks_cli_utils.get_host_token(profile)
     #except databricks_cli.utils.InvalidConfigurationError as e:
     except Exception as e: # TODO: make more specific
-        #import traceback
-        #traceback.print_exc()
         print("WARNING:",e)
         return (None,None)
 
