@@ -28,6 +28,8 @@ class ModelImporter():
         print(f"  {len(dct['latest_versions'])} latest versions")
         print(f"  path: {path}")
 
+        if not model_name:
+            model_name = dct["name"]
         if delete_model:
             model_utils.delete_model(self.client, model_name)
 
@@ -81,7 +83,7 @@ def path_join(x,y):
 
 @click.command()
 @click.option("--input-dir", help="Input directory produced by export_model.py.", required=True, type=str)
-@click.option("--model", help="New registered model name.", required=True, type=str)
+@click.option("--model", help="New registered model name.", required=False, type=str)
 @click.option("--experiment-name", help="Destination experiment name  - will be created if it does not exist.", required=True, type=str)
 @click.option("--delete-model", help="First delete the model if it exists and all its versions.", type=bool, default=False, show_default=True)
 
