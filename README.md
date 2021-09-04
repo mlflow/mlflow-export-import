@@ -388,8 +388,6 @@ In this example we use:
 python -m mlflow_export_import.experiment.copy_experiment --help
 
 Options:
-
-Options:
   --src-uri TEXT                  Source MLflow API URI.  [required]
   --dst-uri TEXT                  Destination MLflow API URI.  [required]
   --src-experiment TEXT           Source experiment ID or name.  [required]
@@ -493,7 +491,6 @@ Imports a run from a directory or zip file.
 python -m mlflow_export_import.run.import_run  --help
 
 Options:
-
   --input TEXT                    Input path - directory or zip file.  [required]
   --experiment-name TEXT          Destination experiment name.  [required]
   --use-src-user-id BOOLEAN       Set the destination user ID to the source
@@ -539,10 +536,9 @@ In this example we use
 **Usage**
 
 ```
-Options:
-
 python -m mlflow_export_import.run.copy_run --help
 
+Options:
   --input TEXT                    Input path - directory or zip file.
                                   [required]
 
@@ -573,6 +569,8 @@ python -u -m mlflow_export_import.run.copy_run \
 ### Export registered model
 
 Export a registered model to a directory.
+The default is to export all versions of a model including all None and Archived stages.
+You can specify a list of stages to export.
 
 Source: [export_model.py](export_model.py).
 
@@ -582,19 +580,27 @@ Source: [export_model.py](export_model.py).
 python -m mlflow_export_import.model.export_model --help
 
 Options:
-
   --model TEXT       Registered model name.  [required]
   --output-dir TEXT  Output directory.  [required]
+  --stages TEXT      Stages to export (comma seperated). Default is all stages.
 ```
 
 #### Run
 ```
-python -u -m mlflow_export_import.model.export_model --model sklearn_wine --output-dir out 
+python -u -m mlflow_export_import.model.export_model \
+  --model sklearn_wine \
+  --output-dir out \
+  --stages Production,Staging
+```
+```
+Found 6 versions
+Exporting version 3 stage 'Production' with run_id 24aa9cce1388474e9f26d17100724cdd to out/24aa9cce1388474e9f26d17100724cdd
+Exporting version 5 stage 'Staging' with run_id 8efd80f59b7946119d8f1838515eea25 to out/8efd80f59b7946119d8f1838515eea25
 ```
 
 #### Output 
 
-Output export directory example
+Output export directory example.
 
 ```
 +-749930c36dee49b8aeb45ee9cdfe1abb/
@@ -608,7 +614,7 @@ Output export directory example
 +-model.json
 ```
 
-model.json 
+model.json
 ```
 {
   "registered_model": {
@@ -633,17 +639,15 @@ Source: [import_model.py](import_model.py).
 **Usage**
 
 ```
-Options:
-
 python -m mlflow_export_import.model.import_model --help
 
+Options:
   --input-dir TEXT        Input directory produced by export_model.py.
                           [required]
 
   --model TEXT            New registered model name.  [required]
   --experiment-name TEXT  Destination experiment name  - will be created if it
                           does not exist.  [required]
-
   --delete-model BOOLEAN  First delete the model if it exists and all its
                           versions.  [default: False]
 ```
@@ -683,7 +687,6 @@ Importing latest versions:
 Version: id=1 status=READY state=None
 Waited 0.01 seconds
 ```
-
 
 ### List all registered models
 
