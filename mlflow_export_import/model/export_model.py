@@ -13,27 +13,30 @@ from mlflow_export_import import utils
 class ModelExporter():
     def __init__(self, export_metadata_tags=False, notebook_formats=["SOURCE"], filesystem=None, stages=None):
         self.fs = filesystem or _filesystem.get_filesystem()
-        self.client = mlflow.tracking.MlflowClient()
-        self.client2 = HttpClient("api/2.0/mlflow")
-        self.run_exporter = RunExporter(self.client, export_metadata_tags=export_metadata_tags, notebook_formats=notebook_formats, filesystem=filesystem)
+        self.mlflow_client = mlflow.tracking.MlflowClient()
+        self.http_client = HttpClient("api/2.0/mlflow")
+        self.run_exporter = RunExporter(self.mlflow_client, export_metadata_tags=export_metadata_tags, notebook_formats=notebook_formats, filesystem=filesystem)
         self.stages = self.normalize_stages(stages)
 
     def export_model(self, output_dir, model_name):
         path = os.path.join(output_dir,"model.json")
-        model = self.client2.get(f"registered-models/get?name={model_name}")
+        model = self.http_client.get(f"registered-models/get?name={model_name}")
         model["registered_model"]["latest_versions"] = []
-        versions = self.client.search_model_versions(f"name='{model_name}'")
-        print(f"Found {len(versions)} versions")
+        versions = self.mlflow_client.search_model_versions(f"name='{model_name}'")
+        print(f"Found {len(versions)} versions for model {model_name}")
+        manifest = []
         for vr in versions:
             if len(self.stages) > 0 and not vr.current_stage.lower() in self.stages:
                 continue
             run_id = vr.run_id
             opath = os.path.join(output_dir,run_id)
             opath = opath.replace("dbfs:","/dbfs")
-            print(f"Exporting version {vr.version} stage '{vr.current_stage}' with run_id {run_id} to {opath}")
+            dct = { "version": vr.version, "stage": vr.current_stage, "run_id": run_id }
+            print(f"Exporting: {dct}")
+            manifest.append(dct)
             try:
                 self.run_exporter.export_run(run_id, opath)
-                run = self.client.get_run(run_id)
+                run = self.mlflow_client.get_run(run_id)
                 dct = dict(vr)
                 dct["artifact_uri"] = run.info.artifact_uri
                 model["registered_model"]["latest_versions"].append(dct)
@@ -44,6 +47,7 @@ class ModelExporter():
                     import traceback
                     traceback.print_exc()
         utils.write_json_file(self.fs, path, model)
+        return manifest
 
     def normalize_stages(self, stages):
         from mlflow.entities.model_registry import model_version_stages
