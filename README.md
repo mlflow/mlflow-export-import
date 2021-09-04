@@ -614,7 +614,7 @@ Output export directory example.
 +-model.json
 ```
 
-model.json
+[model.json](samples/exported_model.json)
 ```
 {
   "registered_model": {

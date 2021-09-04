@@ -1,0 +1,41 @@
+{
+  "registered_model": {
+    "name": "sklearn_wine",
+    "creation_timestamp": "1630416728707",
+    "last_updated_timestamp": "1630752350720",
+    "latest_versions": [
+      {
+        "creation_timestamp": 1630416867141,
+        "current_stage": "Production",
+        "description": "",
+        "last_updated_timestamp": 1630749748751,
+        "name": "sklearn_wine",
+        "run_id": "24aa9cce1388474e9f26d17100724cdd",
+        "run_link": "",
+        "source": "/opt/mlflow/server/mlruns/1/24aa9cce1388474e9f26d17100724cdd/artifacts/sklearn-model",
+        "status": "READY",
+        "status_message": "",
+        "tags": {},
+        "user_id": "",
+        "version": "3",
+        "artifact_uri": "/opt/mlflow/server/mlruns/1/24aa9cce1388474e9f26d17100724cdd/artifacts"
+      },
+      {
+        "creation_timestamp": 1630565611059,
+        "current_stage": "Staging",
+        "description": "",
+        "last_updated_timestamp": 1630752350720,
+        "name": "sklearn_wine",
+        "run_id": "8efd80f59b7946119d8f1838515eea25",
+        "run_link": "",
+        "source": "/opt/mlflow/server/mlruns/5/8efd80f59b7946119d8f1838515eea25/artifacts/sklearn-model",
+        "status": "READY",
+        "status_message": "",
+        "tags": {},
+        "user_id": "",
+        "version": "5",
+        "artifact_uri": "/opt/mlflow/server/mlruns/5/8efd80f59b7946119d8f1838515eea25/artifacts"
+      }
+    ]
+  }
+}
