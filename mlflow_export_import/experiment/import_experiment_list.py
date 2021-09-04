@@ -1,5 +1,5 @@
 """ 
-Exports a list of experiment to a directory.
+Import a list of experiment from a directory.
 """
 
 import os
