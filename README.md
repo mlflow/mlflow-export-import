@@ -114,7 +114,6 @@ Options:
   --experiment TEXT               Experiment name or ID.  [required]
   --output-dir TEXT               Output directory.  [required]
   --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: False]
-
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
                                   JUPYTER or DBC.  [default: SOURCE]
 ```
@@ -583,6 +582,8 @@ Options:
   --model TEXT       Registered model name.  [required]
   --output-dir TEXT  Output directory.  [required]
   --stages TEXT      Stages to export (comma seperated). Default is all stages.
+  --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
+                                  JUPYTER or DBC.  [default: SOURCE]
 ```
 
 #### Run
