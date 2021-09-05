@@ -72,15 +72,16 @@ class RunExporter():
             return False
 
     def export_notebook(self, run_dir, notebook):
+        nb_dir = os.path.join(run_dir,"artifacts","notebooks")
+        os.makedirs(nb_dir, exist_ok=True)
         for format in self.notebook_formats:
-            self.export_notebook_format(run_dir, notebook, format, format.lower())
+            self.export_notebook_format(nb_dir, notebook, format, format.lower())
 
-    def export_notebook_format(self, run_dir, notebook, format, extension):
+    def export_notebook_format(self, nb_dir, notebook, format, extension):
         resource = f"workspace/export?path={notebook}&direct_download=true&format={format}"
         try:
             rsp = self.dbx_client._get(resource)
-            nb_name = "notebook."+extension
-            nb_path = os.path.join(run_dir,nb_name)
+            nb_path = os.path.join(nb_dir, f"notebook.{extension}")
             utils.write_file(nb_path, rsp.content)
             #self.fs.write(nb_path, rsp.content) # Bombs for DBC because dbutils.fs.put only writes strings!
         except MlflowExportImportException as e:
