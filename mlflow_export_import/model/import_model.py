@@ -42,13 +42,13 @@ class ModelImporter():
             run_id = v["run_id"]
             source = v["source"]
             current_stage = v["current_stage"]
-            artifact_uri = v["artifact_uri"]
+            run_artifact_uri = v["_run_artifact_uri"]
             run_dir = os.path.join(input_dir,run_id)
             print(f"  Version {v['version']}:")
             print(f"    current_stage: {current_stage}:")
             print("    Source run - run to import:")
             print("      run_id:", run_id)
-            print("      artifact_uri:", artifact_uri)
+            print("      run_artifact_uri:", run_artifact_uri)
             print("      source:      ", source)
             model_path = extract_model_path(source, run_id)
             print("      model_path:  ", model_path)
@@ -56,7 +56,7 @@ class ModelImporter():
             run = self.client.get_run(run_id)
             print("    Destination run - imported run:")
             print("      run_id:", run_id)
-            print("      artifact_uri:", run.info.artifact_uri)
+            print("      run_artifact_uri:", run.info.artifact_uri)
             source = path_join(run.info.artifact_uri,model_path)
             print("      source:      ", source)
             if not source.startswith("dbfs:") and not os.path.exists(source):

@@ -38,7 +38,7 @@ class ModelExporter():
                 self.run_exporter.export_run(run_id, opath)
                 run = self.mlflow_client.get_run(run_id)
                 dct = dict(vr)
-                dct["artifact_uri"] = run.info.artifact_uri
+                dct["_run_artifact_uri"] = run.info.artifact_uri
                 model["registered_model"]["latest_versions"].append(dct)
             except mlflow.exceptions.RestException as e:
                 if "RESOURCE_DOES_NOT_EXIST: Run" in str(e):
