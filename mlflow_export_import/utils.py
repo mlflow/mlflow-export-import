@@ -98,7 +98,7 @@ def unzip_directory(zip_file, exp_name, funk):
 
 def string_to_list(list_as_string):
     lst = list_as_string.split(",")
-    if "" in lst: list.remove("")
+    if "" in lst: lst.remove("")
     return lst
 
 def get_user_id():
