@@ -25,6 +25,7 @@ class ModelExporter():
         versions = self.mlflow_client.search_model_versions(f"name='{model_name}'")
         print(f"Found {len(versions)} versions for model {model_name}")
         manifest = []
+        exported_versions = 0
         for vr in versions:
             if len(self.stages) > 0 and not vr.current_stage.lower() in self.stages:
                 continue
@@ -42,12 +43,14 @@ class ModelExporter():
                 experiment = mlflow.get_experiment(run.info.experiment_id)
                 dct["_experiment_name"] = experiment.name
                 model["registered_model"]["latest_versions"].append(dct)
+                exported_versions += 1
             except mlflow.exceptions.RestException as e:
                 if "RESOURCE_DOES_NOT_EXIST: Run" in str(e):
                     print(f"WARNING: Run for version {vr.version} does not exist. {e}")
                 else:
                     import traceback
                     traceback.print_exc()
+        print(f"Exported {exported_versions}/{len(versions)} versions for model {model_name}")
         utils.write_json_file(self.fs, path, model)
         return manifest
 
