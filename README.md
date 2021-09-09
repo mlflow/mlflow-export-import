@@ -115,7 +115,7 @@ Options:
   --output-dir TEXT               Output directory.  [required]
   --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: False]
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
-                                  JUPYTER or DBC.  [default: SOURCE]
+                                  JUPYTER or DBC.  [default: ]
 ```
 
 ##### Export examples
@@ -177,7 +177,7 @@ python -u -m mlflow_export_import.experiment.export_experiment_list --help
   --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: False]
 
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
-                                  JUPYTER or DBC.  [default: SOURCE]
+                                  JUPYTER or DBC.  [default: ]
 ```
 
 ##### Export list examples
@@ -423,7 +423,7 @@ Options:
   --output TEXT                   Output directory or zip file.  [required]
   --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: False] 
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
-                                  JUPYTER or DBC.  [default: SOURCE]
+                                  JUPYTER or DBC.  [default: ]
 ```
 
 
@@ -583,7 +583,7 @@ Options:
   --output-dir TEXT  Output directory.  [required]
   --stages TEXT      Stages to export (comma seperated). Default is all stages.
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
-                                  JUPYTER or DBC.  [default: SOURCE]
+                                  JUPYTER or DBC.  [default: ]
 ```
 
 #### Run
