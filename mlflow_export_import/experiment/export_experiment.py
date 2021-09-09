@@ -17,7 +17,7 @@ from mlflow_export_import import utils, click_doc
 client = mlflow.tracking.MlflowClient()
 
 class ExperimentExporter():
-    def __init__(self, client=None, export_metadata_tags=False, notebook_formats=["SOURCE"], filesystem=None):
+    def __init__(self, client=None, export_metadata_tags=False, notebook_formats=[], filesystem=None):
         self.client = client or mlflow.tracking.MlflowClient()
         self.fs = filesystem or _filesystem.get_filesystem()
         print("Filesystem:",type(self.fs).__name__)
@@ -55,8 +55,8 @@ class ExperimentExporter():
         if len(failed_run_ids) == 0:
             print(f"All {len(run_ids)} runs succesfully exported")
         else:
-            print(f"{len(run_ids)}/{len(infos)} runs succesfully exported")
-            print(f"{len(failed_run_ids)}/{len(infos)} runs failed")
+            print(f"{len(run_ids)/j} runs succesfully exported")
+            print(f"{len(failed_run_ids)/j} runs failed")
 
     def export_experiment_to_zip(self, exp_id, zip_file):
         temp_dir = tempfile.mkdtemp()
@@ -70,7 +70,7 @@ class ExperimentExporter():
 @click.option("--experiment", help="Experiment name or ID.", required=True, type=str)
 @click.option("--output-dir", help="Output directory.", required=True)
 @click.option("--export-metadata-tags", help=click_doc.export_metadata_tags, type=bool, default=False, show_default=True)
-@click.option("--notebook-formats", help=click_doc.notebook_formats, default="SOURCE", show_default=True)
+@click.option("--notebook-formats", help=click_doc.notebook_formats, default="", show_default=True)
 
 def main(experiment, output_dir, export_metadata_tags, notebook_formats): # pragma: no cover
     print("Options:")

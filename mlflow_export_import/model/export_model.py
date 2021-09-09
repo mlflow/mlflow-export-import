@@ -11,7 +11,7 @@ from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils, click_doc
 
 class ModelExporter():
-    def __init__(self, export_metadata_tags=False, notebook_formats=["SOURCE"], filesystem=None, stages=None):
+    def __init__(self, export_metadata_tags=False, notebook_formats=[], filesystem=None, stages=None):
         self.fs = filesystem or _filesystem.get_filesystem()
         self.mlflow_client = mlflow.tracking.MlflowClient()
         self.http_client = HttpClient("api/2.0/mlflow")
@@ -70,7 +70,7 @@ class ModelExporter():
 @click.option("--model", help="Registered model name.", required=True, type=str)
 @click.option("--output-dir", help="Output directory.", required=True, type=str)
 @click.option("--stages", help="Stages to export (comma seperated). Default is all stages.", required=None, type=str)
-@click.option("--notebook-formats", help=click_doc.notebook_formats, default="SOURCE", show_default=True)
+@click.option("--notebook-formats", help=click_doc.notebook_formats, default="", show_default=True)
 
 def main(model, output_dir, stages, notebook_formats): # pragma: no cover
     print("Options:")

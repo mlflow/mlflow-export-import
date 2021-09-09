@@ -48,7 +48,7 @@ def export_experiment_list(experiments, output_dir, export_metadata_tags, notebo
 @click.option("--experiments", help="Experiment names or IDs (comma delimited). 'all' will export all experiments. ", required=True, type=str)
 @click.option("--output-dir", help="Output directory.", required=True)
 @click.option("--export-metadata-tags", help=click_doc.export_metadata_tags, type=bool, default=False, show_default=True)
-@click.option("--notebook-formats", help=click_doc.notebook_formats, default="SOURCE", show_default=True)
+@click.option("--notebook-formats", help=click_doc.notebook_formats, default="", show_default=True)
 
 def main(experiments, output_dir, export_metadata_tags, notebook_formats): # pragma: no cover
     print("Options:")

@@ -1,5 +1,5 @@
 """ 
-Exports a run to a directory of zip file.
+Exports a run to a directory or zip file.
 """
 
 import os
@@ -19,7 +19,7 @@ print("MLflow Version:", mlflow.version.VERSION)
 print("MLflow Tracking URI:", mlflow.get_tracking_uri())
 
 class RunExporter():
-    def __init__(self, client=None, export_metadata_tags=False, notebook_formats=["SOURCE"], filesystem=None):
+    def __init__(self, client=None, export_metadata_tags=False, notebook_formats=[], filesystem=None):
         self.client = client or mlflow.tracking.MlflowClient()
         self.dbx_client = DatabricksHttpClient()
         print("Databricks REST client:",self.dbx_client)
@@ -65,7 +65,8 @@ class RunExporter():
                 self.client.download_artifacts(run.info.run_id,"", dst_path=mk_local_path(dst_path))
             notebook = tags.get(TAG_NOTEBOOK_PATH, None)
             if notebook is not None:
-                self.export_notebook(run_dir, notebook)
+                if len(self.notebook_formats) > 0:
+                    self.export_notebook(run_dir, notebook)
             elif len(self.notebook_formats) > 0:
                 print(f"WARNING: Cannot export notebook since tag '{TAG_NOTEBOOK_PATH}' is not set.")
             return True
@@ -94,7 +95,7 @@ class RunExporter():
 @click.option("--run-id", help="Run ID.", required=True, type=str)
 @click.option("--output", help="Output directory or zip file.", required=True)
 @click.option("--export-metadata-tags", help=click_doc.export_metadata_tags, type=bool, default=False, show_default=True)
-@click.option("--notebook-formats", help=click_doc.notebook_formats, default="SOURCE", show_default=True)
+@click.option("--notebook-formats", help=click_doc.notebook_formats, default="", show_default=True)
 
 def main(run_id, output, export_metadata_tags, notebook_formats): # pragma: no cover
     print("Options:")
