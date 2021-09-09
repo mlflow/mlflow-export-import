@@ -58,13 +58,16 @@ class RunExporter():
         # copy artifacts
         dst_path = os.path.join(run_dir,"artifacts")
         try:
+            TAG_NOTEBOOK_PATH = "mlflow.databricks.notebookPath"
             artifacts = self.client.list_artifacts(run.info.run_id)
             if len(artifacts) > 0: # Because of https://github.com/mlflow/mlflow/issues/2839
                 self.fs.mkdirs(dst_path)
                 self.client.download_artifacts(run.info.run_id,"", dst_path=mk_local_path(dst_path))
-            notebook = tags.get("mlflow.databricks.notebookPath", None)
+            notebook = tags.get(TAG_NOTEBOOK_PATH, None)
             if notebook is not None:
                 self.export_notebook(run_dir, notebook)
+            elif len(self.notebook_formats) > 0:
+                print(f"WARNING: Cannot export notebook since tag '{TAG_NOTEBOOK_PATH}' is not set.")
             return True
         except Exception as e:
             print("ERROR: run_id:",run.info.run_id,"Exception:",e)
