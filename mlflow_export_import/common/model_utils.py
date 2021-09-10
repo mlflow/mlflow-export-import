@@ -30,3 +30,19 @@ def wait_until_version_is_ready(client, model_name, model_version, sleep_time=1,
 
 def _show_version(version):
     print(f"Version: id={version.version} status={version.status} state={version.current_stage}")
+
+def dump_model_versions(client, model_name):
+    import pandas as pd
+    from tabulate import tabulate
+    versions = client.get_latest_versions(model_name)
+    versions = [ [vr.version, vr.current_stage] for vr in versions ]
+    df = pd.DataFrame(versions, columns = ["Version","Stage"])
+    print(f"\nLatest {len(versions)} versions")
+    print(tabulate(df, headers="keys", tablefmt="psql", showindex=False))
+
+    versions = client.search_model_versions(f"name='{model_name}'")
+    versions = sorted(versions, key=lambda x: x.current_stage)
+    versions = [ [vr.version, vr.current_stage, vr.status] for vr in versions ]
+    df = pd.DataFrame(versions, columns = ["Version","Stage", "Status"])
+    print(f"\nSearch {len(versions)} versions:")
+    print(tabulate(df, headers="keys", tablefmt="psql", showindex=False))

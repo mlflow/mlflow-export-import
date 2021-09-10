@@ -17,7 +17,7 @@ class ModelImporter():
         self.client = mlflow.tracking.MlflowClient()
         self.run_importer = run_importer if run_importer else RunImporter(self.client, mlmodel_fix=True, import_mlflow_tags=False)
 
-    def import_model(self, input_dir, model_name, experiment_name, delete_model=False):
+    def import_model(self, input_dir, model_name, experiment_name, delete_model=False, verbose=False):
         path = os.path.join(input_dir,"model.json")
         dct = utils.read_json_file(path)
         dct = dct["registered_model"]
@@ -47,6 +47,10 @@ class ModelImporter():
         for vr in dct["latest_versions"]:
             self.import_run(input_dir, experiment_name, vr)
             self.import_version(model_name, vr)
+
+        if verbose:
+            model_utils.dump_model_versions(self.client, model_name)
+
 
     def import_run(self, input_dir, experiment_name, vr):
         run_id = vr["run_id"]
@@ -100,13 +104,14 @@ def path_join(x,y):
 @click.option("--model", help="New registered model name.", required=False, type=str)
 @click.option("--experiment-name", help="Destination experiment name  - will be created if it does not exist.", required=True, type=str)
 @click.option("--delete-model", help="First delete the model if it exists and all its versions.", type=bool, default=False, show_default=True)
+@click.option("--verbose", help="Verbose.", type=bool, default=False, show_default=True)
 
-def main(input_dir, model, experiment_name, delete_model): # pragma: no cover
+def main(input_dir, model, experiment_name, delete_model, verbose): # pragma: no cover
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
     importer = ModelImporter()
-    importer.import_model(input_dir, model, experiment_name, delete_model)
+    importer.import_model(input_dir, model, experiment_name, delete_model, verbose)
 
 
 if __name__ == "__main__":
