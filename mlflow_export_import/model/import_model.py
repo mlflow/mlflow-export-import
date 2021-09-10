@@ -43,33 +43,42 @@ class ModelImporter():
         mlflow.set_experiment(experiment_name)
 
         print("Importing latest versions:")
-        for v in dct["latest_versions"]:
-            run_id = v["run_id"]
-            source = v["source"]
-            current_stage = v["current_stage"]
-            run_artifact_uri = v["_run_artifact_uri"]
-            run_dir = os.path.join(input_dir,run_id)
-            print(f"  Version {v['version']}:")
-            print(f"    current_stage: {current_stage}:")
-            print("    Source run - run to import:")
-            print("      run_id:", run_id)
-            print("      run_artifact_uri:", run_artifact_uri)
-            print("      source:      ", source)
-            model_path = extract_model_path(source, run_id)
-            print("      model_path:  ", model_path)
-            run_id,_ = self.run_importer.import_run(experiment_name, run_dir)
-            run = self.client.get_run(run_id)
-            print("    Destination run - imported run:")
-            print("      run_id:", run_id)
-            print("      run_artifact_uri:", run.info.artifact_uri)
-            source = path_join(run.info.artifact_uri,model_path)
-            print("      source:      ", source)
-            if not source.startswith("dbfs:") and not os.path.exists(source):
-                raise Exception(f"'source' argument for MLflowClient.create_model_version does not exist: {source}")
-            version = self.client.create_model_version(model_name, source, run_id)
-            model_utils.wait_until_version_is_ready(self.client, model_name, version, sleep_time=2)
-            if current_stage != "None":
-                self.client.transition_model_version_stage(model_name, version.version, current_stage)
+
+        for vr in dct["latest_versions"]:
+            self.import_run(input_dir, experiment_name, vr)
+            self.import_version(model_name, vr)
+
+    def import_run(self, input_dir, experiment_name, vr):
+        run_id = vr["run_id"]
+        source = vr["source"]
+        current_stage = vr["current_stage"]
+        run_artifact_uri = vr["_run_artifact_uri"]
+        run_dir = os.path.join(input_dir,run_id)
+        print(f"  Version {vr['version']}:")
+        print(f"    current_stage: {current_stage}:")
+        print(f"    Source run - run to import:")
+        print(f"      run_id: {run_id}")
+        print(f"      run_artifact_uri: {run_artifact_uri}")
+        print(f"      source:           {source}")
+        model_path = extract_model_path(source, run_id)
+        print(f"      model_path:   {model_path}")
+        run_id,_ = self.run_importer.import_run(experiment_name, run_dir)
+        run = self.client.get_run(run_id)
+        print(f"    Destination run - imported run:")
+        print(f"      run_id: {run_id}")
+        print(f"      run_artifact_uri: {run.info.artifact_uri}")
+        source = path_join(run.info.artifact_uri,model_path)
+        print(f"      source:           {source}")
+
+    def import_version(self, model_name, vr):
+        source = vr["source"]
+        current_stage = vr["current_stage"]
+        if not source.startswith("dbfs:") and not os.path.exists(source):
+            raise Exception(f"'source' argument for MLflowClient.create_model_version does not exist: {source}")
+        version = self.client.create_model_version(model_name, source, vr["run_id"])
+        model_utils.wait_until_version_is_ready(self.client, model_name, version, sleep_time=2)
+        if current_stage != "None":
+            self.client.transition_model_version_stage(model_name, version.version, current_stage)
 
 def extract_model_path(source, run_id):
     idx = source.find(run_id)
