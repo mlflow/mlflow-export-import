@@ -5,6 +5,7 @@ Import a registered model and all the experiment runs associated with its latest
 import os
 import click
 import mlflow
+from mlflow.exceptions import RestException
 from mlflow_export_import.run.import_run import RunImporter
 from mlflow_export_import import utils
 from mlflow_export_import.common import model_utils
@@ -33,8 +34,12 @@ class ModelImporter():
         if delete_model:
             model_utils.delete_model(self.client, model_name)
 
-        tags = { e["key"]:e["value"] for e in dct.get("tags", {}) }
-        self.client.create_registered_model(model_name, tags, dct.get("description"))
+        try:
+            tags = { e["key"]:e["value"] for e in dct.get("tags", {}) }
+            self.client.create_registered_model(model_name, tags, dct.get("description"))
+        except RestException as e:
+            if not "RESOURCE_ALREADY_EXISTS: Registered Model" in str(e):
+                raise e
         mlflow.set_experiment(experiment_name)
 
         print("Importing latest versions:")
