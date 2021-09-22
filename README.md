@@ -2,26 +2,25 @@
 
 Tools to export and import MLflow runs, experiments or registered models from one tracking server to another.
 
-There are two ways to run the tool:
+There are two ways to run the tools:
 * As a normal Python package - this page.
 * [Databricks notebooks](databricks_notebooks/README.md) accessing the wheel library.
 
+Note, there is also a secondary "[direct copy](README_copy.md)" feature with documented limitations.
 
 ## Architecture
 
-<img src="export_import_architecture.png" height="220" >
+<img src="export_import_architecture.png" height="330" >
 
 ## Overview
 
 ### Experiments
   * Export experiments to a directory.
   * Import experiments from a directory.
-  * Copy an experiment from one tracking server to another.
 
 ### Runs
   * Export a run to  a directory or zip file.
   * Import a run from a directory or zip file.
-  * Copy a run from one tracking server to another.
 
 ### Registered Models
   * Export a registered model to a directory.
@@ -33,7 +32,7 @@ There are two ways to run the tool:
 
 ### General Limitations
 
-* Nested runs are only supported when you import/copy an experiment. For a run, it is a TODO.
+* Nested runs are only supported when you import an experiment. For a run, it is still a TODO.
 
 ### Databricks Limitations
 
@@ -41,16 +40,7 @@ There are two ways to run the tool:
 The [workspace/export](https://docs.databricks.com/dev-tools/api/latest/workspace.html#export) API endpoint only exports a notebook representing the latest notebook revision.
 * Therefore you can only export/import MLflow experiments and runs. The notebook revision associated with a run cannot be exported or imported.
 * When you import a run, the link to its source notebook revision ID will appear in the UI but you cannot reach that revision (link is dead).
-* For convenience, the export tool exports the latest notebook revision for a notebook-based experiment but again, it cannot be attached to a run when imported. Its store as an artifact in the "notebooks" folder of the run's artifact root.
-
-#### Note on `Copy` tools and Databricks 
-  * Copy tools work only for open source MLflow.
-  * Copy tools do not work when both the source and destination trackings servers are Databricks MLflow.
-  * Things get more complicated for the `copy` feature when using a a Databricks tracking server, either as source or destination .
-  * This is primarily because [MLflow client](https://github.com/mlflow/mlflow/blob/master/mlflow/tracking/client.py) constructor only accepts a tracking_uri. 
-    * For open source MLflow this works fine and you can have the two clients (source and destination) in the same program.
-    * For Databricks MLflow, the constructor is not used to initialize target servers. Environment variables are used to initialize the client, so only one client can exist.
-  * To copy experiments when a Databricks server is involved, you have to use the the two-stage process of first exporting the experiment and then importing it.
+* For convenience, the export tool exports the latest notebook revision for a notebook-based experiment but again, it cannot be attached to a run when imported. Its stored as an artifact in the "notebooks" folder of the run's artifact root.
 
 ## Common options details 
 
@@ -72,9 +62,14 @@ mlflow_tools.metadata.tracking_uri    http://localhost:5000
 
 ## Setup
 
-Built with python 3.7.6.
+Supports python 3.7.6 or above.
 
 ### Local setup
+
+```
+git clone https://github.com/amesar/mlflow-export-import
+cd mlflow-export-import
+```
 
 ```
 python -m venv mlflow-export-import-env
@@ -84,7 +79,7 @@ pip install -e .
 
 ### Databricks setup
 
-If you want to run mlflow-export-import scripts on Databricks, you need to build a wheel artifact, push it up to DBFS and then install it on your cluster.
+If you want to run mlflow-export-import scripts on Databricks, you need to build the wheel artifact, push it up to DBFS and then install it on your cluster.
 
 ```
 python setup.py bdist_wheel
@@ -96,8 +91,8 @@ databricks fs cp dist/mlflow_export_import-1.0.0-py3-none-any.whl {MY_DBFS_PATH}
 ### Export Experiments
 
 There are two main programs to export experiments:
-* export_experiment - exports one experiment
-* export_experiment_list - exports a list of  experiments
+* `export_experiment` - exports one experiment.
+* `export_experiment_list` - exports a list of  experiments.
 
 Both accept either an experiment ID or name.
 
@@ -371,42 +366,6 @@ python -u -m mlflow_export_import.experiment.import_experiment_list \
   --input-dir out 
 ```
 
-### Copy experiment from one tracking server to another
-
-Copies an experiment from one MLflow tracking server to another.
-
-Source: [copy_experiment.py](copy_experiment.py)
-
-In this example we use:
-* Source tracking server runs on port 5000 
-* Destination tracking server runs on 5001
-
-**Usage**
-
-```
-python -m mlflow_export_import.experiment.copy_experiment --help
-
-Options:
-  --src-uri TEXT                  Source MLflow API URI.  [required]
-  --dst-uri TEXT                  Destination MLflow API URI.  [required]
-  --src-experiment TEXT           Source experiment ID or name.  [required]
-  --dst-experiment-name TEXT      Destination experiment name.  [required]
-  --use-src-user-id BOOLEAN       Set the destination user ID to the source
-                                  user ID. Source user ID is ignored when
-                                  importing into Databricks since setting it
-                                  is not allowed.  [default: False]
-  --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: False]
-```
-
-**Run example**
-```
-python -u -m mlflow_export_import.experiment.copy_experiment \
-  --src-experiment sklearn_wine \
-  --dst-experiment-name sklearn_wine_imported \
-  --src-uri http://localhost:5000 \
-  --dst-uri http://localhost:5001
-```
-
 ## Runs
 
 ### Export run
@@ -521,48 +480,6 @@ python -u -m mlflow_export_import.run.import_run \
   --experiment-name /Users/me@mycompany.com/imported/SklearnWine \
 ```
 
-
-### Copy run from one tracking server to another
-
-Copies a run from one MLflow tracking server to another.
-
-Source: [copy_run.py](copy_run.py)
-
-In this example we use
-* Source tracking server runs on port 5000 
-* Destination tracking server runs on 5001
-
-**Usage**
-
-```
-python -m mlflow_export_import.run.copy_run --help
-
-Options:
-  --input TEXT                    Input path - directory or zip file.
-                                  [required]
-
-  --experiment-name TEXT          Destination experiment name.  [required]
-  --use-src-user-id BOOLEAN       Set the destination user ID to the source
-                                  user ID. Source user ID is ignored when
-                                  importing into Databricks since setting it
-                                  is not allowed.  [default: False]
-
-  --import-mlflow-tags BOOLEAN    Import mlflow tags.  [default: True]
-  --import-metadata-tags BOOLEAN  Import mlflow_tools tags.  [default: False]
-```
-
-**Run example**
-```
-export MLFLOW_TRACKING_URI=http://localhost:5000
-
-python -u -m mlflow_export_import.run.copy_run \
-  --src-run-id 50fa90e751eb4b3f9ba9cef0efe8ea30 \
-  --dst-experiment-name sklearn_wine \
-  --src-uri http://localhost:5000 \
-  --dst-uri http://localhost:5001
-```
-
-
 ## Registered Models
 
 ### Export registered model
@@ -571,7 +488,7 @@ Export a registered model to a directory.
 The default is to export all versions of a model including all None and Archived stages.
 You can specify a list of stages to export.
 
-Source: [export_model.py](export_model.py).
+Source: [export_model.py](mlflow_export_import/model/export_model.py).
 
 **Usage**
 
@@ -635,7 +552,7 @@ Output export directory example.
 
 Import a registered model from a directory.
 
-Source: [import_model.py](import_model.py).
+Source: [import_model.py](mlflow_export_import/model/import_model.py).
 
 **Usage**
 
