@@ -59,6 +59,10 @@ experiment_id_or_name, output_dir, export_metadata_tags, formats
 
 # COMMAND ----------
 
+# MAGIC %run ./Common
+
+# COMMAND ----------
+
 if len(experiment_id_or_name)==0: raise Exception("ERROR: Experiment ID or Name is required")
 if len(output_dir)==0: raise Exception("ERROR: DBFS destination is required")
   
@@ -74,10 +78,6 @@ experiment.experiment_id, experiment.name, output_dir
 # COMMAND ----------
 
 # MAGIC %md ### Display MLflow UI URI of Experiment
-
-# COMMAND ----------
-
-# MAGIC %run ./Common
 
 # COMMAND ----------
 
