@@ -1,4 +1,9 @@
 # Databricks notebook source
+# MAGIC %sh
+# MAGIC pip install git+https:///github.com/amesar/mlflow-export-import/#egg=mlflow-export-import
+
+# COMMAND ----------
+
 host_name = dbutils.notebook.entry_point.getDbutils().notebook().getContext().tags().get("browserHostName").get()
 import mlflow
 client = mlflow.tracking.MlflowClient()
