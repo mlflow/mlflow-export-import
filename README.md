@@ -66,20 +66,43 @@ Supports python 3.7.6 or above.
 
 ### Local setup
 
+First create a virtual environment.
+```
+python -m venv mlflow-export-import
+source mlflow-export-import/bin/activate
+```
+
+There are two different ways to install the package.
+
+#### Install from github directly
+
+```
+pip install git+https:///github.com/amesar/mlflow-export-import/#egg=mlflow-export-import
+```
+
+#### Install from github clone
 ```
 git clone https://github.com/amesar/mlflow-export-import
 cd mlflow-export-import
-```
-
-```
-python -m venv mlflow-export-import-env
-source mlflow-export-import-env/bin/activate
 pip install -e .
 ```
 
 ### Databricks setup
 
-If you want to run mlflow-export-import scripts on Databricks, you need to build the wheel artifact, push it up to DBFS and then install it on your cluster.
+There are two different ways to install the package.
+
+#### Install package in notebook
+
+[Install notebook-scoped libraries with %pip](https://docs.databricks.com/libraries/notebooks-python-libraries.html#install-notebook-scoped-libraries-with-pip).
+
+
+```
+pip install git+https:///github.com/amesar/mlflow-export-import/#egg=mlflow-export-import
+```
+
+#### Install package as a wheel on cluster
+
+Build the wheel artifact, upload it to DBFS and then [install it on your cluster](https://docs.databricks.com/libraries/cluster-libraries.html).
 
 ```
 python setup.py bdist_wheel
