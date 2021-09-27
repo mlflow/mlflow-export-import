@@ -32,7 +32,9 @@ if len(input_dir)==0: raise Exception("ERROR: Input folder is required")
 import os
 os.environ["INPUT_DIR"] = input_dir.replace("dbfs:","/dbfs")
 
-model_name, input_dir, experiment_name
+print("model_name:",model_name)
+print("input_dir:",input_dir)
+print("experiment_name:",experiment_name)
 
 # COMMAND ----------
 
