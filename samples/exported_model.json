@@ -18,7 +18,8 @@
         "tags": {},
         "user_id": "",
         "version": "3",
-        "artifact_uri": "/opt/mlflow/server/mlruns/1/24aa9cce1388474e9f26d17100724cdd/artifacts"
+        "_run_artifact_uri": "/opt/mlflow/server/mlruns/1/24aa9cce1388474e9f26d17100724cdd/artifacts",
+        "_experiment_name": "sklearn"
       },
       {
         "creation_timestamp": 1630565611059,
@@ -34,7 +35,8 @@
         "tags": {},
         "user_id": "",
         "version": "5",
-        "artifact_uri": "/opt/mlflow/server/mlruns/5/8efd80f59b7946119d8f1838515eea25/artifacts"
+        "_run_artifact_uri": "/opt/mlflow/server/mlruns/5/8efd80f59b7946119d8f1838515eea25/artifacts",
+        "_experiment_name": "sklearn"
       }
     ]
   }
