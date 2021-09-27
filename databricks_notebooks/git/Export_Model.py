@@ -41,6 +41,8 @@ output_dir = dbutils.widgets.get("Destination base folder")
 output_dir += f"/{model_name}"
 
 model_name, output_dir
+print("model_name:",model_name)
+print("output_dir:",output_dir)
 
 # COMMAND ----------
 
