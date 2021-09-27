@@ -56,6 +56,10 @@ formats = formats.split(",")
 if "" in formats: formats.remove("")
 
 experiment_id_or_name, output_dir, export_metadata_tags, formats
+print("experiment_id_or_name:",experiment_id_or_name)
+print("output_dir:",output_dir)
+print("export_metadata_tags:",export_metadata_tags)
+print("formats:",formats)
 
 # COMMAND ----------
 
