@@ -28,7 +28,11 @@ dbutils.widgets.dropdown("Just peek","no",["yes","no"])
 just_peek = dbutils.widgets.get("Just peek") == "yes"
 
 if len(input_dir)==0: raise Exception("ERROR: Input is required")
-input_dir, experiment_name, import_metadata_tags, just_peek
+
+print("input_dir:",input_dir)
+print("experiment_name:",experiment_name)
+print("import_metadata_tags:",import_metadata_tags)
+print("just_peek:",just_peek)
 
 # COMMAND ----------
 
