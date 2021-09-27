@@ -57,7 +57,10 @@ formats = dbutils.widgets.get("Notebook formats")
 formats = formats.split(",")
 if "" in formats: formats.remove("")
 
-run_id, output_dir, export_metadata_tags, formats
+print("run_id:",run_id)
+print("output_dir:",output_dir)
+print("export_metadata_tags:",export_metadata_tags)
+print("formats:",formats)
 
 # COMMAND ----------
 
