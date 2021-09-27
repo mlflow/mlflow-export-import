@@ -25,6 +25,9 @@ input_dir = dbutils.widgets.get("Input folder")
 if len(input_dir)==0: raise Exception("ERROR: Input is required")
 input_dir, experiment_name
 
+print("input_dir:",input_dir)
+print("experiment_name:",experiment_name)
+
 # COMMAND ----------
 
 # MAGIC %md ### Import Run
