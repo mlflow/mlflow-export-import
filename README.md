@@ -36,9 +36,8 @@ Note, there is also a secondary "[direct copy](README_copy.md)" feature with doc
 
 ### Databricks Limitations
 
-* The Databricks API does not support exporting or importing notebook revision.
-The [workspace/export](https://docs.databricks.com/dev-tools/api/latest/workspace.html#export) API endpoint only exports a notebook representing the latest notebook revision.
-* Therefore you can only export/import MLflow experiments and runs. The notebook revision associated with a run cannot be exported or imported.
+* The Databricks API does not support exporting or importing notebook revisions.
+The [workspace/export](https://docs.databricks.com/dev-tools/api/latest/workspace.html#export) API endpoint only exports a notebook representing the latest revision.
 * When you import a run, the link to its source notebook revision ID will appear in the UI but you cannot reach that revision (link is dead).
 * For convenience, the export tool exports the latest notebook revision for a notebook-based experiment but again, it cannot be attached to a run when imported. Its stored as an artifact in the "notebooks" folder of the run's artifact root.
 
@@ -48,16 +47,16 @@ The [workspace/export](https://docs.databricks.com/dev-tools/api/latest/workspac
 
 `use-src-user-id` -  Set the destination user ID to the source user ID. Source user ID is ignored when importing into Databricks since the user is automatically picked up from your Databricks access token.
 
-`export-metadata-tags` - Creates metadata tags (starting with `mlflow_tools.metadata`) containing export information. Contains the source `mlflow` tags in addition to other information. This is useful for provenance and auditing purposes in regulated industries.
+`export-metadata-tags` - Creates metadata tags (starting with `mlflow_export_import.metadata`) that contain export information. These are the source `mlflow` tags in addition to other information. This is useful for provenance and auditing purposes in regulated industries.
 
 ```
 Name                                  Value
-mlflow_tools.metadata.timestamp       1551037752
-mlflow_tools.metadata.timestamp_nice  2019-02-24 19:49:12
-mlflow_tools.metadata.experiment_id   2
-mlflow_tools.metadata.experiment-name sklearn_wine
-mlflow_tools.metadata.run-id          50fa90e751eb4b3f9ba9cef0efe8ea30
-mlflow_tools.metadata.tracking_uri    http://localhost:5000
+mlflow_export_import.metadata.timestamp       1551037752
+mlflow_export_import.metadata.timestamp_nice  2019-02-24 19:49:12
+mlflow_export_import.metadata.experiment_id   2
+mlflow_export_import.metadata.experiment-name sklearn_wine
+mlflow_export_import.metadata.run-id          50fa90e751eb4b3f9ba9cef0efe8ea30
+mlflow_export_import.metadata.tracking_uri    http://localhost:5000
 ```
 
 ## Setup
@@ -152,7 +151,7 @@ python -u -m mlflow_export_import.experiment.export_experiment_list \
 
 ##### Databricks export examples
 
-See the [Access the MLflow tracking server from outside Databricks](https://docs.databricks.com/applications/mlflow/access-hosted-tracking-server.html).
+See [Access the MLflow tracking server from outside Databricks](https://docs.databricks.com/applications/mlflow/access-hosted-tracking-server.html).
 ```
 export MLFLOW_TRACKING_URI=databricks
 export DATABRICKS_HOST=https://mycompany.cloud.databricks.com
@@ -167,7 +166,7 @@ python -u -m mlflow_export_import.experiment.export_experiment \
 ##### Export directory structure
 
 The output directory contains a manifest file and a subdirectory for each run (by run ID).
-The run directory contains a run.json file containing run metadata and an artifact hierarchy.
+The run directory contains a `run.json` file containing run metadata and an artifact hierarchy.
 
 ```
 +-manifest.json
@@ -269,7 +268,7 @@ In the example below we have two experiments - 1 and 7. Experiment 1 (sklearn) h
 |         +-model/
 ```
 
-Top-level manifest.json for experiments.
+Sample [experiment list manifest.json](samples/experiment_list/manifest.json).
 ```
 {
   "info": {
@@ -290,7 +289,8 @@ Top-level manifest.json for experiments.
 }
 ```
 
-Experiment manifest.json.
+Sample [experiment manifest.json](samples/experiment_list/1/manifest.json).
+
 ```
 {
   "experiment": {
@@ -311,7 +311,6 @@ Experiment manifest.json.
 }
 ```
 
-Run manifest.json: see below.
 
 ### Import Experiments
 
@@ -431,7 +430,7 @@ artifacts
     conda.yaml
     model.pkl
 ```
-Sample run.json
+Sample [run manifest.json](samples/experiment_list/1/6ccadf17812d43929b093d75cca1c33f/run.json).
 ```
 {   
   "info": {
@@ -452,12 +451,12 @@ Sample run.json
     "mlflow.runName": "demo.sh",
     "run_origin": "demo.sh",
     "mlflow.source.type": "LOCAL",
-    "mlflow_tools.metadata.tracking_uri": "http://localhost:5000",
-    "mlflow_tools.metadata.timestamp": 1563572639,
-    "mlflow_tools.metadata.timestamp_nice": "2019-07-19 21:43:59",
-    "mlflow_tools.metadata.run-id": "130bca8d75e54febb2bfa46875a03d59",
-    "mlflow_tools.metadata.experiment_id": "2",
-    "mlflow_tools.metadata.experiment-name": "sklearn_wine"
+    "mlflow_export_import.metadata.tracking_uri": "http://localhost:5000",
+    "mlflow_export_import.metadata.timestamp": 1563572639,
+    "mlflow_export_import.metadata.timestamp_nice": "2019-07-19 21:43:59",
+    "mlflow_export_import.metadata.run-id": "130bca8d75e54febb2bfa46875a03d59",
+    "mlflow_export_import.metadata.experiment_id": "2",
+    "mlflow_export_import.metadata.experiment-name": "sklearn_wine"
   }
 }
 ```
@@ -555,7 +554,7 @@ Output export directory example.
 +-model.json
 ```
 
-[model.json](samples/exported_model.json)
+[model.json](samples/models/model.json)
 ```
 {
   "registered_model": {

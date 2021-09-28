@@ -1,0 +1,17 @@
+{
+  "experiment": {
+    "experiment_id": "1",
+    "name": "sklearn",
+    "artifact_location": "/opt/mlflow/server/mlruns/1",
+    "lifecycle_stage": "active",
+    "tags": {}
+  },
+  "export_info": {
+    "export_time": "2021-09-28 15:41:12",
+    "num_runs": 0
+  },
+  "run_ids": [
+    "6ccadf17812d43929b093d75cca1c33f"
+  ],
+  "failed_run_ids": []
+}

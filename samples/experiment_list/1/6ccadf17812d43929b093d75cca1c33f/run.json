@@ -1,0 +1,50 @@
+{
+  "info": {
+    "run_uuid": "6ccadf17812d43929b093d75cca1c33f",
+    "run_id": "6ccadf17812d43929b093d75cca1c33f",
+    "experiment_id": "1",
+    "user_id": "andre",
+    "status": "FINISHED",
+    "start_time": 1632774882618,
+    "end_time": 1632774885705,
+    "lifecycle_stage": "active",
+    "artifact_uri": "/opt/mlflow/server/mlruns/1/6ccadf17812d43929b093d75cca1c33f/artifacts"
+  },
+  "params": {
+    "max_depth": "4",
+    "max_leaf_nodes": "32"
+  },
+  "metrics": {
+    "rmse": 0.7367947360663162,
+    "r2": 0.28100217442439346,
+    "mae": 0.5877424565761121
+  },
+  "tags": {
+    "data_path": "../../data/train/wine-quality-white.csv",
+    "mlflow.runName": "train.sh",
+    "mlflow.source.git.commit": "d0b5ba834f61bfc10a1801a4da660728ead2edb5",
+    "mlflow.source.name": "/Users/andre/git/andre/mlflow-examples/python/sklearn/wine_quality/train.py",
+    "mlflow.source.type": "LOCAL",
+    "mlflow_export_import.metadata.artifact_uri": "/opt/mlflow/server/mlruns/1/6ccadf17812d43929b093d75cca1c33f/artifacts",
+    "mlflow_export_import.metadata.end_time": 1632774885705,
+    "mlflow_export_import.metadata.experiment_id": "1",
+    "mlflow_export_import.metadata.experiment_name": "sklearn",
+    "mlflow_export_import.metadata.lifecycle_stage": "active",
+    "mlflow_export_import.metadata.run_id": "6ccadf17812d43929b093d75cca1c33f",
+    "mlflow_export_import.metadata.start_time": 1632774882618,
+    "mlflow_export_import.metadata.status": "FINISHED",
+    "mlflow_export_import.metadata.timestamp": "1632843672",
+    "mlflow_export_import.metadata.timestamp_nice": "2021-09-28 15:41:12",
+    "mlflow_export_import.metadata.tracking_uri": "http://localhost:5000",
+    "mlflow_export_import.metadata.user_id": "andre",
+    "model_name": "sklearn_wine",
+    "output_path": "out_run_id.txt",
+    "run_origin": "train.sh",
+    "save_signature": "False",
+    "version.mlflow": "1.20.2",
+    "version.onnx": "1.10.1",
+    "version.platform": "Darwin-19.4.0-x86_64-i386-64bit",
+    "version.python": "3.7.6",
+    "version.sklearn": "0.24.2"
+  }
+}

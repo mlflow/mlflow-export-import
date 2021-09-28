@@ -1,0 +1,13 @@
+{
+  "info": {
+    "mlflow_version": "1.20.2",
+    "mlflow_tracking_uri": "http://localhost:5000",
+    "export_time": "2021-09-28 15:41:12"
+  },
+  "experiments": [
+    {
+      "id": "1",
+      "name": "sklearn"
+    }
+  ]
+}
