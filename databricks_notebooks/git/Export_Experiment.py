@@ -22,12 +22,11 @@
 # MAGIC ```
 # MAGIC 
 # MAGIC ##### Widgets
-# MAGIC * Experiment ID or Name - Either the experiment ID or the name.
-# MAGIC * DBFS destination - Base output directory to which the experiment ID will be appended to. All experiment data will be saved there.
-# MAGIC * Log source metadata as tags such as:
-# MAGIC   * mlflow_tools.export.experiment_name
-# MAGIC   * mlflow_tools.export.experiment_id
-# MAGIC   * mlflow_tools.export.experiment_name	
+# MAGIC * Experiment ID or Name - Either the experiment ID or experiment name.
+# MAGIC * Destination base folder - Base output directory to which the experiment ID will be appended to. All experiment data will be saved here.
+# MAGIC * Export metadata tags - Log source metadata such as:
+# MAGIC   * mlflow_export_import.metadata.experiment_id
+# MAGIC   * mlflow_export_import.metadata.experiment-name	
 # MAGIC * Notebook formats:
 # MAGIC   * Standard Databricks notebook formats such as SOURCE, HTML, JUPYTER, DBC. See [Databricks Export Format](https://docs.databricks.com/dev-tools/api/latest/workspace.html#notebookexportformat) documentation.
 # MAGIC 
