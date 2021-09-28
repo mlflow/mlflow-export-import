@@ -21,10 +21,9 @@
 # MAGIC ##### Widgets
 # MAGIC * Run ID 
 # MAGIC * Destination base folder- Base output folder to which the Run ID will be appended to.
-# MAGIC * Log source metadata as tags such as:
-# MAGIC   * mlflow_tools.export.experiment_name
-# MAGIC   * mlflow_tools.export.experiment_id
-# MAGIC   * mlflow_tools.export.experiment_name	
+# MAGIC * Export metadata tags - Log source metadata such as:
+# MAGIC   * mlflow_export_import.metadata.experiment_id
+# MAGIC   * mlflow_export_import.metadata.experiment-name	
 # MAGIC * Notebook formats:
 # MAGIC   * Standard Databricks notebook formats such as SOURCE, HTML, JUPYTER, DBC. See [Databricks Export Format](https://docs.databricks.com/dev-tools/api/latest/workspace.html#notebookexportformat)  documentation.
 # MAGIC   
