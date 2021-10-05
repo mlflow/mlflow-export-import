@@ -56,7 +56,7 @@ class ModelImporter():
         run_id = vr["run_id"]
         source = vr["source"]
         current_stage = vr["current_stage"]
-        run_artifact_uri = vr["_run_artifact_uri"]
+        run_artifact_uri = vr.get("_run_artifact_uri",None)
         run_dir = os.path.join(input_dir,run_id)
         print(f"  Version {vr['version']}:")
         print(f"    current_stage: {current_stage}:")
