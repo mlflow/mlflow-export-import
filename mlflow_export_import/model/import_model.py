@@ -12,10 +12,11 @@ from mlflow_export_import.common import model_utils
 from mlflow_export_import.common import filesystem as _filesystem
 
 class ModelImporter():
-    def __init__(self, filesystem=None, run_importer=None):
+    def __init__(self, filesystem=None, run_importer=None, await_creation_for=None):
         self.fs = filesystem or _filesystem.get_filesystem()
         self.client = mlflow.tracking.MlflowClient()
         self.run_importer = run_importer if run_importer else RunImporter(self.client, mlmodel_fix=True, import_mlflow_tags=False)
+        self.await_creation_for = await_creation_for 
 
     def import_model(self, input_dir, model_name, experiment_name, delete_model=False, verbose=False):
         path = os.path.join(input_dir,"model.json")
@@ -79,7 +80,8 @@ class ModelImporter():
         current_stage = vr["current_stage"]
         if not source.startswith("dbfs:") and not os.path.exists(source):
             raise Exception(f"'source' argument for MLflowClient.create_model_version does not exist: {source}")
-        version = self.client.create_model_version(model_name, source, vr["run_id"])
+        kwargs = {"await_creation_for": self.await_creation_for } if self.await_creation_for else {}
+        version = self.client.create_model_version(model_name, source, vr["run_id"], **kwargs)
         model_utils.wait_until_version_is_ready(self.client, model_name, version, sleep_time=2)
         if current_stage != "None":
             self.client.transition_model_version_stage(model_name, version.version, current_stage)
@@ -98,21 +100,20 @@ def path_join(x,y):
         path = path.replace("\\","/") 
     return path
 
-
 @click.command()
 @click.option("--input-dir", help="Input directory produced by export_model.py.", required=True, type=str)
 @click.option("--model", help="New registered model name.", required=False, type=str)
 @click.option("--experiment-name", help="Destination experiment name  - will be created if it does not exist.", required=True, type=str)
 @click.option("--delete-model", help="First delete the model if it exists and all its versions.", type=bool, default=False, show_default=True)
+@click.option("--await-creation-for", help="Await creation for", type=int, default=None, show_default=True)
 @click.option("--verbose", help="Verbose.", type=bool, default=False, show_default=True)
 
-def main(input_dir, model, experiment_name, delete_model, verbose): # pragma: no cover
+def main(input_dir, model, experiment_name, delete_model, await_creation_for, verbose): # pragma: no cover
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    importer = ModelImporter()
+    importer = ModelImporter(await_creation_for=await_creation_for)
     importer.import_model(input_dir, model, experiment_name, delete_model, verbose)
-
 
 if __name__ == "__main__":
     main()
