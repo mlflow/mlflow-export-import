@@ -353,11 +353,14 @@ python -u -m mlflow_export_import.experiment.import_experiment \
 
 ##### Databricks import examples
 
+When importing into Databricks MLflow, make sure you set `--import-mlflow-tags False` since Databricks does not allow you to set `mlflow` tags unlike open source MLflow.
+
 ```
 export MLFLOW_TRACKING_URI=databricks
 python -u -m mlflow_export_import.experiment.import_experiment \
   --experiment-name /Users/me@mycompany.com/imported/SklearnWine \
-  --input-dir exported_experiments/3532228
+  --input-dir exported_experiments/3532228 \
+  --import-mlflow-tags False
 ```
 
 #### import_experiment_list
@@ -494,12 +497,16 @@ python -u -m mlflow_export_import.run.import_run \
 ```
 
 ##### Databricks import example
+
+When importing into Databricks MLflow, make sure you set `--import-mlflow-tags False` since Databricks does not allow you to set `mlflow` tags unlike open source MLflow.
+
 ```
 export MLFLOW_TRACKING_URI=databricks
 python -u -m mlflow_export_import.run.import_run \
   --run-id 50fa90e751eb4b3f9ba9cef0efe8ea30 \
   --input out \
   --experiment-name /Users/me@mycompany.com/imported/SklearnWine \
+  --import-mlflow-tags False
 ```
 
 ## Registered Models
