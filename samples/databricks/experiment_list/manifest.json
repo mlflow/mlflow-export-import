@@ -1,0 +1,21 @@
+{
+  "experiment": {
+    "experiment_id": "3532228",
+    "name": "/Users/self/mlflow/02a_Sklearn_Train_Predict",
+    "artifact_location": "dbfs:/databricks/mlflow/3532228",
+    "lifecycle_stage": "active",
+    "tags": {
+      "mlflow.experimentType": "NOTEBOOK",
+      "mlflow.ownerId": "100327",
+      "mlflow.ownerEmail": "self@mycompany.com"
+    }
+  },
+  "export_info": {
+    "export_time": "2021-08-10 19:22:36",
+    "num_runs": 1
+  },
+  "run_ids": [
+    "2079b9ee113b4b6c8ae631790d4c1009"
+  ],
+  "failed_run_ids": []
+}

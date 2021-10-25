@@ -1,0 +1,49 @@
+{
+  "registered_model": {
+    "name": "Sklearn_Train_Predict",
+    "creation_timestamp": 1597468151981,
+    "last_updated_timestamp": 1630941146423,
+    "latest_versions": [
+      {
+        "creation_timestamp": 1627398252257,
+        "current_stage": "Staging",
+        "description": "",
+        "last_updated_timestamp": 1628986347074,
+        "name": "Sklearn_Train_Predict",
+        "run_id": "d49d561a112041bba2e11eab8139c6a7",
+        "run_link": "",
+        "source": "dbfs:/databricks/mlflow-tracking/10778613/d49d561a112041bba2e11eab8139c6a7/artifacts/sklearn-model",
+        "status": "READY",
+        "status_message": "",
+        "tags": {},
+        "user_id": "self@mycompany.com",
+        "version": "42",
+        "_run_artifact_uri": "dbfs:/databricks/mlflow-tracking/10778613/d49d561a112041bba2e11eab8139c6a7/artifacts",
+        "_experiment_name": "/Users/self/models/Sklearn_Train_Predict_ONNX"
+      },
+      {
+        "creation_timestamp": 1628623250163,
+        "current_stage": "Production",
+        "description": "",
+        "last_updated_timestamp": 1628986328616,
+        "name": "Sklearn_Train_Predict",
+        "run_id": "2079b9ee113b4b6c8ae631790d4c1009",
+        "run_link": "",
+        "source": "dbfs:/databricks/mlflow/3532228/2079b9ee113b4b6c8ae631790d4c1009/artifacts/sklearn-model",
+        "status": "READY",
+        "status_message": "",
+        "tags": {},
+        "user_id": "self@mycompany.com",
+        "version": "43",
+        "_run_artifact_uri": "dbfs:/databricks/mlflow/3532228/2079b9ee113b4b6c8ae631790d4c1009/artifacts",
+        "_experiment_name": "/Users/self/models/Sklearn_Train_Predict"
+      }
+    ],
+    "tags": [
+      {
+        "key": "model_tag",
+        "value": "Canonical sklearn wine model"
+      }
+    ]
+  }
+}

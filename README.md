@@ -166,7 +166,10 @@ python -u -m mlflow_export_import.experiment.export_experiment \
 ##### Export directory structure
 
 The output directory contains a manifest file and a subdirectory for each run (by run ID).
-The run directory contains a `run.json` file containing run metadata and an artifact hierarchy.
+The run directory contains a run.json
+([OSS](samples/oss_mlflow/experiment_list/1/6ccadf17812d43929b093d75cca1c33f/run.json),
+[Databricks](samples/databricks/experiment_list/2079b9ee113b4b6c8ae631790d4c1009/run.json)),
+file containing run metadata and an artifact hierarchy.
 
 ```
 +-manifest.json
@@ -268,7 +271,7 @@ In the example below we have two experiments - 1 and 7. Experiment 1 (sklearn) h
 |         +-model/
 ```
 
-Sample [experiment list manifest.json](samples/experiment_list/manifest.json).
+Sample [experiment list manifest.json](samples/oss_mlflow/experiment_list/manifest.json).
 ```
 {
   "info": {
@@ -289,7 +292,7 @@ Sample [experiment list manifest.json](samples/experiment_list/manifest.json).
 }
 ```
 
-Sample [experiment manifest.json](samples/experiment_list/1/manifest.json).
+Sample [experiment manifest.json](samples/oss_mlflow/experiment_list/1/manifest.json).
 
 ```
 {
@@ -433,7 +436,9 @@ artifacts
     conda.yaml
     model.pkl
 ```
-Sample [run manifest.json](samples/experiment_list/1/6ccadf17812d43929b093d75cca1c33f/run.json).
+Sample run.json:
+[OSS](samples/oss_mlflow/experiment_list/1/6ccadf17812d43929b093d75cca1c33f/run.json)
+ \- [Databricks](samples/databricks/experiment_list/2079b9ee113b4b6c8ae631790d4c1009/run.json).
 ```
 {   
   "info": {
@@ -561,7 +566,9 @@ Output export directory example.
 +-model.json
 ```
 
-[model.json](samples/models/model.json)
+Sample model.json:
+[OSS](samples/oss_mlflow/models/model.json)
+\- [Databricks](samples/databricks/models/model.json).
 ```
 {
   "registered_model": {
