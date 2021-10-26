@@ -2,9 +2,14 @@
 
 Tools to export and import MLflow runs, experiments or registered models from one tracking server to another.
 
-There are two ways to run the tools:
+Some of the reasons to use MLflow Export Import:
+  * Backup your experiments
+  * Migrate experiments to another tracking server
+  * Disaster recovery
+
+There are two ways to run MLflow Export Import:
 * As a normal Python package - this page.
-* [Databricks notebooks](databricks_notebooks/README.md) accessing the wheel library.
+* [Databricks notebooks](databricks_notebooks/README.md).
 
 Note, there is also a secondary "[direct copy](README_copy.md)" feature with documented limitations.
 
