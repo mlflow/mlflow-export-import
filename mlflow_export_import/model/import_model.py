@@ -102,10 +102,10 @@ def path_join(x,y):
 
 @click.command()
 @click.option("--input-dir", help="Input directory produced by export_model.py.", required=True, type=str)
-@click.option("--model", help="New registered model name.", required=False, type=str)
+@click.option("--model", help="New registered model name.", required=True, type=str)
 @click.option("--experiment-name", help="Destination experiment name  - will be created if it does not exist.", required=True, type=str)
 @click.option("--delete-model", help="First delete the model if it exists and all its versions.", type=bool, default=False, show_default=True)
-@click.option("--await-creation-for", help="Await creation for", type=int, default=None, show_default=True)
+@click.option("--await-creation-for", help="Await creation for specified seconds.", type=int, default=None, show_default=True)
 @click.option("--verbose", help="Verbose.", type=bool, default=False, show_default=True)
 
 def main(input_dir, model, experiment_name, delete_model, await_creation_for, verbose): # pragma: no cover

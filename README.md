@@ -601,14 +601,17 @@ Source: [import_model.py](mlflow_export_import/model/import_model.py).
 python -m mlflow_export_import.model.import_model --help
 
 Options:
-  --input-dir TEXT        Input directory produced by export_model.py.
-                          [required]
+  --input-dir TEXT              Input directory produced by export_model.py.
+                                [required]
 
-  --model TEXT            New registered model name.  [required]
-  --experiment-name TEXT  Destination experiment name  - will be created if it
-                          does not exist.  [required]
-  --delete-model BOOLEAN  First delete the model if it exists and all its
-                          versions.  [default: False]
+  --model TEXT                  New registered model name.  [required]
+  --experiment-name TEXT        Destination experiment name  - will be created
+                                if it does not exist.  [required]
+  --delete-model BOOLEAN        First delete the model if it exists and all
+                                its versions.  [default: False]
+  --await-creation-for INTEGER  Await creation for specified seconds.
+  --verbose BOOLEAN             Verbose.  [default: False]
+  --help                        Show this message and exit.
 ```
 
 
