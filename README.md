@@ -144,14 +144,16 @@ Options:
 
 Export experiment by experiment ID.
 ```
-python -u -m mlflow_export_import.experiment.export_experiment_list \
-  --experiment 2 --output-dir out
+python -u -m mlflow_export_import.experiment.export_experiment \
+  --experiment 2 \
+  --output-dir out
 ```
 
 Export experiment by experiment name.
 ```
-python -u -m mlflow_export_import.experiment.export_experiment_list \
-  --experiment sklearn-wine --output-dir out
+python -u -m mlflow_export_import.experiment.export_experiment \
+  --experiment sklearn-wine \
+  --output-dir out
 ```
 
 ##### Databricks export examples
@@ -197,10 +199,8 @@ python -u -m mlflow_export_import.experiment.export_experiment_list --help
 
   --experiments TEXT              Experiment names or IDs (comma delimited).
                                   'all' will export all experiments.  [required]
-
   --output-dir TEXT               Output directory.  [required]
   --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: False]
-
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
                                   JUPYTER or DBC.  [default: ]
 ```
@@ -230,7 +230,7 @@ python -u -m mlflow_export_import.experiment.export_experiment_list \
 The output directory contains a manifest file and a subdirectory for each experiment (by experiment ID).
 
 Each experiment subdirectory in turn contains its own manifest file and a subdirectory for each run.
-The run directory contains a run.json file containing run metadata and an artifact hierarchy.
+The run directory contains a run.json file containing run metadata and artifact directories.
 
 In the example below we have two experiments - 1 and 7. Experiment 1 (sklearn) has two runs (f4eaa7ddbb7c41148fe03c530d9b486f and 5f80bb7cd0fc40038e0e17abe22b304c) whereas experiment 7 (sparkml) has one run (ffb7f72a8dfb46edb4b11aed21de444b).
 
