@@ -18,7 +18,7 @@ class ModelImporter():
         self.run_importer = run_importer if run_importer else RunImporter(self.client, mlmodel_fix=True, import_mlflow_tags=False)
         self.await_creation_for = await_creation_for 
 
-    def import_model(self, input_dir, model_name, experiment_name, delete_model=False, verbose=False):
+    def import_model(self, input_dir, model_name, experiment_name, delete_model=False, verbose=False, sleep_time=30):
         path = os.path.join(input_dir,"model.json")
         dct = utils.read_json_file(path)
         dct = dct["registered_model"]
@@ -38,20 +38,19 @@ class ModelImporter():
         try:
             tags = { e["key"]:e["value"] for e in dct.get("tags", {}) }
             self.client.create_registered_model(model_name, tags, dct.get("description"))
+            print(f"Created new registered model '{model_name}'")
         except RestException as e:
             if not "RESOURCE_ALREADY_EXISTS: Registered Model" in str(e):
                 raise e
+            print(f"Registered model '{model_name}' already exists")
+
         mlflow.set_experiment(experiment_name)
-
         print("Importing latest versions:")
-
         for vr in dct["latest_versions"]:
-            self.import_run(input_dir, experiment_name, vr)
-            self.import_version(model_name, vr)
-
+            run_id = self.import_run(input_dir, experiment_name, vr)
+            self.import_version(model_name, vr, run_id, sleep_time)
         if verbose:
             model_utils.dump_model_versions(self.client, model_name)
-
 
     def import_run(self, input_dir, experiment_name, vr):
         run_id = vr["run_id"]
@@ -67,22 +66,26 @@ class ModelImporter():
         print(f"      source:           {source}")
         model_path = extract_model_path(source, run_id)
         print(f"      model_path:   {model_path}")
-        run_id,_ = self.run_importer.import_run(experiment_name, run_dir)
-        run = self.client.get_run(run_id)
+        dst_run_id,_ = self.run_importer.import_run(experiment_name, run_dir)
+        run = self.client.get_run(dst_run_id)
         print(f"    Destination run - imported run:")
-        print(f"      run_id: {run_id}")
+        print(f"      run_id: {dst_run_id}")
         print(f"      run_artifact_uri: {run.info.artifact_uri}")
-        source = path_join(run.info.artifact_uri,model_path)
+        source = path_join(run.info.artifact_uri, model_path)
         print(f"      source:           {source}")
+        return dst_run_id
 
-    def import_version(self, model_name, vr):
-        source = vr["source"]
-        current_stage = vr["current_stage"]
-        if not source.startswith("dbfs:") and not os.path.exists(source):
-            raise Exception(f"'source' argument for MLflowClient.create_model_version does not exist: {source}")
+    def import_version(self, model_name, src_vr, dst_run_id, sleep_time):
+        src_source = src_vr["source"]
+        dst_run = self.client.get_run(dst_run_id)
+        model_path = extract_model_path(src_source, src_vr["run_id"])
+        dst_source = f"{dst_run.info.artifact_uri}/{model_path}"
+        current_stage = src_vr["current_stage"]
+        if not dst_source.startswith("dbfs:") and not os.path.exists(dst_source):
+            raise Exception(f"'source' argument for MLflowClient.create_model_version does not exist: {dst_source}")
         kwargs = {"await_creation_for": self.await_creation_for } if self.await_creation_for else {}
-        version = self.client.create_model_version(model_name, source, vr["run_id"], **kwargs)
-        model_utils.wait_until_version_is_ready(self.client, model_name, version, sleep_time=2)
+        version = self.client.create_model_version(model_name, dst_source, dst_run.info.run_id, **kwargs)
+        model_utils.wait_until_version_is_ready(self.client, model_name, version, sleep_time=sleep_time)
         if current_stage != "None":
             self.client.transition_model_version_stage(model_name, version.version, current_stage)
 
@@ -106,14 +109,15 @@ def path_join(x,y):
 @click.option("--experiment-name", help="Destination experiment name  - will be created if it does not exist.", required=True, type=str)
 @click.option("--delete-model", help="First delete the model if it exists and all its versions.", type=bool, default=False, show_default=True)
 @click.option("--await-creation-for", help="Await creation for specified seconds.", type=int, default=None, show_default=True)
+@click.option("--sleep-time", help="Sleep time for polling until version.status==READY.", default=5, type=int)
 @click.option("--verbose", help="Verbose.", type=bool, default=False, show_default=True)
 
-def main(input_dir, model, experiment_name, delete_model, await_creation_for, verbose): # pragma: no cover
+def main(input_dir, model, experiment_name, delete_model, await_creation_for, verbose, sleep_time): # pragma: no cover
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
     importer = ModelImporter(await_creation_for=await_creation_for)
-    importer.import_model(input_dir, model, experiment_name, delete_model, verbose)
+    importer.import_model(input_dir, model, experiment_name, delete_model, verbose, sleep_time)
 
 if __name__ == "__main__":
     main()
