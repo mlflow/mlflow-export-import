@@ -24,7 +24,7 @@ Note, there is also a secondary "[direct copy](README_copy.md)" feature with doc
   * Import experiments from a directory.
 
 ### Runs
-  * Export a run to  a directory or zip file.
+  * Export a run to  a directory.
   * Import a run from a directory or zip file.
 
 ### Registered Models
@@ -476,7 +476,7 @@ Sample run.json:
 
 ### Import run
 
-Imports a run from a directory or zip file.
+Imports a run from a directory.
 
 #### Usage
 
@@ -484,7 +484,7 @@ Imports a run from a directory or zip file.
 python -m mlflow_export_import.run.import_run  --help
 
 Options:
-  --input TEXT                    Input path - directory or zip file.  [required]
+  --input TEXT                    Input path - directory.  [required]
   --experiment-name TEXT          Destination experiment name.  [required]
   --use-src-user-id BOOLEAN       Set the destination user ID to the source
                                   user ID. Source user ID is ignored when

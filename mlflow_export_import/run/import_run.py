@@ -1,5 +1,5 @@
 """
-Imports a run from a directory of zip file.
+Imports a run from a directory.
 """
 
 import os
@@ -8,7 +8,6 @@ import yaml
 import tempfile
 import click
 import mlflow
-from mlflow.utils.file_utils import TempDir
 
 from mlflow_export_import import utils, click_doc
 from mlflow_export_import import mk_local_path
@@ -26,15 +25,10 @@ class RunImporter():
         print(f"importing_into_databricks: {utils.importing_into_databricks()}")
 
     def import_run(self, exp_name, input):
-        print(f"Importing run into experiment '{exp_name}' from '{input}'")
-        if input.endswith(".zip"):
-            return self.import_run_from_zip(exp_name, input)
-        else:
-            return self.import_run_from_dir(exp_name, input)
-
-    def import_run_from_zip(self, exp_name, zip_file):
-        utils.unzip_directory(zip_file, exp_name, self.import_run_from_dir)
-        return "run_id_TODO"
+        print(f"Importing run from '{input}'")
+        res = self.import_run_from_dir(exp_name, input)
+        print(f"Imported run into '{exp_name}/{res[0]}'")
+        return res
 
     def import_run_from_dir(self, dst_exp_name, src_run_id):
         mlflow.set_experiment(dst_exp_name)
@@ -94,7 +88,7 @@ class RunImporter():
         self.client.log_batch(run_id, metrics, params, tags)
 
 @click.command()
-@click.option("--input", help="Input path - directory or zip file.", required=True, type=str)
+@click.option("--input", help="Input path - directory.", required=True, type=str)
 @click.option("--experiment-name", help="Destination experiment name.", required=True, type=str)
 @click.option("--mlmodel-fix", help="Add correct run ID in destination MLmodel artifact. Can be expensive for deeply nested artifacts.", type=bool, default=True, show_default=True)
 @click.option("--use-src-user-id", help=click_doc.use_src_user_id, type=bool, default=False, show_default=True)
