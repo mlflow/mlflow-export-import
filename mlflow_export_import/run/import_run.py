@@ -12,6 +12,8 @@ import mlflow
 from mlflow_export_import import utils, click_doc
 from mlflow_export_import import mk_local_path
 from mlflow_export_import.common.find_artifacts import find_artifacts
+from mlflow_export_import.common.http_client import DatabricksHttpClient
+from mlflow_export_import.common import mlflow_utils
 
 class RunImporter():
     def __init__(self, mlflow_client=None, mlmodel_fix=True, use_src_user_id=False, import_mlflow_tags=False, import_metadata_tags=False):
@@ -21,6 +23,7 @@ class RunImporter():
         self.import_mlflow_tags = import_mlflow_tags
         self.import_metadata_tags = import_metadata_tags
         self.in_databricks = "DATABRICKS_RUNTIME_VERSION" in os.environ
+        self.dbx_client = DatabricksHttpClient()
         print(f"in_databricks: {self.in_databricks}")
         print(f"importing_into_databricks: {utils.importing_into_databricks()}")
 
@@ -31,10 +34,8 @@ class RunImporter():
         return res
 
     def import_run_from_dir(self, dst_exp_name, src_run_id):
-        mlflow.set_experiment(dst_exp_name)
-        dst_exp = self.client.get_experiment_by_name(dst_exp_name)
-        #print("Experiment name:",dst_exp_name)
-        #print("Experiment ID:",dst_exp.experiment_id)
+        mlflow_utils.set_experiment(self.dbx_client, dst_exp_name)
+        self.client.get_experiment_by_name(dst_exp_name)
         src_run_path = os.path.join(src_run_id,"run.json")
         src_run_dct = utils.read_json_file(src_run_path)
         with mlflow.start_run() as run:

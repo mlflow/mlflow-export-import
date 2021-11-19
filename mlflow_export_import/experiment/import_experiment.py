@@ -9,12 +9,15 @@ from mlflow_export_import import click_doc
 from mlflow_export_import import peek_at_experiment
 from mlflow_export_import.run.import_run import RunImporter
 from mlflow_export_import import utils
+from mlflow_export_import.common import mlflow_utils
+from mlflow_export_import.common.http_client import DatabricksHttpClient
 
 class ExperimentImporter():
     def __init__(self, mlflow_client=None, use_src_user_id=False, import_mlflow_tags=True, import_metadata_tags=False):
         self.client = mlflow_client or mlflow.tracking.MlflowClient()
         self.run_importer = RunImporter(self.client, use_src_user_id=use_src_user_id, import_mlflow_tags=import_mlflow_tags, import_metadata_tags=import_metadata_tags)
         print("MLflowClient:",self.client)
+        self.dbx_client = DatabricksHttpClient()
 
     def import_experiment(self, exp_name, input):
         if input.endswith(".zip"):
@@ -23,7 +26,7 @@ class ExperimentImporter():
             self.import_experiment_from_dir(exp_name, input)
 
     def import_experiment_from_dir(self, exp_name, exp_dir):
-        mlflow.set_experiment(exp_name)
+        mlflow_utils.set_experiment(self.dbx_client, exp_name)
         manifest_path = os.path.join(exp_dir,"manifest.json")
         dct = utils.read_json_file(manifest_path)
         run_ids = dct["run_ids"]
