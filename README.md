@@ -45,6 +45,7 @@ Note, there is also a secondary "[direct copy](README_copy.md)" feature with doc
 The [workspace/export](https://docs.databricks.com/dev-tools/api/latest/workspace.html#export) API endpoint only exports a notebook representing the latest revision.
 * When you import a run, the link to its source notebook revision ID will appear in the UI but you cannot reach that revision (link is dead).
 * For convenience, the export tool exports the latest notebook revision for a notebook-based experiment but again, it cannot be attached to a run when imported. Its stored as an artifact in the "notebooks" folder of the run's artifact root.
+* When importing a run or experiment, for open source MLflow you can specify the user owner. For Databricks import you cannot - the owner will be based on the personal access token.
 
 ## Common options details 
 
