@@ -277,7 +277,7 @@ In the example below we have two experiments - 1 and 7. Experiment 1 (sklearn) h
 |         +-model/
 ```
 
-Sample [experiment list manifest.json](samples/oss_mlflow/experiments/manifest.json).
+Sample [experiment list manifest.json](samples/oss_mlflow/experiment_list/manifest.json).
 ```
 {
   "info": {
@@ -298,7 +298,7 @@ Sample [experiment list manifest.json](samples/oss_mlflow/experiments/manifest.j
 }
 ```
 
-Sample [experiment manifest.json](samples/oss_mlflow/experiments/1/manifest.json).
+Sample [experiment manifest.json](samples/oss_mlflow/experiment_list/1/manifest.json).
 
 ```
 {
@@ -443,7 +443,7 @@ artifacts
     model.pkl
 ```
 Sample run.json:
-[OSS](samples/oss_mlflow/experiments/1/6ccadf17812d43929b093d75cca1c33f/run.json)
+[OSS](samples/oss_mlflow/experiment_list/1/6ccadf17812d43929b093d75cca1c33f/run.json)
  \- [Databricks](samples/databricks/experiments/sklearn_wine/16c36560c57a43fdb46e98f88a8d8819/run.json).
 ```
 {   
