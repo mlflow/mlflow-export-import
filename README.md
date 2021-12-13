@@ -11,8 +11,6 @@ There are two ways to run MLflow Export Import:
 * As a normal Python package - this page.
 * [Databricks notebooks](databricks_notebooks/README.md).
 
-Note, there is also a secondary "[direct copy](README_copy.md)" feature with documented limitations.
-
 ## Architecture
 
 <img src="export_import_architecture.png" height="330" >

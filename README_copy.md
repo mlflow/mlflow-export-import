@@ -3,7 +3,8 @@
 ## Overview
 
 * Directly copy an experiment or run from one tracking server to another.
-* This functionality is less often used (and therefore tested) then export/import so your mileage may vary.
+* This functionality is less often used (and therefore less tested) then export/import so your mileage may vary.
+* Basically it is deprecated and not supported.
 
 ## Databricks Limitations
 
