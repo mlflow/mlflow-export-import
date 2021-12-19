@@ -8,6 +8,7 @@ import yaml
 import tempfile
 import click
 import mlflow
+from mlflow.entities import RunStatus
 
 from mlflow_export_import import utils, click_doc
 from mlflow_export_import import mk_local_path
@@ -17,7 +18,7 @@ from mlflow_export_import.common import mlflow_utils
 
 class RunImporter():
     def __init__(self, mlflow_client=None, mlmodel_fix=True, use_src_user_id=False, import_mlflow_tags=False, import_metadata_tags=False):
-        self.client = mlflow_client or mlflow.tracking.MlflowClient()
+        self.mlflow_client = mlflow_client or mlflow.tracking.MlflowClient()
         self.mlmodel_fix = mlmodel_fix
         self.use_src_user_id = use_src_user_id
         self.import_mlflow_tags = import_mlflow_tags
@@ -35,17 +36,27 @@ class RunImporter():
 
     def import_run_from_dir(self, dst_exp_name, src_run_id):
         mlflow_utils.set_experiment(self.dbx_client, dst_exp_name)
-        self.client.get_experiment_by_name(dst_exp_name)
+        exp = self.mlflow_client.get_experiment_by_name(dst_exp_name)
         src_run_path = os.path.join(src_run_id,"run.json")
         src_run_dct = utils.read_json_file(src_run_path)
-        with mlflow.start_run() as run:
-            run_id = run.info.run_id
+
+        run = self.mlflow_client.create_run(exp.experiment_id)
+        run_id = run.info.run_id
+        try:
             self.import_run_data(src_run_dct, run_id, src_run_dct["info"]["user_id"])
             path = os.path.join(src_run_id,"artifacts")
             if os.path.exists(path):
-                mlflow.log_artifacts(mk_local_path(path))
-        if self.mlmodel_fix:
-            self.update_mlmodel_run_id(run.info.run_id)
+                self.mlflow_client.log_artifacts(run_id, mk_local_path(path))
+            if self.mlmodel_fix:
+                self.update_mlmodel_run_id(run_id)
+            self.mlflow_client.set_terminated(run_id, RunStatus.to_string(RunStatus.FINISHED))
+        except Exception as e:
+            self.mlflow_client.set_terminated(run_id, RunStatus.to_string(RunStatus.FAILED))
+            import traceback
+            traceback.print_exc()
+            from mlflow_export_import.common import MlflowExportImportException
+            raise MlflowExportImportException from e
+            
         return (run_id, src_run_dct["tags"].get(utils.TAG_PARENT_ID,None))
 
     # Patch to fix the run_id in the destination MLmodel file since there is no API to get all model artifacts of a run.
@@ -53,7 +64,7 @@ class RunImporter():
         mlmodel_paths = find_artifacts(run_id, "", "MLmodel")
         for mlmodel_path in mlmodel_paths:
             model_path = mlmodel_path.replace("/MLmodel","")
-            local_path = self.client.download_artifacts(run_id, mlmodel_path)
+            local_path = self.mlflow_client.download_artifacts(run_id, mlmodel_path)
             with open(local_path, "r") as f:
                 mlmodel = yaml.safe_load(f)
             mlmodel["run_id"] = run_id
@@ -61,7 +72,7 @@ class RunImporter():
                 output_path = os.path.join(dir, "MLmodel")
                 with open(output_path, "w") as f:
                     yaml.dump(mlmodel, f)
-                self.client.log_artifact(run_id, output_path,  f"{model_path}")
+                self.mlflow_client.log_artifact(run_id, output_path,  f"{model_path}")
 
     def dump_tags(self, tags, msg=""):
         print(f"Tags {msg} - {len(tags)}:")
@@ -86,7 +97,7 @@ class RunImporter():
         if not self.in_databricks:
             utils.set_dst_user_id(tags, src_user_id, self.use_src_user_id)
         #self.dump_tags(tags,"2") # debug
-        self.client.log_batch(run_id, metrics, params, tags)
+        self.mlflow_client.log_batch(run_id, metrics, params, tags)
 
 @click.command()
 @click.option("--input", help="Input path - directory.", required=True, type=str)
