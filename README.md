@@ -483,14 +483,22 @@ Imports a run from a directory.
 python -m mlflow_export_import.run.import_run  --help
 
 Options:
-  --input TEXT                    Input path - directory.  [required]
+  --input-dir TEXT                Source input directory that contains the
+                                  exported run.  [required]
+
   --experiment-name TEXT          Destination experiment name.  [required]
+  --mlmodel-fix BOOLEAN           Add correct run ID in destination MLmodel
+                                  artifact. Can be expensive for deeply nested
+                                  artifacts.  [default: True]
+
   --use-src-user-id BOOLEAN       Set the destination user ID to the source
                                   user ID. Source user ID is ignored when
                                   importing into Databricks since setting it
                                   is not allowed.  [default: False]
-  --import-mlflow-tags BOOLEAN    Import mlflow tags.  [default: True]
-  --import-metadata-tags BOOLEAN  Import mlflow_tools tags.  [default: False]
+
+  --import-mlflow-tags BOOLEAN    Import mlflow tags.  [default: False]
+  --import-metadata-tags BOOLEAN  Import mlflow_export_import tags.  [default:
+                                  False]
 ```
 
 #### Import examples
