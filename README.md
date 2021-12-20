@@ -422,12 +422,7 @@ Options:
 ```
 python -u -m mlflow_export_import.run.export_run \
   --run-id 50fa90e751eb4b3f9ba9cef0efe8ea30 \
-  --output out
-```
-```
-python -u -m mlflow_export_import.run.export_run \
-  --run-id 50fa90e751eb4b3f9ba9cef0efe8ea30 \
-  --output run.zip
+  --output-dir out
 ```
 
 Produces a directory with the following structure:
