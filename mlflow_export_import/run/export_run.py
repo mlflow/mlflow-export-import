@@ -1,5 +1,5 @@
 """ 
-Exports a run to a directory or zip file.
+Exports a run to a directory.
 """
 
 import os
@@ -19,54 +19,39 @@ print("MLflow Version:", mlflow.version.VERSION)
 print("MLflow Tracking URI:", mlflow.get_tracking_uri())
 
 class RunExporter():
-    def __init__(self, client=None, export_metadata_tags=False, notebook_formats=[], filesystem=None):
+    def __init__(self, client=None, export_metadata_tags=False, notebook_formats=[]):
         self.client = client or mlflow.tracking.MlflowClient()
         self.dbx_client = DatabricksHttpClient()
         print("Databricks REST client:",self.dbx_client)
-        self.fs = filesystem or _filesystem.get_filesystem()
-        print("Filesystem:",type(self.fs).__name__)
         self.export_metadata_tags = export_metadata_tags
         self.notebook_formats = notebook_formats
 
-    def export_run(self, run_id, output):
+    def export_run(self, run_id, output_dir):
+        fs = _filesystem.get_filesystem(output_dir)
+        #print("Filesystem:",type(fs).__name__)
         run = self.client.get_run(run_id)
-        if output.endswith(".zip"):
-            return self.export_run_to_zip(run, output)
-        else:
-            self.fs.mkdirs(output)
-            return self.export_run_to_dir(run, output)
-
-    def export_run_to_zip(self, run, zip_file):
-        temp_dir = tempfile.mkdtemp()
-        try:
-            self.export_run_to_dir(run, temp_dir)
-            utils.zip_directory(zip_file, temp_dir)
-        finally:
-            shutil.rmtree(temp_dir)
-            #fs.rm(temp_dir,True) # TODO
-
-    def export_run_to_dir(self, run, run_dir):
+        fs.mkdirs(output_dir)
         tags =  utils.create_tags_for_metadata(self.client, run, self.export_metadata_tags)
         dct = { "info": utils.strip_underscores(run.info) , 
                 "params": run.data.params,
                 "metrics": run.data.metrics,
                 "tags": tags,
               }
-        path = os.path.join(run_dir,"run.json")
-        utils.write_json_file(self.fs, path, dct)
+        path = os.path.join(output_dir,"run.json")
+        utils.write_json_file(fs, path, dct)
 
         # copy artifacts
-        dst_path = os.path.join(run_dir,"artifacts")
+        dst_path = os.path.join(output_dir,"artifacts")
         try:
             TAG_NOTEBOOK_PATH = "mlflow.databricks.notebookPath"
             artifacts = self.client.list_artifacts(run.info.run_id)
             if len(artifacts) > 0: # Because of https://github.com/mlflow/mlflow/issues/2839
-                self.fs.mkdirs(dst_path)
+                fs.mkdirs(dst_path)
                 self.client.download_artifacts(run.info.run_id,"", dst_path=mk_local_path(dst_path))
             notebook = tags.get(TAG_NOTEBOOK_PATH, None)
             if notebook is not None:
                 if len(self.notebook_formats) > 0:
-                    self.export_notebook(run_dir, notebook)
+                    self.export_notebook(output_dir, notebook, fs)
             elif len(self.notebook_formats) > 0:
                 print(f"WARNING: Cannot export notebook since tag '{TAG_NOTEBOOK_PATH}' is not set.")
             return True
@@ -75,34 +60,33 @@ class RunExporter():
             traceback.print_exc()
             return False
 
-    def export_notebook(self, run_dir, notebook):
-        nb_dir = os.path.join(run_dir,"artifacts","notebooks")
-        os.makedirs(nb_dir, exist_ok=True)
+    def export_notebook(self, output_dir, notebook, fs):
+        notebook_dir = os.path.join(output_dir,"artifacts","notebooks")
+        res = fs.mkdirs(notebook_dir)
         for format in self.notebook_formats:
-            self.export_notebook_format(nb_dir, notebook, format, format.lower())
+            self.export_notebook_format(notebook_dir, notebook, format, format.lower())
 
-    def export_notebook_format(self, nb_dir, notebook, format, extension):
+    def export_notebook_format(self, notebook_dir, notebook, format, extension):
         resource = f"workspace/export?path={notebook}&direct_download=true&format={format}"
         try:
             rsp = self.dbx_client._get(resource)
-            nb_path = os.path.join(nb_dir, f"notebook.{extension}")
-            utils.write_file(nb_path, rsp.content)
-            #self.fs.write(nb_path, rsp.content) # Bombs for DBC because dbutils.fs.put only writes strings!
+            notebook_path = os.path.join(notebook_dir, f"notebook.{extension}")
+            utils.write_file(notebook_path, rsp.content)
         except MlflowExportImportException as e:
             print(f"WARNING: Cannot save notebook '{notebook}'. {e}")
 
 @click.command()
 @click.option("--run-id", help="Run ID.", required=True, type=str)
-@click.option("--output", help="Output directory or zip file.", required=True)
+@click.option("--output-dir", help="Output directory or zip file.", required=True)
 @click.option("--export-metadata-tags", help=click_doc.export_metadata_tags, type=bool, default=False, show_default=True)
 @click.option("--notebook-formats", help=click_doc.notebook_formats, default="", show_default=True)
 
-def main(run_id, output, export_metadata_tags, notebook_formats): # pragma: no cover
+def main(run_id, output_dir, export_metadata_tags, notebook_formats): # pragma: no cover
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
     exporter = RunExporter(None, export_metadata_tags, utils.string_to_list(notebook_formats))
-    exporter.export_run(run_id, output)
+    exporter.export_run(run_id, output_dir)
 
 if __name__ == "__main__":
     main()

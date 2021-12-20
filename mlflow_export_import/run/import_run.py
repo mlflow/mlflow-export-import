@@ -15,6 +15,7 @@ from mlflow_export_import import mk_local_path
 from mlflow_export_import.common.find_artifacts import find_artifacts
 from mlflow_export_import.common.http_client import DatabricksHttpClient
 from mlflow_export_import.common import mlflow_utils
+from mlflow_export_import.common import filesystem as _filesystem
 
 class RunImporter():
     def __init__(self, mlflow_client=None, mlmodel_fix=True, use_src_user_id=False, import_mlflow_tags=False, import_metadata_tags=False):
@@ -45,11 +46,11 @@ class RunImporter():
         :param input_dir: Source input directory that contains the exported run.
         """
         print(f"Importing run from '{input_dir}'")
-        res = self._import_run_from_dir(exp_name, input_dir)
+        res = self._import_run(exp_name, input_dir)
         print(f"Imported run into '{exp_name}/{res[0]}'")
         return res
 
-    def _import_run_from_dir(self, dst_exp_name, src_run_id):
+    def _import_run(self, dst_exp_name, src_run_id):
         mlflow_utils.set_experiment(self.dbx_client, dst_exp_name)
         exp = self.mlflow_client.get_experiment_by_name(dst_exp_name)
         src_run_path = os.path.join(src_run_id,"run.json")

@@ -1,3 +1,7 @@
+"""
+Filesystem utilities - local or Databricks
+"""
+
 import os
 import shutil
 
@@ -45,6 +49,5 @@ class LocalFileSystem(object):
         with open(mk_local_path(path), 'w') as f:
             f.write(content)
 
-def get_filesystem():
-    use_databricks = "DATABRICKS_RUNTIME_VERSION" in os.environ
-    return DatabricksFileSystem() if use_databricks else LocalFileSystem()
+def get_filesystem(dir):
+    return DatabricksFileSystem() if dir.startswith("dbfs:") else LocalFileSystem()

@@ -411,7 +411,7 @@ python -m mlflow_export_import.run.export_run --help
 
 Options:
   --run-id TEXT                   Run ID.  [required]
-  --output TEXT                   Output directory or zip file.  [required]
+  --output-dir TEXT               Output directory.  [required]
   --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: False] 
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
                                   JUPYTER or DBC.  [default: ]

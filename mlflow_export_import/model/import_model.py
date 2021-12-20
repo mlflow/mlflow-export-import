@@ -13,7 +13,6 @@ from mlflow_export_import.common import filesystem as _filesystem
 
 class ModelImporter():
     def __init__(self, filesystem=None, run_importer=None, await_creation_for=None):
-        self.fs = filesystem or _filesystem.get_filesystem()
         self.client = mlflow.tracking.MlflowClient()
         self.run_importer = run_importer if run_importer else RunImporter(self.client, mlmodel_fix=True, import_mlflow_tags=False)
         self.await_creation_for = await_creation_for 
