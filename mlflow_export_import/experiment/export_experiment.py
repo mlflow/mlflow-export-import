@@ -28,16 +28,13 @@ class ExperimentExporter():
         fs = _filesystem.get_filesystem(output_dir)
         print("Filesystem:",type(fs).__name__)
         fs.mkdirs(output_dir)
-        self._export_experiment(exp_id, output_dir, fs)
-
-    def _export_experiment(self, exp_id, exp_dir, fs):
         exp = self.client.get_experiment(exp_id)
         dct = {"experiment": utils.strip_underscores(exp)}
         run_ids = []
         failed_run_ids = []
         j = -1
         for j,run in enumerate(SearchRunsIterator(self.client, exp_id)):
-            run_dir = os.path.join(exp_dir, run.info.run_id)
+            run_dir = os.path.join(output_dir, run.info.run_id)
             print(f"Exporting run {j+1}: {run.info.run_id}")
             res = self.run_exporter.export_run(run.info.run_id, run_dir)
             if res:
@@ -47,7 +44,7 @@ class ExperimentExporter():
         dct["export_info"] = { "export_time": utils.get_now_nice(), "num_runs": (j+1) }
         dct["run_ids"] = run_ids
         dct["failed_run_ids"] = failed_run_ids
-        path = os.path.join(exp_dir,"manifest.json")
+        path = os.path.join(output_dir,"manifest.json")
         utils.write_json_file(fs, path, dct)
         if len(failed_run_ids) == 0:
             print(f"All {len(run_ids)} runs succesfully exported")
