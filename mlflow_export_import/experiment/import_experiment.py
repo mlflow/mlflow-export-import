@@ -20,10 +20,7 @@ class ExperimentImporter():
         self.dbx_client = DatabricksHttpClient()
 
     def import_experiment(self, exp_name, input):
-        if input.endswith(".zip"):
-            self.import_experiment_from_zip(exp_name, input)
-        else:
-            self.import_experiment_from_dir(exp_name, input)
+        self.import_experiment_from_dir(exp_name, input)
 
     def import_experiment_from_dir(self, exp_name, exp_dir):
         mlflow_utils.set_experiment(self.dbx_client, exp_name)
@@ -40,9 +37,6 @@ class ExperimentImporter():
         if len(failed_run_ids) > 0:
             print(f"Warning: {len(failed_run_ids)} failed runs were not imported - see {manifest_path}")
         utils.nested_tags(self.client, run_ids_mapping)
-
-    def import_experiment_from_zip(self, exp_name, zip_file):
-        utils.unzip_directory(zip_file, exp_name, self.import_experiment_from_dir)
 
 @click.command()
 @click.option("--input-dir", help="Input path - directory", required=True, type=str)

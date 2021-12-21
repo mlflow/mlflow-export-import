@@ -77,7 +77,7 @@ class RunExporter():
 
 @click.command()
 @click.option("--run-id", help="Run ID.", required=True, type=str)
-@click.option("--output-dir", help="Output directory or zip file.", required=True)
+@click.option("--output-dir", help="Output directory.", required=True)
 @click.option("--export-metadata-tags", help=click_doc.export_metadata_tags, type=bool, default=False, show_default=True)
 @click.option("--notebook-formats", help=click_doc.notebook_formats, default="", show_default=True)
 

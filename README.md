@@ -23,7 +23,7 @@ There are two ways to run MLflow Export Import:
 
 ### Runs
   * Export a run to  a directory.
-  * Import a run from a directory or zip file.
+  * Import a run from a directory.
 
 ### Registered Models
   * Export a registered model to a directory.
@@ -402,7 +402,7 @@ python -u -m mlflow_export_import.experiment.import_experiment_list \
 
 ### Export run
 
-Export run to directory or zip file.
+Export run to directory.
 
 **Usage**
 
