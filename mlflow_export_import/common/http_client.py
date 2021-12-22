@@ -39,7 +39,7 @@ class HttpClient():
         return json.loads(rsp.text)
 
     def _mk_headers(self):
-        headers = { "User-Agent": "mlflow-export-importe/1.0.0"} 
+        headers = { "User-Agent": "mlflow-export-import/1.0.0"} 
         if self.token:
             headers["Authorization"] = f"Bearer {self.token}" 
         return headers
