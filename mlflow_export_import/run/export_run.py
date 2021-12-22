@@ -51,7 +51,7 @@ class RunExporter():
             notebook = tags.get(TAG_NOTEBOOK_PATH, None)
             if notebook is not None:
                 if len(self.notebook_formats) > 0:
-                    self.export_notebook(output_dir, notebook, run.data.tags["mlflow.databricks.notebookRevisionID"], fs)
+                    self.export_notebook(output_dir, notebook, run.data.tags, fs)
             elif len(self.notebook_formats) > 0:
                 print(f"WARNING: Cannot export notebook since tag '{TAG_NOTEBOOK_PATH}' is not set.")
             return True
@@ -60,17 +60,19 @@ class RunExporter():
             traceback.print_exc()
             return False
 
-    def export_notebook(self, output_dir, notebook, revision, fs):
+    def export_notebook(self, output_dir, notebook, tags, fs):
         notebook_dir = os.path.join(output_dir,"artifacts","notebooks")
         fs.mkdirs(notebook_dir)
         for format in self.notebook_formats:
-            self.export_notebook_format(notebook_dir, notebook, format, format.lower(), revision)
+            self.export_notebook_format(notebook_dir, notebook, format, format.lower(), tags)
 
-    def export_notebook_format(self, notebook_dir, notebook, format, extension, revision):
+    def export_notebook_format(self, notebook_dir, notebook, format, extension, tags):
+        revision = tags["mlflow.databricks.notebookRevisionID"]
+        notebook_name = os.path.basename(tags["mlflow.databricks.notebookPath"])
         resource = f'workspace/export?path={notebook}&direct_download=true&format={format}&revision={{"revision_timestamp":{revision}}}'
         try:
             rsp = self.dbx_client._get(resource)
-            notebook_path = os.path.join(notebook_dir, f"notebook.{extension}")
+            notebook_path = os.path.join(notebook_dir, f"{notebook_name}.{extension}")
             utils.write_file(notebook_path, rsp.content)
         except MlflowExportImportException as e:
             print(f"WARNING: Cannot save notebook '{notebook}'. {e}")
