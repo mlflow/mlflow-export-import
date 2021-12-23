@@ -3,6 +3,7 @@ Exports a run to a directory.
 """
 
 import os
+import json
 import shutil
 import traceback
 import tempfile
@@ -63,13 +64,18 @@ class RunExporter():
     def export_notebook(self, output_dir, notebook, tags, fs):
         notebook_dir = os.path.join(output_dir,"artifacts","notebooks")
         fs.mkdirs(notebook_dir)
+        revision_id = tags["mlflow.databricks.notebookRevisionID"]
+        notebook_path = tags["mlflow.databricks.notebookPath"]
+        notebook_name = os.path.basename(notebook_path)
+        dct = { "mlflow.databricks.notebookRevisionID": revision_id, "mlflow.databricks.notebookPath": notebook_path }
+        path = os.path.join(notebook_dir,"manifest.json")
+        with open(path, "w") as f:
+            f.write(json.dumps(dct,indent=2)+"\n")
         for format in self.notebook_formats:
-            self.export_notebook_format(notebook_dir, notebook, format, format.lower(), tags)
+            self.export_notebook_format(notebook_dir, notebook, format, format.lower(), notebook_name, revision_id)
 
-    def export_notebook_format(self, notebook_dir, notebook, format, extension, tags):
-        revision = tags["mlflow.databricks.notebookRevisionID"]
-        notebook_name = os.path.basename(tags["mlflow.databricks.notebookPath"])
-        resource = f'workspace/export?path={notebook}&direct_download=true&format={format}&revision={{"revision_timestamp":{revision}}}'
+    def export_notebook_format(self, notebook_dir, notebook, format, extension, notebook_name, revision_id):
+        resource = f'workspace/export?path={notebook}&direct_download=true&format={format}&revision={{"revision_timestamp":{revision_id}}}'
         try:
             rsp = self.dbx_client._get(resource)
             notebook_path = os.path.join(notebook_dir, f"{notebook_name}.{extension}")
