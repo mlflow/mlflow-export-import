@@ -11,10 +11,10 @@ from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils, click_doc
 
 class ModelExporter():
-    def __init__(self, export_metadata_tags=False, notebook_formats=[], filesystem=None, stages=None):
+    def __init__(self, export_metadata_tags=False, notebook_formats=[], stages=None):
         self.mlflow_client = mlflow.tracking.MlflowClient()
         self.http_client = HttpClient("api/2.0/mlflow")
-        self.run_exporter = RunExporter(self.mlflow_client, export_metadata_tags=export_metadata_tags, notebook_formats=notebook_formats, filesystem=filesystem)
+        self.run_exporter = RunExporter(self.mlflow_client, export_metadata_tags=export_metadata_tags, notebook_formats=notebook_formats)
         self.stages = self.normalize_stages(stages)
 
     def export_model(self, output_dir, model_name):
@@ -50,7 +50,7 @@ class ModelExporter():
                     import traceback
                     traceback.print_exc()
         print(f"Exported {exported_versions}/{len(versions)} versions for model {model_name}")
-        fs = _filesystem.get_filesystem2(path)
+        fs = _filesystem.get_filesystem(path)
         utils.write_json_file(fs, path, model)
         return manifest
 
