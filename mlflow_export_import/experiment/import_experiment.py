@@ -14,9 +14,9 @@ from mlflow_export_import.common.http_client import DatabricksHttpClient
 
 class ExperimentImporter():
     def __init__(self, mlflow_client=None, use_src_user_id=False, import_mlflow_tags=True, import_metadata_tags=False):
-        self.client = mlflow_client or mlflow.tracking.MlflowClient()
-        self.run_importer = RunImporter(self.client, use_src_user_id=use_src_user_id, import_mlflow_tags=import_mlflow_tags, import_metadata_tags=import_metadata_tags)
-        print("MLflowClient:",self.client)
+        self.mlflow_client = mlflow_client or mlflow.tracking.MlflowClient()
+        self.run_importer = RunImporter(self.mlflow_client, use_src_user_id=use_src_user_id, import_mlflow_tags=import_mlflow_tags, import_metadata_tags=import_metadata_tags)
+        print("MLflowClient:",self.mlflow_client)
         self.dbx_client = DatabricksHttpClient()
 
     def import_experiment(self, exp_name, input):
@@ -36,7 +36,7 @@ class ExperimentImporter():
         print(f"Imported {len(run_ids)} runs into experiment '{exp_name}' from {exp_dir}")
         if len(failed_run_ids) > 0:
             print(f"Warning: {len(failed_run_ids)} failed runs were not imported - see {manifest_path}")
-        utils.nested_tags(self.client, run_ids_mapping)
+        utils.nested_tags(self.mlflow_client, run_ids_mapping)
 
 @click.command()
 @click.option("--input-dir", help="Input path - directory", required=True, type=str)

@@ -4,9 +4,7 @@ Exports a run to a directory.
 
 import os
 import json
-import shutil
 import traceback
-import tempfile
 import mlflow
 import click
 
@@ -21,7 +19,7 @@ print("MLflow Tracking URI:", mlflow.get_tracking_uri())
 
 class RunExporter():
     def __init__(self, client=None, export_metadata_tags=False, notebook_formats=[]):
-        self.client = client or mlflow.tracking.MlflowClient()
+        self.mlflow_client = client or mlflow.tracking.MlflowClient()
         self.dbx_client = DatabricksHttpClient()
         print("Databricks REST client:",self.dbx_client)
         self.export_metadata_tags = export_metadata_tags
@@ -30,9 +28,9 @@ class RunExporter():
     def export_run(self, run_id, output_dir):
         fs = _filesystem.get_filesystem(output_dir)
         #print("Filesystem:",type(fs).__name__)
-        run = self.client.get_run(run_id)
+        run = self.mlflow_client.get_run(run_id)
         fs.mkdirs(output_dir)
-        tags =  utils.create_tags_for_metadata(self.client, run, self.export_metadata_tags)
+        tags =  utils.create_tags_for_metadata(self.mlflow_client, run, self.export_metadata_tags)
         dct = { "info": utils.strip_underscores(run.info) , 
                 "params": run.data.params,
                 "metrics": run.data.metrics,
@@ -45,10 +43,10 @@ class RunExporter():
         dst_path = os.path.join(output_dir,"artifacts")
         try:
             TAG_NOTEBOOK_PATH = "mlflow.databricks.notebookPath"
-            artifacts = self.client.list_artifacts(run.info.run_id)
+            artifacts = self.mlflow_client.list_artifacts(run.info.run_id)
             if len(artifacts) > 0: # Because of https://github.com/mlflow/mlflow/issues/2839
                 fs.mkdirs(dst_path)
-                self.client.download_artifacts(run.info.run_id,"", dst_path=mk_local_path(dst_path))
+                self.mlflow_client.download_artifacts(run.info.run_id,"", dst_path=mk_local_path(dst_path))
             notebook = tags.get(TAG_NOTEBOOK_PATH, None)
             if notebook is not None:
                 if len(self.notebook_formats) > 0:
