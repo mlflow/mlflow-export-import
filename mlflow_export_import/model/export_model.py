@@ -5,7 +5,7 @@ Export a registered model and all the experiment runs associated with each versi
 import os
 import click
 import mlflow
-from mlflow_export_import.common.http_client import HttpClient
+from mlflow_export_import.common.http_client import MlflowHttpClient
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils, click_doc
@@ -13,7 +13,7 @@ from mlflow_export_import import utils, click_doc
 class ModelExporter():
     def __init__(self, export_metadata_tags=False, notebook_formats=[], stages=None):
         self.mlflow_client = mlflow.tracking.MlflowClient()
-        self.http_client = HttpClient("api/2.0/mlflow")
+        self.http_client = MlflowHttpClient()
         self.run_exporter = RunExporter(self.mlflow_client, export_metadata_tags=export_metadata_tags, notebook_formats=notebook_formats)
         self.stages = self.normalize_stages(stages)
 
