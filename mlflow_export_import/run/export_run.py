@@ -74,9 +74,14 @@ class RunExporter():
             self.export_notebook_format(notebook_dir, notebook, format, format.lower(), notebook_name, revision_id)
 
     def export_notebook_format(self, notebook_dir, notebook, format, extension, notebook_name, revision_id):
-        resource = f'workspace/export?path={notebook}&direct_download=true&format={format}&revision={{"revision_timestamp":{revision_id}}}'
+        params = { 
+            "path": notebook, 
+            "direct_download": True,
+            "format": format
+            ## "revision": '{"revision_timestamp":{revision_id}}' # TODO: coming shortly
+        }
         try:
-            rsp = self.dbx_client._get(resource)
+            rsp = self.dbx_client._get("workspace/export", params)
             notebook_path = os.path.join(notebook_dir, f"{notebook_name}.{extension}")
             utils.write_file(notebook_path, rsp.content)
         except MlflowExportImportException as e:
