@@ -15,17 +15,17 @@ class HttpClient():
         self.api_uri = os.path.join(host,api_name)
         self.token = token
 
-    def _get(self, resource):
+    def _get(self, resource, params=None):
         """ Executes an HTTP GET call
         :param resource: Relative path name of resource such as cluster/list
         """
         uri = self._mk_uri(resource)
-        rsp = requests.get(uri, headers=self._mk_headers())
+        rsp = requests.get(uri, headers=self._mk_headers(), params=params)
         self._check_response(rsp, uri)
         return rsp
 
-    def get(self, resource):
-        return json.loads(self._get(resource).text)
+    def get(self, resource, params=None):
+        return json.loads(self._get(resource, params).text)
 
     def post(self, resource, data):
         """ Executes an HTTP POST call

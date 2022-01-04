@@ -19,7 +19,7 @@ class ModelExporter():
 
     def export_model(self, output_dir, model_name):
         path = os.path.join(output_dir,"model.json")
-        model = self.http_client.get(f"registered-models/get?name={model_name}")
+        model = self.http_client.get(f"registered-models/get", {"name": model_name})
         model["registered_model"]["latest_versions"] = []
         versions = self.mlflow_client.search_model_versions(f"name='{model_name}'")
         print(f"Found {len(versions)} versions for model {model_name}")
