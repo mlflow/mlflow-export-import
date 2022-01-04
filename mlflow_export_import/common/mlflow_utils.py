@@ -12,17 +12,17 @@ def dump_mlflow_info():
     print("  DATABRICKS_TOKEN:", os.environ.get("DATABRICKS_TOKEN",""))
 
 def get_mlflow_host():
-    ''' Returns the host (tracking URI) and token '''
+    """ Returns the host (tracking URI) and token """
     return get_mlflow_host_token()[0]
 
 def get_mlflow_host_token():
-    ''' Returns the host (tracking URI) and token '''
-    uri = os.environ.get('MLFLOW_TRACKING_URI',None)
+    """ Returns the host (tracking URI) and token """
+    uri = os.environ.get("MLFLOW_TRACKING_URI",None)
     if uri is not None and uri != "databricks":
         return (uri,None)
     try:
         from mlflow_export_import.common import databricks_cli_utils
-        profile = os.environ.get('MLFLOW_PROFILE',None)
+        profile = os.environ.get("MLFLOW_PROFILE",None)
         ##host_token = databricks_cli_utils.get_host_token(profile)
         return databricks_cli_utils.get_host_token(profile)
     #except databricks_cli.utils.InvalidConfigurationError as e:
@@ -30,21 +30,21 @@ def get_mlflow_host_token():
         print("WARNING:",e)
         return (None,None)
 
-def get_experiment(client, exp_id_or_name):
-    ''' Gets an experiment either by ID or name.  '''
-    exp = client.get_experiment_by_name(exp_id_or_name)
+def get_experiment(mlflow_client, exp_id_or_name):
+    """ Gets an experiment either by ID or name.  """
+    exp = mlflow_client.get_experiment_by_name(exp_id_or_name)
     if exp is None:
         try:
-            exp = client.get_experiment(exp_id_or_name)
+            exp = mlflow_client.get_experiment(exp_id_or_name)
         except Exception:
-            raise Exception(f"Cannot find experiment ID or name '{exp_id_or_name}'. Client: {client}'")
+            raise Exception(f"Cannot find experiment ID or name '{exp_id_or_name}'. Client: {mlflow_client}'")
     return exp
 
 def set_experiment(dbx_client, exp_name):
-    '''
+    """
     Set experiment name. 
     For Databricks, create the workspace directory if it doesn't exist.
-    '''
+    """
     from mlflow_export_import import utils
     if utils.importing_into_databricks():
         exp_dir = os.path.dirname(exp_name)
@@ -53,11 +53,11 @@ def set_experiment(dbx_client, exp_name):
     mlflow.set_experiment(exp_name)
 
 # BUG
-def _get_experiment(client, exp_id_or_name):
+def _get_experiment(mlflow_client, exp_id_or_name):
     try:
-        exp = client.get_experiment(exp_id_or_name)
+        exp = mlflow_client.get_experiment(exp_id_or_name)
     except Exception:
-        exp = client.get_experiment_by_name(exp_id_or_name)
+        exp = mlflow_client.get_experiment_by_name(exp_id_or_name)
     if exp is None:
-        raise Exception(f"Cannot find experiment ID or name '{exp_id_or_name}'. Client: {client}'")
+        raise Exception(f"Cannot find experiment ID or name '{exp_id_or_name}'. Client: {mlflow_client}'")
     return exp
