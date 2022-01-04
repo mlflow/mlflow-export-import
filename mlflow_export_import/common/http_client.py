@@ -18,6 +18,7 @@ class HttpClient():
     def _get(self, resource, params=None):
         """ Executes an HTTP GET call
         :param resource: Relative path name of resource such as cluster/list
+        :param params: Dict of query parameters 
         """
         uri = self._mk_uri(resource)
         rsp = requests.get(uri, headers=self._mk_headers(), params=params)
