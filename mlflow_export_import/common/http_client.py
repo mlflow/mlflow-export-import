@@ -5,8 +5,13 @@ from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common import MlflowExportImportException
 
 class HttpClient():
-    """ Wrapper for get and post methods for Databricks REST APIs. """
+    """ Wrapper for GET and POST methods for Databricks REST APIs  - standard Databricks API and MLflow API. """
     def __init__(self, api_name, host=None, token=None):
+        """
+        :param api_name: Name of base API such as 'api/2.0' or 'api/2.0/mlflow'.
+        :param host: Host name of tracking server.
+        :param token: Databricks token.
+        """
         self.api_uri = "?"
         if host is None:
             (host,token) = mlflow_utils.get_mlflow_host_token()
