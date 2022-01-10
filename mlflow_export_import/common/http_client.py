@@ -3,6 +3,7 @@ import json
 import requests
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common import MlflowExportImportException
+from mlflow_export_import.common import USER_AGENT
 
 class HttpClient():
     """ Wrapper for GET and POST methods for Databricks REST APIs  - standard Databricks API and MLflow API. """
@@ -45,7 +46,7 @@ class HttpClient():
         return json.loads(rsp.text)
 
     def _mk_headers(self):
-        headers = { "User-Agent": "mlflow-export-import/1.0.0"} 
+        headers = { "User-Agent": USER_AGENT }
         if self.token:
             headers["Authorization"] = f"Bearer {self.token}" 
         return headers
