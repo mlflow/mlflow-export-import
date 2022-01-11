@@ -1,6 +1,7 @@
 import os
 import json
 import requests
+import click
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common import USER_AGENT
@@ -34,7 +35,7 @@ class HttpClient():
     def get(self, resource, params=None):
         return json.loads(self._get(resource, params).text)
 
-    def post(self, resource, data):
+    def _post(self, resource, data):
         """ Executes an HTTP POST call
         :param resource: Relative path name of resource such as runs/search
         :param data: Post request payload
@@ -43,7 +44,10 @@ class HttpClient():
         data = json.dumps(data)
         rsp = requests.post(uri, headers=self._mk_headers(), data=data)
         self._check_response(rsp,uri)
-        return json.loads(rsp.text)
+        return rsp
+
+    def post(self, resource, data):
+        return json.loads(self._post(resource, data).text)
 
     def _mk_headers(self):
         headers = { "User-Agent": USER_AGENT }
@@ -68,3 +72,42 @@ class DatabricksHttpClient(HttpClient):
 class MlflowHttpClient(HttpClient):
     def __init__(self, host=None, token=None):
         super().__init__("api/2.0/mlflow", host, token)
+
+@click.command()
+@click.option("--api", help="API: mlflow|databricks", default="mlflow", type=str)
+@click.option("--resource", help="API resource.", required=True, type=str)
+@click.option("--method", help="HTTP method: GET|POST.", default="GET", type=str)
+@click.option("--params", help="HTTP GET query parameters as JSON.", required=False, type=str)
+@click.option("--data", help="HTTP POST data as JSON.", required=False, type=str)
+@click.option("--output-file", help="Output file.", required=False, type=str)
+@click.option("--verbose", help="Verbose.", type=bool, default=False, show_default=True)
+
+def main(api, resource, method, params, data, output_file, verbose):
+    def write_output(rsp, output_file):
+        if output_file:
+            print(f"Output file: {output_file}")
+            with open(output_file, "w") as f:
+                f.write(rsp.text)
+        else:
+            print(rsp.text)
+
+    if verbose:
+        print("Options:")
+        for k,v in locals().items():
+            print(f"  {k}: {v}")
+
+    client = DatabricksHttpClient() if api == "databricks" else MlflowHttpClient()
+    method = method.upper() 
+    if "GET" == method:
+        if params:
+            params = json.loads(params)
+        rsp = client._get(resource, params)
+        write_output(rsp, output_file)
+    elif "POST" == method:
+        rsp = client._post(resource, data)
+        write_output(rsp, output_file)
+    else:
+        print(f"ERROR: Unsupported HTTP method '{method}'")
+
+if __name__ == "__main__":
+    main()
