@@ -27,7 +27,7 @@ class HttpClient():
         :param params: Dict of query parameters 
         """
         uri = self._mk_uri(resource)
-        rsp = requests.get(uri, headers=self._mk_headers(), params=params)
+        rsp = requests.get(uri, headers=self._mk_headers(), json=params)
         self._check_response(rsp, uri)
         return rsp
 
@@ -40,7 +40,7 @@ class HttpClient():
         :param data: Post request payload
         """
         uri = self._mk_uri(resource)
-        data=json.dumps(data)
+        data = json.dumps(data)
         rsp = requests.post(uri, headers=self._mk_headers(), data=data)
         self._check_response(rsp,uri)
         return json.loads(rsp.text)
