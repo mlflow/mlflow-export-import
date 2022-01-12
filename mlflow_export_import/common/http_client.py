@@ -73,9 +73,10 @@ class MlflowHttpClient(HttpClient):
     def __init__(self, host=None, token=None):
         super().__init__("api/2.0/mlflow", host, token)
 
+
 @click.command()
-@click.option("--api", help="API: mlflow|databricks", default="mlflow", type=str)
-@click.option("--resource", help="API resource.", required=True, type=str)
+@click.option("--api", help="API: mlflow|databricks.", default="mlflow", type=str)
+@click.option("--resource", help="API resource such as 'experiments/list'.", required=True, type=str)
 @click.option("--method", help="HTTP method: GET|POST.", default="GET", type=str)
 @click.option("--params", help="HTTP GET query parameters as JSON.", required=False, type=str)
 @click.option("--data", help="HTTP POST data as JSON.", required=False, type=str)
