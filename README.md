@@ -1,14 +1,15 @@
 # Export and Import MLflow Experiments, Runs or Models
 
-Tools to export and import MLflow runs, experiments or registered models from one tracking server to another.
+Tools to export and import MLflow runs, experiments or registered models from one tracking server (Databricks workspace) to another.
 
 Some of the reasons to use MLflow Export Import:
-  * Backup your experiments
-  * Migrate experiments to another tracking server
-  * Disaster recovery
+  * Share and collaborate with data scientists in another tracking server.
+  * Backup your experiments.
+  * Migrate experiments to another tracking server.
+  * Disaster recovery.
 
 There are two ways to run MLflow Export Import:
-* As a normal Python package - this page.
+* Open source MLflow - As a normal Python package - this page.
 * [Databricks notebooks](databricks_notebooks/README.md).
 
 ## Architecture
@@ -43,7 +44,7 @@ There are two ways to run MLflow Export Import:
 The [workspace/export](https://docs.databricks.com/dev-tools/api/latest/workspace.html#export) API endpoint only exports a notebook representing the latest revision.
 * When you import a run, the link to its source notebook revision ID will appear in the UI but you cannot reach that revision (link is dead).
 * For convenience, the export tool exports the latest notebook revision for a notebook-based experiment but again, it cannot be attached to a run when imported. Its stored as an artifact in the "notebooks" folder of the run's artifact root.
-* When importing a run or experiment, for open source MLflow you can specify the user owner. For Databricks import you cannot - the owner will be based on the personal access token.
+* When importing a run or experiment, for open source MLflow you can specify the user owner. For Databricks import you cannot - the owner will be based on the personal access token (PAT) of the import user.
 
 ## Common options details 
 
@@ -66,6 +67,19 @@ mlflow_export_import.metadata.tracking_uri    http://localhost:5000
 ## Setup
 
 Supports python 3.7.6 or above.
+
+### Console scripts
+
+Python [console scripts](https://python-packaging.readthedocs.io/en/latest/command-line-scripts.html#the-console-scripts-entry-point)  (such as export-run, import-run) are provided as a convenience. For a list of scripts see [setup.py](setup.py).
+
+This allows you to use
+```
+export-experiment --help
+```
+instead of
+```
+python -u -m mlflow_export_import.experiment.export_experiment --help
+```
 
 ### Local setup
 
@@ -129,7 +143,7 @@ Export one experiment to a directory.
 ##### Usage
 
 ```
-python -u -m mlflow_export_import.experiment.export_experiment --help
+export-experiment --help
 
 Options:
   --experiment TEXT               Experiment name or ID.  [required]
@@ -143,14 +157,14 @@ Options:
 
 Export experiment by experiment ID.
 ```
-python -u -m mlflow_export_import.experiment.export_experiment \
+export-experiment \
   --experiment 2 \
   --output-dir out
 ```
 
 Export experiment by experiment name.
 ```
-python -u -m mlflow_export_import.experiment.export_experiment \
+export-experiment \
   --experiment sklearn-wine \
   --output-dir out
 ```
@@ -163,7 +177,7 @@ export MLFLOW_TRACKING_URI=databricks
 export DATABRICKS_HOST=https://mycompany.cloud.databricks.com
 export DATABRICKS_TOKEN=MY_TOKEN
 
-python -u -m mlflow_export_import.experiment.export_experiment \
+export-experiment \
   --experiment /Users/me@mycompany.com/SklearnWine \
   --output-dir out \
   --notebook-formats DBC,SOURCE 
@@ -194,7 +208,7 @@ Export several (or all) experiments to a directory.
 
 ##### Usage
 ```
-python -u -m mlflow_export_import.experiment.export_experiment_list --help
+export-experiment-list --help
 
   --experiments TEXT              Experiment names or IDs (comma delimited).
                                   'all' will export all experiments.  [required]
@@ -208,19 +222,19 @@ python -u -m mlflow_export_import.experiment.export_experiment_list --help
 
 Export experiments by experiment ID.
 ```
-python -u -m mlflow_export_import.experiment.export_experiment_list \
+export-experiment-list \
   --experiments 2,3 --output-dir out
 ```
 
 Export experiments by experiment name.
 ```
-python -u -m mlflow_export_import.experiment.export_experiment_list \
+export-experiment-list \
   --experiments sklearn,sparkml --output-dir out
 ```
 
 Export all experiments.
 ```
-python -u -m mlflow_export_import.experiment.export_experiment_list \
+export-experiment-list \
   --experiments all --output-dir out
 ```
 
@@ -336,7 +350,7 @@ Imports one experiment.
 
 ##### Usage
 ```
-python -u -m mlflow_export_import.experiment.import_experiment --help \
+import-experiment --help \
 
 Options:
   --input-dir TEXT                Input path - directory  [required]
@@ -353,7 +367,7 @@ Options:
 ##### Import examples
 
 ```
-python -u -m mlflow_export_import.experiment.import_experiment \
+import-experiment \
   --experiment-name imported_sklearn \
   --input-dir out
 ```
@@ -364,7 +378,7 @@ When importing into Databricks MLflow, make sure you set `--import-mlflow-tags F
 
 ```
 export MLFLOW_TRACKING_URI=databricks
-python -u -m mlflow_export_import.experiment.import_experiment \
+import-experiment \
   --experiment-name /Users/me@mycompany.com/imported/SklearnWine \
   --input-dir exported_experiments/3532228 \
   --import-mlflow-tags False
@@ -377,7 +391,7 @@ Import a list of experiments.
 ##### Usage
 
 ```
-python -m mlflow_export_import.experiment.import_experiment_list --help
+import-experiment-list --help
 
 Options:
   --input-dir TEXT                Input directory.  [required]
@@ -393,7 +407,7 @@ Options:
 ##### Import examples
 
 ```
-python -u -m mlflow_export_import.experiment.import_experiment_list \
+import-experiment-list \
   --experiment-name-prefix imported_ \
   --input-dir out 
 ```
@@ -407,7 +421,7 @@ Export run to directory.
 **Usage**
 
 ```
-python -m mlflow_export_import.run.export_run --help
+export-run --help
 
 Options:
   --run-id TEXT                   Run ID.  [required]
@@ -420,7 +434,7 @@ Options:
 
 **Run examples**
 ```
-python -u -m mlflow_export_import.run.export_run \
+export-run \
   --run-id 50fa90e751eb4b3f9ba9cef0efe8ea30 \
   --output-dir out
 ```
@@ -475,7 +489,7 @@ Imports a run from a directory.
 #### Usage
 
 ```
-python -m mlflow_export_import.run.import_run  --help
+import-run --help
 
 Options:
   --input-dir TEXT                Source input directory that contains the
@@ -502,7 +516,7 @@ Directory `out` is where you exported your run.
 
 ##### Local import example
 ```
-python -u -m mlflow_export_import.run.import_run \
+import-run \
   --run-id 50fa90e751eb4b3f9ba9cef0efe8ea30 \
   --input out \
   --experiment-name sklearn_wine_imported
@@ -514,7 +528,7 @@ When importing into Databricks MLflow, make sure you set `--import-mlflow-tags F
 
 ```
 export MLFLOW_TRACKING_URI=databricks
-python -u -m mlflow_export_import.run.import_run \
+run.import-run \
   --run-id 50fa90e751eb4b3f9ba9cef0efe8ea30 \
   --input out \
   --experiment-name /Users/me@mycompany.com/imported/SklearnWine \
@@ -534,7 +548,7 @@ Source: [export_model.py](mlflow_export_import/model/export_model.py).
 **Usage**
 
 ```
-python -m mlflow_export_import.model.export_model --help
+export-model --help
 
 Options:
   --model TEXT       Registered model name.  [required]
@@ -546,7 +560,7 @@ Options:
 
 #### Run
 ```
-python -u -m mlflow_export_import.model.export_model \
+export-model \
   --model sklearn_wine \
   --output-dir out \
   --stages Production,Staging
@@ -600,7 +614,7 @@ Source: [import_model.py](mlflow_export_import/model/import_model.py).
 **Usage**
 
 ```
-python -m mlflow_export_import.model.import_model --help
+import-model --help
 
 Options:
   --input-dir TEXT              Input directory produced by export_model.py.
@@ -620,7 +634,7 @@ Options:
 #### Run
 
 ```
-python -u -m mlflow_export_import.model.import_model \
+import-model \
   --model sklearn_wine \
   --experiment-name sklearn_wine_imported \
   --input-dir out  \
@@ -656,7 +670,7 @@ Waited 0.01 seconds
 
 Calls the `registered-models/list` API endpoint and creates the file `registered_models.json`.
 ```
-python -u -m mlflow_export_import.model.list_registered_models
+list-models
 ```
 
 cat registered_models.json
