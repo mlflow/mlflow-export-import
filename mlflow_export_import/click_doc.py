@@ -8,3 +8,5 @@ import_mlflow_tags = "Import mlflow tags."
 import_metadata_tags = "Import mlflow_export_import tags."
 
 notebook_formats = "Notebook formats. Values are SOURCE, HTML, JUPYTER or DBC."
+
+export_notebook_revision = "Export the run's notebook revision. Experimental not yet publicly available."

@@ -4,8 +4,6 @@ Exports an experiment to a directory.
 
 import os
 import mlflow
-import shutil
-import tempfile
 import click
 
 from mlflow_export_import.common import filesystem as _filesystem
@@ -17,9 +15,9 @@ from mlflow_export_import import utils, click_doc
 client = mlflow.tracking.MlflowClient()
 
 class ExperimentExporter():
-    def __init__(self, client=None, export_metadata_tags=False, notebook_formats=[]):
+    def __init__(self, client=None, export_metadata_tags=False, notebook_formats=[], export_notebook_revision=False):
         self.client = client or mlflow.tracking.MlflowClient()
-        self.run_exporter = RunExporter(self.client, export_metadata_tags, notebook_formats)
+        self.run_exporter = RunExporter(self.client, export_metadata_tags, notebook_formats, export_notebook_revision)
 
     def export_experiment(self, exp_id_or_name, output_dir):
         exp = mlflow_utils.get_experiment(self.client, exp_id_or_name)
@@ -57,12 +55,13 @@ class ExperimentExporter():
 @click.option("--output-dir", help="Output directory.", required=True)
 @click.option("--export-metadata-tags", help=click_doc.export_metadata_tags, type=bool, default=False, show_default=True)
 @click.option("--notebook-formats", help=click_doc.notebook_formats, default="", show_default=True)
+@click.option("--export-notebook-revision", help=click_doc.export_notebook_revision, type=bool, default=False, show_default=True)
 
-def main(experiment, output_dir, export_metadata_tags, notebook_formats): # pragma: no cover
+def main(experiment, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision): # pragma: no cover
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    exporter = ExperimentExporter(None, export_metadata_tags, utils.string_to_list(notebook_formats))
+    exporter = ExperimentExporter(None, export_metadata_tags, utils.string_to_list(notebook_formats), export_notebook_revision)
     exporter.export_experiment(experiment, output_dir)
 
 if __name__ == "__main__":

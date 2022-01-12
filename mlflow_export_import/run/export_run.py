@@ -8,7 +8,6 @@ import traceback
 import mlflow
 import click
 
-from mlflow_export_import.common import user_agent_header
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common.filesystem import mk_local_path
 from mlflow_export_import.common.http_client import DatabricksHttpClient
@@ -19,16 +18,16 @@ print("MLflow Version:", mlflow.version.VERSION)
 print("MLflow Tracking URI:", mlflow.get_tracking_uri())
 
 class RunExporter():
-    def __init__(self, client=None, export_metadata_tags=False, notebook_formats=[]):
+    def __init__(self, client=None, export_metadata_tags=False, notebook_formats=[], export_notebook_revision=False):
         self.mlflow_client = client or mlflow.tracking.MlflowClient()
         self.dbx_client = DatabricksHttpClient()
         print("Databricks REST client:",self.dbx_client)
         self.export_metadata_tags = export_metadata_tags
         self.notebook_formats = notebook_formats
+        self.export_notebook_revision = export_notebook_revision
 
     def export_run(self, run_id, output_dir):
         fs = _filesystem.get_filesystem(output_dir)
-        #print("Filesystem:",type(fs).__name__)
         run = self.mlflow_client.get_run(run_id)
         fs.mkdirs(output_dir)
         tags =  utils.create_tags_for_metadata(self.mlflow_client, run, self.export_metadata_tags)
@@ -66,8 +65,11 @@ class RunExporter():
         revision_id = tags["mlflow.databricks.notebookRevisionID"]
         notebook_path = tags["mlflow.databricks.notebookPath"]
         notebook_name = os.path.basename(notebook_path)
-        dct = { "mlflow.databricks.notebookRevisionID": revision_id, "mlflow.databricks.notebookPath": notebook_path }
-        path = os.path.join(notebook_dir,"manifest.json")
+        dct = { 
+           "mlflow.databricks.notebookRevisionID": revision_id, 
+           "mlflow.databricks.notebookPath": notebook_path,
+           "mlflow.databricks.export-notebook-revision": self.export_notebook_revision }
+        path = os.path.join(notebook_dir, "manifest.json")
         with open(path, "w") as f:
             f.write(json.dumps(dct,indent=2)+"\n")
         for format in self.notebook_formats:
@@ -77,9 +79,11 @@ class RunExporter():
         params = { 
             "path": notebook, 
             "direct_download": True,
-            "format": format
-            ## "revision": '{"revision_timestamp":{revision_id}}' # TODO: coming shortly
+            "format": format,
+            # "revision": {"revision_timestamp": revision_id}
         }
+        if self.export_notebook_revision:
+            params["revision"] = { "revision_timestamp": revision_id }
         try:
             rsp = self.dbx_client._get("workspace/export", params)
             notebook_path = os.path.join(notebook_dir, f"{notebook_name}.{extension}")
@@ -92,12 +96,13 @@ class RunExporter():
 @click.option("--output-dir", help="Output directory.", required=True)
 @click.option("--export-metadata-tags", help=click_doc.export_metadata_tags, type=bool, default=False, show_default=True)
 @click.option("--notebook-formats", help=click_doc.notebook_formats, default="", show_default=True)
+@click.option("--export-notebook-revision", help=click_doc.export_notebook_revision, type=bool, default=False, show_default=True)
 
-def main(run_id, output_dir, export_metadata_tags, notebook_formats): # pragma: no cover
+def main(run_id, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision): # pragma: no cover
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    exporter = RunExporter(None, export_metadata_tags, utils.string_to_list(notebook_formats))
+    exporter = RunExporter(None, export_metadata_tags, utils.string_to_list(notebook_formats), export_notebook_revision)
     exporter.export_run(run_id, output_dir)
 
 if __name__ == "__main__":

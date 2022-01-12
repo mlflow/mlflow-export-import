@@ -11,10 +11,10 @@ from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils, click_doc
 
 class ModelExporter():
-    def __init__(self, export_metadata_tags=False, notebook_formats=[], stages=None):
+    def __init__(self, export_metadata_tags=False, notebook_formats=[], stages=None, export_notebook_revision=False):
         self.mlflow_client = mlflow.tracking.MlflowClient()
         self.http_client = MlflowHttpClient()
-        self.run_exporter = RunExporter(self.mlflow_client, export_metadata_tags=export_metadata_tags, notebook_formats=notebook_formats)
+        self.run_exporter = RunExporter(self.mlflow_client, export_metadata_tags=export_metadata_tags, notebook_formats=notebook_formats, export_notebook_revision=export_notebook_revision)
         self.stages = self.normalize_stages(stages)
 
     def export_model(self, output_dir, model_name):
@@ -71,12 +71,13 @@ class ModelExporter():
 @click.option("--output-dir", help="Output directory.", required=True, type=str)
 @click.option("--stages", help="Stages to export (comma seperated). Default is all stages.", required=None, type=str)
 @click.option("--notebook-formats", help=click_doc.notebook_formats, default="", show_default=True)
+@click.option("--export-notebook-revision", help=click_doc.export_notebook_revision, type=bool, default=False, show_default=True)
 
-def main(model, output_dir, stages, notebook_formats): # pragma: no cover
+def main(model, output_dir, stages, notebook_formats, export_notebook_revision): # pragma: no cover
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    exporter = ModelExporter(stages=stages, notebook_formats=utils.string_to_list(notebook_formats))
+    exporter = ModelExporter(stages=stages, notebook_formats=utils.string_to_list(notebook_formats), export_notebook_revision=export_notebook_revision)
     exporter.export_model(output_dir, model)
 
 if __name__ == "__main__":
