@@ -28,7 +28,7 @@ class ExperimentExporter():
         fs.mkdirs(output_dir)
         exp = self.client.get_experiment(exp_id)
         dct = {"experiment": utils.strip_underscores(exp)}
-        run_ids = []
+        ok_run_ids = []
         failed_run_ids = []
         j = -1
         for j,run in enumerate(SearchRunsIterator(self.client, exp_id)):
@@ -36,19 +36,25 @@ class ExperimentExporter():
             print(f"Exporting run {j+1}: {run.info.run_id}")
             res = self.run_exporter.export_run(run.info.run_id, run_dir)
             if res:
-                run_ids.append(run.info.run_id)
+                ok_run_ids.append(run.info.run_id)
             else:
                 failed_run_ids.append(run.info.run_id)
-        dct["export_info"] = { "export_time": utils.get_now_nice(), "num_runs": (j+1) }
-        dct["run_ids"] = run_ids
-        dct["failed_run_ids"] = failed_run_ids
+        dct["export_info"] = { 
+            "export_time": utils.get_now_nice(), 
+             "num_total_runs": (j+1),
+             "num_ok_runs": len(ok_run_ids),
+             "ok_runs": ok_run_ids,
+             "num_failed_runs": len(failed_run_ids),
+             "failed_runs": failed_run_ids }
+
         path = os.path.join(output_dir,"manifest.json")
         utils.write_json_file(fs, path, dct)
         if len(failed_run_ids) == 0:
-            print(f"All {len(run_ids)} runs succesfully exported")
+            print(f"All {len(ok_run_ids)} runs succesfully exported")
         else:
-            print(f"{len(run_ids)/j} runs succesfully exported")
+            print(f"{len(ok_run_ids)/j} runs succesfully exported")
             print(f"{len(failed_run_ids)/j} runs failed")
+        return len(ok_run_ids), len(failed_run_ids) 
 
 @click.command()
 @click.option("--experiment", help="Experiment name or ID.", required=True, type=str)

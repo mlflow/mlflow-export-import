@@ -7,11 +7,14 @@
     "tags": {}
   },
   "export_info": {
-    "export_time": "2021-09-28 15:41:12",
-    "num_runs": 0
-  },
-  "run_ids": [
-    "6ccadf17812d43929b093d75cca1c33f"
-  ],
-  "failed_run_ids": []
+    "export_time": "2022-01-14 03:26:42",
+    "num_total_runs": 2,
+    "num_ok_runs": 2,
+    "ok_runs": [
+      "4445f19b7bf04d0fb0173424db476198",
+      "d835e17257ad4d6db92441ad93bec549"
+    ],
+    "num_failed_runs": 0,
+    "failed_runs": []
+  }
 }

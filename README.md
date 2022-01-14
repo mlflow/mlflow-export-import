@@ -238,6 +238,17 @@ export-experiment-list \
   --experiments all --output-dir out
 ```
 
+```
+Exporting experiment 'Default' (ID 0) to 'out/0'
+Exporting experiment 'sklearn' (ID 1) to 'out/1'
+Exporting experiment 'keras_mnist' (ID 2) to 'out/2'
+. . .
+
+249 experiments exported
+1770/1770 runs succesfully exported
+Duration: 1.6 seonds
+```
+
 ##### Export directory structure
 
 The output directory contains a manifest file and a subdirectory for each experiment (by experiment ID).
@@ -321,14 +332,16 @@ Sample [experiment manifest.json](samples/oss_mlflow/experiment_list/1/manifest.
     "lifecycle_stage": "active"
   },
   "export_info": {
-    "export_time": "2020-09-10 20:23:45",
-    "num_runs": 2
-  },
-  "run-ids": [
-    "f4eaa7ddbb7c41148fe03c530d9b486f",
-    "f80bb7cd0fc40038e0e17abe22b304c"
-  ],
-  "failed_run-ids": []
+    "export_time": "2022-01-14 03:26:42",
+    "num_total_runs": 2,
+    "num_ok_runs": 2,
+    "ok_runs": [
+      "4445f19b7bf04d0fb0173424db476198",
+      "d835e17257ad4d6db92441ad93bec549"
+    ],
+    "num_failed_runs": 0,
+    "failed_runs": []
+  }
 }
 ```
 

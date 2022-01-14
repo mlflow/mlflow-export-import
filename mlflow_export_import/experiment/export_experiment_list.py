@@ -3,6 +3,7 @@ Exports a list of experiments to a directory.
 """
 
 import os
+import time
 import json
 import mlflow
 import click
@@ -11,6 +12,7 @@ from mlflow_export_import import utils, click_doc
 from mlflow_export_import.experiment.export_experiment import ExperimentExporter
 
 def export_experiment_list(experiments, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision):
+    start_time = time.time()
     client = mlflow.tracking.MlflowClient()
 
     if experiments == "all":
@@ -22,27 +24,46 @@ def export_experiment_list(experiments, output_dir, export_metadata_tags, notebo
         print(f"  {exp}")
 
     exporter = ExperimentExporter(client, export_metadata_tags, utils.string_to_list(notebook_formats), export_notebook_revision)
-    lst = []
+    export_results = []
+    ok_runs = 0
+    failed_runs = 0
+    print("")
     for exp_id_or_name in experiments:
         exp = mlflow_utils.get_experiment(client, exp_id_or_name)
         exp_output = os.path.join(output_dir, exp.experiment_id)
         try:
-            lst.append( { "id" : exp.experiment_id, "name": exp.name } )
-            exporter.export_experiment(exp.experiment_id, exp_output)
+            _ok_runs, _failed_runs = exporter.export_experiment(exp.experiment_id, exp_output)
+            ok_runs += _ok_runs
+            failed_runs += _failed_runs
+            export_results.append( { "id" : exp.experiment_id, "name": exp.name, "ok_runs": _ok_runs, "failed_runs": _failed_runs })
         except Exception:
             import traceback
             traceback.print_exc()
+        print("")
+    total_runs = ok_runs + failed_runs
+    duration = round(time.time() - start_time, 1)
 
     dct = { 
         "info": {
             "mlflow_version": mlflow.__version__,
             "mlflow_tracking_uri": mlflow.get_tracking_uri(),
-            "export_time": utils.get_now_nice()
+            "export_time": utils.get_now_nice(),
+            "experiments": len(experiments),
+            "total_runs": total_runs,
+            "ok_runs": ok_runs,
+            "failed_runs": failed_runs,
+            "duration": duration
         },
-        "experiments": lst 
+        "experiments": export_results 
     }
     with open(os.path.join(output_dir, "manifest.json"), "w") as f:
         f.write(json.dumps(dct,indent=2)+"\n")
+
+    print(f"{len(experiments)} experiments exported")
+    print(f"{ok_runs}/{total_runs} runs succesfully exported")
+    if failed_runs > 0:
+        print(f"{failed_runs}/{total_runs} runs failed")
+    print(f"Duration: {duration} seonds")
 
 @click.command()
 @click.option("--experiments", help="Experiment names or IDs (comma delimited). 'all' will export all experiments. ", required=True, type=str)
