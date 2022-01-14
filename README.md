@@ -130,7 +130,7 @@ databricks fs cp dist/mlflow_export_import-1.0.0-py3-none-any.whl {MY_DBFS_PATH}
 
 ### Export Experiments
 
-There are two main programs to export experiments:
+There are two scripts to export experiments:
 * `export_experiment` - exports one experiment.
 * `export_experiment_list` - exports a list of  experiments.
 
@@ -353,7 +353,7 @@ Import experiments from a directory. Reads the manifest file to import expiremen
 The experiment will be created if it does not exist in the destination tracking server. 
 If the experiment already exists, the source runs will be added to it.
 
-There are two main programs to import experiments:
+There are two scripts to import experiments:
 * import_experiment - imports one experiment
 * import_experiment_list - imports a list of experiments
 
@@ -550,7 +550,13 @@ run.import-run \
 
 ## Registered Models
 
-### Export registered model
+### Export Registered Model
+
+There are two scripts to export models:
+* `export_model` - exports one model.
+* `export_model_list` - exports a list of models.
+
+#### export_model 
 
 Export a registered model to a directory.
 The default is to export all versions of a model including all None and Archived stages.
@@ -559,19 +565,20 @@ You can specify a list of stages to export.
 Source: [export_model.py](mlflow_export_import/model/export_model.py).
 
 **Usage**
-
 ```
 export-model --help
 
 Options:
   --model TEXT       Registered model name.  [required]
   --output-dir TEXT  Output directory.  [required]
-  --stages TEXT      Stages to export (comma seperated). Default is all stages.
+  --stages TEXT                   Stages to export (comma seperated). Default
+                                  is all stages. Values are Production,
+                                  Staging, Archived and None
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
                                   JUPYTER or DBC.  [default: ]
 ```
 
-#### Run
+**Run**
 ```
 export-model \
   --model sklearn_wine \
@@ -584,7 +591,7 @@ Exporting version 3 stage 'Production' with run_id 24aa9cce1388474e9f26d17100724
 Exporting version 5 stage 'Staging' with run_id 8efd80f59b7946119d8f1838515eea25 to out/8efd80f59b7946119d8f1838515eea25
 ```
 
-#### Output 
+**Output**
 
 Output export directory example.
 
@@ -617,6 +624,39 @@ Sample model.json:
         "creation_timestamp": "1587517284216",
 . . .
 ```
+
+#### export_model_list
+
+Export a list of several (or all) registered models to a directory.
+
+Source: [export_model_list.py](mlflow_export_import/model/export_model_list.py).
+
+**Usage**
+```
+Options:
+  --models TEXT                   Registered model names (comma delimited).
+                                  'all' will export all experiments.
+                                  [required]
+  --output-dir TEXT               Output directory.  [required]
+  --stages TEXT                   Stages to export (comma seperated). Default
+                                  is all stages. Values are Production,
+  --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
+                                  JUPYTER or DBC.  [default: ]
+  --export-notebook-revision BOOLEAN
+                                  Export the run's notebook revision.
+                                  Experimental not yet publicly available.
+                                  [default: False]
+```
+
+**Run**
+```
+export-model-list \
+  --models sklearn_wine,keras_mnist \
+  --output-dir out \
+  --stages Production,Staging
+```
+
+Sample output: [manifest.json](samples/oss_mlflow/model_list/manifest.json).
 
 ### Import registered model
 

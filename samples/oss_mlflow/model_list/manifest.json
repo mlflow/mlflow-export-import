@@ -1,0 +1,15 @@
+{
+  "info": {
+    "mlflow_version": "1.22.0",
+    "mlflow_tracking_uri": "http://localhost:5000",
+    "export_time": "2022-01-14 04:41:13",
+    "models": 2,
+    "duration": 0.2
+  },
+  "stages": "production,staging",
+  "notebook_formats": "",
+  "models": [
+    "sklearn_wine",
+    "keras_mnist"
+  ]
+}

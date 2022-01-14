@@ -18,7 +18,8 @@ class ModelExporter():
         self.stages = self.normalize_stages(stages)
 
     def export_model(self, output_dir, model_name):
-        path = os.path.join(output_dir,"model.json")
+        fs = _filesystem.get_filesystem(output_dir)
+        fs.mkdirs(output_dir)
         model = self.http_client.get(f"registered-models/get", {"name": model_name})
         model["registered_model"]["latest_versions"] = []
         versions = self.mlflow_client.search_model_versions(f"name='{model_name}'")
@@ -50,7 +51,7 @@ class ModelExporter():
                     import traceback
                     traceback.print_exc()
         print(f"Exported {exported_versions}/{len(versions)} versions for model {model_name}")
-        fs = _filesystem.get_filesystem(path)
+        path = os.path.join(output_dir, "model.json")
         utils.write_json_file(fs, path, model)
         return manifest
 
@@ -69,7 +70,7 @@ class ModelExporter():
 @click.command()
 @click.option("--model", help="Registered model name.", required=True, type=str)
 @click.option("--output-dir", help="Output directory.", required=True, type=str)
-@click.option("--stages", help="Stages to export (comma seperated). Default is all stages.", required=None, type=str)
+@click.option("--stages", help=click_doc.model_stages, required=None, type=str)
 @click.option("--notebook-formats", help=click_doc.notebook_formats, default="", show_default=True)
 @click.option("--export-notebook-revision", help=click_doc.export_notebook_revision, type=bool, default=False, show_default=True)
 

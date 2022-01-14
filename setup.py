@@ -23,6 +23,7 @@ setup(name="mlflow_export_import",
              "export-experiment-list = mlflow_export_import.experiment.export_experiment_list:main",
              "import-experiment-list = mlflow_export_import.experiment.import_experiment_list:main",
              "export-model = mlflow_export_import.model.export_model:main",
+             "export-model-list = mlflow_export_import.model.export_model_list:main",
              "import-model = mlflow_export_import.model.import_model:main",
              "list-models = mlflow_export_import.model.list_registered_models:main",
              "http-client = mlflow_export_import.common.http_client:main"
