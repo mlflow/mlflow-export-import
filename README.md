@@ -40,10 +40,9 @@ There are two ways to run MLflow Export Import:
 
 ### Databricks Limitations
 
-* The Databricks API does not support exporting or importing notebook revisions.
-The [workspace/export](https://docs.databricks.com/dev-tools/api/latest/workspace.html#export) API endpoint only exports a notebook representing the latest revision.
+* The Databricks API does not support importing notebook revisions.
 * When you import a run, the link to its source notebook revision ID will appear in the UI but you cannot reach that revision (link is dead).
-* For convenience, the export tool exports the latest notebook revision for a notebook-based experiment but again, it cannot be attached to a run when imported. Its stored as an artifact in the "notebooks" folder of the run's artifact root.
+* For convenience, the export tool exports the desired notebook revision (latest revision or specific revision based on the --export-notebook-revision flag) for a notebook-based experiment but again, it cannot be attached to a run when imported. Its stored as an artifact in the "notebooks" folder of the run's artifact root.
 * When importing a run or experiment, for open source MLflow you can specify the user owner. For Databricks import you cannot - the owner will be based on the personal access token (PAT) of the import user.
 
 ## Common options details 
@@ -151,6 +150,10 @@ Options:
   --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: False]
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
                                   JUPYTER or DBC.  [default: ]
+  --export-notebook-revision BOOLEAN
+                                  Export the run's notebook revision.
+                                  Experimental not yet publicly available.
+                                  [default: False]
 ```
 
 ##### Export examples
@@ -216,6 +219,10 @@ export-experiment-list --help
   --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: False]
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
                                   JUPYTER or DBC.  [default: ]
+  --export-notebook-revision BOOLEAN
+                                  Export the run's notebook revision.
+                                  Experimental not yet publicly available.
+                                  [default: False]
 ```
 
 ##### Export list examples
@@ -442,6 +449,10 @@ Options:
   --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: False] 
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
                                   JUPYTER or DBC.  [default: ]
+  --export-notebook-revision BOOLEAN
+                                  Export the run's notebook revision.
+                                  Experimental not yet publicly available.
+                                  [default: False]
 ```
 
 
@@ -576,6 +587,10 @@ Options:
                                   Staging, Archived and None
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
                                   JUPYTER or DBC.  [default: ]
+  --export-notebook-revision BOOLEAN
+                                  Export the run's notebook revision.
+                                  Experimental not yet publicly available.
+                                  [default: False]
 ```
 
 **Run**
