@@ -55,7 +55,7 @@ def init_run_test(exporter, importer, verbose=False):
     if verbose: print("res:",res)
 
     run1 = client.get_run(run.info.run_id)
-    run2 = client.get_run(res[0])
+    run2 = client.get_run(res[0].info.run_id)
     if verbose: dump_runs(run1, run2)
     return run1, run2
 
@@ -129,8 +129,7 @@ def init_exp_copy_test(copier, verbose=False):
     exp, run = create_simple_run()
     run1 = client.get_run(run.info.run_id)
     dst_experiment_name = f"{exp.name}_copy_exp"
-
-    copier.copy_experiment(exp.name, dst_experiment_name)
+    copier.copy_experiment(exp.name, dst_experiment_name) # FAILS
     exp2 = client.get_experiment_by_name(dst_experiment_name)
     infos = client.list_run_infos(exp2.experiment_id)
     run2 = client.get_run(infos[0].run_id)
@@ -138,6 +137,7 @@ def init_exp_copy_test(copier, verbose=False):
     return run1, run2
 
 def test_copy_exp_basic():
+    init_exp_copy_test(ExperimentCopier(client, client), verbose=False)
     run1, run2 = init_exp_copy_test(ExperimentCopier(client, client), verbose=False)
     compare_runs(client, output, run1, run2)
 

@@ -15,6 +15,4 @@ def test_extract_model_path_oss():
 
 def _test_extract_model_path(source):
     model_path2 = extract_model_path(source, run_id)
-    print(">> source:",source)
-    print(">> model_path2:",model_path2)
     assert model_path == model_path2
