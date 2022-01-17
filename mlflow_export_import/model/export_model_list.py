@@ -13,7 +13,7 @@ from mlflow_export_import import utils, click_doc
 
 client = mlflow.tracking.MlflowClient()
 
-def export_models(models, output_dir, stages, notebook_formats, export_notebook_revision): # pragma: no cover
+def export_models(models, output_dir, stages, notebook_formats, export_notebook_revision, export_run=True):
     start_time = time.time()
     if models == "all":
         models = [ model.name for model in client.list_registered_models() ]
@@ -25,7 +25,7 @@ def export_models(models, output_dir, stages, notebook_formats, export_notebook_
     print("models:")
     for model in models:
         print(f"  {model}")
-    exporter = ModelExporter(stages=stages, notebook_formats=utils.string_to_list(notebook_formats), export_notebook_revision=export_notebook_revision)
+    exporter = ModelExporter(stages=stages, notebook_formats=utils.string_to_list(notebook_formats), export_notebook_revision=export_notebook_revision, export_run=export_run)
     for model in models:
         dir = os.path.join(output_dir, model)
         exporter.export_model(dir, model)

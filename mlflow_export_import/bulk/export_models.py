@@ -19,7 +19,7 @@ def export_all(output_dir, models, stages, notebook_formats, export_notebook_rev
     exp_ids = exps_and_runs.keys()
     start_time = time.time()
     export_experiment_list.export_experiment_list(exp_ids, os.path.join(output_dir,"experiments"), True, notebook_formats, export_notebook_revision)
-    export_model_list.export_models(models, os.path.join(output_dir,"models"), stages, notebook_formats, export_notebook_revision)
+    export_model_list.export_models(models, os.path.join(output_dir,"models"), stages, notebook_formats, export_notebook_revision, export_run=False)
     duration = round(time.time() - start_time, 1)
     write_export_manifest_file(output_dir, duration, stages, notebook_formats, export_notebook_revision)
     print(f"Duration: {duration} seconds")

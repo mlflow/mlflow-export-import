@@ -11,11 +11,12 @@ from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils, click_doc
 
 class ModelExporter():
-    def __init__(self, export_metadata_tags=False, notebook_formats=[], stages=None, export_notebook_revision=False):
+    def __init__(self, export_metadata_tags=False, notebook_formats=[], stages=None, export_notebook_revision=False, export_run=True):
         self.mlflow_client = mlflow.tracking.MlflowClient()
         self.http_client = MlflowHttpClient()
         self.run_exporter = RunExporter(self.mlflow_client, export_metadata_tags=export_metadata_tags, notebook_formats=notebook_formats, export_notebook_revision=export_notebook_revision)
         self.stages = self.normalize_stages(stages)
+        self.export_run = export_run
 
     def export_model(self, output_dir, model_name):
         fs = _filesystem.get_filesystem(output_dir)
@@ -36,7 +37,8 @@ class ModelExporter():
             print(f"Exporting: {dct}")
             manifest.append(dct)
             try:
-                self.run_exporter.export_run(run_id, opath)
+                if self.export_run:
+                    self.run_exporter.export_run(run_id, opath)
                 run = self.mlflow_client.get_run(run_id)
                 dct = dict(vr)
                 dct["_run_artifact_uri"] = run.info.artifact_uri
