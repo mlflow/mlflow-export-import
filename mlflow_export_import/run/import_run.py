@@ -47,7 +47,7 @@ class RunImporter():
         """
         print(f"Importing run from '{input_dir}'")
         res = self._import_run(exp_name, input_dir)
-        print(f"Imported run into '{exp_name}/{res[0]}'")
+        print(f"Imported run into '{exp_name}/{res[0].info.run_id}'")
         return res
 
     def _import_run(self, dst_exp_name, src_run_id):
@@ -73,7 +73,7 @@ class RunImporter():
             traceback.print_exc()
             raise MlflowExportImportException from e
             
-        return (run_id, src_run_dct["tags"].get(utils.TAG_PARENT_ID,None))
+        return (run, src_run_dct["tags"].get(utils.TAG_PARENT_ID,None))
 
     def _update_mlmodel_run_id(self, run_id):
         """ Patch to fix the run_id in the destination MLmodel file since there is no API to get all model artifacts of a run. """
