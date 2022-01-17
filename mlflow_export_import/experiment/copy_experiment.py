@@ -22,11 +22,11 @@ class ExperimentCopier(BaseCopier):
         dst_exp = self.get_experiment(self.dst_client, dst_exp_name)
         print("src_experiment_name:",src_exp.name)
         print("src_experiment_id:",src_exp.experiment_id)
-        run_ids_mapping = {}
+        run_ids_map = {}
         for j,run in enumerate(SearchRunsIterator(self.src_client, src_exp.experiment_id)):
             dst_run_id, src_parent_run_id = self.run_copier._copy_run(run.info.run_id, dst_exp.experiment_id)
-            run_ids_mapping[run.info.run_id] = (dst_run_id,src_parent_run_id)
-        utils.nested_tags(self.dst_client, run_ids_mapping)
+            run_ids_map[run.info.run_id] = { "dst_run_id": dst_run_id, "src_parent_run_id": src_parent_run_id }
+        utils.nested_tags(self.dst_client, run_ids_map)
 
 @click.command()
 @click.option("--src-uri", help="Source MLflow API URI.", required=True, type=str)
