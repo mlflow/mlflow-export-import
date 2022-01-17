@@ -7,44 +7,61 @@ import click
 import mlflow
 from mlflow.exceptions import RestException
 from mlflow_export_import.run.import_run import RunImporter
-from mlflow_export_import import utils
+from mlflow_export_import import utils, click_doc
 from mlflow_export_import.common import model_utils
 
-class ModelImporter():
+class BaseModelImporter():
     def __init__(self, run_importer=None, await_creation_for=None):
         self.client = mlflow.tracking.MlflowClient()
         self.run_importer = run_importer if run_importer else RunImporter(self.client, mlmodel_fix=True, import_mlflow_tags=False)
         self.await_creation_for = await_creation_for 
 
-    def import_model(self, input_dir, model_name, experiment_name, delete_model=False, verbose=False, sleep_time=30):
+    def _import_version(self, model_name, src_vr, dst_run_id, sleep_time, dst_source):
+        src_current_stage = src_vr["current_stage"]
+        if not dst_source.startswith("dbfs:") and not os.path.exists(dst_source):
+            raise Exception(f"'source' argument for MLflowClient.create_model_version does not exist: {dst_source}")
+        kwargs = {"await_creation_for": self.await_creation_for } if self.await_creation_for else {}
+        version = self.client.create_model_version(model_name, dst_source, dst_run_id, **kwargs)
+        model_utils.wait_until_version_is_ready(self.client, model_name, version, sleep_time=sleep_time)
+        if src_current_stage != "None":
+            self.client.transition_model_version_stage(model_name, version.version, src_current_stage)
+
+    def _import_model(self, input_dir, model_name, delete_model=False, verbose=False, sleep_time=30):
         path = os.path.join(input_dir,"model.json")
-        dct = utils.read_json_file(path)
-        dct = dct["registered_model"]
+        model_dct = utils.read_json_file(path)["registered_model"]
 
         print("Model to import:")
-        print(f"  Name: {dct['name']}")
-        print(f"  Description: {dct.get('description','')}")
-        print(f"  Tags: {dct.get('tags','')}")
-        print(f"  {len(dct['latest_versions'])} latest versions")
+        print(f"  Name: {model_dct['name']}")
+        print(f"  Description: {model_dct.get('description','')}")
+        print(f"  Tags: {model_dct.get('tags','')}")
+        print(f"  {len(model_dct['latest_versions'])} latest versions")
         print(f"  path: {path}")
 
         if not model_name:
-            model_name = dct["name"]
+            model_name = model_dct["name"]
         if delete_model:
             model_utils.delete_model(self.client, model_name)
 
         try:
-            tags = { e["key"]:e["value"] for e in dct.get("tags", {}) }
-            self.client.create_registered_model(model_name, tags, dct.get("description"))
+            tags = { e["key"]:e["value"] for e in model_dct.get("tags", {}) }
+            self.client.create_registered_model(model_name, tags, model_dct.get("description"))
             print(f"Created new registered model '{model_name}'")
         except RestException as e:
             if not "RESOURCE_ALREADY_EXISTS: Registered Model" in str(e):
                 raise e
             print(f"Registered model '{model_name}' already exists")
+        return model_dct
 
+class ModelImporter(BaseModelImporter):
+    """ Low-level 'point' model importer  """
+    def __init__(self, run_importer=None, await_creation_for=None):
+        super().__init__(run_importer, await_creation_for)
+
+    def import_model(self, input_dir, model_name, experiment_name, delete_model=False, verbose=False, sleep_time=30):
+        model_dct = self._import_model(input_dir, model_name, delete_model, verbose, sleep_time)
         mlflow.set_experiment(experiment_name)
-        print("Importing latest versions:")
-        for vr in dct["latest_versions"]:
+        print("Importing versions:")
+        for vr in model_dct["latest_versions"]:
             run_id = self.import_run(input_dir, experiment_name, vr)
             self.import_version(model_name, vr, run_id, sleep_time)
         if verbose:
@@ -64,7 +81,8 @@ class ModelImporter():
         print(f"      source:           {source}")
         model_path = extract_model_path(source, run_id)
         print(f"      model_path:   {model_path}")
-        dst_run_id,_ = self.run_importer.import_run(experiment_name, run_dir)
+        dst_run,_ = self.run_importer.import_run(experiment_name, run_dir)
+        dst_run_id = dst_run.info.run_id
         run = self.client.get_run(dst_run_id)
         print(f"    Destination run - imported run:")
         print(f"      run_id: {dst_run_id}")
@@ -74,18 +92,35 @@ class ModelImporter():
         return dst_run_id
 
     def import_version(self, model_name, src_vr, dst_run_id, sleep_time):
-        src_source = src_vr["source"]
         dst_run = self.client.get_run(dst_run_id)
-        model_path = extract_model_path(src_source, src_vr["run_id"])
+        model_path = extract_model_path(src_vr["source"], src_vr["run_id"])
         dst_source = f"{dst_run.info.artifact_uri}/{model_path}"
-        current_stage = src_vr["current_stage"]
-        if not dst_source.startswith("dbfs:") and not os.path.exists(dst_source):
-            raise Exception(f"'source' argument for MLflowClient.create_model_version does not exist: {dst_source}")
-        kwargs = {"await_creation_for": self.await_creation_for } if self.await_creation_for else {}
-        version = self.client.create_model_version(model_name, dst_source, dst_run.info.run_id, **kwargs)
-        model_utils.wait_until_version_is_ready(self.client, model_name, version, sleep_time=sleep_time)
-        if current_stage != "None":
-            self.client.transition_model_version_stage(model_name, version.version, current_stage)
+        self._import_version(model_name, src_vr, dst_run_id, sleep_time, dst_source)
+
+class AllModelImporter(BaseModelImporter):
+    """ High-level 'bulk' model importer  """
+    def __init__(self, run_info_map, run_importer=None, await_creation_for=None):
+        super().__init__(run_importer, await_creation_for)
+        self.run_info_map = run_info_map
+
+    def import_model(self, input_dir, model_name, delete_model=False, verbose=False, sleep_time=30):
+        model_dct = self._import_model(input_dir, model_name, delete_model, verbose, sleep_time)
+        print("Importing latest versions:")
+        for vr in model_dct["latest_versions"]:
+            src_run_id = vr["run_id"]
+            dst_run_id = self.run_info_map[src_run_id].run_id
+            mlflow.set_experiment(vr["_experiment_name"])
+            self.import_version(model_name, vr, dst_run_id, sleep_time)
+        if verbose:
+            model_utils.dump_model_versions(self.client, model_name)
+
+    def import_version(self, model_name, src_vr, dst_run_id, sleep_time):
+        src_run_id = src_vr["run_id"]
+        model_path = extract_model_path(src_vr["source"], src_run_id)
+        dst_artifact_uri = self.run_info_map[src_run_id].artifact_uri
+        dst_source = f"{dst_artifact_uri}/{model_path}"
+        self._import_version(model_name, src_vr, dst_run_id, sleep_time, dst_source)
+
 
 def extract_model_path(source, run_id):
     idx = source.find(run_id)
@@ -105,7 +140,7 @@ def path_join(x,y):
 @click.option("--input-dir", help="Input directory produced by export_model.py.", required=True, type=str)
 @click.option("--model", help="New registered model name.", required=True, type=str)
 @click.option("--experiment-name", help="Destination experiment name  - will be created if it does not exist.", required=True, type=str)
-@click.option("--delete-model", help="First delete the model if it exists and all its versions.", type=bool, default=False, show_default=True)
+@click.option("--delete-model", help=click_doc.delete_model, type=bool, default=False, show_default=True)
 @click.option("--await-creation-for", help="Await creation for specified seconds.", type=int, default=None, show_default=True)
 @click.option("--sleep-time", help="Sleep time for polling until version.status==READY.", default=5, type=int)
 @click.option("--verbose", help="Verbose.", type=bool, default=False, show_default=True)

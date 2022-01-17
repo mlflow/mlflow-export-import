@@ -15,10 +15,14 @@ def export_experiment_list(experiments, output_dir, export_metadata_tags, notebo
     start_time = time.time()
     client = mlflow.tracking.MlflowClient()
 
-    if experiments == "all":
-        experiments = [ exp.experiment_id for exp in client.list_experiments() ]
-    else:
-        experiments = experiments.split(",")
+    if isinstance(experiments,str):
+        if experiments == "all":
+            experiments = [ exp.experiment_id for exp in client.list_experiments() ]
+        elif experiments.endswith("*"):
+            exp_prefix = experiments[:-1]
+            experiments = [ exp.experiment_id for exp in client.list_experiments() if exp.name.startswith(exp_prefix) ] # Wish there was an experiment search method for efficiency
+        else:
+            experiments = experiments.split(",")
     print("Experiments:")
     for exp in experiments:
         print(f"  {exp}")
@@ -43,6 +47,7 @@ def export_experiment_list(experiments, output_dir, export_metadata_tags, notebo
     total_runs = ok_runs + failed_runs
     duration = round(time.time() - start_time, 1)
 
+    #manifest = utils.create_common_manifest(duration)
     dct = { 
         "info": {
             "mlflow_version": mlflow.__version__,
@@ -51,8 +56,7 @@ def export_experiment_list(experiments, output_dir, export_metadata_tags, notebo
             "experiments": len(experiments),
             "total_runs": total_runs,
             "ok_runs": ok_runs,
-            "failed_runs": failed_runs,
-            "duration": duration
+            "failed_runs": failed_runs
         },
         "experiments": export_results 
     }

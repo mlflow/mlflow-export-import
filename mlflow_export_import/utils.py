@@ -1,5 +1,4 @@
 import os
-import shutil
 import json
 import time
 import mlflow
@@ -89,10 +88,22 @@ def nested_tags(dst_client, run_ids_mapping):
     """
     Set the new parentRunId for new imported child runs.
     """
-    for _,(dst_run_id,src_parent_run_id) in run_ids_mapping.items():
+    for _,v in run_ids_mapping.items():
+        src_parent_run_id = v.get("src_parent_run_id",None)
         if src_parent_run_id:
-            dst_parent_run_id,_ = run_ids_mapping[src_parent_run_id]
+            dst_run_id = v["dst_run_id"]
+            dst_parent_run_id = run_ids_mapping[src_parent_run_id]["dst_run_id"]
             dst_client.set_tag(dst_run_id, "mlflow.parentRunId", dst_parent_run_id)
 
 def importing_into_databricks():
     return mlflow.tracking.get_tracking_uri().startswith("databricks")
+
+def create_common_manifest(duration):
+    return {
+        "info": {
+            "mlflow_version": mlflow.__version__,
+            "mlflow_tracking_uri": mlflow.get_tracking_uri(),
+            "export_time": get_now_nice(),
+            "duration": duration
+        }
+    }

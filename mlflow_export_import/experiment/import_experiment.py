@@ -19,24 +19,32 @@ class ExperimentImporter():
         print("MLflowClient:",self.mlflow_client)
         self.dbx_client = DatabricksHttpClient()
 
-    def import_experiment(self, exp_name, input):
-        self.import_experiment_from_dir(exp_name, input)
-
-    def import_experiment_from_dir(self, exp_name, exp_dir):
+    def import_experiment(self, exp_name, input_dir):
+        """
+        :param: exp_name: Destination experiment name.
+        :param: input_dir: Source experiment directory.
+        :return: A map of source run IDs and destination run.info.
+        """
         mlflow_utils.set_experiment(self.dbx_client, exp_name)
-        manifest_path = os.path.join(exp_dir,"manifest.json")
+        dst_exp_id = self.mlflow_client.get_experiment_by_name(exp_name).experiment_id # TODO
+        manifest_path = os.path.join(input_dir,"manifest.json")
         dct = utils.read_json_file(manifest_path)
-        run_ids = dct["run_ids"]
-        failed_run_ids = dct['failed_run_ids']
-        print(f"Importing {len(run_ids)} runs into experiment '{exp_name}' from {exp_dir}")
-        run_ids_mapping = {}
+        run_ids = dct["export_info"]["ok_runs"]
+        failed_run_ids = dct["export_info"]["failed_runs"]
+        print(f"Importing {len(run_ids)} runs into experiment '{exp_name}' from {input_dir}")
+        run_ids_map = {}
+        run_info_map = {}
         for src_run_id in run_ids:
-            dst_run_id, src_parent_run_id = self.run_importer.import_run(exp_name, os.path.join(exp_dir,src_run_id))
-            run_ids_mapping[src_run_id] = (dst_run_id,src_parent_run_id)
-        print(f"Imported {len(run_ids)} runs into experiment '{exp_name}' from {exp_dir}")
+            dst_run, src_parent_run_id = self.run_importer.import_run(exp_name, os.path.join(input_dir,src_run_id))
+            dst_run_id = dst_run.info.run_id
+            run_ids_map[src_run_id] = { "dst_run_id": dst_run_id, "src_parent_run_id": src_parent_run_id }
+            run_info_map[src_run_id] = dst_run.info
+        print(f"Imported {len(run_ids)} runs into experiment '{exp_name}' from {input_dir}")
         if len(failed_run_ids) > 0:
             print(f"Warning: {len(failed_run_ids)} failed runs were not imported - see {manifest_path}")
-        utils.nested_tags(self.mlflow_client, run_ids_mapping)
+        utils.nested_tags(self.mlflow_client, run_ids_map)
+        return run_info_map
+
 
 @click.command()
 @click.option("--input-dir", help="Input path - directory", required=True, type=str)

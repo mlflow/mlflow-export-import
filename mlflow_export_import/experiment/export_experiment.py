@@ -19,7 +19,7 @@ class ExperimentExporter():
         self.client = client or mlflow.tracking.MlflowClient()
         self.run_exporter = RunExporter(self.client, export_metadata_tags, notebook_formats, export_notebook_revision)
 
-    def export_experiment(self, exp_id_or_name, output_dir):
+    def export_experiment(self, exp_id_or_name, output_dir, run_ids=None):
         exp = mlflow_utils.get_experiment(self.client, exp_id_or_name)
         exp_id = exp.experiment_id
         print(f"Exporting experiment '{exp.name}' (ID {exp.experiment_id}) to '{output_dir}'")
@@ -31,14 +31,12 @@ class ExperimentExporter():
         ok_run_ids = []
         failed_run_ids = []
         j = -1
-        for j,run in enumerate(SearchRunsIterator(self.client, exp_id)):
-            run_dir = os.path.join(output_dir, run.info.run_id)
-            print(f"Exporting run {j+1}: {run.info.run_id}")
-            res = self.run_exporter.export_run(run.info.run_id, run_dir)
-            if res:
-                ok_run_ids.append(run.info.run_id)
-            else:
-                failed_run_ids.append(run.info.run_id)
+        if run_ids:
+            for j,run in enumerate(run_ids):
+                self._export_run(j, run, output_dir, ok_run_ids, failed_run_ids)
+        else:
+            for j,run in enumerate(SearchRunsIterator(self.client, exp_id)):
+                self._export_run(j, run, output_dir, ok_run_ids, failed_run_ids)
         dct["export_info"] = { 
             "export_time": utils.get_now_nice(), 
              "num_total_runs": (j+1),
@@ -55,6 +53,15 @@ class ExperimentExporter():
             print(f"{len(ok_run_ids)/j} runs succesfully exported")
             print(f"{len(failed_run_ids)/j} runs failed")
         return len(ok_run_ids), len(failed_run_ids) 
+
+    def _export_run(self, idx, run, output_dir, ok_run_ids, failed_run_ids):
+        run_dir = os.path.join(output_dir, run.info.run_id)
+        print(f"Exporting run {idx+1}: {run.info.run_id}")
+        res = self.run_exporter.export_run(run.info.run_id, run_dir)
+        if res:
+            ok_run_ids.append(run.info.run_id)
+        else:
+            failed_run_ids.append(run.info.run_id)
 
 @click.command()
 @click.option("--experiment", help="Experiment name or ID.", required=True, type=str)
