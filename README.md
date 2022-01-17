@@ -1,9 +1,11 @@
 # Export and Import MLflow Experiments, Runs or Models
 
-Tools to export and import MLflow runs, experiments or registered models from one tracking server (Databricks workspace) to another.
+Tools to export and import MLflow objects (runs, experiments or registered models) from one tracking server (Databricks workspace) to another.
+For details see the [Databricks_MLflow_Object_Relationships](https://github.com/amesar/mlflow-resources/blob/master/slides/Databricks_MLflow_Object_Relationships.pdf) slide deck.
 
 Some of the reasons to use MLflow Export Import:
-  * Share and collaborate with data scientists in another tracking server.
+  * Share and collaborate with other data scientists in the same or another tracking server.
+    * For example, you can a favorable experiment/run from another user to your own workspace.
   * Backup your experiments.
   * Migrate experiments to another tracking server.
   * Disaster recovery.
@@ -11,26 +13,45 @@ Some of the reasons to use MLflow Export Import:
 There are two ways to run MLflow Export Import:
 * Open source MLflow - As a normal Python package - this page.
 * [Databricks notebooks](databricks_notebooks/README.md).
-
 ## Architecture
 
 <img src="export_import_architecture.png" height="330" >
 
 ## Overview
 
-### Experiments
+There are types of export/import tools:
+
+* `Bulk tools` - high-level tools to copy a web of MLflow objects and maintain full object referential integrity with their original names.
+* `Point tools` - lower-level tools to copy individual MLflow objects and have fine-grained control over the target names.
+
+### Bulk tools
+
+* Automated tool that migrates models and their versions' runs along with the runs' experiment.
+* Original source model and experiment names are preserved.
+* Leverages the "point" tools as basic building blocks.
+* Bulk tools:
+  * `export-all` - exports all the MLflow objects of the tracking server.
+  * `export-models` - exports registered models and their versions' backing run along with the experiment that the run belongs to.
+  * `import-models` - imports models and their runs and experiments from the above exported directory.
+
+### Point tools
+
+* Lower-level tools which allow you to control the target MLflow object's name.
+* Useful for copying an MLflow object to another user - either in same or different tracking server.
+* Are the basic building blocks for the bulk tools.
+
+#### Experiments
   * Export experiments to a directory.
   * Import experiments from a directory.
 
-### Runs
+#### Runs
   * Export a run to  a directory.
   * Import a run from a directory.
 
-### Registered Models
+#### Registered Models
   * Export a registered model to a directory.
   * Import a registered model from a directory.
   * List all registered models.
-
 
 ## Limitations
 
@@ -125,9 +146,117 @@ python setup.py bdist_wheel
 databricks fs cp dist/mlflow_export_import-1.0.0-py3-none-any.whl {MY_DBFS_PATH}
 ```
 
-## Experiments 
+## Bulk Tools
 
-### Export Experiments
+Top-level output directory structure.
+```
++---experiments
++---models
+```
+
+For further directory structure see the `point` tool sections for experiments and models further below.
+
+### Export the entire MLflow tracking server
+
+Export all models, experiments and runs as well as a run's Databricks notebook (best effort).
+
+Source: [export_all.py](mlflow_export_import/bulk/export_all.py).
+
+#### Usage
+```
+Options:
+  --output-dir TEXT               Output directory.  [required]
+  --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
+                                  JUPYTER or DBC (comma seperated).  [default: ]
+  --export-notebook-revision BOOLEAN
+                                  Export the run's notebook revision.
+                                  Experimental not yet publicly available.
+                                  [default: False]
+```
+#### Examples
+
+```
+export-all --output-dir
+```
+
+### Export models with their experiments and runs
+
+Exports models and their versions' backing run along with the experiment that the run belongs to.
+
+Source: [export_models.py](mlflow_export_import/bulk/export_models.py).
+
+#### Usage
+```
+Options:
+  --output-dir TEXT               Output directory.  [required]
+  --models TEXT                   Models to export. Values are 'all', comma
+                                  seperated list of models or model prefix
+                                  with * ('sklearn*'). Default is 'all'
+  --stages TEXT                   Stages to export (comma seperated). Default
+                                  is all stages. Values are Production,
+                                  Staging, Archived and None.
+  --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
+                                  JUPYTER or DBC (comma seperated).  [default: ]
+  --export-notebook-revision BOOLEAN
+                                  Export the run's notebook revision.
+                                  Experimental not yet publicly available.
+                                  [default: False]
+  --help                          Show this message and exit.
+```
+
+#### Examples
+
+##### Export all models
+
+```
+export-models --output-dir out
+```
+
+##### Export specified models
+```
+export-models \
+  --output-dir out \
+  --models sklearn-wine,sklearn-iris
+```
+
+##### Export models starting with prefix
+```
+export-models \
+  --output-dir out \
+  --models sklearn*
+```
+
+### Import models and experiments
+
+Source: [import_models.py](mlflow_export_import/bulk/import_models.py).
+
+#### Usage
+```
+Options:
+  --input-dir TEXT                Input directory.  [required]
+  --delete-model BOOLEAN          First delete the model if it exists and all
+                                  its versions.  [default: False]
+  --verbose BOOLEAN               Verbose.  [default: False]
+  --use-src-user-id BOOLEAN       Set the destination user ID to the source
+                                  user ID. Source user ID is ignored when
+                                  importing into Databricks since setting it
+                                  is not allowed.  [default: False]
+  --import-mlflow-tags BOOLEAN    Import mlflow tags.  [default: False]
+  --import-metadata-tags BOOLEAN  Import mlflow_export_import tags.  [default:
+                                  False]
+```
+
+### Examples
+```
+import-models  --input-dir out
+```
+
+
+## Point tools
+
+### Experiments 
+
+#### Export Experiments
 
 There are two scripts to export experiments:
 * `export_experiment` - exports one experiment.
@@ -135,11 +264,11 @@ There are two scripts to export experiments:
 
 Both accept either an experiment ID or name.
 
-#### export_experiment
+##### export_experiment
 
 Export one experiment to a directory.
 
-##### Usage
+###### Usage
 
 ```
 export-experiment --help
@@ -149,14 +278,14 @@ Options:
   --output-dir TEXT               Output directory.  [required]
   --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: False]
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
-                                  JUPYTER or DBC.  [default: ]
+                                  JUPYTER or DBC (comma seperated).  [default: ]
   --export-notebook-revision BOOLEAN
                                   Export the run's notebook revision.
                                   Experimental not yet publicly available.
                                   [default: False]
 ```
 
-##### Export examples
+###### Export examples
 
 Export experiment by experiment ID.
 ```
@@ -172,7 +301,7 @@ export-experiment \
   --output-dir out
 ```
 
-##### Databricks export examples
+###### Databricks export examples
 
 See [Access the MLflow tracking server from outside Databricks](https://docs.databricks.com/applications/mlflow/access-hosted-tracking-server.html).
 ```
@@ -186,7 +315,7 @@ export-experiment \
   --notebook-formats DBC,SOURCE 
 ```
 
-##### Export directory structure
+###### Export directory structure
 
 The output directory contains a manifest file and a subdirectory for each run (by run ID).
 The run directory contains a run.json
@@ -205,11 +334,11 @@ file containing run metadata and an artifact hierarchy.
 |     +-MLmodel
 ```
 
-#### export_experiment_list
+##### export_experiment_list
 
 Export several (or all) experiments to a directory.
 
-##### Usage
+###### Usage
 ```
 export-experiment-list --help
 
@@ -218,14 +347,14 @@ export-experiment-list --help
   --output-dir TEXT               Output directory.  [required]
   --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: False]
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
-                                  JUPYTER or DBC.  [default: ]
+                                  JUPYTER or DBC (comma seperated).  [default: ]
   --export-notebook-revision BOOLEAN
                                   Export the run's notebook revision.
                                   Experimental not yet publicly available.
                                   [default: False]
 ```
 
-##### Export list examples
+###### Export list examples
 
 Export experiments by experiment ID.
 ```
@@ -256,7 +385,7 @@ Exporting experiment 'keras_mnist' (ID 2) to 'out/2'
 Duration: 1.6 seonds
 ```
 
-##### Export directory structure
+###### Export directory structure
 
 The output directory contains a manifest file and a subdirectory for each experiment (by experiment ID).
 
@@ -353,7 +482,7 @@ Sample [experiment manifest.json](samples/oss_mlflow/experiment_list/1/manifest.
 ```
 
 
-### Import Experiments
+#### Import Experiments
 
 Import experiments from a directory. Reads the manifest file to import expirements and their runs.
 
@@ -364,11 +493,11 @@ There are two scripts to import experiments:
 * import_experiment - imports one experiment
 * import_experiment_list - imports a list of experiments
 
-#### import_experiment
+##### import_experiment
 
 Imports one experiment.
 
-##### Usage
+###### Usage
 ```
 import-experiment --help \
 
@@ -384,7 +513,7 @@ Options:
   --import-metadata-tags BOOLEAN  Import mlflow_export_import tags
 ```
 
-##### Import examples
+###### Import examples
 
 ```
 import-experiment \
@@ -392,7 +521,7 @@ import-experiment \
   --input-dir out
 ```
 
-##### Databricks import examples
+###### Databricks import examples
 
 When importing into Databricks MLflow, make sure you set `--import-mlflow-tags False` since Databricks does not allow you to set `mlflow` tags unlike open source MLflow.
 
@@ -404,11 +533,11 @@ import-experiment \
   --import-mlflow-tags False
 ```
 
-#### import_experiment_list
+##### import_experiment_list
 
 Import a list of experiments.
 
-##### Usage
+###### Usage
 
 ```
 import-experiment-list --help
@@ -424,7 +553,7 @@ Options:
   --import-metadata-tags BOOLEAN  Import mlflow_tools tags.  [default: False]
 ```
 
-##### Import examples
+###### Import examples
 
 ```
 import-experiment-list \
@@ -432,9 +561,9 @@ import-experiment-list \
   --input-dir out 
 ```
 
-## Runs
+### Runs
 
-### Export run
+#### Export run
 
 Export run to directory.
 
@@ -448,7 +577,7 @@ Options:
   --output-dir TEXT               Output directory.  [required]
   --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: False] 
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
-                                  JUPYTER or DBC.  [default: ]
+                                  JUPYTER or DBC (comma seperated).  [default: ]
   --export-notebook-revision BOOLEAN
                                   Export the run's notebook revision.
                                   Experimental not yet publicly available.
@@ -506,11 +635,11 @@ Sample run.json:
 }
 ```
 
-### Import run
+#### Import run
 
 Imports a run from a directory.
 
-#### Usage
+##### Usage
 
 ```
 import-run --help
@@ -534,11 +663,11 @@ Options:
                                   False]
 ```
 
-#### Import examples
+##### Import examples
 
 Directory `out` is where you exported your run.
 
-##### Local import example
+###### Local import example
 ```
 import-run \
   --run-id 50fa90e751eb4b3f9ba9cef0efe8ea30 \
@@ -546,7 +675,7 @@ import-run \
   --experiment-name sklearn_wine_imported
 ```
 
-##### Databricks import example
+###### Databricks import example
 
 When importing into Databricks MLflow, make sure you set `--import-mlflow-tags False` since Databricks does not allow you to set `mlflow` tags unlike open source MLflow.
 
@@ -559,9 +688,9 @@ run.import-run \
   --import-mlflow-tags False
 ```
 
-## Registered Models
+### Registered Models
 
-### Export Registered Model
+#### Export Registered Model
 
 There are two scripts to export models:
 * `export_model` - exports one model.
@@ -575,7 +704,7 @@ You can specify a list of stages to export.
 
 Source: [export_model.py](mlflow_export_import/model/export_model.py).
 
-**Usage**
+##### Usage
 ```
 export-model --help
 
@@ -586,14 +715,14 @@ Options:
                                   is all stages. Values are Production,
                                   Staging, Archived and None
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
-                                  JUPYTER or DBC.  [default: ]
+                                  JUPYTER or DBC (comma seperated).  [default: ]
   --export-notebook-revision BOOLEAN
                                   Export the run's notebook revision.
                                   Experimental not yet publicly available.
                                   [default: False]
 ```
 
-**Run**
+##### Run
 ```
 export-model \
   --model sklearn_wine \
@@ -606,7 +735,7 @@ Exporting version 3 stage 'Production' with run_id 24aa9cce1388474e9f26d17100724
 Exporting version 5 stage 'Staging' with run_id 8efd80f59b7946119d8f1838515eea25 to out/8efd80f59b7946119d8f1838515eea25
 ```
 
-**Output**
+##### Output
 
 Output export directory example.
 
@@ -646,7 +775,7 @@ Export a list of several (or all) registered models to a directory.
 
 Source: [export_model_list.py](mlflow_export_import/model/export_model_list.py).
 
-**Usage**
+##### Usage
 ```
 Options:
   --models TEXT                   Registered model names (comma delimited).
@@ -656,14 +785,14 @@ Options:
   --stages TEXT                   Stages to export (comma seperated). Default
                                   is all stages. Values are Production,
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
-                                  JUPYTER or DBC.  [default: ]
+                                  JUPYTER or DBC (comma seperated).  [default: ]
   --export-notebook-revision BOOLEAN
                                   Export the run's notebook revision.
                                   Experimental not yet publicly available.
                                   [default: False]
 ```
 
-**Run**
+##### Run
 ```
 export-model-list \
   --models sklearn_wine,keras_mnist \
@@ -673,13 +802,13 @@ export-model-list \
 
 Sample output: [manifest.json](samples/oss_mlflow/model_list/manifest.json).
 
-### Import registered model
+#### Import registered model
 
 Import a registered model from a directory.
 
 Source: [import_model.py](mlflow_export_import/model/import_model.py).
 
-**Usage**
+##### Usage
 
 ```
 import-model --help
@@ -699,7 +828,7 @@ Options:
 ```
 
 
-#### Run
+##### Run
 
 ```
 import-model \
@@ -734,7 +863,7 @@ Version: id=1 status=READY state=None
 Waited 0.01 seconds
 ```
 
-### List all registered models
+#### List all registered models
 
 Calls the `registered-models/list` API endpoint and creates the file `registered_models.json`.
 ```
