@@ -20,8 +20,11 @@ def get_experiments_runs_of_models(models, show_experiments=False, show_runs=Fal
     for model_name in models:
         versions = client.search_model_versions(f"name='{model_name}'")
         for vr in versions:
-            run = client.get_run(vr.run_id)
-            exps_and_runs.setdefault(run.info.experiment_id,[]).append(run.info.run_id)
+            try:
+                run = client.get_run(vr.run_id)
+                exps_and_runs.setdefault(run.info.experiment_id,[]).append(run.info.run_id)
+            except mlflow.exceptions.RestException:
+                print(f"WARNING: run {vr.run_id} of version {vr.version} of model '{model_name}' does not exist")
     if show_experiments:
         show_experiments_runs_of_models(exps_and_runs, show_runs)
     return exps_and_runs

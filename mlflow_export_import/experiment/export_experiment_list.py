@@ -12,20 +12,30 @@ from mlflow_export_import import utils, click_doc
 from mlflow_export_import.experiment.export_experiment import ExperimentExporter
 
 def export_experiment_list(experiments, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision):
+    """
+    :param: experiments: Can be either:
+      - List of experiment names 
+      - List of experiment IDs
+      - Dictionary with experiment ID key and list of run IDs 
+      - String with comma-delimited experiment names of IDs.
+    """
     start_time = time.time()
     client = mlflow.tracking.MlflowClient()
 
-    if isinstance(experiments,str):
-        if experiments == "all":
-            experiments = [ exp.experiment_id for exp in client.list_experiments() ]
-        elif experiments.endswith("*"):
-            exp_prefix = experiments[:-1]
-            experiments = [ exp.experiment_id for exp in client.list_experiments() if exp.name.startswith(exp_prefix) ] # Wish there was an experiment search method for efficiency
-        else:
-            experiments = experiments.split(",")
-    print("Experiments:")
-    for exp in experiments:
-        print(f"  {exp}")
+    export_all_runs = not isinstance(experiments,dict) 
+    if export_all_runs:
+        experiments = utils.get_experiments(experiments)
+        table_data = experiments
+        columns = ["Experiment ID"]
+    else:
+        experiments_dct = experiments
+        experiments = experiments.keys()
+        experiments = utils.get_experiments(experiments)
+        table_data = [ [exp_id,len(runs)] for exp_id,runs in experiments_dct.items() ]
+        num_runs = sum(x[1] for x in table_data)
+        table_data.append(["Total",num_runs])
+        columns = ["Experiment ID", "# Runs"]
+    utils.show_table("Experiments",table_data,columns)
 
     exporter = ExperimentExporter(client, export_metadata_tags, utils.string_to_list(notebook_formats), export_notebook_revision)
     export_results = []
@@ -34,9 +44,12 @@ def export_experiment_list(experiments, output_dir, export_metadata_tags, notebo
     print("")
     for exp_id_or_name in experiments:
         exp = mlflow_utils.get_experiment(client, exp_id_or_name)
-        exp_output = os.path.join(output_dir, exp.experiment_id)
+        out_dir = os.path.join(output_dir, exp.experiment_id)
+        run_ids = None
+        if not export_all_runs:
+            run_ids = experiments_dct.get(exp.experiment_id)
         try:
-            _ok_runs, _failed_runs = exporter.export_experiment(exp.experiment_id, exp_output)
+            _ok_runs, _failed_runs = exporter.export_experiment(exp.experiment_id, out_dir, run_ids)
             ok_runs += _ok_runs
             failed_runs += _failed_runs
             export_results.append( { "id" : exp.experiment_id, "name": exp.name, "ok_runs": _ok_runs, "failed_runs": _failed_runs })
@@ -47,12 +60,12 @@ def export_experiment_list(experiments, output_dir, export_metadata_tags, notebo
     total_runs = ok_runs + failed_runs
     duration = round(time.time() - start_time, 1)
 
-    #manifest = utils.create_common_manifest(duration)
     dct = { 
         "info": {
             "mlflow_version": mlflow.__version__,
             "mlflow_tracking_uri": mlflow.get_tracking_uri(),
             "export_time": utils.get_now_nice(),
+            "duration": duration,
             "experiments": len(experiments),
             "total_runs": total_runs,
             "ok_runs": ok_runs,
@@ -67,7 +80,7 @@ def export_experiment_list(experiments, output_dir, export_metadata_tags, notebo
     print(f"{ok_runs}/{total_runs} runs succesfully exported")
     if failed_runs > 0:
         print(f"{failed_runs}/{total_runs} runs failed")
-    print(f"Duration: {duration} seonds")
+    print(f"Experiment export duration: {duration} seonds")
 
 @click.command()
 @click.option("--experiments", help="Experiment names or IDs (comma delimited). 'all' will export all experiments. ", required=True, type=str)

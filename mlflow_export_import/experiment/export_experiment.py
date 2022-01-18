@@ -32,7 +32,8 @@ class ExperimentExporter():
         failed_run_ids = []
         j = -1
         if run_ids:
-            for j,run in enumerate(run_ids):
+            for j,run_id in enumerate(run_ids):
+                run = self.client.get_run(run_id)
                 self._export_run(j, run, output_dir, ok_run_ids, failed_run_ids)
         else:
             for j,run in enumerate(SearchRunsIterator(self.client, exp_id)):

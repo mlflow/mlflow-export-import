@@ -179,9 +179,15 @@ Options:
 export-all --output-dir
 ```
 
-### Export models with their experiments and runs
+### Export models with versions' runs and runs' experiment
+
 
 Exports models and their versions' backing run along with the experiment that the run belongs to.
+
+The `export-all-runs` option is of particular significance. 
+It controls whether all runs of an experiment are exported or only those associated with a registered model version.
+Obviously there are many runs that are not linked to a registered model version.
+This can make a substantial difference in export time.
 
 Source: [export_models.py](mlflow_export_import/bulk/export_models.py).
 
@@ -197,11 +203,12 @@ Options:
                                   Staging, Archived and None.
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
                                   JUPYTER or DBC (comma seperated).  [default: ]
+  --export-all-runs BOOLEAN       Export all runs of experiment or just runs
+                                  associated with registered model versions.
   --export-notebook-revision BOOLEAN
                                   Export the run's notebook revision.
                                   Experimental not yet publicly available.
                                   [default: False]
-  --help                          Show this message and exit.
 ```
 
 #### Examples
@@ -776,7 +783,7 @@ Export a list of several (or all) registered models to a directory.
 Source: [export_model_list.py](mlflow_export_import/model/export_model_list.py).
 
 ##### Usage
-```
+
 Options:
   --models TEXT                   Registered model names (comma delimited).
                                   'all' will export all experiments.
