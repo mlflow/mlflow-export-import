@@ -51,7 +51,7 @@ def export_models(models, output_dir, stages, notebook_formats, export_notebook_
         f.write(json.dumps(manifest, indent=2)+"\n")
 
     print(f"{len(models)} models exported")
-    print(f"Duration: {duration} seonds")
+    print(f"Duration for registered models export: {duration} seonds")
 
 @click.command()
 @click.option("--models", help="Registered model names (comma delimited). 'all' will export all experiments.", required=True, type=str)

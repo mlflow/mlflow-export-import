@@ -27,7 +27,7 @@ def main(output_dir, notebook_formats, export_notebook_revision):
 
     duration = round(time.time() - start_time, 1)
     write_export_manifest_file(output_dir, duration, ALL_STAGES, notebook_formats, export_notebook_revision)
-    print(f"Duration: {duration} seconds")
+    print(f"Duraton for entire tracking server export: {duration} seconds")
 
 if __name__ == "__main__":
     main()

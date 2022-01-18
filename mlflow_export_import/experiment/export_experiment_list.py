@@ -80,7 +80,7 @@ def export_experiment_list(experiments, output_dir, export_metadata_tags, notebo
     print(f"{ok_runs}/{total_runs} runs succesfully exported")
     if failed_runs > 0:
         print(f"{failed_runs}/{total_runs} runs failed")
-    print(f"Experiment export duration: {duration} seonds")
+    print(f"Duration for experiment list export: {duration} seconds")
 
 @click.command()
 @click.option("--experiments", help="Experiment names or IDs (comma delimited). 'all' will export all experiments. ", required=True, type=str)
