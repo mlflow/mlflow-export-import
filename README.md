@@ -19,10 +19,11 @@ There are two modes to use MLflow Export Import
 
 ## Overview
 
-There are types of export-import tools:
+There are two types of export-import tools:
 
 * [Bulk tools](README_bulk.md) - high-level tools to copy an entire tracking server or the web of MLflow objects (runs and experiments) associated with registered models. 
-A model's versions' runs and the runs' experiment. Full object referential integrity is maintained as well as the original MLflow object names.
+A model's versions' runs and the runs' experiment are  transitively exported. 
+Full object referential integrity is maintained as well as the original MLflow object names.
 * [Point tools](README_point.md) - lower-level tools to copy individual MLflow objects and have fine-grained control over the target names.
 
 ## Limitations
@@ -35,7 +36,7 @@ A model's versions' runs and the runs' experiment. Full object referential integ
 
 * The Databricks API does not support importing notebook revisions.
 * When you import a run, the link to its source notebook revision ID will appear in the UI but you cannot reach that revision (link is dead).
-* For convenience, the export tool exports the desired notebook revision (latest revision or specific revision based on the --export-notebook-revision flag) for a notebook-based experiment but again, it cannot be attached to a run when imported. Its stored as an artifact in the "notebooks" folder of the run's artifact root.
+* For convenience, the export tool exports the desired notebook revision (latest revision or specific revision based on the `--export-notebook-revision` flag) for a notebook-based experiment but again, it cannot be attached to a run when imported. It is stored as an artifact in the `notebooks` folder of the run's artifact root.
 * When importing a run or experiment, for open source MLflow you can specify the user owner. For Databricks import you cannot - the owner will be based on the personal access token (PAT) of the import user.
 
 ## Common options details 
@@ -71,13 +72,13 @@ source mlflow-export-import/bin/activate
 
 There are two different ways to install the package.
 
-#### Install from github directly
+#### 1. Install from github directly
 
 ```
 pip install git+https:///github.com/amesar/mlflow-export-import/#egg=mlflow-export-import
 ```
 
-#### Install from github clone
+#### 2. Install from github clone
 ```
 git clone https://github.com/amesar/mlflow-export-import
 cd mlflow-export-import
@@ -88,7 +89,7 @@ pip install -e .
 
 There are two different ways to install the package.
 
-#### Install package in notebook
+#### 1. Install package in notebook
 
 [Install notebook-scoped libraries with %pip](https://docs.databricks.com/libraries/notebooks-python-libraries.html#install-notebook-scoped-libraries-with-pip).
 
@@ -97,7 +98,7 @@ There are two different ways to install the package.
 pip install git+https:///github.com/amesar/mlflow-export-import/#egg=mlflow-export-import
 ```
 
-#### Install package as a wheel on cluster
+#### 2. Install package as a wheel on cluster
 
 Build the wheel artifact, upload it to DBFS and then [install it on your cluster](https://docs.databricks.com/libraries/cluster-libraries.html).
 
@@ -119,15 +120,15 @@ For full details see [Access the MLflow tracking server from outside Databricks]
 
 ## Running tools
 
-The main tool scripts can be executed either as standard Python scripts or console scripts.
+The main tool scripts can be executed either as a standard Python script or console script.
 
 Python [console scripts](https://python-packaging.readthedocs.io/en/latest/command-line-scripts.html#the-console-scripts-entry-point)  (such as export-run, import-run, etc.) are provided as a convenience. For a list of scripts see [setup.py](setup.py).
 
-This allows you to use
+This allows you to use:
 ```
 export-experiment --help
 ```
-instead of
+instead of:
 ```
 python -u -m mlflow_export_import.experiment.export_experiment --help
 ```

@@ -7,7 +7,7 @@ import time
 import click
 import mlflow
 from mlflow_export_import.model import export_model_list
-from mlflow_export_import.experiment import export_experiment_list
+from mlflow_export_import.bulk import export_experiments
 from mlflow_export_import import click_doc
 from mlflow_export_import.bulk import write_export_manifest_file
 from mlflow_export_import.bulk.model_utils import get_experiments_runs_of_models
@@ -20,7 +20,7 @@ def export_all(output_dir, models, stages, notebook_formats, export_notebook_rev
     start_time = time.time()
     out_dir = os.path.join(output_dir,"experiments")
     exps_to_export = exp_ids if export_all_runs else exps_and_runs
-    export_experiment_list.export_experiment_list(exps_to_export, out_dir, True, notebook_formats, export_notebook_revision)
+    export_experiments.export_experiments(exps_to_export, out_dir, True, notebook_formats, export_notebook_revision)
     export_model_list.export_models(models, os.path.join(output_dir,"models"), stages, notebook_formats, export_notebook_revision, export_run=False)
     duration = round(time.time() - start_time, 1)
     write_export_manifest_file(output_dir, duration, stages, notebook_formats, export_notebook_revision)

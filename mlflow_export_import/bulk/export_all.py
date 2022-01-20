@@ -6,7 +6,7 @@ import os
 import time
 import click
 from mlflow_export_import.model import export_model_list
-from mlflow_export_import.experiment import export_experiment_list
+from mlflow_export_import.bulk import export_experiments
 from mlflow_export_import import click_doc
 from mlflow_export_import.bulk import write_export_manifest_file
 

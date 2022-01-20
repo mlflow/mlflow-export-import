@@ -11,7 +11,7 @@ from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import import utils, click_doc
 from mlflow_export_import.experiment.export_experiment import ExperimentExporter
 
-def export_experiment_list(experiments, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision):
+def export_experiments(experiments, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision):
     """
     :param: experiments: Can be either:
       - List of experiment names 
@@ -82,18 +82,38 @@ def export_experiment_list(experiments, output_dir, export_metadata_tags, notebo
         print(f"{failed_runs}/{total_runs} runs failed")
     print(f"Duration for experiment list export: {duration} seconds")
 
-@click.command()
-@click.option("--experiments", help="Experiment names or IDs (comma delimited). 'all' will export all experiments. ", required=True, type=str)
-@click.option("--output-dir", help="Output directory.", required=True)
-@click.option("--export-metadata-tags", help=click_doc.export_metadata_tags, type=bool, default=False, show_default=True)
-@click.option("--notebook-formats", help=click_doc.notebook_formats, default="", show_default=True)
-@click.option("--export-notebook-revision", help=click_doc.export_notebook_revision, type=bool, default=False, show_default=True)
 
+@click.command()
+@click.option("--experiments", 
+    help="Experiment names or IDs (comma delimited). 'all' will export all experiments. ", 
+    required=True, 
+    type=str
+)
+@click.option("--output-dir", 
+    help="Output directory.", 
+    required=True
+)
+@click.option("--export-metadata-tags", 
+    help=click_doc.export_metadata_tags, 
+    type=bool, 
+    default=False, 
+    show_default=True
+)
+@click.option("--notebook-formats", 
+    help=click_doc.notebook_formats, 
+    default="", show_default=True
+)
+@click.option("--export-notebook-revision", 
+    help=click_doc.export_notebook_revision, 
+    type=bool, 
+    default=False, 
+    show_default=True
+)
 def main(experiments, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision): # pragma: no cover
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    export_experiment_list(experiments, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision)
+    export_experiments(experiments, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision)
 
 if __name__ == "__main__":
     main()

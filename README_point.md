@@ -2,38 +2,27 @@
 
 ## Overview
 
-* Lower-level tools which allow you to control the target MLflow object's name.
-* Useful for copying an MLflow object to another user - either in same or different tracking server.
-* Are the basic building blocks for the bulk tools.
-
 ### Experiments
-  * Export experiments to a directory.
-  * Import experiments from a directory.
+  * Export experiment to a directory.
+  * Import experiment from a directory.
 
 ### Runs
-  * Export a run to  a directory.
-  * Import a run from a directory.
+  * Export run to  a directory.
+  * Import run from a directory.
 
 ### Registered Models
-  * Export a registered model to a directory.
-  * Import a registered model from a directory.
+  * Export registered model to a directory.
+  * Import registered model from a directory.
   * List all registered models.
 
 ## Experiments 
 
-### Export Experiments
+### Export Experiment - XX
 
-There are two scripts to export experiments:
-* `export_experiment` - exports one experiment.
-* `export_experiment_list` - exports a list of  experiments.
+Export an experiment to a directory.
+Accepts either an experiment ID or name.
 
-Both accept either an experiment ID or name.
-
-#### export_experiment
-
-Export one experiment to a directory.
-
-##### Usage
+#### Usage
 
 ```
 export-experiment --help
@@ -50,7 +39,7 @@ Options:
                                   [default: False]
 ```
 
-##### Export examples
+#### Examples
 
 Export experiment by experiment ID.
 ```
@@ -66,7 +55,7 @@ export-experiment \
   --output-dir out
 ```
 
-##### Databricks export examples
+#### Databricks export examples
 
 See [Access the MLflow tracking server from outside Databricks](https://docs.databricks.com/applications/mlflow/access-hosted-tracking-server.html).
 ```
@@ -80,7 +69,7 @@ export-experiment \
   --notebook-formats DBC,SOURCE 
 ```
 
-##### Export directory structure
+#### Export directory structure
 
 The output directory contains a manifest file and a subdirectory for each run (by run ID).
 The run directory contains a run.json
@@ -99,170 +88,15 @@ file containing run metadata and an artifact hierarchy.
 |     +-MLmodel
 ```
 
-#### export_experiment_list
 
-Export several (or all) experiments to a directory.
+### Import Experiment
 
-##### Usage
-```
-export-experiment-list --help
-
-  --experiments TEXT              Experiment names or IDs (comma delimited).
-                                  'all' will export all experiments.  [required]
-  --output-dir TEXT               Output directory.  [required]
-  --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: False]
-  --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
-                                  JUPYTER or DBC (comma seperated).  [default: ]
-  --export-notebook-revision BOOLEAN
-                                  Export the run's notebook revision.
-                                  Experimental not yet publicly available.
-                                  [default: False]
-```
-
-##### Export list examples
-
-Export experiments by experiment ID.
-```
-export-experiment-list \
-  --experiments 2,3 --output-dir out
-```
-
-Export experiments by experiment name.
-```
-export-experiment-list \
-  --experiments sklearn,sparkml --output-dir out
-```
-
-Export all experiments.
-```
-export-experiment-list \
-  --experiments all --output-dir out
-```
-
-```
-Exporting experiment 'Default' (ID 0) to 'out/0'
-Exporting experiment 'sklearn' (ID 1) to 'out/1'
-Exporting experiment 'keras_mnist' (ID 2) to 'out/2'
-. . .
-
-249 experiments exported
-1770/1770 runs succesfully exported
-Duration: 1.6 seonds
-```
-
-##### Export directory structure
-
-The output directory contains a manifest file and a subdirectory for each experiment (by experiment ID).
-
-Each experiment subdirectory in turn contains its own manifest file and a subdirectory for each run.
-The run directory contains a run.json file containing run metadata and artifact directories.
-
-In the example below we have two experiments - 1 and 7. Experiment 1 (sklearn) has two runs (f4eaa7ddbb7c41148fe03c530d9b486f and 5f80bb7cd0fc40038e0e17abe22b304c) whereas experiment 7 (sparkml) has one run (ffb7f72a8dfb46edb4b11aed21de444b).
-
-```
-+-manifest.json
-+-1/
-| +-manifest.json
-| +-f4eaa7ddbb7c41148fe03c530d9b486f/
-| | +-run.json
-| | +-artifacts/
-| |   +-plot.png
-| |   +-sklearn-model/
-| |   | +-model.pkl
-| |   | +-conda.yaml
-| |   | +-MLmodel
-| |   +-onnx-model/
-| |     +-model.onnx
-| |     +-conda.yaml
-| |     +-MLmodel
-| +-5f80bb7cd0fc40038e0e17abe22b304c/
-| | +-run.json
-|   +-artifacts/
-|     +-plot.png
-|     +-sklearn-model/
-|     | +-model.pkl
-|     | +-conda.yaml
-|     | +-MLmodel
-|     +-onnx-model/
-|       +-model.onnx
-|       +-conda.yaml
-|       +-MLmodel
-+-7/
-| +-manifest.json
-| +-ffb7f72a8dfb46edb4b11aed21de444b/
-| | +-run.json
-|   +-artifacts/
-|     +-spark-model/
-|     | +-sparkml/
-|     |   +-stages/
-|     |   +-metadata/
-|     +-mleap-model/
-|       +-mleap/
-|         +-model/
-```
-
-Sample [experiment list manifest.json](samples/oss_mlflow/experiment_list/manifest.json).
-```
-{
-  "info": {
-    "mlflow_version": "1.11.0",
-    "mlflow_tracking_uri": "http://localhost:5000",
-    "export_time": "2020-09-10 20:23:45"
-  },
-  "experiments": [
-    {
-      "id": "1",
-      "name": "sklearn"
-    },
-    {
-      "id": "7",
-      "name": "sparkml"
-    }
-  ]
-}
-```
-
-Sample [experiment manifest.json](samples/oss_mlflow/experiment_list/1/manifest.json).
-
-```
-{
-  "experiment": {
-    "experiment_id": "1",
-    "name": "sklearn",
-    "artifact_location": "/opt/mlflow/server/mlruns/1",
-    "lifecycle_stage": "active"
-  },
-  "export_info": {
-    "export_time": "2022-01-14 03:26:42",
-    "num_total_runs": 2,
-    "num_ok_runs": 2,
-    "ok_runs": [
-      "4445f19b7bf04d0fb0173424db476198",
-      "d835e17257ad4d6db92441ad93bec549"
-    ],
-    "num_failed_runs": 0,
-    "failed_runs": []
-  }
-}
-```
-
-
-### Import Experiments
-
-Import experiments from a directory. Reads the manifest file to import expirements and their runs.
+Import an experiment from a directory. Reads the manifest file to import the expirement and their runs.
 
 The experiment will be created if it does not exist in the destination tracking server. 
 If the experiment already exists, the source runs will be added to it.
 
-There are two scripts to import experiments:
-* import_experiment - imports one experiment
-* import_experiment_list - imports a list of experiments
-
-#### import_experiment
-
-Imports one experiment.
-
-##### Usage
+#### Usage
 ```
 import-experiment --help \
 
@@ -278,7 +112,7 @@ Options:
   --import-metadata-tags BOOLEAN  Import mlflow_export_import tags
 ```
 
-##### Import examples
+#### Import examples
 
 ```
 import-experiment \
@@ -286,7 +120,7 @@ import-experiment \
   --input-dir out
 ```
 
-##### Databricks import examples
+#### Databricks import examples
 
 When importing into Databricks MLflow, make sure you set `--import-mlflow-tags False` since Databricks does not allow you to set `mlflow` tags unlike open source MLflow.
 
@@ -298,33 +132,6 @@ import-experiment \
   --import-mlflow-tags False
 ```
 
-#### import_experiment_list
-
-Import a list of experiments.
-
-##### Usage
-
-```
-import-experiment-list --help
-
-Options:
-  --input-dir TEXT                Input directory.  [required]
-  --experiment-name-prefix TEXT   If specified, added as prefix to experiment name.
-  --use-src-user-id BOOLEAN       Set the destination user ID to the source
-                                  user ID. Source user ID is ignored when
-                                  importing into Databricks since setting it
-                                  is not allowed.  [default: False]
-  --import-mlflow-tags BOOLEAN    Import mlflow tags.  [default: True]
-  --import-metadata-tags BOOLEAN  Import mlflow_tools tags.  [default: False]
-```
-
-##### Import examples
-
-```
-import-experiment-list \
-  --experiment-name-prefix imported_ \
-  --input-dir out 
-```
 
 ## Runs
 
