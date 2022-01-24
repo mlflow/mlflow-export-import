@@ -22,7 +22,7 @@ def main(output_dir, notebook_formats, export_notebook_revision):
     for k,v in locals().items():
         print(f"  {k}: {v}")
     start_time = time.time()
-    export_experiment_list.export_experiment_list("all", os.path.join(output_dir,"experiments"), True, notebook_formats, export_notebook_revision)
+    export_experiments.export_experiments("all", os.path.join(output_dir,"experiments"), True, notebook_formats, export_notebook_revision)
     export_model_list.export_models("all", os.path.join(output_dir,"models"), ALL_STAGES, notebook_formats, export_notebook_revision)
 
     duration = round(time.time() - start_time, 1)
