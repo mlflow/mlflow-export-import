@@ -79,13 +79,41 @@ def import_all(input_dir, delete_model, use_src_user_id, import_mlflow_tags, imp
 
 
 @click.command()
-@click.option("--input-dir", help="Input directory.", required=True, type=str)
-@click.option("--delete-model", help=click_doc.delete_model, type=bool, default=False, show_default=True)
-@click.option("--verbose", help="Verbose.", type=bool, default=False, show_default=True)
-@click.option("--use-src-user-id", help=click_doc.use_src_user_id, type=bool, default=False, show_default=True)
-@click.option("--import-mlflow-tags", help=click_doc.import_mlflow_tags, type=bool, default=False, show_default=True)
-@click.option("--import-metadata-tags", help=click_doc.import_metadata_tags, type=bool, default=False, show_default=True)
-
+@click.option("--input-dir", 
+    help="Input directory.", 
+    required=True, 
+    type=str
+)
+@click.option("--delete-model", 
+    help=click_doc.delete_model, 
+    type=bool, 
+    default=False, 
+    show_default=True
+)
+@click.option("--verbose", 
+    type=bool, 
+    help="Verbose.", 
+    default=False, 
+    show_default=True
+)
+@click.option("--use-src-user-id", 
+    help=click_doc.use_src_user_id, 
+    type=bool, 
+    default=False, 
+    show_default=True
+)
+@click.option("--import-mlflow-tags", 
+    help=click_doc.import_mlflow_tags, 
+    type=bool, 
+    default=False, 
+    show_default=True
+)
+@click.option("--import-metadata-tags", 
+    help=click_doc.import_metadata_tags, 
+    type=bool, 
+    default=False, 
+    show_default=True
+)
 @click.option("--use-threads",
     help=click_doc.use_threads,
     type=bool,
