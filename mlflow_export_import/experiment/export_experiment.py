@@ -5,7 +5,6 @@ Exports an experiment to a directory.
 import os
 import mlflow
 import click
-
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common.search_runs_iterator import SearchRunsIterator
@@ -34,7 +33,7 @@ class ExperimentExporter():
         if run_ids:
             for j,run_id in enumerate(run_ids):
                 run = self.client.get_run(run_id)
-                self._export_run(j, run, output_dir, ok_run_ids, failed_run_ids)
+                self._export_run(j, run_id, output_dir, ok_run_ids, failed_run_ids)
         else:
             for j,run in enumerate(SearchRunsIterator(self.client, exp_id)):
                 self._export_run(j, run, output_dir, ok_run_ids, failed_run_ids)
@@ -48,11 +47,12 @@ class ExperimentExporter():
 
         path = os.path.join(output_dir,"manifest.json")
         utils.write_json_file(fs, path, dct)
+        msg = f"for experiment '{exp.name}' (ID: {exp.experiment_id})"
         if len(failed_run_ids) == 0:
-            print(f"All {len(ok_run_ids)} runs succesfully exported")
+            print(f"All {len(ok_run_ids)} runs succesfully exported {msg}")
         else:
-            print(f"{len(ok_run_ids)/j} runs succesfully exported")
-            print(f"{len(failed_run_ids)/j} runs failed")
+            print(f"{len(ok_run_ids)/j} runs succesfully exported {msg}")
+            print(f"{len(failed_run_ids)/j} runs failed {msg}")
         return len(ok_run_ids), len(failed_run_ids) 
 
     def _export_run(self, idx, run, output_dir, ok_run_ids, failed_run_ids):

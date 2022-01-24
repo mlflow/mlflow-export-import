@@ -58,10 +58,12 @@ def import_models(input_dir, run_info_map, delete_model, verbose, use_threads):
     manifest = utils.read_json_file(manifest_path)
     models = manifest["models"]
     importer = AllModelImporter(run_info_map)
+
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for model in models:
-            dir = os.path.join(input_dir, model)
+            dir = os.path.join(models_dir, model)
             executor.submit(importer.import_model, dir, model, delete_model, verbose)
+
     duration = round(time.time() - start_time, 1)
     return { "models": len(models), "duration": duration }
 
