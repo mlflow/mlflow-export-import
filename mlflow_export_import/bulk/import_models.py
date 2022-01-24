@@ -6,6 +6,7 @@ import os
 import time
 import json
 import click
+from concurrent.futures import ThreadPoolExecutor
 import mlflow
 from mlflow_export_import import utils, click_doc
 from mlflow_export_import.common import filesystem as _filesystem
@@ -49,24 +50,26 @@ def import_experiments(input_dir, use_src_user_id, import_mlflow_tags, import_me
 
     return run_info_map, { "experiments": len(exps), "exceptions": exceptions, "duration": duration }
 
-def import_models(input_dir, run_info_map, delete_model, verbose):
+def import_models(input_dir, run_info_map, delete_model, verbose, use_threads):
+    max_workers = os.cpu_count() or 4 if use_threads else 1
     start_time = time.time()
     models_dir = os.path.join(input_dir, "models")
     manifest_path = os.path.join(models_dir,"manifest.json")
     manifest = utils.read_json_file(manifest_path)
     models = manifest["models"]
     importer = AllModelImporter(run_info_map)
-    for model in models:
-        dir = os.path.join(models_dir, model)
-        importer.import_model(dir, model, delete_model, verbose)
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        for model in models:
+            dir = os.path.join(input_dir, model)
+            executor.submit(importer.import_model, dir, model, delete_model, verbose)
     duration = round(time.time() - start_time, 1)
     return { "models": len(models), "duration": duration }
 
-def import_all(input_dir, delete_model, use_src_user_id, import_mlflow_tags, import_metadata_tags, verbose):
+def import_all(input_dir, delete_model, use_src_user_id, import_mlflow_tags, import_metadata_tags, verbose, use_threads):
     start_time = time.time()
     exp_res = import_experiments(input_dir, use_src_user_id, import_mlflow_tags, import_metadata_tags)
     run_info_map = _remap(exp_res[0])
-    model_res = import_models(input_dir, run_info_map, delete_model, verbose)
+    model_res = import_models(input_dir, run_info_map, delete_model, verbose, use_threads)
     duration = round(time.time() - start_time, 1)
     dct = { "duration": duration, "experiment_import": exp_res[1], "model_import": model_res }
     fs = _filesystem.get_filesystem(".")
@@ -83,11 +86,18 @@ def import_all(input_dir, delete_model, use_src_user_id, import_mlflow_tags, imp
 @click.option("--import-mlflow-tags", help=click_doc.import_mlflow_tags, type=bool, default=False, show_default=True)
 @click.option("--import-metadata-tags", help=click_doc.import_metadata_tags, type=bool, default=False, show_default=True)
 
-def main(input_dir, delete_model, use_src_user_id, import_mlflow_tags, import_metadata_tags, verbose):
+@click.option("--use-threads",
+    help=click_doc.use_threads,
+    type=bool,
+    default=False,
+    show_default=True
+)
+
+def main(input_dir, delete_model, use_src_user_id, import_mlflow_tags, import_metadata_tags, verbose, use_threads):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    import_all(input_dir, delete_model, use_src_user_id, import_mlflow_tags, import_metadata_tags, verbose)
+    import_all(input_dir, delete_model, use_src_user_id, import_mlflow_tags, import_metadata_tags, verbose, use_threads)
 
 if __name__ == "__main__":
     main()

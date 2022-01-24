@@ -146,6 +146,8 @@ Options:
   --import-mlflow-tags BOOLEAN    Import mlflow tags.  [default: False]
   --import-metadata-tags BOOLEAN  Import mlflow_export_import tags.  [default:
                                   False]
+  --use-threads BOOLEAN           Process the export/import in parallel using
+                                  threads.  [default: False]
 ```
 
 #### Examples

@@ -8,7 +8,6 @@ import time
 import click
 from concurrent.futures import ThreadPoolExecutor
 import mlflow
-#from mlflow_export_import.model import export_model_list
 from mlflow_export_import.model.export_model import ModelExporter
 from mlflow_export_import.bulk import export_experiments
 from mlflow_export_import.common import filesystem as _filesystem
