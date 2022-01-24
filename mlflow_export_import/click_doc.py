@@ -14,3 +14,5 @@ export_notebook_revision = "Export the run's notebook revision. Experimental not
 model_stages = "Stages to export (comma seperated). Default is all stages. Values are Production, Staging, Archived and None."
 
 delete_model = "First delete the model if it exists and all its versions."
+
+use_threads = "Process the export/import in parallel using threads."

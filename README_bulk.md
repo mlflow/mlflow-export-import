@@ -23,7 +23,7 @@ Source: [export_all.py](mlflow_export_import/bulk/export_all.py).
 
 #### Usage
 ```
-export-models --help
+export-all --help
 
 Options:
   --output-dir TEXT               Output directory.  [required]
@@ -33,6 +33,8 @@ Options:
                                   Export the run's notebook revision.
                                   Experimental not yet publicly available.
                                   [default: False]
+  --use-threads BOOLEAN           Process the export/import in parallel using
+                                  threads.  [default: False]
 ```
 #### Example
 
@@ -98,6 +100,8 @@ Options:
                                   Export the run's notebook revision.
                                   Experimental not yet publicly available.
                                   [default: False]
+  --use-threads BOOLEAN           Process the export/import in parallel using
+                                  threads.  [default: False]
 ```
 
 #### Examples
@@ -256,7 +260,7 @@ In the example below we have two experiments - 1 and 7. Experiment 1 (sklearn) h
 |         +-model/
 ```
 
-Sample [experiment list manifest.json](samples/oss_mlflow/experiment_list/manifest.json).
+Sample [experiments manifest.json](samples/oss_mlflow/experiment_list/manifest.json).
 ```
 {
   "info": {
