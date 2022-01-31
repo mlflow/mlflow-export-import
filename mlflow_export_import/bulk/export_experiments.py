@@ -36,7 +36,7 @@ def _export_experiment(client, exp_id_or_name, output_dir, exporter, export_resu
         traceback.print_exc()
     return ok_runs, failed_runs
 
-def export_experiments(experiments, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision, use_threads):
+def export_experiments(experiments, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision=False, use_threads=False):
     """
     :param: experiments: Can be either:
       - List of experiment names 
@@ -107,7 +107,7 @@ def export_experiments(experiments, output_dir, export_metadata_tags, notebook_f
     print(f"{ok_runs}/{total_runs} runs succesfully exported")
     if failed_runs > 0:
         print(f"{failed_runs}/{total_runs} runs failed")
-    print(f"Duration for experiment list export: {duration} seconds")
+    print(f"Duration for experiments export: {duration} seconds")
 
 
 @click.command()
