@@ -15,7 +15,7 @@ There are two modes to use MLflow Export Import
 * [Databricks notebooks](databricks_notebooks/README.md).
 ## Architecture
 
-<img src="export_import_architecture.png" height="330" >
+<img src="architecture.png" height="330" />
 
 ## Overview
 
