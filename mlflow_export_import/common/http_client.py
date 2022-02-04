@@ -59,7 +59,6 @@ class HttpClient():
         return f"{self.api_uri}/{resource}"
 
     def _check_response(self, rsp, uri, params=None):
-        print(">> uri:",uri,"code:",rsp.status_code)
         if rsp.status_code < 200 or rsp.status_code > 299:
             raise MlflowExportImportException(f"HTTP status code: {rsp.status_code}. Reason: {rsp.reason}. URI: {uri}. Params: {params}.")
 
