@@ -11,6 +11,7 @@ import mlflow
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import import utils, click_doc
 from mlflow_export_import.experiment.export_experiment import ExperimentExporter
+from mlflow_export_import.common import filesystem as _filesystem
 
 client = mlflow.tracking.MlflowClient()
 
@@ -100,6 +101,8 @@ def export_experiments(experiments, output_dir, export_metadata_tags, notebook_f
         },
         "experiments": export_results 
     }
+    fs = _filesystem.get_filesystem(output_dir)
+    fs.mkdirs(output_dir)
     with open(os.path.join(output_dir, "manifest.json"), "w") as f:
         f.write(json.dumps(dct,indent=2)+"\n")
 
