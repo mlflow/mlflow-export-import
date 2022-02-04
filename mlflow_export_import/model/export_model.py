@@ -19,9 +19,17 @@ class ModelExporter():
         self.export_run = export_run
 
     def export_model(self, output_dir, model_name):
+        try:
+            self._export_model(output_dir, model_name)
+            return True, model_name
+        except Exception as e:
+            print("ERROR:",e)
+            return False, model_name
+
+    def _export_model(self, output_dir, model_name):
         fs = _filesystem.get_filesystem(output_dir)
-        fs.mkdirs(output_dir)
         model = self.http_client.get(f"registered-models/get", {"name": model_name})
+        fs.mkdirs(output_dir)
         model["registered_model"]["latest_versions"] = []
         versions = self.mlflow_client.search_model_versions(f"name='{model_name}'")
         print(f"Found {len(versions)} versions for model {model_name}")

@@ -27,27 +27,39 @@ def _export_models(models, output_dir, stages, notebook_formats, export_notebook
         models = [ model.name for model in client.list_registered_models() if model.name.startswith(model_prefix) ] # Wish there was an model search method for efficiency]
     else:
         models = models.split(",")
-    print("models:")
+    print("Models:")
     for model in models:
         print(f"  {model}")
+
     exporter = ModelExporter(stages=stages, notebook_formats=utils.string_to_list(notebook_formats), export_notebook_revision=export_notebook_revision, export_run=export_run)
+    futures = []
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for model in models:
             dir = os.path.join(output_dir, model)
-            executor.submit(exporter.export_model, dir, model)
+            future = executor.submit(exporter.export_model, dir, model)
+            futures.append(future)
+    ok_models = [] ; failed_models = []
+    for future in futures:
+        result = future.result()
+        if result[0]: ok_models.append(result[1])
+        else: failed_models.append(result[1])
+
     duration = round(time.time() - start_time, 1)
     manifest = {
         "info": {
             "mlflow_version": mlflow.__version__,
             "mlflow_tracking_uri": mlflow.get_tracking_uri(),
             "export_time": utils.get_now_nice(),
-            "models": len(models),
+            "total_models": len(models),
+            "ok_models": len(ok_models),
+            "failed_models": len(failed_models),
             "duration": duration
         },
         "stages": stages,
         "notebook_formats": notebook_formats,
         "export_notebook_revision": export_notebook_revision,
-        "models": models
+        "ok_models": ok_models,
+        "failed_models": failed_models
     }
 
     fs = _filesystem.get_filesystem(output_dir)
