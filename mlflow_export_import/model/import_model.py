@@ -137,13 +137,44 @@ def path_join(x,y):
     return path
 
 @click.command()
-@click.option("--input-dir", help="Input directory produced by export_model.py.", required=True, type=str)
-@click.option("--model", help="New registered model name.", required=True, type=str)
-@click.option("--experiment-name", help="Destination experiment name  - will be created if it does not exist.", required=True, type=str)
-@click.option("--delete-model", help=click_doc.delete_model, type=bool, default=False, show_default=True)
-@click.option("--await-creation-for", help="Await creation for specified seconds.", type=int, default=None, show_default=True)
-@click.option("--sleep-time", help="Sleep time for polling until version.status==READY.", default=5, type=int)
-@click.option("--verbose", help="Verbose.", type=bool, default=False, show_default=True)
+@click.option("--input-dir", 
+    help="Input directory produced by export_model.py.", 
+    type=str,
+    required=True
+)
+@click.option("--model", 
+    help="New registered model name.", 
+    type=str,
+    required=True, 
+)
+@click.option("--experiment-name", 
+    help="Destination experiment name  - will be created if it does not exist.", 
+    type=str,
+    required=True
+)
+@click.option("--delete-model", 
+    help=click_doc.delete_model, 
+    type=bool,
+    default=False, 
+    show_default=True
+)
+@click.option("--await-creation-for", 
+    help="Await creation for specified seconds.", 
+    type=int, 
+    default=None, 
+    show_default=True
+)
+@click.option("--sleep-time", 
+    help="Sleep time for polling until version.status==READY.", 
+    type=int,
+    default=5,
+)
+@click.option("--verbose", 
+    help="Verbose.", 
+    type=bool, 
+    default=False, 
+    show_default=True
+)
 
 def main(input_dir, model, experiment_name, delete_model, await_creation_for, verbose, sleep_time): # pragma: no cover
     print("Options:")

@@ -95,7 +95,7 @@ def export_models(models, output_dir, stages, notebook_formats, export_notebook_
 @click.option("--stages", 
     help=click_doc.model_stages, 
     type=str,
-    required=False, 
+    required=False
 )
 @click.option("--notebook-formats", 
     help=click_doc.notebook_formats, 

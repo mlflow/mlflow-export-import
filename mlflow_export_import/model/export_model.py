@@ -78,11 +78,33 @@ class ModelExporter():
         return stages
 
 @click.command()
-@click.option("--model", help="Registered model name.", required=True, type=str)
-@click.option("--output-dir", help="Output directory.", required=True, type=str)
-@click.option("--stages", help=click_doc.model_stages, required=None, type=str)
-@click.option("--notebook-formats", help=click_doc.notebook_formats, default="", show_default=True)
-@click.option("--export-notebook-revision", help=click_doc.export_notebook_revision, type=bool, default=False, show_default=True)
+@click.option("--model", 
+    help="Registered model name.", 
+    type=str,
+    required=True
+)
+@click.option("--output-dir", 
+    help="Output directory.", 
+    type=str,
+    required=True
+)
+@click.option("--stages", 
+    help=click_doc.model_stages, 
+    type=str,
+    required=False
+)
+@click.option("--notebook-formats", 
+    help=click_doc.notebook_formats, 
+    type=str,
+    default="", 
+    show_default=True
+)
+@click.option("--export-notebook-revision", 
+    help=click_doc.export_notebook_revision, 
+    type=bool, 
+    default=False, 
+    show_default=True
+)
 
 def main(model, output_dir, stages, notebook_formats, export_notebook_revision): # pragma: no cover
     print("Options:")
