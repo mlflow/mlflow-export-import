@@ -56,7 +56,7 @@ def import_models(input_dir, run_info_map, delete_model, verbose, use_threads):
     models_dir = os.path.join(input_dir, "models")
     manifest_path = os.path.join(models_dir,"manifest.json")
     manifest = utils.read_json_file(manifest_path)
-    models = manifest["models"]
+    models = manifest["ok_models"]
     importer = AllModelImporter(run_info_map)
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
