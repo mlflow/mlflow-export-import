@@ -11,31 +11,41 @@ from mlflow_export_import.common.search_runs_iterator import SearchRunsIterator
 from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils, click_doc
 
-client = mlflow.tracking.MlflowClient()
-
 class ExperimentExporter():
-    def __init__(self, client=None, export_metadata_tags=False, notebook_formats=[], export_notebook_revision=False):
-        self.client = client or mlflow.tracking.MlflowClient()
-        self.run_exporter = RunExporter(self.client, export_metadata_tags, notebook_formats, export_notebook_revision)
+    def __init__(self, mlflow_client=None, export_metadata_tags=False, notebook_formats=[], export_notebook_revision=False):
+        """
+        :param mlflow_client: MLflow client or if None create default client.
+        :param export_metadata_tags: Export source run metadata tags.
+        :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
+        :param export_notebook_revision: Export the run's notebook revision. Experimental not yet publicly available.
+        """
+        self.mlflow_client = mlflow_client or mlflow.tracking.MlflowClient()
+        self.run_exporter = RunExporter(self.mlflow_client, export_metadata_tags, notebook_formats, export_notebook_revision)
 
     def export_experiment(self, exp_id_or_name, output_dir, run_ids=None):
-        exp = mlflow_utils.get_experiment(self.client, exp_id_or_name)
+        """
+        :param exp_id_or_name: Experiment ID or name.
+        :param output_dir: Output directory.
+        :param run_ids: List of run IDs to export. If None export all run IDs.
+        :return: Number of successful and number of failed runs.
+        """
+        exp = mlflow_utils.get_experiment(self.mlflow_client, exp_id_or_name)
         exp_id = exp.experiment_id
         print(f"Exporting experiment '{exp.name}' (ID {exp.experiment_id}) to '{output_dir}'")
         fs = _filesystem.get_filesystem(output_dir)
         print("Filesystem:",type(fs).__name__)
         fs.mkdirs(output_dir)
-        exp = self.client.get_experiment(exp_id)
+        exp = self.mlflow_client.get_experiment(exp_id)
         dct = {"experiment": utils.strip_underscores(exp)}
         ok_run_ids = []
         failed_run_ids = []
         j = -1
         if run_ids:
             for j,run_id in enumerate(run_ids):
-                run = self.client.get_run(run_id)
+                run = self.mlflow_client.get_run(run_id)
                 self._export_run(j, run, output_dir, ok_run_ids, failed_run_ids)
         else:
-            for j,run in enumerate(SearchRunsIterator(self.client, exp_id)):
+            for j,run in enumerate(SearchRunsIterator(self.mlflow_client, exp_id)):
                 self._export_run(j, run, output_dir, ok_run_ids, failed_run_ids)
         dct["export_info"] = { 
             "export_time": utils.get_now_nice(), 
@@ -65,13 +75,36 @@ class ExperimentExporter():
             failed_run_ids.append(run.info.run_id)
 
 @click.command()
-@click.option("--experiment", help="Experiment name or ID.", required=True, type=str)
-@click.option("--output-dir", help="Output directory.", required=True)
-@click.option("--export-metadata-tags", help=click_doc.export_metadata_tags, type=bool, default=False, show_default=True)
-@click.option("--notebook-formats", help=click_doc.notebook_formats, default="", show_default=True)
-@click.option("--export-notebook-revision", help=click_doc.export_notebook_revision, type=bool, default=False, show_default=True)
+@click.option("--experiment",
+    help="Experiment name or ID.", 
+    type=str,
+    required=True
+)
+@click.option("--output-dir",
+    help="Output directory.", 
+    type=str,
+    required=True
+)
+@click.option("--export-metadata-tags",
+    help=click_doc.export_metadata_tags, 
+    type=bool, 
+    default=False, 
+    show_default=True
+)
+@click.option("--notebook-formats",
+    help=click_doc.notebook_formats, 
+    type=str, 
+    default="", 
+    show_default=True
+)
+@click.option("--export-notebook-revision",
+    help=click_doc.export_notebook_revision, 
+    type=bool, 
+    default=False, 
+    show_default=True
+)
 
-def main(experiment, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision): # pragma: no cover
+def main(experiment, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")

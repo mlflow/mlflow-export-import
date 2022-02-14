@@ -15,7 +15,7 @@ from mlflow_export_import.common import filesystem as _filesystem
 
 client = mlflow.tracking.MlflowClient()
 
-def _export_experiment(client, exp_id_or_name, output_dir, exporter, export_results, run_ids):
+def _export_experiment(exp_id_or_name, output_dir, exporter, export_results, run_ids):
     exp = mlflow_utils.get_experiment(client, exp_id_or_name)
     exp_output = os.path.join(output_dir, exp.experiment_id)
     ok_runs = -1; failed_runs = -1
@@ -37,6 +37,7 @@ def _export_experiment(client, exp_id_or_name, output_dir, exporter, export_resu
         traceback.print_exc()
     return ok_runs, failed_runs
 
+  # export_experiments(experiments, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision, use_threads)
 def export_experiments(experiments, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision=False, use_threads=False):
     """
     :param: experiments: Can be either:
@@ -63,20 +64,17 @@ def export_experiments(experiments, output_dir, export_metadata_tags, notebook_f
         table_data.append(["Total",num_runs])
         columns = ["Experiment ID", "# Runs"]
     utils.show_table("Experiments",table_data,columns)
+    print("")
 
-    exporter = ExperimentExporter(client, export_metadata_tags, utils.string_to_list(notebook_formats), export_notebook_revision)
-    export_results = []
     ok_runs = 0
     failed_runs = 0
-    print("")
-    
-    exporter = ExperimentExporter(client, export_metadata_tags, utils.string_to_list(notebook_formats), export_notebook_revision)
     export_results = []
     futures = []
+    exporter = ExperimentExporter(client, export_metadata_tags, utils.string_to_list(notebook_formats), export_notebook_revision)
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for exp_id_or_name in experiments:
             run_ids = experiments_dct.get(exp_id_or_name,None)
-            future = executor.submit(_export_experiment, client, exp_id_or_name, output_dir, exporter, export_results, run_ids)
+            future = executor.submit(_export_experiment, exp_id_or_name, output_dir, exporter, export_results, run_ids)
             futures.append(future)
     duration = round(time.time() - start_time, 1)
     ok_runs = 0
@@ -131,7 +129,9 @@ def export_experiments(experiments, output_dir, export_metadata_tags, notebook_f
 )
 @click.option("--notebook-formats", 
     help=click_doc.notebook_formats, 
-    default="", show_default=True
+    type=str, 
+    default="", 
+    show_default=True
 )
 @click.option("--export-notebook-revision", 
     help=click_doc.export_notebook_revision, 
@@ -150,8 +150,7 @@ def main(experiments, output_dir, export_metadata_tags, notebook_formats, export
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    export_experiments(experiments, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision
-, use_threads)
+    export_experiments(experiments, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision, use_threads)
 
 if __name__ == "__main__":
     main()

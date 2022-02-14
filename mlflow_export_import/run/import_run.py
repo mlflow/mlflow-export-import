@@ -42,8 +42,9 @@ class RunImporter():
     def import_run(self, exp_name, input_dir):
         """ 
         Imports a run into the specified experiment.
-        :param exp_name: Experiment name
+        :param exp_name: Experiment name.
         :param input_dir: Source input directory that contains the exported run.
+        :return: The run and its parent run ID if the run is a nested run.
         """
         print(f"Importing run from '{input_dir}'")
         res = self._import_run(exp_name, input_dir)
@@ -116,12 +117,40 @@ class RunImporter():
         self.mlflow_client.log_batch(run_id, metrics, params, tags)
 
 @click.command()
-@click.option("--input-dir", help="Source input directory that contains the exported run.", required=True, type=str)
-@click.option("--experiment-name", help="Destination experiment name.", required=True, type=str)
-@click.option("--mlmodel-fix", help="Add correct run ID in destination MLmodel artifact. Can be expensive for deeply nested artifacts.", type=bool, default=True, show_default=True)
-@click.option("--use-src-user-id", help=click_doc.use_src_user_id, type=bool, default=False, show_default=True)
-@click.option("--import-mlflow-tags", help=click_doc.import_mlflow_tags, type=bool, default=False, show_default=True)
-@click.option("--import-metadata-tags", help=click_doc.import_metadata_tags, type=bool, default=False, show_default=True)
+@click.option("--input-dir",
+    help="Source input directory that contains the exported run.", 
+    required=True, 
+    type=str
+)
+@click.option("--experiment-name",
+    help="Destination experiment name.", 
+    type=str,
+    required=True
+)
+@click.option("--mlmodel-fix",
+    help="Add correct run ID in destination MLmodel artifact. Can be expensive for deeply nested artifacts.", 
+    type=bool, 
+    default=True, 
+    show_default=True
+)
+@click.option("--use-src-user-id",
+    help=click_doc.use_src_user_id, 
+    type=bool, 
+    default=False, 
+    show_default=True
+)
+@click.option("--import-mlflow-tags",
+    help=click_doc.import_mlflow_tags, 
+    type=bool, 
+    default=False, 
+    show_default=True
+)
+@click.option("--import-metadata-tags",
+    help=click_doc.import_metadata_tags, 
+    type=bool, 
+    default=False, 
+    show_default=True
+)
 
 def main(input_dir, experiment_name, mlmodel_fix, use_src_user_id, import_mlflow_tags, import_metadata_tags): # pragma: no cover
     print("Options:")

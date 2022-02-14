@@ -29,12 +29,38 @@ class ExperimentCopier(BaseCopier):
         utils.nested_tags(self.dst_client, run_ids_map)
 
 @click.command()
-@click.option("--src-uri", help="Source MLflow API URI.", required=True, type=str)
-@click.option("--dst-uri", help="Destination MLflow API URI.", required=True, type=str)
-@click.option("--src-experiment", help="Source experiment ID or name.", required=True, type=str)
-@click.option("--dst-experiment-name", help="Destination experiment name.", required=True, type=str)
-@click.option("--use-src-user-id", help=click_doc.use_src_user_id, type=bool, default=False, show_default=True)
-@click.option("--export-metadata-tags", help=click_doc.export_metadata_tags, type=bool, default=False, show_default=True)
+@click.option("--src-uri",
+    help="Source MLflow API URI.", 
+    required=True,
+    type=str
+)
+@click.option("--dst-uri",
+    help="Destination MLflow API URI.", 
+    required=True,
+    type=str
+)
+@click.option("--src-experiment",
+    help="Source experiment ID or name.", 
+    required=True,
+    type=str
+)
+@click.option("--dst-experiment-name",
+    help="Destination experiment name.", 
+    required=True,
+    type=str
+)
+@click.option("--use-src-user-id",
+    help=click_doc.use_src_user_id,
+    type=bool, 
+    default=False, 
+    show_default=True
+)
+@click.option("--export-metadata-tags",
+    help=click_doc.export_metadata_tags,
+    type=bool, 
+    default=False, 
+    show_default=True
+)
 
 def main(src_uri, dst_uri, src_experiment, dst_experiment_name, use_src_user_id, export_metadata_tags): # pragma: no cover
     print("Options:")

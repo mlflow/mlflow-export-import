@@ -48,7 +48,7 @@ Full object referential integrity is maintained as well as the original MLflow o
 `export-metadata-tags` - Creates metadata tags (starting with `mlflow_export_import.metadata`) that contain export information. These are the source `mlflow` tags in addition to other information. This is useful for provenance and auditing purposes in regulated industries.
 
 ```
-Name                                  Value
+Name                                          Value
 mlflow_export_import.metadata.timestamp       1551037752
 mlflow_export_import.metadata.timestamp_nice  2019-02-24 19:49:12
 mlflow_export_import.metadata.experiment_id   2

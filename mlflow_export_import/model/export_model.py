@@ -11,22 +11,36 @@ from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils, click_doc
 
 class ModelExporter():
-    def __init__(self, export_metadata_tags=False, notebook_formats=[], stages=None, export_notebook_revision=False, export_run=True):
-        self.mlflow_client = mlflow.tracking.MlflowClient()
+    def __init__(self,  mlflow_client=None, export_metadata_tags=False, notebook_formats=[], export_notebook_revision=False, stages=None, export_run=True):
+        """
+        :param mlflow_client: MLflow client or if None create default client.
+        :param export_metadata_tags: Export source run metadata tags.
+        :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
+        :param export_notebook_revision: Export the run's notebook revision. Experimental not yet publicly available.
+        :param stages: Stages to export. Default is all stages. Values are Production, Staging, Archived and None.
+        :param export_runs: Export the run that generated a registered model's version.
+        """
+        self.mlflow_client = mlflow_client or mlflow.tracking.MlflowClient()
+        print(">> client:",self.mlflow_client)
         self.http_client = MlflowHttpClient()
         self.run_exporter = RunExporter(self.mlflow_client, export_metadata_tags=export_metadata_tags, notebook_formats=notebook_formats, export_notebook_revision=export_notebook_revision)
-        self.stages = self.normalize_stages(stages)
+        self.stages = self._normalize_stages(stages)
         self.export_run = export_run
 
-    def export_model(self, output_dir, model_name):
+    def export_model(self, model_name, output_dir):
+        """
+        :param model_name: Registered model name.
+        :param output_dir: Output directory.
+        :return: Returns bool if export succeeded and the model name.
+        """
         try:
-            self._export_model(output_dir, model_name)
+            self._export_model(model_name, output_dir)
             return True, model_name
         except Exception as e:
             print("ERROR:",e)
             return False, model_name
 
-    def _export_model(self, output_dir, model_name):
+    def _export_model(self, model_name, output_dir):
         fs = _filesystem.get_filesystem(output_dir)
         model = self.http_client.get(f"registered-models/get", {"name": model_name})
         fs.mkdirs(output_dir)
@@ -65,7 +79,7 @@ class ModelExporter():
         utils.write_json_file(fs, path, model)
         return manifest
 
-    def normalize_stages(self, stages):
+    def _normalize_stages(self, stages):
         from mlflow.entities.model_registry import model_version_stages
         if stages is None:
             return []
@@ -111,7 +125,7 @@ def main(model, output_dir, stages, notebook_formats, export_notebook_revision):
     for k,v in locals().items():
         print(f"  {k}: {v}")
     exporter = ModelExporter(stages=stages, notebook_formats=utils.string_to_list(notebook_formats), export_notebook_revision=export_notebook_revision)
-    exporter.export_model(output_dir, model)
+    exporter.export_model(model, output_dir)
 
 if __name__ == "__main__":
     main()

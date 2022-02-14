@@ -13,9 +13,16 @@ from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common.http_client import DatabricksHttpClient
 
 class ExperimentImporter():
-    def __init__(self, mlflow_client=None, use_src_user_id=False, import_mlflow_tags=True, import_metadata_tags=False):
+    def __init__(self, mlflow_client=None, mlmodel_fix=True, use_src_user_id=False, import_mlflow_tags=True, import_metadata_tags=False):
+        """
+        :param mlflow_client: MLflow client or if None create default client.
+        :param import_mlflow_tags: Import mlflow tags.
+        :param use_src_user_id: Set the destination user ID to the source user ID.
+                                Source user ID is ignored when importing into
+        :param import_metadata_tags: Import mlflow_export_import tags.
+        """
         self.mlflow_client = mlflow_client or mlflow.tracking.MlflowClient()
-        self.run_importer = RunImporter(self.mlflow_client, use_src_user_id=use_src_user_id, import_mlflow_tags=import_mlflow_tags, import_metadata_tags=import_metadata_tags)
+        self.run_importer = RunImporter(self.mlflow_client, mlmodel_fix=mlmodel_fix, use_src_user_id=use_src_user_id, import_mlflow_tags=import_mlflow_tags, import_metadata_tags=import_metadata_tags)
         print("MLflowClient:",self.mlflow_client)
         self.dbx_client = DatabricksHttpClient()
 
@@ -47,12 +54,36 @@ class ExperimentImporter():
 
 
 @click.command()
-@click.option("--input-dir", help="Input path - directory", required=True, type=str)
-@click.option("--experiment-name", help="Destination experiment name", required=True, type=str)
-@click.option("--just-peek", help="Just display experiment metadata - do not import", type=bool, default=False)
-@click.option("--use-src-user-id", help=click_doc.use_src_user_id, type=bool, default=False)
-@click.option("--import-mlflow-tags", help="Import mlflow tags", type=bool, default=True)
-@click.option("--import-metadata-tags", help="Import mlflow_export_import tags", type=bool, default=False)
+@click.option("--input-dir", 
+    help="Input path - directory", 
+    type=str,
+    required=True
+)
+@click.option("--experiment-name", 
+    help="Destination experiment name", 
+    type=str,
+    required=True
+)
+@click.option("--just-peek", 
+    help="Just display experiment metadata - do not import", 
+    type=bool, 
+    default=False
+)
+@click.option("--use-src-user-id", 
+    help=click_doc.use_src_user_id, 
+    type=bool, 
+    default=False
+)
+@click.option("--import-mlflow-tags", 
+    help="Import mlflow tags", 
+    type=bool, 
+    default=True
+)
+@click.option("--import-metadata-tags", 
+    help="Import mlflow_export_import tags", 
+    type=bool, 
+    default=False
+)
 
 def main(input_dir, experiment_name, just_peek, use_src_user_id, import_mlflow_tags, import_metadata_tags): # pragma: no cover
     print("Options:")

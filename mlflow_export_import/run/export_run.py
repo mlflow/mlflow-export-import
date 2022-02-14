@@ -18,8 +18,14 @@ print("MLflow Version:", mlflow.version.VERSION)
 print("MLflow Tracking URI:", mlflow.get_tracking_uri())
 
 class RunExporter():
-    def __init__(self, client=None, export_metadata_tags=False, notebook_formats=[], export_notebook_revision=False):
-        self.mlflow_client = client or mlflow.tracking.MlflowClient()
+    def __init__(self, mlflow_client=None, export_metadata_tags=False, notebook_formats=[], export_notebook_revision=False):
+        """
+        :param mlflow_client: MLflow client or if None create default client.
+        :param export_metadata_tags: Export source run metadata tags.
+        :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
+        :param export_notebook_revision: Export the run's notebook revision. Experimental not yet publicly available.
+        """
+        self.mlflow_client = mlflow_client or mlflow.tracking.MlflowClient()
         self.dbx_client = DatabricksHttpClient()
         print("Databricks REST client:",self.dbx_client)
         self.export_metadata_tags = export_metadata_tags
@@ -27,6 +33,11 @@ class RunExporter():
         self.export_notebook_revision = export_notebook_revision
 
     def export_run(self, run_id, output_dir):
+        """
+        :param run_id: Run ID.
+        :param output_dir: Output directory.
+        :return: whether export succeeded.
+        """
         fs = _filesystem.get_filesystem(output_dir)
         run = self.mlflow_client.get_run(run_id)
         fs.mkdirs(output_dir)
@@ -92,11 +103,34 @@ class RunExporter():
             print(f"WARNING: Cannot save notebook '{notebook}'. {e}")
 
 @click.command()
-@click.option("--run-id", help="Run ID.", required=True, type=str)
-@click.option("--output-dir", help="Output directory.", required=True)
-@click.option("--export-metadata-tags", help=click_doc.export_metadata_tags, type=bool, default=False, show_default=True)
-@click.option("--notebook-formats", help=click_doc.notebook_formats, default="", show_default=True)
-@click.option("--export-notebook-revision", help=click_doc.export_notebook_revision, type=bool, default=False, show_default=True)
+@click.option("--run-id", 
+    help="Run ID.", 
+    type=str,
+    required=True
+)
+@click.option("--output-dir", 
+    help="Output directory.", 
+    type=str,
+    required=True
+)
+@click.option("--export-metadata-tags", 
+    help=click_doc.export_metadata_tags, 
+    type=bool, 
+    default=False, 
+    show_default=True
+)
+@click.option("--notebook-formats", 
+    help=click_doc.notebook_formats, 
+    type=str,
+    default="", 
+    show_default=True
+)
+@click.option("--export-notebook-revision", 
+    help=click_doc.export_notebook_revision, 
+    type=bool, 
+    default=False, 
+    show_default=True
+)
 
 def main(run_id, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision): # pragma: no cover
     print("Options:")
