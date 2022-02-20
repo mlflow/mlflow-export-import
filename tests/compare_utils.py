@@ -12,8 +12,6 @@ def compare_run_no_import_mlflow_tags(client, output_dir, run1, run2):
     compare_tags(run1.data.tags, run2.data.tags)
 
 def compare_run_import_metadata_tags(client, output_dir, run1, run2):
-    #dump_tags(run1.data.tags,"Run1.a")
-    #dump_tags(run2.data.tags,"Run2.a")
     compare_runs_no_tags(client, output_dir, run1, run2)
     exp = client.get_experiment(run1.info.experiment_id)
     metadata_tags2 = { k:v for k,v in run2.data.tags.items() if k.startswith("mlflow_export_import.metadata") }
@@ -32,8 +30,8 @@ def compare_runs_no_tags(client, output_dir, run1, run2):
     assert run1.data.params == run2.data.params
     assert run1.data.metrics == run2.data.metrics
     dump_runs(run1, run2)
-    os.makedirs(os.path.join(output_dir,"run1"), exist_ok=True) # TODO
-    os.makedirs(os.path.join(output_dir,"run2"), exist_ok=True) # TODO
+    os.makedirs(os.path.join(output_dir,"run1"), exist_ok=True) 
+    os.makedirs(os.path.join(output_dir,"run2"), exist_ok=True)
     path1 = client.download_artifacts(run1.info.run_id, ".", dst_path=os.path.join(output_dir,"run1"))
     path2 = client.download_artifacts(run2.info.run_id, ".", dst_path=os.path.join(output_dir,"run2"))
     assert compare_dirs(path1, path2)
