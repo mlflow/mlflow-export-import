@@ -21,7 +21,6 @@ class ModelExporter():
         :param export_runs: Export the run that generated a registered model's version.
         """
         self.mlflow_client = mlflow_client or mlflow.tracking.MlflowClient()
-        print(">> client:",self.mlflow_client)
         self.http_client = MlflowHttpClient()
         self.run_exporter = RunExporter(self.mlflow_client, export_metadata_tags=export_metadata_tags, notebook_formats=notebook_formats, export_notebook_revision=export_notebook_revision)
         self.stages = self._normalize_stages(stages)

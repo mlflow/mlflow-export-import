@@ -19,8 +19,6 @@ class BaseModelImporter():
         :param await_creation_for: Seconds to wait for model version crreation.
         """
         self.mlflow_client = mlflow.tracking.MlflowClient()
-        print(">> run_importer:",run_importer)
-        print(">> run_importer.type:",type(run_importer))
         self.run_importer = run_importer if run_importer else RunImporter(self.mlflow_client, mlmodel_fix=True, import_mlflow_tags=False)
         self.await_creation_for = await_creation_for 
 
@@ -104,8 +102,6 @@ class ModelImporter(BaseModelImporter):
         print(f"      source:           {source}")
         model_path = _extract_model_path(source, run_id)
         print(f"      model_path:   {model_path}")
-        print(">> self.run_importer:",self.run_importer)
-        print(">> self.run_importer.type:",type(self.run_importer))
         dst_run,_ = self.run_importer.import_run(experiment_name, run_dir)
         dst_run_id = dst_run.info.run_id
         run = self.mlflow_client.get_run(dst_run_id)
