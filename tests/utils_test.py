@@ -1,4 +1,5 @@
 import time
+import uuid
 import mlflow
 import mlflow.sklearn
 
@@ -8,12 +9,12 @@ print("MLflow version:", mlflow.__version__)
 client = mlflow.tracking.MlflowClient()
 exp_count = 0
 
-def now():
-    return round(time.time())
+def mk_uuid():
+    return str(uuid.uuid4())
 
 def create_experiment():
     global exp_count
-    exp_name = f"test_exp_{now()}_{exp_count}"
+    exp_name = f"test_exp_{mk_uuid()}_{exp_count}"
     exp_count += 1
     mlflow.set_experiment(exp_name)
     exp = client.get_experiment_by_name(exp_name)
