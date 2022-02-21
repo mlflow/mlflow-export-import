@@ -1,5 +1,3 @@
-import os
-import shutil
 import mlflow
 from mlflow_export_import.model.export_model import ModelExporter
 from mlflow_export_import.model.import_model import ModelImporter
@@ -70,15 +68,10 @@ def _create_version(model_name, stage=None):
     return vr
 
 def _create_run():
-    _init_output_dir()
+    utils_test.create_output_dir(output_dir)
     _, run = create_simple_run()
     return client.get_run(run.info.run_id)
     
-def _init_output_dir():
-    if os.path.exists(output_dir):
-        shutil.rmtree(output_dir)
-    os.makedirs(output_dir)
-
 def _compare_models(model_src, model_dst):
     assert model_src.description == model_dst.description
     assert model_src.tags == model_dst.tags
