@@ -37,7 +37,6 @@ def _export_experiment(exp_id_or_name, output_dir, exporter, export_results, run
         traceback.print_exc()
     return ok_runs, failed_runs
 
-  # export_experiments(experiments, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision, use_threads)
 def export_experiments(experiments, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision=False, use_threads=False):
     """
     :param: experiments: Can be either:
@@ -150,7 +149,12 @@ def main(experiments, output_dir, export_metadata_tags, notebook_formats, export
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    export_experiments(experiments, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision, use_threads)
+    export_experiments(experiments=experiments, \
+        output_dir=output_dir, \
+        export_metadata_tags=export_metadata_tags, \
+        notebook_formats=notebook_formats, \
+        export_notebook_revision=export_notebook_revision, \
+        use_threads=use_threads)
 
 if __name__ == "__main__":
     main()

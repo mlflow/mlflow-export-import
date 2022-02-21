@@ -127,7 +127,13 @@ def main(models, output_dir, stages, notebook_formats, export_notebook_revision,
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    export_models(models, output_dir, notebook_formats, export_notebook_revision, stages, export_all_runs, use_threads)
+    export_models(models, 
+        output_dir=output_dir, 
+        notebook_formats=notebook_formats, 
+        export_notebook_revision=export_notebook_revision, 
+        stages=stages, 
+        export_all_runs=export_all_runs, 
+        use_threads=use_threads)
 
 if __name__ == "__main__":
     main()

@@ -127,7 +127,13 @@ def main(input_dir, delete_model, use_src_user_id, import_mlflow_tags, import_me
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    import_all(input_dir, delete_model, use_src_user_id, import_mlflow_tags, import_metadata_tags, verbose, use_threads)
+    import_all(input_dir, 
+        delete_model=delete_model, 
+        use_src_user_id=use_src_user_id, 
+        import_mlflow_tags=import_mlflow_tags, 
+        import_metadata_tags=import_metadata_tags, 
+        verbose=verbose, 
+        use_threads=use_threads)
 
 if __name__ == "__main__":
     main()

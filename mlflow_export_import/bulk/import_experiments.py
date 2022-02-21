@@ -61,7 +61,10 @@ def main(input_dir, experiment_name_prefix, use_src_user_id, import_mlflow_tags,
     for exp in dct["experiments"]:
         print("  ",exp)
 
-    importer = ExperimentImporter(None, use_src_user_id, import_mlflow_tags, import_metadata_tags)
+    importer = ExperimentImporter(None, \
+        use_src_user_id=use_src_user_id, \
+        import_mlflow_tags=import_mlflow_tags, \
+        import_metadata_tags=import_metadata_tags)
     max_workers = os.cpu_count() or 4 if use_threads else 1
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for exp in dct["experiments"]:
