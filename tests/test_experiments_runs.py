@@ -1,6 +1,5 @@
 import mlflow
 import os, shutil
-#from mlflow_export_import.common.dump_run import dump_run
 from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import.run.import_run import RunImporter
 from mlflow_export_import.experiment.export_experiment import ExperimentExporter
@@ -9,7 +8,8 @@ from mlflow_export_import.run.copy_run import RunCopier
 from mlflow_export_import.experiment.copy_experiment import ExperimentCopier
 from utils_test import create_experiment, mk_uuid
 from sklearn_utils import create_sklearn_model
-from compare_utils import *
+from compare_utils import compare_runs, compare_run_no_import_mlflow_tags, compare_run_import_metadata_tags
+from compare_utils import dump_runs
 
 # == Setup
 
