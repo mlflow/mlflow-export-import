@@ -1,3 +1,5 @@
+import os
+import shutil
 import uuid
 import mlflow
 import mlflow.sklearn
@@ -7,6 +9,11 @@ print("MLflow version:", mlflow.__version__)
 
 client = mlflow.tracking.MlflowClient()
 exp_count = 0
+
+def create_output_dir(output_dir):
+    if os.path.exists(output_dir):
+        shutil.rmtree(output_dir)
+    os.makedirs(output_dir)
 
 def mk_uuid():
     return str(uuid.uuid4())
