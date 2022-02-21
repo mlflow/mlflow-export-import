@@ -7,7 +7,7 @@ from mlflow_export_import.experiment.export_experiment import ExperimentExporter
 from mlflow_export_import.experiment.import_experiment import ExperimentImporter
 from mlflow_export_import.run.copy_run import RunCopier
 from mlflow_export_import.experiment.copy_experiment import ExperimentCopier
-from utils_test import create_experiment, dump_tags
+from utils_test import create_experiment, mk_uuid
 from sklearn_utils import create_sklearn_model
 from compare_utils import *
 
@@ -28,6 +28,7 @@ def create_simple_run():
         mlflow.log_param("max_depth",max_depth)
         mlflow.log_metric("rmse",.789)
         mlflow.set_tag("my_tag","my_val")
+        mlflow.set_tag("my_uuid",mk_uuid())
         mlflow.sklearn.log_model(model, "model")
         with open("info.txt", "w") as f:
             f.write("Hi artifact")
