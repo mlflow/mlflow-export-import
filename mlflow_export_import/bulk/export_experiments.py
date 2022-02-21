@@ -149,11 +149,11 @@ def main(experiments, output_dir, export_metadata_tags, notebook_formats, export
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    export_experiments(experiments=experiments, \
-        output_dir=output_dir, \
-        export_metadata_tags=export_metadata_tags, \
-        notebook_formats=notebook_formats, \
-        export_notebook_revision=export_notebook_revision, \
+    export_experiments(experiments=experiments,
+        output_dir=output_dir,
+        export_metadata_tags=export_metadata_tags,
+        notebook_formats=notebook_formats,
+        export_notebook_revision=export_notebook_revision,
         use_threads=use_threads)
 
 if __name__ == "__main__":
