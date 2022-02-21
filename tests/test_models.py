@@ -44,8 +44,6 @@ def test_export_import_model_stages():
     vr_prod_src = _create_version(model_name_src, "Production")
     _create_version(model_name_src, "Archived")
     exporter.export_model(model_name_src, output_dir)
-    print(">> vr_prod_src:",vr_prod_src)
-    print(">> vr_staging_src:",vr_staging_src)
 
     model_name_dst = f"{model_name_src}_imported"
     experiment_name =  f"exp_{model_name_dst}"
