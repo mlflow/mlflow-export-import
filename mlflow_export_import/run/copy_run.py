@@ -5,6 +5,7 @@ Copies a run from one MLflow server to another.
 import time
 import click
 import mlflow
+from mlflow.utils.annotations import deprecated
 from mlflow.entities import Metric, Param, RunTag
 from mlflow_export_import import utils, click_doc
 from mlflow_export_import import BaseCopier, create_client
@@ -12,6 +13,7 @@ from mlflow_export_import import BaseCopier, create_client
 print("MLflow Version:", mlflow.__version__)
 print("MLflow Tracking URI:", mlflow.get_tracking_uri())
 
+@deprecated()
 class RunCopier(BaseCopier):
     def __init__(self, src_client, dst_client, use_src_user_id=False, export_metadata_tags=False):
         super().__init__(src_client, dst_client)

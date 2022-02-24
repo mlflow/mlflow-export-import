@@ -3,12 +3,14 @@ Copies an experiment from one MLflow server to another.
 """
 
 import click
+from mlflow.utils.annotations import deprecated
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common.search_runs_iterator import SearchRunsIterator
 from mlflow_export_import.run.copy_run import RunCopier
 from mlflow_export_import import BaseCopier, create_client
 from mlflow_export_import import utils, click_doc
 
+@deprecated()
 class ExperimentCopier(BaseCopier):
 
     def __init__(self, src_client, dst_client, use_src_user_id=False, export_metadata_tags=False):
