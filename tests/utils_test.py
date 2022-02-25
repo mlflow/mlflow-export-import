@@ -3,17 +3,24 @@ import shutil
 import uuid
 import mlflow
 import mlflow.sklearn
+from sklearn_utils import create_sklearn_model
 
 print("Mlflow path:", mlflow.__file__)
 print("MLflow version:", mlflow.__version__)
 
 client = mlflow.tracking.MlflowClient()
 exp_count = 0
+output_dir = "out"
 
-def create_output_dir(output_dir):
+def create_output_dir():
     if os.path.exists(output_dir):
         shutil.rmtree(output_dir)
     os.makedirs(output_dir)
+
+def init_output_dirs():
+    create_output_dir()
+    os.makedirs(os.path.join(output_dir,"run1"))
+    os.makedirs(os.path.join(output_dir,"run2"))
 
 def mk_uuid():
     return str(uuid.uuid4())
@@ -27,6 +34,23 @@ def create_experiment():
     for info in client.list_run_infos(exp.experiment_id):
         client.delete_run(info.run_id)
     return exp
+
+def create_simple_run():
+    exp = create_experiment()
+    max_depth = 4
+    model = create_sklearn_model(max_depth)
+    with mlflow.start_run(run_name="my_run") as run:
+        mlflow.log_param("max_depth",max_depth)
+        mlflow.log_metric("rmse",.789)
+        mlflow.set_tag("my_tag","my_val")
+        mlflow.set_tag("my_uuid",mk_uuid())
+        mlflow.sklearn.log_model(model, "model")
+        with open("info.txt", "w") as f:
+            f.write("Hi artifact")
+        mlflow.log_artifact("info.txt")
+        mlflow.log_artifact("info.txt","dir2")
+        mlflow.log_metric("m1", 0.1)
+    return exp, run
 
 def create_runs():
     create_experiment()

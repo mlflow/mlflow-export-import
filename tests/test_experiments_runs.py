@@ -1,13 +1,11 @@
 import mlflow
-import os
 from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import.run.import_run import RunImporter
 from mlflow_export_import.experiment.export_experiment import ExperimentExporter
 from mlflow_export_import.experiment.import_experiment import ExperimentImporter
 from mlflow_export_import.run.copy_run import RunCopier
 from mlflow_export_import.experiment.copy_experiment import ExperimentCopier
-from utils_test import create_experiment, mk_uuid, create_output_dir
-from sklearn_utils import create_sklearn_model
+from utils_test import create_output_dir, create_simple_run, init_output_dirs, output_dir
 from compare_utils import compare_runs, compare_run_no_import_mlflow_tags, compare_run_import_metadata_tags
 from compare_utils import dump_runs
 
@@ -15,37 +13,12 @@ from compare_utils import dump_runs
 
 client = mlflow.tracking.MlflowClient()
 #mlflow.sklearn.autolog()
-output_dir = "out"
 mlmodel_fix = True
-
-# == Common
-
-def create_simple_run():
-    exp = create_experiment()
-    max_depth = 4
-    model = create_sklearn_model(max_depth)
-    with mlflow.start_run(run_name="my_run") as run:
-        mlflow.log_param("max_depth",max_depth)
-        mlflow.log_metric("rmse",.789)
-        mlflow.set_tag("my_tag","my_val")
-        mlflow.set_tag("my_uuid",mk_uuid())
-        mlflow.sklearn.log_model(model, "model")
-        with open("info.txt", "w") as f:
-            f.write("Hi artifact")
-        mlflow.log_artifact("info.txt")
-        mlflow.log_artifact("info.txt","dir2")
-        mlflow.log_metric("m1", 0.1)
-    return exp, run
-
-def init_output_dirs():
-    create_output_dir(output_dir)
-    os.makedirs(os.path.join(output_dir,"run1"))
-    os.makedirs(os.path.join(output_dir,"run2"))
 
 # == Export/import Run tests
 
 def init_run_test(exporter, importer, verbose=False):
-    create_output_dir(output_dir)
+    create_output_dir()
     exp, run = create_simple_run()
     exporter.export_run(run.info.run_id, output_dir)
 
