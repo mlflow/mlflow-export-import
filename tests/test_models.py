@@ -68,8 +68,8 @@ def _create_version(model_name, stage=None):
     return vr
 
 def _create_run():
-    utils_test.create_output_dir(output_dir)
-    _, run = create_simple_run()
+    utils_test.create_output_dir()
+    _, run = utils_test.create_simple_run()
     return client.get_run(run.info.run_id)
     
 def _compare_models(model_src, model_dst):
