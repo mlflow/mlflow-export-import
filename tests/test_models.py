@@ -1,9 +1,8 @@
 import mlflow
 from mlflow_export_import.model.export_model import ModelExporter
 from mlflow_export_import.model.import_model import ModelImporter
-from test_experiments_runs import create_simple_run
 import utils_test 
-from compare_utils import compare_runs
+import compare_utils
 
 client = mlflow.tracking.MlflowClient()
 
@@ -90,7 +89,7 @@ def _compare_versions(vr_src, vr_dst):
     assert vr_src.run_id != vr_dst.run_id
     run_src = client.get_run(vr_src.run_id)
     run_dst = client.get_run(vr_dst.run_id)
-    compare_runs(client, output_dir, run_src, run_dst)
+    compare_utils.compare_runs(client, output_dir, run_src, run_dst)
 
 
 from mlflow_export_import.model.import_model import _extract_model_path
