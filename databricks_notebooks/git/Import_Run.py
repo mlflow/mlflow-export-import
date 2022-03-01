@@ -35,9 +35,9 @@ print("experiment_name:",experiment_name)
 # COMMAND ----------
 
 from mlflow_export_import.run.import_run import RunImporter
-importer = RunImporter()
-run_id, parent_run_id = importer.import_run(experiment_name, input_dir)
-run_id, parent_run_id
+importer = RunImporter(import_mlflow_tags=False)
+run, _ = importer.import_run(experiment_name, input_dir)
+run.info.run_id
 
 # COMMAND ----------
 
@@ -49,4 +49,4 @@ run_id, parent_run_id
 
 # COMMAND ----------
 
-display_run_uri(run_id)
+display_run_uri(run.info.run_id)
