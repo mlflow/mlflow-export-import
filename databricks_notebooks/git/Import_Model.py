@@ -56,7 +56,7 @@ print("experiment_name:",experiment_name)
 
 from mlflow_export_import.model.import_model import ModelImporter
 importer = ModelImporter()
-importer.import_model(input_dir, model_name, experiment_name, delete_model=True)
+importer.import_model(model_name, input_dir, experiment_name, delete_model=True)
 
 # COMMAND ----------
 
