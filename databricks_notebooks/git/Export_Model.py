@@ -82,7 +82,7 @@ dbutils.fs.mkdirs(output_dir)
 
 from mlflow_export_import.model.export_model import ModelExporter
 exporter = ModelExporter()
-exporter.export_model(output_dir, model_name)
+exporter.export_model(model_name, output_dir)
 
 # COMMAND ----------
 
