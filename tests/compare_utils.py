@@ -29,7 +29,7 @@ def compare_runs_no_tags(client, output_dir, run1, run2):
     assert run1.info.status == run2.info.status
     assert run1.data.params == run2.data.params
     assert run1.data.metrics == run2.data.metrics
-    dump_runs(run1, run2)
+    #dump_runs(run1, run2)
     os.makedirs(os.path.join(output_dir,"run1"), exist_ok=True) 
     os.makedirs(os.path.join(output_dir,"run2"), exist_ok=True)
     path1 = client.download_artifacts(run1.info.run_id, ".", dst_path=os.path.join(output_dir,"run1"))
@@ -43,8 +43,8 @@ def compare_runs(client, output_dir, run1, run2):
 def compare_tags(tags1, tags2):
     tags1 = tags1.copy()
     tags1.pop("mlflow.log-model.history",None) # sklearn.autolog adds this. TODO: Semantics? To copy this tag to dst run maybe and tweak run ID?
-    dump_tags(tags1,"Run1")
-    dump_tags(tags2,"Run2")
+    #dump_tags(tags1,"Run1")
+    #dump_tags(tags2,"Run2")
 
 def dump_runs(run1, run2):
     print("======= Run1")

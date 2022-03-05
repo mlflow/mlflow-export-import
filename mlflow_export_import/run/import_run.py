@@ -3,7 +3,6 @@ Imports a run from a directory.
 """
 
 import os
-import time
 import yaml
 import tempfile
 import click
@@ -16,6 +15,9 @@ from mlflow_export_import.common.find_artifacts import find_artifacts
 from mlflow_export_import.common.http_client import DatabricksHttpClient
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common import filesystem as _filesystem
+from mlflow_export_import.run import run_data_importer
+from mlflow.utils.validation import MAX_PARAMS_TAGS_PER_BATCH, MAX_METRICS_PER_BATCH
+
 
 class RunImporter():
     def __init__(self, mlflow_client=None, mlmodel_fix=True, use_src_user_id=False, import_mlflow_tags=False, import_metadata_tags=False):
@@ -91,30 +93,20 @@ class RunImporter():
                     yaml.dump(mlmodel, f)
                 self.mlflow_client.log_artifact(run_id, output_path,  f"{model_path}")
 
-    def _dump_tags(self, tags, msg=""):
-        print(f"Tags {msg} - {len(tags)}:")
-        for t in tags: print(f"  {t.key} - {t.value}")
-
     def _import_run_data(self, run_dct, run_id, src_user_id):
-        from mlflow.entities import Metric, Param, RunTag
-        now = round(time.time())
-        params = [ Param(k,v) for k,v in run_dct["params"].items() ]
-        metrics = [ Metric(k,v,now,0) for k,v in run_dct["metrics"].items() ] # TODO: missing timestamp and step semantics?
+        run_data_importer.log_params(self.mlflow_client, run_dct, run_id, MAX_PARAMS_TAGS_PER_BATCH)
+        run_data_importer.log_metrics(self.mlflow_client, run_dct, run_id, MAX_METRICS_PER_BATCH)
+        run_data_importer.log_tags(
+            self.mlflow_client, 
+            run_dct, 
+            run_id, 
+            MAX_PARAMS_TAGS_PER_BATCH, 
+            self.import_mlflow_tags, 
+            self.import_metadata_tags, 
+            self.in_databricks, 
+            src_user_id, 
+            self.use_src_user_id)
 
-        tags = run_dct["tags"]
-        if not self.import_mlflow_tags: # remove mlflow tags
-            tags = { k:v for k,v in tags.items() if not k.startswith(utils.TAG_PREFIX_MLFLOW) }
-        if not self.import_metadata_tags: # remove mlflow_export_import tags
-            tags = { k:v for k,v in tags.items() if not k.startswith(utils.TAG_PREFIX_METADATA) }
-        tags = utils.create_mlflow_tags_for_databricks_import(tags) # remove "mlflow" tags that cannot be imported into Databricks
-
-        tags = [ RunTag(k,str(v)) for k,v in tags.items() ]
-
-        #self._dump_tags(tags,"1") # debug
-        if not self.in_databricks:
-            utils.set_dst_user_id(tags, src_user_id, self.use_src_user_id)
-        #self._dump_tags(tags,"2") # debug
-        self.mlflow_client.log_batch(run_id, metrics, params, tags)
 
 @click.command()
 @click.option("--input-dir",
