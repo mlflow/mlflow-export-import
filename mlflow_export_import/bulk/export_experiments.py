@@ -37,7 +37,7 @@ def _export_experiment(exp_id_or_name, output_dir, exporter, export_results, run
         traceback.print_exc()
     return ok_runs, failed_runs
 
-def export_experiments(experiments, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision=False, use_threads=False):
+def export_experiments(experiments, output_dir, export_metadata_tags, notebook_formats, use_threads=False):
     """
     :param: experiments: Can be either:
       - List of experiment names 
@@ -52,7 +52,7 @@ def export_experiments(experiments, output_dir, export_metadata_tags, notebook_f
     if export_all_runs:
         experiments = utils.get_experiments(experiments)
         table_data = experiments
-        columns = ["Experiment ID"]
+        columns = ["Experiment Name or ID"]
         experiments_dct = {}
     else:
         experiments_dct = experiments
@@ -69,7 +69,7 @@ def export_experiments(experiments, output_dir, export_metadata_tags, notebook_f
     failed_runs = 0
     export_results = []
     futures = []
-    exporter = ExperimentExporter(client, export_metadata_tags, utils.string_to_list(notebook_formats), export_notebook_revision)
+    exporter = ExperimentExporter(client, export_metadata_tags, utils.string_to_list(notebook_formats))
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for exp_id_or_name in experiments:
             run_ids = experiments_dct.get(exp_id_or_name,None)
@@ -132,12 +132,6 @@ def export_experiments(experiments, output_dir, export_metadata_tags, notebook_f
     default="", 
     show_default=True
 )
-@click.option("--export-notebook-revision", 
-    help=click_doc.export_notebook_revision, 
-    type=bool, 
-    default=False, 
-    show_default=True
-)
 @click.option("--use-threads",
     help=click_doc.use_threads,
     type=bool,
@@ -145,7 +139,7 @@ def export_experiments(experiments, output_dir, export_metadata_tags, notebook_f
     show_default=True
 )
 
-def main(experiments, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision, use_threads): 
+def main(experiments, output_dir, export_metadata_tags, notebook_formats, use_threads): 
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
@@ -153,7 +147,6 @@ def main(experiments, output_dir, export_metadata_tags, notebook_formats, export
         output_dir=output_dir,
         export_metadata_tags=export_metadata_tags,
         notebook_formats=notebook_formats,
-        export_notebook_revision=export_notebook_revision,
         use_threads=use_threads)
 
 if __name__ == "__main__":

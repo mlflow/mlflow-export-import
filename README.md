@@ -36,14 +36,17 @@ Full object referential integrity is maintained as well as the original MLflow o
 
 ### Databricks Limitations
 
+#### Notebook Revisions
+* The notebook revision associated with the run will be exported. It is stored as an artifact in the notebooks folder of the run's artifact root.
 * The Databricks API does not support importing notebook revisions.
 * When you import a run, the link to its source notebook revision ID will appear in the UI but you cannot reach that revision (link is dead).
-* For convenience, the export tool exports the desired notebook revision (latest revision or specific revision based on the `--export-notebook-revision` flag) for a notebook-based experiment but again, it cannot be attached to a run when imported. It is stored as an artifact in the `notebooks` folder of the run's artifact root.
+
+#### Used ID
 * When importing a run or experiment, for open source MLflow you can specify the user owner. For Databricks import you cannot - the owner will be based on the personal access token (PAT) of the import user.
 
 ## Common options details 
 
-`notebook-formats` - If exporting a Databricks experiment, the run's notebook (latest revision, not the revision associated with the run) can be saved in the specified formats (comma-delimited argument). Each format is saved in the notebooks folder of the run's artifact root directory as `notebook.{format}`. Supported formats are  SOURCE, HTML, JUPYTER and DBC. See Databricks [Export Format](https://docs.databricks.com/dev-tools/api/latest/workspace.html#notebookexportformat) documentation.
+`notebook-formats` - If exporting a Databricks run, the run's notebook revision can be saved in the specified formats (comma-delimited argument). Each format is saved in the notebooks folder of the run's artifact root directory as `notebook.{format}`. Supported formats are  SOURCE, HTML, JUPYTER and DBC. See Databricks [Export Format](https://docs.databricks.com/dev-tools/api/latest/workspace.html#notebookexportformat) documentation.
 
 `use-src-user-id` -  Set the destination user ID to the source user ID. Source user ID is ignored when importing into Databricks since the user is automatically picked up from your Databricks access token.
 

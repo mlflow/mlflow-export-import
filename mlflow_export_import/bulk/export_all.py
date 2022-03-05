@@ -24,12 +24,6 @@ ALL_STAGES = "Production,Staging,Archive,None"
     default="", 
     show_default=True
 )
-@click.option("--export-notebook-revision", 
-    help=click_doc.export_notebook_revision, 
-    type=bool, 
-    default=False, 
-    show_default=True
-)
 @click.option("--use-threads",
     help=click_doc.use_threads,
     type=bool,
@@ -37,7 +31,7 @@ ALL_STAGES = "Production,Staging,Archive,None"
     show_default=True
 )
 
-def main(output_dir, notebook_formats, export_notebook_revision, use_threads):
+def main(output_dir, notebook_formats, use_threads):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
@@ -46,16 +40,14 @@ def main(output_dir, notebook_formats, export_notebook_revision, use_threads):
         output_dir=os.path.join(output_dir,"experiments"),
         export_metadata_tags=True,
         notebook_formats=notebook_formats,
-        export_notebook_revision=export_notebook_revision,
         use_threads=use_threads)
     export_models(models="all", 
         output_dir=os.path.join(output_dir,"models"),
         notebook_formats=notebook_formats, 
-        export_notebook_revision=export_notebook_revision, 
         stages=ALL_STAGES, 
         use_threads=use_threads)
     duration = round(time.time() - start_time, 1)
-    write_export_manifest_file(output_dir, duration, ALL_STAGES, notebook_formats, export_notebook_revision)
+    write_export_manifest_file(output_dir, duration, ALL_STAGES, notebook_formats)
     print(f"Duraton for entire tracking server export: {duration} seconds")
 
 if __name__ == "__main__":

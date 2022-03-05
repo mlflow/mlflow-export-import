@@ -18,19 +18,17 @@ print("MLflow Version:", mlflow.version.VERSION)
 print("MLflow Tracking URI:", mlflow.get_tracking_uri())
 
 class RunExporter():
-    def __init__(self, mlflow_client=None, export_metadata_tags=False, notebook_formats=[], export_notebook_revision=False):
+    def __init__(self, mlflow_client=None, export_metadata_tags=False, notebook_formats=[]):
         """
         :param mlflow_client: MLflow client or if None create default client.
         :param export_metadata_tags: Export source run metadata tags.
         :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
-        :param export_notebook_revision: Export the run's notebook revision. Experimental not yet publicly available.
         """
         self.mlflow_client = mlflow_client or mlflow.tracking.MlflowClient()
         self.dbx_client = DatabricksHttpClient()
         print("Databricks REST client:",self.dbx_client)
         self.export_metadata_tags = export_metadata_tags
         self.notebook_formats = notebook_formats
-        self.export_notebook_revision = export_notebook_revision
 
     def export_run(self, run_id, output_dir):
         """
@@ -76,13 +74,13 @@ class RunExporter():
         revision_id = tags["mlflow.databricks.notebookRevisionID"]
         notebook_path = tags["mlflow.databricks.notebookPath"]
         notebook_name = os.path.basename(notebook_path)
-        dct = { 
+        manifest = { 
            "mlflow.databricks.notebookRevisionID": revision_id, 
            "mlflow.databricks.notebookPath": notebook_path,
-           "mlflow.databricks.export-notebook-revision": self.export_notebook_revision }
+           "mlflow.databricks.export-notebook-revision": revision_id }
         path = os.path.join(notebook_dir, "manifest.json")
         with open(path, "w") as f:
-            f.write(json.dumps(dct,indent=2)+"\n")
+            f.write(json.dumps(manifest,indent=2)+"\n")
         for format in self.notebook_formats:
             self.export_notebook_format(notebook_dir, notebook, format, format.lower(), notebook_name, revision_id)
 
@@ -91,10 +89,8 @@ class RunExporter():
             "path": notebook, 
             "direct_download": True,
             "format": format,
-            # "revision": {"revision_timestamp": revision_id}
+            "revision_timestamp": revision_id 
         }
-        if self.export_notebook_revision:
-            params["revision"] = { "revision_timestamp": revision_id }
         try:
             rsp = self.dbx_client._get("workspace/export", params)
             notebook_path = os.path.join(notebook_dir, f"{notebook_name}.{extension}")
@@ -125,18 +121,12 @@ class RunExporter():
     default="", 
     show_default=True
 )
-@click.option("--export-notebook-revision", 
-    help=click_doc.export_notebook_revision, 
-    type=bool, 
-    default=False, 
-    show_default=True
-)
 
-def main(run_id, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision): # pragma: no cover
+def main(run_id, output_dir, export_metadata_tags, notebook_formats):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    exporter = RunExporter(None, export_metadata_tags, utils.string_to_list(notebook_formats), export_notebook_revision)
+    exporter = RunExporter(None, export_metadata_tags, utils.string_to_list(notebook_formats))
     exporter.export_run(run_id, output_dir)
 
 if __name__ == "__main__":

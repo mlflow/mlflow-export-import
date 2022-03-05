@@ -3,8 +3,8 @@ Exports an experiment to a directory.
 """
 
 import os
-import mlflow
 import click
+import mlflow
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common.search_runs_iterator import SearchRunsIterator
@@ -12,15 +12,14 @@ from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils, click_doc
 
 class ExperimentExporter():
-    def __init__(self, mlflow_client=None, export_metadata_tags=False, notebook_formats=[], export_notebook_revision=False):
+    def __init__(self, mlflow_client=None, export_metadata_tags=False, notebook_formats=[]):
         """
         :param mlflow_client: MLflow client or if None create default client.
         :param export_metadata_tags: Export source run metadata tags.
         :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
-        :param export_notebook_revision: Export the run's notebook revision. Experimental not yet publicly available.
         """
         self.mlflow_client = mlflow_client or mlflow.tracking.MlflowClient()
-        self.run_exporter = RunExporter(self.mlflow_client, export_metadata_tags, notebook_formats, export_notebook_revision)
+        self.run_exporter = RunExporter(self.mlflow_client, export_metadata_tags, notebook_formats)
 
     def export_experiment(self, exp_id_or_name, output_dir, run_ids=None):
         """
@@ -97,18 +96,12 @@ class ExperimentExporter():
     default="", 
     show_default=True
 )
-@click.option("--export-notebook-revision",
-    help=click_doc.export_notebook_revision, 
-    type=bool, 
-    default=False, 
-    show_default=True
-)
 
-def main(experiment, output_dir, export_metadata_tags, notebook_formats, export_notebook_revision):
+def main(experiment, output_dir, export_metadata_tags, notebook_formats):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    exporter = ExperimentExporter(None, export_metadata_tags, utils.string_to_list(notebook_formats), export_notebook_revision)
+    exporter = ExperimentExporter(None, export_metadata_tags, utils.string_to_list(notebook_formats))
     exporter.export_experiment(experiment, output_dir)
 
 if __name__ == "__main__":

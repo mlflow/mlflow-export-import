@@ -11,18 +11,17 @@ from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils, click_doc
 
 class ModelExporter():
-    def __init__(self,  mlflow_client=None, export_metadata_tags=False, notebook_formats=[], export_notebook_revision=False, stages=None, export_run=True):
+    def __init__(self,  mlflow_client=None, export_metadata_tags=False, notebook_formats=[], stages=None, export_run=True):
         """
         :param mlflow_client: MLflow client or if None create default client.
         :param export_metadata_tags: Export source run metadata tags.
         :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
-        :param export_notebook_revision: Export the run's notebook revision. Experimental not yet publicly available.
         :param stages: Stages to export. Default is all stages. Values are Production, Staging, Archived and None.
         :param export_runs: Export the run that generated a registered model's version.
         """
         self.mlflow_client = mlflow_client or mlflow.tracking.MlflowClient()
         self.http_client = MlflowHttpClient()
-        self.run_exporter = RunExporter(self.mlflow_client, export_metadata_tags=export_metadata_tags, notebook_formats=notebook_formats, export_notebook_revision=export_notebook_revision)
+        self.run_exporter = RunExporter(self.mlflow_client, export_metadata_tags=export_metadata_tags, notebook_formats=notebook_formats)
         self.stages = self._normalize_stages(stages)
         self.export_run = export_run
 
@@ -112,18 +111,12 @@ class ModelExporter():
     default="", 
     show_default=True
 )
-@click.option("--export-notebook-revision", 
-    help=click_doc.export_notebook_revision, 
-    type=bool, 
-    default=False, 
-    show_default=True
-)
 
-def main(model, output_dir, stages, notebook_formats, export_notebook_revision): # pragma: no cover
+def main(model, output_dir, stages, notebook_formats):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    exporter = ModelExporter(stages=stages, notebook_formats=utils.string_to_list(notebook_formats), export_notebook_revision=export_notebook_revision)
+    exporter = ModelExporter(stages=stages, notebook_formats=utils.string_to_list(notebook_formats))
     exporter.export_model(model, output_dir)
 
 if __name__ == "__main__":
