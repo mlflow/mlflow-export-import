@@ -12,10 +12,6 @@ from mlflow.entities import Metric, Param, RunTag
 from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import.run.import_run import RunImporter
 
-print(">> MAX_PARAMS_TAGS_PER_BATCH:",MAX_PARAMS_TAGS_PER_BATCH)
-print(">> MAX_PARAMS_TAGS_PER_BATCH:",MAX_PARAMS_TAGS_PER_BATCH)
-print(">> MAX_METRICS_PER_BATCH:",MAX_METRICS_PER_BATCH)
-
 _num_params = 10
 _num_metrics = 10
 _num_tags = 10
@@ -24,31 +20,21 @@ client = mlflow.tracking.MlflowClient()
 
 def test_params():
     run1, run2 = init_test_runs(RunExporter(), RunImporter(mlmodel_fix=True, import_mlflow_tags=True), num_params=_num_params)
-    print(">> test_params: #run1.data.params:",len(run1.data.params))
-    print(">> test_params: #run2.data.params:",len(run2.data.params))
     assert len(run1.data.params) == MAX_PARAMS_TAGS_PER_BATCH + _num_params
     compare_runs(client, output_dir, run1, run2)
 
 def test_metrics():
     run1, run2 = init_test_runs(RunExporter(), RunImporter(mlmodel_fix=True, import_mlflow_tags=True), num_metrics=_num_metrics)
-    print(">> test_metrics: #run1.data.metrics:",len(run1.data.metrics))
-    print(">> test_metrics: #run2.data.metrics:",len(run2.data.metrics))
     assert len(run1.data.metrics) == MAX_METRICS_PER_BATCH + _num_metrics
     compare_runs(client, output_dir, run1, run2)
 
 def test_tags():
     run1, run2 = init_test_runs(RunExporter(), RunImporter(mlmodel_fix=True, import_mlflow_tags=True), num_tags=_num_tags)
-    print(">> test_tags: #run1.data.tags:",len(run1.data.tags))
-    print(">> test_tags: #run2.data.tags:",len(run2.data.tags))
     assert len(run1.data.tags) >= MAX_PARAMS_TAGS_PER_BATCH + _num_tags
     compare_runs(client, output_dir, run1, run2)
 
 def test_params_and_metrics():
     run1, run2 = init_test_runs(RunExporter(), RunImporter(mlmodel_fix=True, import_mlflow_tags=True), num_params=_num_params, num_metrics=_num_metrics)
-    print(">> test_params_and_metrics: #run1.data.params:",len(run1.data.params))
-    print(">> test_params_and_metrics: #run2.data.params:",len(run2.data.params))
-    print(">> test_params_and_metrics: #run1.data.metrics:",len(run1.data.metrics))
-    print(">> test_params_and_metrics: #run2.data.metrics:",len(run2.data.metrics))
     assert len(run1.data.params) == MAX_PARAMS_TAGS_PER_BATCH + _num_params
     assert len(run1.data.metrics) == MAX_METRICS_PER_BATCH + _num_metrics
     compare_runs(client, output_dir, run1, run2)
