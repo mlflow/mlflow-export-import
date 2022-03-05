@@ -17,7 +17,6 @@ setup(name="mlflow_export_import",
       entry_points={
          "console_scripts": [
              "export-all = mlflow_export_import.bulk.export_all:main",
-             "import-all = mlflow_export_import.bulk.import_models:main",
              "export-models = mlflow_export_import.bulk.export_models:main",
              "import-models = mlflow_export_import.bulk.import_models:main",
              "export-run = mlflow_export_import.run.export_run:main",
