@@ -62,7 +62,7 @@ def import_models(input_dir, run_info_map, delete_model, verbose, use_threads):
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for model in models:
             dir = os.path.join(models_dir, model)
-            executor.submit(importer.import_model, dir, model, delete_model, verbose)
+            executor.submit(importer.import_model, model, dir, delete_model, verbose)
 
     duration = round(time.time() - start_time, 1)
     return { "models": len(models), "duration": duration }
