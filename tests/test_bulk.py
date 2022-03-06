@@ -8,6 +8,7 @@ from mlflow_export_import.bulk.export_experiments import export_experiments
 from mlflow_export_import.bulk.import_experiments import import_experiments
 
 notebook_formats = "SOURCE,DBC"
+exp_prefix = "Imported_"
 
 # == Setup
 
@@ -38,25 +39,26 @@ def _create_test_experiment(num_runs):
 
 def _run_test(compare_func, import_mlflow_tags=True, export_metadata_tags=False, use_threads=False):
     create_output_dir()
-    exp1 = _create_test_experiment(3)
-    experiments = exp1.name
-    export_experiments(experiments=experiments,
+    exps = [ _create_test_experiment(3), _create_test_experiment(4) ]
+    exp_names = [ exp.name for exp in exps ]
+    export_experiments(experiments=exp_names,
         output_dir=output_dir,
         export_metadata_tags=export_metadata_tags,
         notebook_formats=notebook_formats,
         use_threads=use_threads)
 
-    exp_prefix = "Imported_"
     import_experiments(output_dir, experiment_name_prefix=exp_prefix, use_src_user_id=False, import_mlflow_tags=import_mlflow_tags, import_metadata_tags=False, use_threads=False)
 
-    base_dir = os.path.join(output_dir,"compare_runs")
+    base_dir = os.path.join(output_dir,"test_compare_runs")
     os.makedirs(base_dir)
-    exp2 = client.get_experiment_by_name(exp_prefix + exp1.name)
-    for run1 in client.search_runs(exp1.experiment_id, ""):
-        tag = run1.data.tags["run_index"]
-        run2 = client.search_runs(exp2.experiment_id, f"tags.run_index = '{tag}'")[0]
-        odir = os.path.join(base_dir,run1.info.experiment_id)
-        compare_func(client, odir, run1, run2)
+
+    for exp1 in exps:
+        exp2 = client.get_experiment_by_name(exp_prefix + exp1.name)
+        for run1 in client.search_runs(exp1.experiment_id, ""):
+            tag = run1.data.tags["run_index"]
+            run2 = client.search_runs(exp2.experiment_id, f"tags.run_index = '{tag}'")[0]
+            odir = os.path.join(base_dir,run1.info.experiment_id)
+            compare_func(client, odir, run1, run2)
 
 def test_exp_basic():
     _run_test(compare_runs, import_mlflow_tags=False)
