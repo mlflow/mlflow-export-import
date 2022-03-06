@@ -16,6 +16,24 @@ def _import_experiment(importer, exp_name, exp_input_dir):
         import traceback
         traceback.print_exc()
 
+def import_experiments(input_dir, experiment_name_prefix, use_src_user_id, import_mlflow_tags, import_metadata_tags, use_threads): 
+    path = os.path.join(input_dir,"manifest.json")
+    with open(path, "r") as f:
+        dct = json.loads(f.read())
+    for exp in dct["experiments"]:
+        print("  ",exp)
+
+    importer = ExperimentImporter(None,
+        use_src_user_id=use_src_user_id,
+        import_mlflow_tags=import_mlflow_tags,
+        import_metadata_tags=import_metadata_tags)
+    max_workers = os.cpu_count() or 4 if use_threads else 1
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        for exp in dct["experiments"]:
+            exp_input_dir = os.path.join(input_dir,exp["id"])
+            exp_name = experiment_name_prefix + exp["name"] if experiment_name_prefix else exp["name"]
+            executor.submit(_import_experiment, importer, exp_name, exp_input_dir)
+
 @click.command()
 @click.option("--input-dir", 
     help="Input directory.", required=True, type=str
@@ -50,27 +68,12 @@ def _import_experiment(importer, exp_name, exp_input_dir):
     default=False,
     show_default=True
 )
+
 def main(input_dir, experiment_name_prefix, use_src_user_id, import_mlflow_tags, import_metadata_tags, use_threads): 
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-
-    path = os.path.join(input_dir,"manifest.json")
-    with open(path, "r") as f:
-        dct = json.loads(f.read())
-    for exp in dct["experiments"]:
-        print("  ",exp)
-
-    importer = ExperimentImporter(None,
-        use_src_user_id=use_src_user_id,
-        import_mlflow_tags=import_mlflow_tags,
-        import_metadata_tags=import_metadata_tags)
-    max_workers = os.cpu_count() or 4 if use_threads else 1
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        for exp in dct["experiments"]:
-            exp_input_dir = os.path.join(input_dir,exp["id"])
-            exp_name = experiment_name_prefix + exp["name"] if experiment_name_prefix else exp["name"]
-            executor.submit(_import_experiment, importer, exp_name, exp_input_dir)
+    import_experiments(input_dir, experiment_name_prefix, use_src_user_id, import_mlflow_tags, import_metadata_tags, use_threads)
 
 if __name__ == "__main__":
     main()
