@@ -110,19 +110,6 @@ def create_common_manifest(duration):
         }
     }
 
-client = mlflow.tracking.MlflowClient()
-
-def get_experiments(experiments):
-    if isinstance(experiments,str):
-        if experiments == "all":
-            experiments = [ exp.experiment_id for exp in client.list_experiments() ]
-        elif experiments.endswith("*"):
-            exp_prefix = experiments[:-1]
-            experiments = [ exp.experiment_id for exp in client.list_experiments() if exp.name.startswith(exp_prefix) ] # Wish there was an experiment search method for efficiency
-        else:
-            experiments = experiments.split(",")
-    return experiments
-
 def show_table(title, lst, columns):
     print(title)
     df = pd.DataFrame(lst, columns = columns)

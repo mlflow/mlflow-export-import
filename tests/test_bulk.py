@@ -1,11 +1,13 @@
 import os
 import mlflow
+from mlflow_export_import.bulk import bulk_utils
 from utils_test import create_output_dir, create_experiment, output_dir, mk_uuid
 from sklearn_utils import create_sklearn_model
 from compare_utils import compare_runs, compare_run_no_import_mlflow_tags
 
 from mlflow_export_import.bulk.export_experiments import export_experiments
 from mlflow_export_import.bulk.import_experiments import import_experiments
+from mlflow_export_import.common import MlflowExportImportException
 
 notebook_formats = "SOURCE,DBC"
 exp_prefix = "Imported_"
@@ -34,6 +36,10 @@ def _create_test_experiment(num_runs):
     for j in range(num_runs):
         _create_simple_run(j)
     return exp
+
+def _delete_experiments():
+    for exp in client.list_experiments():
+        client.delete_experiment(exp.experiment_id)
 
 # == Export/import Experiments tests
 
@@ -71,3 +77,28 @@ def test_exp_no_import_mlflow_tags():
 
 def test_exp_import_metadata_tags():
     _run_test(compare_run_no_import_mlflow_tags, export_metadata_tags=True)
+
+
+def test_get_experiment_ids_from_comma_delimited_string():
+    exp_ids = bulk_utils.get_experiment_ids("exp1,exp2,exp3")
+    assert len(exp_ids) == 3
+
+def test_get_experiment_ids_from_all_string():
+    create_output_dir()
+    _delete_experiments()
+    exps = [ _create_test_experiment(3), _create_test_experiment(4) ]
+    exp_ids = bulk_utils.get_experiment_ids("all")
+    assert exp_ids == [ exp.experiment_id for exp in exps ]
+
+def test_get_experiment_ids_from_list():
+    exp_ids1 = ["exp1","exp2","exp3"]
+    exp_ids2 = bulk_utils.get_experiment_ids(exp_ids1)
+    assert exp_ids1 == exp_ids2
+
+def test_get_experiment_ids_from_illegal_argument():
+    try:
+        bulk_utils.get_experiment_ids({})
+        assert False
+    except MlflowExportImportException:
+        assert True
+

@@ -10,6 +10,7 @@ import click
 import mlflow
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import import utils, click_doc
+from mlflow_export_import.bulk import bulk_utils
 from mlflow_export_import.experiment.export_experiment import ExperimentExporter
 from mlflow_export_import.common import filesystem as _filesystem
 
@@ -50,14 +51,14 @@ def export_experiments(experiments, output_dir, export_metadata_tags, notebook_f
 
     export_all_runs = not isinstance(experiments,dict) 
     if export_all_runs:
-        experiments = utils.get_experiments(experiments)
+        experiments = bulk_utils.get_experiment_ids(experiments)
         table_data = experiments
         columns = ["Experiment Name or ID"]
         experiments_dct = {}
     else:
         experiments_dct = experiments
         experiments = experiments.keys()
-        experiments = utils.get_experiments(experiments)
+        experiments = bulk_utils.get_experiment_ids(experiments)
         table_data = [ [exp_id,len(runs)] for exp_id,runs in experiments_dct.items() ]
         num_runs = sum(x[1] for x in table_data)
         table_data.append(["Total",num_runs])
