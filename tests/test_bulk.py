@@ -94,11 +94,3 @@ def test_get_experiment_ids_from_list():
     exp_ids1 = ["exp1","exp2","exp3"]
     exp_ids2 = bulk_utils.get_experiment_ids(exp_ids1)
     assert exp_ids1 == exp_ids2
-
-def test_get_experiment_ids_from_illegal_argument():
-    try:
-        bulk_utils.get_experiment_ids({})
-        assert False
-    except MlflowExportImportException:
-        assert True
-

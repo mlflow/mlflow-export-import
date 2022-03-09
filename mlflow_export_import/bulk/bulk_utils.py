@@ -1,6 +1,4 @@
-
 import mlflow
-from mlflow_export_import.common import MlflowExportImportException
 
 client = mlflow.tracking.MlflowClient()
 
@@ -19,4 +17,20 @@ def get_experiment_ids(experiment_ids):
     elif isinstance(experiment_ids,list):
         return experiment_ids
     else:
-        raise MlflowExportImportException(f"Argument to get_experiment_ids() is of type '{type(experiment_ids)}. Must must be a string or list")
+        return experiment_ids
+        #raise MlflowExportImportException(f"Argument to get_experiment_ids() is of type '{type(experiment_ids)}. Must must be a string or list")
+
+def get_model_names(model_names):
+    if isinstance(model_names,str):
+        if model_names == "all":
+            model_names = [ model.name for model in client.list_registered_models() ]
+        elif model_names.endswith("*"):
+            model_prefix = model_names[:-1]
+            model_names = [ model.name for model in client.list_registered_models() if model.name.startswith(model_prefix) ] # Wish there was an model search method for efficiency]
+        else:
+            model_names = model_names.split(",")
+    elif isinstance(model_names,list):
+        return model_names
+    else:
+        return model_names
+    return model_names

@@ -14,29 +14,24 @@ from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import import utils, click_doc
 from mlflow_export_import.bulk import write_export_manifest_file
 from mlflow_export_import.bulk.model_utils import get_experiments_runs_of_models
+from mlflow_export_import.bulk import bulk_utils
 
 client = mlflow.tracking.MlflowClient()
 
-def _export_models(models, output_dir, notebook_formats, stages, export_run=True, use_threads=False):
+def _export_models(model_names, output_dir, notebook_formats, stages, export_run=True, use_threads=False):
     max_workers = os.cpu_count() or 4 if use_threads else 1
     start_time = time.time()
-    if models == "all":
-        models = [ model.name for model in client.list_registered_models() ]
-    elif models.endswith("*"):
-        model_prefix = models[:-1]
-        models = [ model.name for model in client.list_registered_models() if model.name.startswith(model_prefix) ] # Wish there was an model search method for efficiency]
-    else:
-        models = models.split(",")
-    print("Models:")
-    for model in models:
-        print(f"  {model}")
+    model_names = bulk_utils.get_model_names(model_names)
+    print("Models to export:")
+    for model_name in model_names:
+        print(f"  {model_name}")
 
     exporter = ModelExporter(stages=stages, notebook_formats=utils.string_to_list(notebook_formats), export_run=export_run)
     futures = []
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        for model in models:
-            dir = os.path.join(output_dir, model)
-            future = executor.submit(exporter.export_model, model, dir)
+        for model_name in model_names:
+            dir = os.path.join(output_dir, model_name)
+            future = executor.submit(exporter.export_model, model_name, dir)
             futures.append(future)
     ok_models = [] ; failed_models = []
     for future in futures:
@@ -50,7 +45,7 @@ def _export_models(models, output_dir, notebook_formats, stages, export_run=True
             "mlflow_version": mlflow.__version__,
             "mlflow_tracking_uri": mlflow.get_tracking_uri(),
             "export_time": utils.get_now_nice(),
-            "total_models": len(models),
+            "total_models": len(model_names),
             "ok_models": len(ok_models),
             "failed_models": len(failed_models),
             "duration": duration
@@ -66,17 +61,17 @@ def _export_models(models, output_dir, notebook_formats, stages, export_run=True
     with open(os.path.join(output_dir, "manifest.json"), "w") as f:
         f.write(json.dumps(manifest, indent=2)+"\n")
 
-    print(f"{len(models)} models exported")
+    print(f"{len(model_names)} models exported")
     print(f"Duration for registered models export: {duration} seconds")
 
-def export_models(models, output_dir, notebook_formats, stages="", export_all_runs=False, use_threads=False):
-    exps_and_runs = get_experiments_runs_of_models(models)
+def export_models(model_names, output_dir, notebook_formats, stages="", export_all_runs=False, use_threads=False):
+    exps_and_runs = get_experiments_runs_of_models(model_names)
     exp_ids = exps_and_runs.keys()
     start_time = time.time()
     out_dir = os.path.join(output_dir,"experiments")
     exps_to_export = exp_ids if export_all_runs else exps_and_runs
     export_experiments.export_experiments(exps_to_export, out_dir, True, notebook_formats, use_threads)
-    _export_models(models, os.path.join(output_dir,"models"), notebook_formats, stages, export_run=False, use_threads=use_threads)
+    _export_models(model_names, os.path.join(output_dir,"models"), notebook_formats, stages, export_run=False, use_threads=use_threads)
     duration = round(time.time() - start_time, 1)
     write_export_manifest_file(output_dir, duration, stages, notebook_formats)
     print(f"Duration for total registered models and versions' runs export: {duration} seconds")

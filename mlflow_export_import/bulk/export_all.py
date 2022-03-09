@@ -41,7 +41,7 @@ def main(output_dir, notebook_formats, use_threads):
         export_metadata_tags=True,
         notebook_formats=notebook_formats,
         use_threads=use_threads)
-    export_models(models="all", 
+    export_models(model_names="all", 
         output_dir=os.path.join(output_dir,"models"),
         notebook_formats=notebook_formats, 
         stages=ALL_STAGES, 

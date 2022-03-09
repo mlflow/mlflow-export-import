@@ -1,23 +1,17 @@
 
 import mlflow
+from mlflow_export_import.bulk import bulk_utils
 
 client = mlflow.tracking.MlflowClient()
 
-def get_experiments_runs_of_models(models, show_experiments=False, show_runs=False):
+def get_experiments_runs_of_models(model_names, show_experiments=False, show_runs=False):
     """ Get experiments and runs to to export. """
-
-    if models == "all":
-        models = [ model.name for model in client.list_registered_models() ]
-    elif models.endswith("*"):
-        model_prefix = models[:-1]
-        models = [ model.name for model in client.list_registered_models() if model.name.startswith(model_prefix) ]
-    else:
-        models = models.split(",")
+    model_names = bulk_utils.get_model_names(model_names)
     print("Models:")
-    for model in models:
-        print(f"  {model}")
+    for model_name in model_names:
+        print(f"  {model_name}")
     exps_and_runs = {}
-    for model_name in models:
+    for model_name in model_names:
         versions = client.search_model_versions(f"name='{model_name}'")
         for vr in versions:
             try:
