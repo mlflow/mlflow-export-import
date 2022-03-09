@@ -16,8 +16,9 @@ Notes:
 
 ### Export
 
-Exports all MLflow objects of the tracking server (Databricks workspace) - all models, experiments and runs as well as a run's Databricks notebook (best effort).
+**Note: WIP.**
 
+Exports all MLflow objects of the tracking server (Databricks workspace) - all models, experiments and runs as well as a run's Databricks notebook (best effort).
 
 Source: [export_all.py](mlflow_export_import/bulk/export_all.py).
 
