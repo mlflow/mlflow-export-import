@@ -50,13 +50,10 @@ def _run_test(compare_func, import_mlflow_tags=True, import_metadata_tags=False,
         client.rename_registered_model(model_name,_rename_model_name(model_name))
     exp_ids = [ exp.experiment_id for exp in client.list_experiments() ]
     exp_names = [ exp.name for exp in client.list_experiments() ]
-    print(">> exp_ids:",exp_ids)
-    print(">> exp_names.1a:",exp_names)
     exps = client.list_experiments() 
     for exp in exps:
         client.rename_experiment(exp.experiment_id, f"Original_{exp.name}")
     exp_names = [ exp.name for exp in client.list_experiments() ]
-    print(">> exp_names.1b:",exp_names)
 
     import_all(output_dir,
         delete_model=False,
@@ -66,7 +63,6 @@ def _run_test(compare_func, import_mlflow_tags=True, import_metadata_tags=False,
         verbose=False,
         use_threads=use_threads)
     exp_names = [ exp.name for exp in client.list_experiments() ]
-    print(">> exp_names.2:",exp_names)
 
     test_dir = os.path.join(output_dir,"test_compare_runs")
     os.makedirs(test_dir)
@@ -82,7 +78,6 @@ def _run_test(compare_func, import_mlflow_tags=True, import_metadata_tags=False,
             run1 = client.search_runs(exp_ids, filter)[0]
             tdir = os.path.join(test_dir,run2.info.run_id)
             os.makedirs(tdir)
-            print(">> run1:",run1.info.run_id,"run2:",run2.info.run_id)
             assert run1.info.run_id != run2.info.run_id
             compare_func(client, tdir, run1, run2)
 
