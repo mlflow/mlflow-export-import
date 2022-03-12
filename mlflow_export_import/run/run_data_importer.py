@@ -37,15 +37,6 @@ def log_metrics(client, run_dct, run_id, batch_size):
         client.log_batch(run_id, metrics=metrics)
     _log_data(run_dct, run_id, batch_size, get_data, log_data)
 
-def _log_metrics(client, run_dct, run_id, batch_size):
-    def get_data(run_dct, args=None):
-        import time
-        now = round(time.time())
-        return [ Metric(k,v,now,0) for k,v in run_dct["metrics"].items() ]
-    def log_data(run_id, metrics):
-        client.log_batch(run_id, metrics=metrics)
-    _log_data(run_dct, run_id, batch_size, get_data, log_data)
-
 def log_tags(client, run_dct, run_id, batch_size, import_mlflow_tags, import_metadata_tags, in_databricks, src_user_id, use_src_user_id):
     def get_data(run_dct, args):
         tags = run_dct["tags"]
