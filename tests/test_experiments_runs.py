@@ -15,9 +15,9 @@ mlmodel_fix = True
 
 # == Export/import Run tests
 
-def init_run_test(exporter, importer, verbose=False):
+def init_run_test(exporter, importer, use_metric_steps=False, verbose=False):
     create_output_dir()
-    exp, run = create_simple_run()
+    exp, run = create_simple_run(use_metric_steps)
     exporter.export_run(run.info.run_id, output_dir)
 
     experiment_name = f"{exp.name}_imported" 
@@ -40,6 +40,10 @@ def test_run_no_import_mlflow_tags():
 def test_run_import_metadata_tags():
     run1, run2 = init_run_test(RunExporter(export_metadata_tags=True), RunImporter(mlmodel_fix=mlmodel_fix, import_metadata_tags=True, import_mlflow_tags=True), verbose=False)
     compare_run_import_metadata_tags(client, output_dir, run1, run2)
+
+def test_run_basic_use_metric_steps():
+    run1, run2 = init_run_test(RunExporter(), RunImporter(mlmodel_fix=mlmodel_fix, import_mlflow_tags=True), use_metric_steps=True)
+    compare_runs(client, output_dir, run1, run2)
 
 # == Export/import Experiment tests
 

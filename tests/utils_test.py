@@ -35,13 +35,17 @@ def create_experiment():
         client.delete_run(info.run_id)
     return exp
 
-def create_simple_run():
+def create_simple_run(use_metric_steps=False):
     exp = create_experiment()
     max_depth = 4
     model = create_sklearn_model(max_depth)
     with mlflow.start_run(run_name="my_run") as run:
         mlflow.log_param("max_depth",max_depth)
-        mlflow.log_metric("rmse",.789)
+        if use_metric_steps:
+            for j in range(0,5):
+                mlflow.log_metric("rmse",.789+j,j)
+        else:
+            mlflow.log_metric("rmse",.789)
         mlflow.set_tag("my_tag","my_val")
         mlflow.set_tag("my_uuid",mk_uuid())
         mlflow.sklearn.log_model(model, "model")

@@ -30,6 +30,17 @@ class RunExporter():
         self.export_metadata_tags = export_metadata_tags
         self.notebook_formats = notebook_formats
 
+    def get_metrics_with_steps(self, run):
+        metrics_with_steps = {}
+        for metric in run.data.metrics.keys():
+            metric_history = self.mlflow_client.get_metric_history(run.info.run_id,metric)
+            lst = [ utils.strip_underscores(m) for m in metric_history ]
+            for x in lst:
+                del x["key"] 
+            metrics_with_steps[metric] = lst
+        return metrics_with_steps
+# XX
+
     def export_run(self, run_id, output_dir):
         """
         :param run_id: Run ID.
@@ -42,7 +53,7 @@ class RunExporter():
         tags =  utils.create_tags_for_metadata(self.mlflow_client, run, self.export_metadata_tags)
         dct = { "info": utils.strip_underscores(run.info) , 
                 "params": run.data.params,
-                "metrics": run.data.metrics,
+                "metrics": self.get_metrics_with_steps(run),
                 "tags": tags,
               }
         path = os.path.join(output_dir,"run.json")

@@ -28,6 +28,17 @@ def log_params(client, run_dct, run_id, batch_size):
 
 def log_metrics(client, run_dct, run_id, batch_size):
     def get_data(run_dct, args=None):
+        metrics = []
+        for metric,steps in  run_dct["metrics"].items():
+            for step in steps:
+                metrics.append(Metric(metric,step["value"],step["timestamp"],step["step"]))
+        return metrics
+    def log_data(run_id, metrics):
+        client.log_batch(run_id, metrics=metrics)
+    _log_data(run_dct, run_id, batch_size, get_data, log_data)
+
+def _log_metrics(client, run_dct, run_id, batch_size):
+    def get_data(run_dct, args=None):
         import time
         now = round(time.time())
         return [ Metric(k,v,now,0) for k,v in run_dct["metrics"].items() ]
