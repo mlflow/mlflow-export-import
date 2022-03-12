@@ -63,6 +63,10 @@ def create_runs():
 def delete_experiment(exp):
     client.delete_experiment(exp.experiment_id)
 
+def delete_experiments():
+    for exp in client.list_experiments():
+        client.delete_experiment(exp.experiment_id)
+
 def compare_dirs(d1, d2):
     from filecmp import dircmp
     def _compare_dirs(dcmp):

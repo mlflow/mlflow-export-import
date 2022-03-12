@@ -31,7 +31,7 @@ def _create_simple_run(idx):
         mlflow.log_artifact("info.txt","dir2")
         mlflow.log_metric("m1", idx)
 
-def _create_test_experiment(num_runs):
+def create_test_experiment(num_runs):
     exp = create_experiment()
     for j in range(num_runs):
         _create_simple_run(j)
@@ -45,7 +45,7 @@ def _delete_experiments():
 
 def _run_test(compare_func, import_mlflow_tags=True, export_metadata_tags=False, use_threads=False):
     create_output_dir()
-    exps = [ _create_test_experiment(3), _create_test_experiment(4) ]
+    exps = [ create_test_experiment(3), create_test_experiment(4) ]
     exp_names = [ exp.name for exp in exps ]
     export_experiments(experiments=exp_names,
         output_dir=output_dir,
@@ -86,7 +86,7 @@ def test_get_experiment_ids_from_comma_delimited_string():
 def test_get_experiment_ids_from_all_string():
     create_output_dir()
     _delete_experiments()
-    exps = [ _create_test_experiment(3), _create_test_experiment(4) ]
+    exps = [ create_test_experiment(3), create_test_experiment(4) ]
     exp_ids = bulk_utils.get_experiment_ids("all")
     assert exp_ids == [ exp.experiment_id for exp in exps ]
 
