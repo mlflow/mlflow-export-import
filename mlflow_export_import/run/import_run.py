@@ -6,8 +6,10 @@ import os
 import yaml
 import tempfile
 import click
+import base64
 import mlflow
 from mlflow.entities import RunStatus
+from mlflow.utils.validation import MAX_PARAMS_TAGS_PER_BATCH, MAX_METRICS_PER_BATCH
 
 from mlflow_export_import import utils, click_doc
 from mlflow_export_import import mk_local_path
@@ -16,8 +18,7 @@ from mlflow_export_import.common.http_client import DatabricksHttpClient
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.run import run_data_importer
-from mlflow.utils.validation import MAX_PARAMS_TAGS_PER_BATCH, MAX_METRICS_PER_BATCH
-
+from mlflow_export_import.common import MlflowExportImportException
 
 class RunImporter():
     def __init__(self, mlflow_client=None, mlmodel_fix=True, use_src_user_id=False, import_mlflow_tags=False, import_metadata_tags=False):
@@ -41,29 +42,30 @@ class RunImporter():
         print(f"in_databricks: {self.in_databricks}")
         print(f"importing_into_databricks: {utils.importing_into_databricks()}")
 
-    def import_run(self, exp_name, input_dir):
+    def import_run(self, exp_name, input_dir, dst_notebook_dir=None):
         """ 
         Imports a run into the specified experiment.
         :param exp_name: Experiment name.
         :param input_dir: Source input directory that contains the exported run.
+        :param dst_notebook_dir: Databricks destination workpsace directory for notebook.
         :return: The run and its parent run ID if the run is a nested run.
         """
         print(f"Importing run from '{input_dir}'")
-        res = self._import_run(exp_name, input_dir)
+        res = self._import_run(exp_name, input_dir, dst_notebook_dir)
         print(f"Imported run into '{exp_name}/{res[0].info.run_id}'")
         return res
 
-    def _import_run(self, dst_exp_name, src_run_id):
+    def _import_run(self, dst_exp_name, input_dir, dst_notebook_dir):
         mlflow_utils.set_experiment(self.dbx_client, dst_exp_name)
         exp = self.mlflow_client.get_experiment_by_name(dst_exp_name)
-        src_run_path = os.path.join(src_run_id,"run.json")
+        src_run_path = os.path.join(input_dir,"run.json")
         src_run_dct = utils.read_json_file(src_run_path)
 
         run = self.mlflow_client.create_run(exp.experiment_id)
         run_id = run.info.run_id
         try:
             self._import_run_data(src_run_dct, run_id, src_run_dct["info"]["user_id"])
-            path = os.path.join(src_run_id,"artifacts")
+            path = os.path.join(input_dir,"artifacts")
             if os.path.exists(_filesystem.mk_local_path(path)):
                 self.mlflow_client.log_artifacts(run_id, mk_local_path(path))
             if self.mlmodel_fix:
@@ -72,10 +74,10 @@ class RunImporter():
         except Exception as e:
             self.mlflow_client.set_terminated(run_id, RunStatus.to_string(RunStatus.FAILED))
             import traceback
-            from mlflow_export_import.common import MlflowExportImportException
             traceback.print_exc()
             raise MlflowExportImportException from e
-            
+        if utils.importing_into_databricks() and dst_notebook_dir:
+            self._upload_databricks_notebook(input_dir, src_run_dct, dst_notebook_dir)
         return (run, src_run_dct["tags"].get(utils.TAG_PARENT_ID,None))
 
     def _update_mlmodel_run_id(self, run_id):
@@ -106,6 +108,39 @@ class RunImporter():
             self.in_databricks, 
             src_user_id, 
             self.use_src_user_id)
+
+    def _upload_databricks_notebook(self, input_dir, src_run_dct, dst_notebook_dir):
+        run_id = src_run_dct["info"]["run_id"]
+        tag_key = "mlflow.databricks.notebookPath"
+        src_notebook_path = src_run_dct["tags"].get(tag_key,None)
+        if not src_notebook_path:
+            print(f"WARNING: No tag '{tag_key}' for run_id '{run_id}'")
+            return
+        notebook_name = os.path.basename(src_notebook_path)
+
+        format = "source" 
+        notebook_path = os.path.join(input_dir,"artifacts","notebooks",f"{notebook_name}.{format}")
+        if not os.path.exists(notebook_path): 
+            print(f"WARNING: Source '{notebook_path}' does not exist for run_id '{run_id}'")
+            return
+
+        with open(notebook_path, "r") as f:
+            content = f.read()
+        dst_notebook_path = os.path.join(dst_notebook_dir,notebook_name)
+        content = base64.b64encode(content.encode()).decode("utf-8")
+        data = {
+            "path": dst_notebook_path,
+            "language": "PYTHON",
+            "format": format,
+            "overwrite": True,
+            "content": content
+            }
+        mlflow_utils.create_workspace_dir(self.dbx_client, dst_notebook_dir)
+        try:
+            print(f"Importing notebook '{dst_notebook_path}' for run {run_id}")
+            self.dbx_client._post("workspace/import", data)
+        except MlflowExportImportException as e:
+            print(f"WARNING: Cannot save notebook '{dst_notebook_path}'. {e}")
 
 
 @click.command()
@@ -143,13 +178,18 @@ class RunImporter():
     default=False, 
     show_default=True
 )
-
-def main(input_dir, experiment_name, mlmodel_fix, use_src_user_id, import_mlflow_tags, import_metadata_tags): # pragma: no cover
+@click.option("--dst-notebook-dir",
+    help="Databricks destination workpsace directory for notebook",
+    type=str, 
+    required=False, 
+    show_default=True
+)
+def main(input_dir, experiment_name, mlmodel_fix, use_src_user_id, import_mlflow_tags, import_metadata_tags, dst_notebook_dir):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
     importer = RunImporter(None, mlmodel_fix, use_src_user_id, import_mlflow_tags, import_metadata_tags)
-    importer.import_run(experiment_name, input_dir)
+    importer.import_run(experiment_name, input_dir, dst_notebook_dir)
 
 if __name__ == "__main__":
     main()

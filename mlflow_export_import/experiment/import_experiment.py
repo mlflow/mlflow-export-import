@@ -26,14 +26,13 @@ class ExperimentImporter():
         print("MLflowClient:",self.mlflow_client)
         self.dbx_client = DatabricksHttpClient()
 
-    def import_experiment(self, exp_name, input_dir):
+    def import_experiment(self, exp_name, input_dir, dst_notebook_dir=None):
         """
         :param: exp_name: Destination experiment name.
         :param: input_dir: Source experiment directory.
         :return: A map of source run IDs and destination run.info.
         """
         mlflow_utils.set_experiment(self.dbx_client, exp_name)
-        dst_exp_id = self.mlflow_client.get_experiment_by_name(exp_name).experiment_id # TODO
         manifest_path = os.path.join(input_dir,"manifest.json")
         dct = utils.read_json_file(manifest_path)
         run_ids = dct["export_info"]["ok_runs"]
@@ -42,7 +41,7 @@ class ExperimentImporter():
         run_ids_map = {}
         run_info_map = {}
         for src_run_id in run_ids:
-            dst_run, src_parent_run_id = self.run_importer.import_run(exp_name, os.path.join(input_dir,src_run_id))
+            dst_run, src_parent_run_id = self.run_importer.import_run(exp_name, os.path.join(input_dir,src_run_id),dst_notebook_dir)
             dst_run_id = dst_run.info.run_id
             run_ids_map[src_run_id] = { "dst_run_id": dst_run_id, "src_parent_run_id": src_parent_run_id }
             run_info_map[src_run_id] = dst_run.info
@@ -84,8 +83,14 @@ class ExperimentImporter():
     type=bool, 
     default=False
 )
+@click.option("--dst-notebook-dir",
+    help="Databricks destination workpsace directory for notebook",
+    type=str,
+    required=False,
+    show_default=True
+)
 
-def main(input_dir, experiment_name, just_peek, use_src_user_id, import_mlflow_tags, import_metadata_tags): # pragma: no cover
+def main(input_dir, experiment_name, just_peek, use_src_user_id, import_mlflow_tags, import_metadata_tags, dst_notebook_dir):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
@@ -93,7 +98,7 @@ def main(input_dir, experiment_name, just_peek, use_src_user_id, import_mlflow_t
         peek_at_experiment(input_dir)
     else:
         importer = ExperimentImporter(None, use_src_user_id, import_mlflow_tags, import_metadata_tags)
-        importer.import_experiment(experiment_name, input_dir)
+        importer.import_experiment(experiment_name, input_dir, dst_notebook_dir)
 
 if __name__ == "__main__":
     main()

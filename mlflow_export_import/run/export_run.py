@@ -39,7 +39,6 @@ class RunExporter():
                 del x["key"] 
             metrics_with_steps[metric] = lst
         return metrics_with_steps
-# XX
 
     def export_run(self, run_id, output_dir):
         """

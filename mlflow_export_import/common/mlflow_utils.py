@@ -40,6 +40,13 @@ def get_experiment(mlflow_client, exp_id_or_name):
             raise Exception(f"Cannot find experiment ID or name '{exp_id_or_name}'. Client: {mlflow_client}'")
     return exp
 
+def create_workspace_dir(dbx_client, workspace_dir):
+    """
+    Create Databricks workspace directory.
+    """
+    print(f"Creating Databricks workspace directory '{workspace_dir}'")
+    dbx_client.post("workspace/mkdirs", { "path": workspace_dir })
+
 def set_experiment(dbx_client, exp_name):
     """
     Set experiment name. 
@@ -47,9 +54,7 @@ def set_experiment(dbx_client, exp_name):
     """
     from mlflow_export_import import utils
     if utils.importing_into_databricks():
-        exp_dir = os.path.dirname(exp_name)
-        print(f"Creating Databricks workspace directory '{exp_dir}'")
-        dbx_client.post("workspace/mkdirs", { "path": exp_dir })
+        create_workspace_dir(dbx_client, os.path.dirname(exp_name))
     mlflow.set_experiment(exp_name)
 
 # BUG
