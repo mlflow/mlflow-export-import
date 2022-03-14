@@ -21,7 +21,8 @@ from mlflow_export_import.run import run_data_importer
 from mlflow_export_import.common import MlflowExportImportException
 
 class RunImporter():
-    def __init__(self, mlflow_client=None, mlmodel_fix=True, use_src_user_id=False, import_mlflow_tags=False, import_metadata_tags=False):
+    def __init__(self, mlflow_client=None, mlmodel_fix=True, use_src_user_id=False, import_mlflow_tags=False, \
+            import_metadata_tags=False, dst_notebook_dir_add_run_id=False):
         """ 
         :param mlflow_client: MLflow client or if None create default client.
         :param mlmodel_fix: Add correct run ID in destination MLmodel artifact. 
@@ -31,6 +32,8 @@ class RunImporter():
                                 Databricks since setting it is not allowed.
         :param import_mlflow_tags: Import mlflow tags.
         :param import_metadata_tags: Import mlflow_export_import tags.
+        :param dst_notebook_dir: Databricks destination workpsace directory for notebook import.
+        :param dst_notebook_dir_add_run_id: Add the run ID to the destination notebook directory.
         """
         self.mlflow_client = mlflow_client or mlflow.tracking.MlflowClient()
         self.mlmodel_fix = mlmodel_fix
@@ -38,6 +41,7 @@ class RunImporter():
         self.import_mlflow_tags = import_mlflow_tags
         self.import_metadata_tags = import_metadata_tags
         self.in_databricks = "DATABRICKS_RUNTIME_VERSION" in os.environ
+        self.dst_notebook_dir_add_run_id = dst_notebook_dir_add_run_id
         self.dbx_client = DatabricksHttpClient()
         print(f"in_databricks: {self.in_databricks}")
         print(f"importing_into_databricks: {utils.importing_into_databricks()}")
@@ -77,7 +81,8 @@ class RunImporter():
             traceback.print_exc()
             raise MlflowExportImportException from e
         if utils.importing_into_databricks() and dst_notebook_dir:
-            self._upload_databricks_notebook(input_dir, src_run_dct, dst_notebook_dir)
+            ndir = os.path.join(dst_notebook_dir, run_id) if self.dst_notebook_dir_add_run_id else dst_notebook_dir
+            self._upload_databricks_notebook(input_dir, src_run_dct, ndir)
         return (run, src_run_dct["tags"].get(utils.TAG_PARENT_ID,None))
 
     def _update_mlmodel_run_id(self, run_id):
@@ -179,16 +184,23 @@ class RunImporter():
     show_default=True
 )
 @click.option("--dst-notebook-dir",
-    help="Databricks destination workpsace directory for notebook",
+    help="Databricks destination workpsace directory for notebook import.",
     type=str, 
     required=False, 
     show_default=True
 )
-def main(input_dir, experiment_name, mlmodel_fix, use_src_user_id, import_mlflow_tags, import_metadata_tags, dst_notebook_dir):
+@click.option("--dst-notebook-dir-add-run-id",
+    help="Add the run ID to the destination notebook directory.",
+    type=str, 
+    required=False, 
+    show_default=True
+)
+def main(input_dir, experiment_name, mlmodel_fix, use_src_user_id, import_mlflow_tags, \
+        import_metadata_tags, dst_notebook_dir, dst_notebook_dir_add_run_id):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    importer = RunImporter(None, mlmodel_fix, use_src_user_id, import_mlflow_tags, import_metadata_tags)
+    importer = RunImporter(None, mlmodel_fix, use_src_user_id, import_mlflow_tags, import_metadata_tags, dst_notebook_dir_add_run_id)
     importer.import_run(experiment_name, input_dir, dst_notebook_dir)
 
 if __name__ == "__main__":

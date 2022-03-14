@@ -13,7 +13,8 @@ from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common.http_client import DatabricksHttpClient
 
 class ExperimentImporter():
-    def __init__(self, mlflow_client=None, mlmodel_fix=True, use_src_user_id=False, import_mlflow_tags=True, import_metadata_tags=False):
+    def __init__(self, mlflow_client=None, mlmodel_fix=True, use_src_user_id=False, \
+            import_mlflow_tags=True, import_metadata_tags=False):
         """
         :param mlflow_client: MLflow client or if None create default client.
         :param import_mlflow_tags: Import mlflow tags.
@@ -22,7 +23,9 @@ class ExperimentImporter():
         :param import_metadata_tags: Import mlflow_export_import tags.
         """
         self.mlflow_client = mlflow_client or mlflow.tracking.MlflowClient()
-        self.run_importer = RunImporter(self.mlflow_client, mlmodel_fix=mlmodel_fix, use_src_user_id=use_src_user_id, import_mlflow_tags=import_mlflow_tags, import_metadata_tags=import_metadata_tags)
+        self.run_importer = RunImporter(self.mlflow_client, mlmodel_fix=mlmodel_fix, \
+            use_src_user_id=use_src_user_id, import_mlflow_tags=import_mlflow_tags, \
+            import_metadata_tags=import_metadata_tags, dst_notebook_dir_add_run_id=True)
         print("MLflowClient:",self.mlflow_client)
         self.dbx_client = DatabricksHttpClient()
 
@@ -41,7 +44,7 @@ class ExperimentImporter():
         run_ids_map = {}
         run_info_map = {}
         for src_run_id in run_ids:
-            dst_run, src_parent_run_id = self.run_importer.import_run(exp_name, os.path.join(input_dir,src_run_id),dst_notebook_dir)
+            dst_run, src_parent_run_id = self.run_importer.import_run(exp_name, os.path.join(input_dir,src_run_id), dst_notebook_dir)
             dst_run_id = dst_run.info.run_id
             run_ids_map[src_run_id] = { "dst_run_id": dst_run_id, "src_parent_run_id": src_parent_run_id }
             run_info_map[src_run_id] = dst_run.info
@@ -84,7 +87,7 @@ class ExperimentImporter():
     default=False
 )
 @click.option("--dst-notebook-dir",
-    help="Databricks destination workpsace directory for notebook",
+    help="Databricks destination workpsace base directory for notebook. A run ID will be added to contain the run's notebook.",
     type=str,
     required=False,
     show_default=True
