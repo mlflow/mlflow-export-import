@@ -113,6 +113,9 @@ Options:
                                   is not allowed.
   --import-mlflow-tags BOOLEAN    Import mlflow tags
   --import-metadata-tags BOOLEAN  Import mlflow_export_import tags
+  --dst-notebook-dir TEXT         Databricks destination workpsace base
+                                  directory for notebook. A run ID will be
+                                  added to contain the run's notebook.
 ```
 
 #### Import examples
@@ -234,8 +237,12 @@ Options:
                                   is not allowed.  [default: False]
 
   --import-mlflow-tags BOOLEAN    Import mlflow tags.  [default: False]
-  --import-metadata-tags BOOLEAN  Import mlflow_export_import tags.  [default:
-                                  False]
+  --import-metadata-tags BOOLEAN  Import mlflow_export_import tags.  [default: False]
+  --dst-notebook-dir TEXT         Databricks destination workpsace directory
+                                  for notebook import.
+  --dst-notebook-dir-add-run-id TEXT
+                                  Add the run ID to the destination notebook
+                                  directory.
 ```
 
 #### Import examples

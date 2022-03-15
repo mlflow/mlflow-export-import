@@ -36,10 +36,23 @@ Full object referential integrity is maintained as well as the original MLflow o
 
 ### Databricks Limitations
 
-#### Notebook Revisions
-* The notebook revision associated with the run will be exported. It is stored as an artifact in the notebooks folder of the run's artifact root.
-* The Databricks API does not support importing notebook revisions.
-* When you import a run, the link to its source notebook revision ID will appear in the UI but you cannot reach that revision (link is dead).
+#### Exporting Notebook Revisions
+* The notebook revision associated with the run can be exported. It is stored as an artifact in the `notebooks` folder under the run's `artifacts` root.
+*  You can save the notebook in the suppported SOURCE, HTML, JUPYTER and DBC formats. 
+
+#### Importing Notebooks
+
+* Partial functionality due to Databricks API limitations.
+* The Databricks API does not support importing an entire notebook with all its revision history.
+* The Databricks API does not support linking an imported run with a given notebook revision.
+* When you import a run, the link to its source notebook revision ID will not exist and thus will not appear in the UI.
+* As a convenience, the import tools allows you to import the exported notebook into Databricks. See:
+  *  [README_point - Import run](README_point.md#Import-run)
+  *  [README_point - Import experiment](README_point.md#Import-Experiment)
+* The imported notebook will not be attached to the run that created it.
+* If you have several runs that point to different revisions of the same notebook, each imported run will have be a different notebook.
+* You must export a notebook in the SOURCE format for the notebook to be imported.
+
 
 #### Used ID
 * When importing a run or experiment, for open source MLflow you can specify the user owner. For Databricks import you cannot - the owner will be based on the personal access token (PAT) of the import user.
