@@ -200,7 +200,13 @@ def main(input_dir, experiment_name, mlmodel_fix, use_src_user_id, import_mlflow
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    importer = RunImporter(None, mlmodel_fix, use_src_user_id, import_mlflow_tags, import_metadata_tags, dst_notebook_dir_add_run_id)
+    importer = RunImporter(
+        mlflow_client=None, 
+        mlmodel_fix=mlmodel_fix, 
+        use_src_user_id=use_src_user_id, 
+        import_mlflow_tags=import_mlflow_tags, 
+        import_metadata_tags=import_metadata_tags, 
+        dst_notebook_dir_add_run_id=dst_notebook_dir_add_run_id)
     importer.import_run(experiment_name, input_dir, dst_notebook_dir)
 
 if __name__ == "__main__":

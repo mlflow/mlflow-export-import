@@ -101,7 +101,10 @@ def main(experiment, output_dir, export_metadata_tags, notebook_formats):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    exporter = ExperimentExporter(None, export_metadata_tags, utils.string_to_list(notebook_formats))
+    exporter = ExperimentExporter(
+        mlflow_client=None, 
+        export_metadata_tags=export_metadata_tags, 
+        notebook_formats=utils.string_to_list(notebook_formats))
     exporter.export_experiment(experiment, output_dir)
 
 if __name__ == "__main__":

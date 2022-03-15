@@ -100,7 +100,11 @@ def main(input_dir, experiment_name, just_peek, use_src_user_id, import_mlflow_t
     if just_peek:
         peek_at_experiment(input_dir)
     else:
-        importer = ExperimentImporter(None, use_src_user_id, import_mlflow_tags, import_metadata_tags)
+        importer = ExperimentImporter(
+            mlflow_client=None, 
+            use_src_user_id=use_src_user_id, 
+            import_mlflow_tags=import_mlflow_tags, 
+            import_metadata_tags=import_metadata_tags)
         importer.import_experiment(experiment_name, input_dir, dst_notebook_dir)
 
 if __name__ == "__main__":
