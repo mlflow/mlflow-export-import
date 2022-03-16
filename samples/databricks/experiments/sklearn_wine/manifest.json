@@ -5,17 +5,22 @@
     "artifact_location": "dbfs:/databricks/mlflow/3532228",
     "lifecycle_stage": "active",
     "tags": {
-      "mlflow.experimentType": "NOTEBOOK",
       "mlflow.ownerId": "100327",
-      "mlflow.ownerEmail": "andre@mycompany"
+      "mlflow.experiment.sourceName": "/Users/andre@mycompany/mlflow/02a_Sklearn_Train_Predict",
+      "mlflow.ownerEmail": "andre@mycompany.com",
+      "mlflow.experimentType": "NOTEBOOK"
     }
   },
   "export_info": {
-    "export_time": "2021-12-11 22:57:48",
-    "num_runs": 2
-  },
-  "run_ids": [
-    "16c36560c57a43fdb46e98f88a8d8819"
-  ],
-  "failed_run_ids": []
+    "mlflow_version": "1.24.0",
+    "mlflow_tracking_uri": "databricks",
+    "export_time": "2022-03-16 01:08:39",
+    "num_total_runs": 1,
+    "num_ok_runs": 1,
+    "ok_runs": [
+      "16c36560c57a43fdb46e98f88a8d8819"
+    ],
+    "num_failed_runs": 0,
+    "failed_runs": []
+  }
 }
