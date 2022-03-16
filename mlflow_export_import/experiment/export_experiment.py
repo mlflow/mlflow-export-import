@@ -47,12 +47,14 @@ class ExperimentExporter():
             for j,run in enumerate(SearchRunsIterator(self.mlflow_client, exp_id)):
                 self._export_run(j, run, output_dir, ok_run_ids, failed_run_ids)
         dct["export_info"] = { 
+            "mlflow_version": mlflow.__version__,
+            "mlflow_tracking_uri": mlflow.get_tracking_uri(),
             "export_time": utils.get_now_nice(), 
-             "num_total_runs": (j+1),
-             "num_ok_runs": len(ok_run_ids),
-             "ok_runs": ok_run_ids,
-             "num_failed_runs": len(failed_run_ids),
-             "failed_runs": failed_run_ids }
+            "num_total_runs": (j+1),
+            "num_ok_runs": len(ok_run_ids),
+            "ok_runs": ok_run_ids,
+            "num_failed_runs": len(failed_run_ids),
+            "failed_runs": failed_run_ids }
 
         path = os.path.join(output_dir,"manifest.json")
         utils.write_json_file(fs, path, dct)

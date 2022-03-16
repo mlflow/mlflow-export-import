@@ -50,7 +50,11 @@ class RunExporter():
         run = self.mlflow_client.get_run(run_id)
         fs.mkdirs(output_dir)
         tags =  utils.create_tags_for_metadata(self.mlflow_client, run, self.export_metadata_tags)
-        dct = { "info": utils.strip_underscores(run.info) , 
+        dct = { "export_info": {
+                    "mlflow_version": mlflow.__version__,
+                    "mlflow_tracking_uri": mlflow.get_tracking_uri(),
+                    "export_time": utils.get_now_nice() },
+                "info": utils.strip_underscores(run.info) , 
                 "params": run.data.params,
                 "metrics": self.get_metrics_with_steps(run),
                 "tags": tags,
