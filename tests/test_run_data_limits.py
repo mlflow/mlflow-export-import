@@ -19,22 +19,22 @@ _num_tags = 10
 client = mlflow.tracking.MlflowClient()
 
 def test_params():
-    run1, run2 = init_test_runs(RunExporter(), RunImporter(mlmodel_fix=True, import_mlflow_tags=True), num_params=_num_params)
+    run1, run2 = init_test_runs(RunExporter(), RunImporter(mlmodel_fix=True), num_params=_num_params)
     assert len(run1.data.params) == MAX_PARAMS_TAGS_PER_BATCH + _num_params
     compare_runs(client, output_dir, run1, run2)
 
 def test_metrics():
-    run1, run2 = init_test_runs(RunExporter(), RunImporter(mlmodel_fix=True, import_mlflow_tags=True), num_metrics=_num_metrics)
+    run1, run2 = init_test_runs(RunExporter(), RunImporter(mlmodel_fix=True), num_metrics=_num_metrics)
     assert len(run1.data.metrics) == MAX_METRICS_PER_BATCH + _num_metrics
     compare_runs(client, output_dir, run1, run2)
 
 def test_tags():
-    run1, run2 = init_test_runs(RunExporter(), RunImporter(mlmodel_fix=True, import_mlflow_tags=True), num_tags=_num_tags)
+    run1, run2 = init_test_runs(RunExporter(), RunImporter(mlmodel_fix=True), num_tags=_num_tags)
     assert len(run1.data.tags) >= MAX_PARAMS_TAGS_PER_BATCH + _num_tags
     compare_runs(client, output_dir, run1, run2)
 
 def test_params_and_metrics():
-    run1, run2 = init_test_runs(RunExporter(), RunImporter(mlmodel_fix=True, import_mlflow_tags=True), num_params=_num_params, num_metrics=_num_metrics)
+    run1, run2 = init_test_runs(RunExporter(), RunImporter(mlmodel_fix=True), num_params=_num_params, num_metrics=_num_metrics)
     assert len(run1.data.params) == MAX_PARAMS_TAGS_PER_BATCH + _num_params
     assert len(run1.data.metrics) == MAX_METRICS_PER_BATCH + _num_metrics
     compare_runs(client, output_dir, run1, run2)

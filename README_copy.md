@@ -79,8 +79,6 @@ Options:
                                   user ID. Source user ID is ignored when
                                   importing into Databricks since setting it
                                   is not allowed.  [default: False]
-
-  --import-mlflow-tags BOOLEAN    Import mlflow tags.  [default: True]
   --import-metadata-tags BOOLEAN  Import mlflow_tools tags.  [default: False]
 ```
 

@@ -21,7 +21,7 @@ from mlflow_export_import.run import run_data_importer
 from mlflow_export_import.common import MlflowExportImportException
 
 class RunImporter():
-    def __init__(self, mlflow_client=None, mlmodel_fix=True, use_src_user_id=False, import_mlflow_tags=False, \
+    def __init__(self, mlflow_client=None, mlmodel_fix=True, use_src_user_id=False, \
             import_metadata_tags=False, dst_notebook_dir_add_run_id=False):
         """ 
         :param mlflow_client: MLflow client or if None create default client.
@@ -30,7 +30,6 @@ class RunImporter():
         :param use_src_user_id: Set the destination user ID to the source user ID. 
                                 Source user ID is ignored when importing into 
                                 Databricks since setting it is not allowed.
-        :param import_mlflow_tags: Import mlflow tags.
         :param import_metadata_tags: Import mlflow_export_import tags.
         :param dst_notebook_dir: Databricks destination workpsace directory for notebook import.
         :param dst_notebook_dir_add_run_id: Add the run ID to the destination notebook directory.
@@ -38,7 +37,6 @@ class RunImporter():
         self.mlflow_client = mlflow_client or mlflow.tracking.MlflowClient()
         self.mlmodel_fix = mlmodel_fix
         self.use_src_user_id = use_src_user_id
-        self.import_mlflow_tags = import_mlflow_tags
         self.import_metadata_tags = import_metadata_tags
         self.in_databricks = "DATABRICKS_RUNTIME_VERSION" in os.environ
         self.dst_notebook_dir_add_run_id = dst_notebook_dir_add_run_id
@@ -108,7 +106,6 @@ class RunImporter():
             run_dct, 
             run_id, 
             MAX_PARAMS_TAGS_PER_BATCH, 
-            self.import_mlflow_tags, 
             self.import_metadata_tags, 
             self.in_databricks, 
             src_user_id, 
@@ -171,12 +168,6 @@ class RunImporter():
     default=False, 
     show_default=True
 )
-@click.option("--import-mlflow-tags",
-    help=click_doc.import_mlflow_tags, 
-    type=bool, 
-    default=False, 
-    show_default=True
-)
 @click.option("--import-metadata-tags",
     help=click_doc.import_metadata_tags, 
     type=bool, 
@@ -195,7 +186,7 @@ class RunImporter():
     required=False, 
     show_default=True
 )
-def main(input_dir, experiment_name, mlmodel_fix, use_src_user_id, import_mlflow_tags, \
+def main(input_dir, experiment_name, mlmodel_fix, use_src_user_id, \
         import_metadata_tags, dst_notebook_dir, dst_notebook_dir_add_run_id):
     print("Options:")
     for k,v in locals().items():
@@ -204,7 +195,6 @@ def main(input_dir, experiment_name, mlmodel_fix, use_src_user_id, import_mlflow
         mlflow_client=None, 
         mlmodel_fix=mlmodel_fix, 
         use_src_user_id=use_src_user_id, 
-        import_mlflow_tags=import_mlflow_tags, 
         import_metadata_tags=import_metadata_tags, 
         dst_notebook_dir_add_run_id=dst_notebook_dir_add_run_id)
     importer.import_run(experiment_name, input_dir, dst_notebook_dir)

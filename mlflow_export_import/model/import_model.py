@@ -18,8 +18,8 @@ class BaseModelImporter():
         :param run_importer: RunImporter instance.
         :param await_creation_for: Seconds to wait for model version crreation.
         """
-        self.mlflow_client = mlflow.tracking.MlflowClient()
-        self.run_importer = run_importer if run_importer else RunImporter(self.mlflow_client, mlmodel_fix=True, import_mlflow_tags=False)
+        self.mlflow_client = mlflow_client or mlflow.tracking.MlflowClient()
+        self.run_importer = run_importer if run_importer else RunImporter(self.mlflow_client, mlmodel_fix=True)
         self.await_creation_for = await_creation_for 
 
     def _import_version(self, model_name, src_vr, dst_run_id, dst_source, sleep_time):
@@ -66,7 +66,7 @@ class BaseModelImporter():
 
         try:
             tags = { e["key"]:e["value"] for e in model_dct.get("tags", {}) }
-            x = self.mlflow_client.create_registered_model(model_name, tags, model_dct.get("description"))
+            self.mlflow_client.create_registered_model(model_name, tags, model_dct.get("description"))
             print(f"Created new registered model '{model_name}'")
         except RestException as e:
             if not "RESOURCE_ALREADY_EXISTS: Registered Model" in str(e):

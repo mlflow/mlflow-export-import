@@ -111,7 +111,6 @@ Options:
                                   user ID. Source user ID is ignored when
                                   importing into Databricks since setting it
                                   is not allowed.
-  --import-mlflow-tags BOOLEAN    Import mlflow tags
   --import-metadata-tags BOOLEAN  Import mlflow_export_import tags
   --dst-notebook-dir TEXT         Databricks destination workpsace base
                                   directory for notebook. A run ID will be
@@ -128,14 +127,11 @@ import-experiment \
 
 #### Databricks import examples
 
-When importing into Databricks MLflow, make sure you set `--import-mlflow-tags False` since Databricks does not allow you to set `mlflow` tags unlike open source MLflow.
-
 ```
 export MLFLOW_TRACKING_URI=databricks
 import-experiment \
   --experiment-name /Users/me@mycompany.com/imported/SklearnWine \
   --input-dir exported_experiments/3532228 \
-  --import-mlflow-tags False
 ```
 
 
@@ -236,7 +232,6 @@ Options:
                                   importing into Databricks since setting it
                                   is not allowed.  [default: False]
 
-  --import-mlflow-tags BOOLEAN    Import mlflow tags.  [default: False]
   --import-metadata-tags BOOLEAN  Import mlflow_export_import tags.  [default: False]
   --dst-notebook-dir TEXT         Databricks destination workpsace directory
                                   for notebook import.
@@ -259,15 +254,12 @@ import-run \
 
 ##### Databricks import example
 
-When importing into Databricks MLflow, make sure you set `--import-mlflow-tags False` since Databricks does not allow you to set `mlflow` tags unlike open source MLflow.
-
 ```
 export MLFLOW_TRACKING_URI=databricks
 run.import-run \
   --run-id 50fa90e751eb4b3f9ba9cef0efe8ea30 \
   --input out \
   --experiment-name /Users/me@mycompany.com/imported/SklearnWine \
-  --import-mlflow-tags False
 ```
 
 ## Registered Models

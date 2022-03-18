@@ -4,7 +4,7 @@ from mlflow_export_import.run.import_run import RunImporter
 from mlflow_export_import.experiment.export_experiment import ExperimentExporter
 from mlflow_export_import.experiment.import_experiment import ExperimentImporter
 from utils_test import create_output_dir, create_simple_run, init_output_dirs, output_dir
-from compare_utils import compare_runs, compare_run_no_import_mlflow_tags, compare_run_import_metadata_tags
+from compare_utils import compare_runs, compare_run_import_metadata_tags
 from compare_utils import dump_runs
 
 # == Setup
@@ -30,19 +30,15 @@ def init_run_test(exporter, importer, use_metric_steps=False, verbose=False):
     return run1, run2
 
 def test_run_basic():
-    run1, run2 = init_run_test(RunExporter(), RunImporter(mlmodel_fix=mlmodel_fix, import_mlflow_tags=True))
+    run1, run2 = init_run_test(RunExporter(), RunImporter(mlmodel_fix=mlmodel_fix))
     compare_runs(client, output_dir, run1, run2)
 
-def test_run_no_import_mlflow_tags():
-    run1, run2 = init_run_test(RunExporter(), RunImporter(mlmodel_fix=mlmodel_fix, import_mlflow_tags=False))
-    compare_run_no_import_mlflow_tags(client, output_dir, run1, run2)
-
 def test_run_import_metadata_tags():
-    run1, run2 = init_run_test(RunExporter(export_metadata_tags=True), RunImporter(mlmodel_fix=mlmodel_fix, import_metadata_tags=True, import_mlflow_tags=True), verbose=False)
+    run1, run2 = init_run_test(RunExporter(export_metadata_tags=True), RunImporter(mlmodel_fix=mlmodel_fix, import_metadata_tags=True), verbose=False)
     compare_run_import_metadata_tags(client, output_dir, run1, run2)
 
 def test_run_basic_use_metric_steps():
-    run1, run2 = init_run_test(RunExporter(), RunImporter(mlmodel_fix=mlmodel_fix, import_mlflow_tags=True), use_metric_steps=True)
+    run1, run2 = init_run_test(RunExporter(), RunImporter(mlmodel_fix=mlmodel_fix), use_metric_steps=True)
     compare_runs(client, output_dir, run1, run2)
 
 # == Export/import Experiment tests
@@ -65,10 +61,6 @@ def init_exp_test(exporter, importer, verbose=False):
 def test_exp_basic():
     run1, run2 = init_exp_test(ExperimentExporter(), ExperimentImporter(), True)
     compare_runs(client, output_dir, run1, run2)
-
-def test_exp_no_import_mlflow_tags():
-    run1, run2 = init_exp_test(ExperimentExporter(), ExperimentImporter(import_mlflow_tags=False))
-    compare_run_no_import_mlflow_tags(client, output_dir, run1, run2)
 
 def test_exp_import_metadata_tags():
     run1, run2 = init_exp_test(ExperimentExporter(export_metadata_tags=True), ExperimentImporter(import_metadata_tags=True), verbose=False)

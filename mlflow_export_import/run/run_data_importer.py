@@ -37,11 +37,9 @@ def log_metrics(client, run_dct, run_id, batch_size):
         client.log_batch(run_id, metrics=metrics)
     _log_data(run_dct, run_id, batch_size, get_data, log_data)
 
-def log_tags(client, run_dct, run_id, batch_size, import_mlflow_tags, import_metadata_tags, in_databricks, src_user_id, use_src_user_id):
+def log_tags(client, run_dct, run_id, batch_size, import_metadata_tags, in_databricks, src_user_id, use_src_user_id):
     def get_data(run_dct, args):
         tags = run_dct["tags"]
-        if not import_mlflow_tags: # remove mlflow tags
-            tags = { k:v for k,v in tags.items() if not k.startswith(utils.TAG_PREFIX_MLFLOW) }
         if not import_metadata_tags: # remove mlflow_export_import tags
             tags = { k:v for k,v in tags.items() if not k.startswith(utils.TAG_PREFIX_METADATA) }
         tags = utils.create_mlflow_tags_for_databricks_import(tags) # remove "mlflow" tags that cannot be imported into Databricks
@@ -54,7 +52,6 @@ def log_tags(client, run_dct, run_id, batch_size, import_mlflow_tags, import_met
         client.log_batch(run_id, tags=tags)
 
     args_get = {
-        "import_mlflow_tags": import_mlflow_tags,
         "import_metadata_tags": import_metadata_tags, 
         "in_databricks": in_databricks, 
         "src_user_id": src_user_id,

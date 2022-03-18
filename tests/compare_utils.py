@@ -1,15 +1,9 @@
 import os
-from utils_test import compare_dirs, dump_tags
+from utils_test import compare_dirs
+#from utils_test import dump_tags
 from mlflow_export_import.common.dump_run import dump_run
 
 # == Compare runs
-
-def compare_run_no_import_mlflow_tags(client, output_dir, run1, run2):
-    compare_runs_no_tags(client, output_dir, run1, run2)
-    #assert "mlflow.runName" in run1.data.tags
-    #assert not "mlflow.runName" in run2.data.tags
-    #run1.data.tags.pop("mlflow.runName")
-    compare_tags(run1.data.tags, run2.data.tags)
 
 def compare_run_import_metadata_tags(client, output_dir, run1, run2):
     compare_runs_no_tags(client, output_dir, run1, run2)

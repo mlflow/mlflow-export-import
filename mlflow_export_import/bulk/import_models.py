@@ -22,12 +22,12 @@ def _remap(run_info_map):
             res[src_run_id] = run_info
     return res
 
-def import_experiments(input_dir, use_src_user_id, import_mlflow_tags, import_metadata_tags):
+def import_experiments(input_dir, use_src_user_id, import_metadata_tags):
     start_time = time.time()
     manifest_path = os.path.join(input_dir,"experiments","manifest.json")
     manifest = utils.read_json_file(manifest_path)
     exps = manifest["experiments"]
-    importer = ExperimentImporter(None, use_src_user_id, import_mlflow_tags, import_metadata_tags)
+    importer = ExperimentImporter(None, use_src_user_id, import_metadata_tags)
     print("Experiments:")
     for exp in exps: 
         print(" ",exp)
@@ -67,9 +67,9 @@ def import_models(input_dir, run_info_map, delete_model, verbose, use_threads):
     duration = round(time.time() - start_time, 1)
     return { "models": len(models), "duration": duration }
 
-def import_all(input_dir, delete_model, use_src_user_id, import_mlflow_tags, import_metadata_tags, verbose, use_threads):
+def import_all(input_dir, delete_model, use_src_user_id, import_metadata_tags, verbose, use_threads):
     start_time = time.time()
-    exp_res = import_experiments(input_dir, use_src_user_id, import_mlflow_tags, import_metadata_tags)
+    exp_res = import_experiments(input_dir, use_src_user_id, import_metadata_tags)
     run_info_map = _remap(exp_res[0])
     model_res = import_models(input_dir, run_info_map, delete_model, verbose, use_threads)
     duration = round(time.time() - start_time, 1)
@@ -104,12 +104,6 @@ def import_all(input_dir, delete_model, use_src_user_id, import_mlflow_tags, imp
     default=False, 
     show_default=True
 )
-@click.option("--import-mlflow-tags", 
-    help=click_doc.import_mlflow_tags, 
-    type=bool, 
-    default=False, 
-    show_default=True
-)
 @click.option("--import-metadata-tags", 
     help=click_doc.import_metadata_tags, 
     type=bool, 
@@ -123,14 +117,13 @@ def import_all(input_dir, delete_model, use_src_user_id, import_mlflow_tags, imp
     show_default=True
 )
 
-def main(input_dir, delete_model, use_src_user_id, import_mlflow_tags, import_metadata_tags, verbose, use_threads):
+def main(input_dir, delete_model, use_src_user_id, import_metadata_tags, verbose, use_threads):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
     import_all(input_dir, 
         delete_model=delete_model, 
         use_src_user_id=use_src_user_id, 
-        import_mlflow_tags=import_mlflow_tags, 
         import_metadata_tags=import_metadata_tags, 
         verbose=verbose, 
         use_threads=use_threads)

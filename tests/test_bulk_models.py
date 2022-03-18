@@ -1,7 +1,7 @@
 import os
 import mlflow
 from utils_test import create_output_dir, output_dir, mk_uuid, delete_experiments
-from compare_utils import compare_runs, compare_run_no_import_mlflow_tags
+from compare_utils import compare_runs
 
 from mlflow_export_import.model.export_model import ModelExporter
 from mlflow_export_import.bulk.export_models import export_models
@@ -42,27 +42,23 @@ def _create_model():
         client.create_model_version(model_name, source, run.info.run_id)
     return model.name
 
-def _run_test(compare_func, import_mlflow_tags=True, import_metadata_tags=False, use_threads=False):
+def _run_test(compare_func, import_metadata_tags=False, use_threads=False):
     _init()
     model_names = [ _create_model() for j in range(0,num_models) ]
     export_models(model_names, output_dir, notebook_formats, stages="None", export_all_runs=False, use_threads=False)
     for model_name in model_names:
         client.rename_registered_model(model_name,_rename_model_name(model_name))
     exp_ids = [ exp.experiment_id for exp in client.list_experiments() ]
-    exp_names = [ exp.name for exp in client.list_experiments() ]
     exps = client.list_experiments() 
     for exp in exps:
         client.rename_experiment(exp.experiment_id, f"Original_{exp.name}")
-    exp_names = [ exp.name for exp in client.list_experiments() ]
 
     import_all(output_dir,
         delete_model=False,
         use_src_user_id=False,
-        import_mlflow_tags=import_mlflow_tags,
         import_metadata_tags=import_metadata_tags,
         verbose=False,
         use_threads=use_threads)
-    exp_names = [ exp.name for exp in client.list_experiments() ]
 
     test_dir = os.path.join(output_dir,"test_compare_runs")
     os.makedirs(test_dir)
@@ -82,16 +78,13 @@ def _run_test(compare_func, import_mlflow_tags=True, import_metadata_tags=False,
             compare_func(client, tdir, run1, run2)
 
 def test_basic():
-    _run_test(compare_runs, import_mlflow_tags=False)
+    _run_test(compare_runs)
 
 def test_exp_basic_threads():
-    _run_test(compare_runs, import_mlflow_tags=False, use_threads=True)
-
-def test_exp_no_import_mlflow_tags():
-    _run_test(compare_run_no_import_mlflow_tags, import_mlflow_tags=False)
+    _run_test(compare_runs, use_threads=True)
 
 def test_exp_import_metadata_tags():
-    _run_test(compare_run_no_import_mlflow_tags, import_metadata_tags=True)
+    _run_test(compare_runs, import_metadata_tags=True)
 
 
 def test_get_model_names_from_comma_delimited_string():
