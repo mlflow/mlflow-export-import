@@ -93,8 +93,7 @@ class RunExporter():
            "mlflow.databricks.notebookPath": notebook_path,
            "mlflow.databricks.export-notebook-revision": revision_id }
         path = os.path.join(notebook_dir, "manifest.json")
-        with open(path, "w") as f:
-            f.write(json.dumps(manifest,indent=2)+"\n")
+        fs.write(path, (json.dumps(manifest,indent=2)+"\n"))
         for format in self.notebook_formats:
             self.export_notebook_format(notebook_dir, notebook, format, format.lower(), notebook_name, revision_id)
 
