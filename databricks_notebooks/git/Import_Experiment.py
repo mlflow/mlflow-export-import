@@ -7,7 +7,7 @@
 # MAGIC * Just peek - Just display manifest.json and do not import the experiment.
 # MAGIC 
 # MAGIC #### Setup
-# MAGIC * See Setup in [README]($00_README_Export_Import).
+# MAGIC * See the Setup section in [README]($00_README_Export_Import).
 
 # COMMAND ----------
 
@@ -41,6 +41,10 @@ from mlflow_export_import import peek_at_experiment
 
 importer = ExperimentImporter(import_metadata_tags=import_metadata_tags)
 peek_at_experiment(input_dir)
+
+# COMMAND ----------
+
+input_dir
 
 # COMMAND ----------
 
