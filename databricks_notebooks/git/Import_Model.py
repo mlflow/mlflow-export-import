@@ -38,6 +38,10 @@ print("experiment_name:",experiment_name)
 
 # COMMAND ----------
 
+# MAGIC %run ./Common
+
+# COMMAND ----------
+
 # MAGIC %md ### Display model files to be imported
 
 # COMMAND ----------
@@ -61,10 +65,6 @@ importer.import_model(model_name, input_dir, experiment_name, delete_model=True)
 # COMMAND ----------
 
 # MAGIC %md ### Display MLflow UI URIs
-
-# COMMAND ----------
-
-# MAGIC %run ./Common
 
 # COMMAND ----------
 
