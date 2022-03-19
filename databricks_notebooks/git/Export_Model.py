@@ -53,11 +53,11 @@ import mlflow
 
 # COMMAND ----------
 
-# MAGIC %md ### Display MLflow UI URI of Registered Model
+# MAGIC %run ./Common
 
 # COMMAND ----------
 
-# MAGIC %run ./Common
+# MAGIC %md ### Display MLflow UI URI of Registered Model
 
 # COMMAND ----------
 
