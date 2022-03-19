@@ -1,6 +1,5 @@
 # Databricks notebook source
-# MAGIC %sh
-# MAGIC pip install git+https:///github.com/amesar/mlflow-export-import/#egg=mlflow-export-import
+# MAGIC %sh pip install git+https:///github.com/amesar/mlflow-export-import/#egg=mlflow-export-import
 
 # COMMAND ----------
 
