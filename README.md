@@ -46,11 +46,11 @@ Full object referential integrity is maintained as well as the original MLflow o
 * The Databricks API does not support importing an entire notebook with all its revision history.
 * The Databricks API does not support linking an imported run with a given notebook revision.
 * When you import a run, the link to its source notebook revision ID will not exist and thus will not appear in the UI.
-* As a convenience, the import tools allows you to import the exported notebook into Databricks. See:
+* As a convenience, the import tools allows you to import the exported notebook into Databricks. For more details, see:
   *  [README_point - Import run](README_point.md#Import-run)
   *  [README_point - Import experiment](README_point.md#Import-Experiment)
-* The imported notebook will not be attached to the run that created it.
-* If you have several runs that point to different revisions of the same notebook, each imported run will have be a different notebook.
+* The imported notebook cannot be attached to the run that created it.
+* If you have several runs that point to different revisions of the same notebook, each imported run will be attached a different notebook.
 * You must export a notebook in the SOURCE format for the notebook to be imported.
 
 
