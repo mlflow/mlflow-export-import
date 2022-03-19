@@ -35,7 +35,7 @@ print("experiment_name:",experiment_name)
 # COMMAND ----------
 
 from mlflow_export_import.run.import_run import RunImporter
-importer = RunImporter(import_mlflow_tags=False)
+importer = RunImporter()
 run, _ = importer.import_run(experiment_name, input_dir)
 run.info.run_id
 
