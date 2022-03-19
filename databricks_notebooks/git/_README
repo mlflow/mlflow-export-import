@@ -11,7 +11,7 @@
 # MAGIC * These notebooks are an unofficial tool that address these problems.
 # MAGIC * You will need to set up a common cloud bucket mounted on DBFS in your source and destination workspaces.
 # MAGIC * For details see:
-# MAGIC   * [MLflow Export Import](https://databricks.atlassian.net/wiki/spaces/UN/pages/800754006/MLflow+Export+Import) - wiki page
+# MAGIC   * [MLflow Export Import](https://databricks.atlassian.net/wiki/spaces/UN/pages/800754006/MLflow+Export+Import) - Databricks wiki page
 # MAGIC   * Github code:
 # MAGIC     * Source code: https://github.com/amesar/mlflow-export-import
 # MAGIC     * Databricks notebooks: https://github.com/amesar/mlflow-export-import/tree/master/databricks_notebooks
@@ -26,7 +26,6 @@
 # MAGIC   * [Import_Run]($./Import_Run) - import run from folder
 # MAGIC * Experiment
 # MAGIC   * [Export_Experiment]($./Export_Experiment) - export an experiment (and all its runs) to folder
-# MAGIC     * [Export_Experiment_List]($./Export_Experiment_List) - export a list of experiments (or all) to folder - WIP
 # MAGIC   * [Import_Experiment]($./Import_Experiment) - import experiment from folder
 # MAGIC * Registered Model
 # MAGIC   * [Export_Model]($./Export_Model) - export model (and runs of all its versions) to folder
@@ -35,11 +34,8 @@
 # MAGIC   
 # MAGIC #### Limitations
 # MAGIC 
-# MAGIC * The OSS export/import logic is solid.
-# MAGIC * Databricks limitations:
-# MAGIC   * We cannot export the notebook revision linked to a run since the Databricks workspace API does not support exporting/importing notebook revisions.
-# MAGIC   * As a convenience, when a run is exported the notebook (current revision) is exported. It is not attached to any run.
-# MAGIC   * When importing a run you will have a dead notebook revision ID link.
+# MAGIC * [General limitations](https://github.com/amesar/mlflow-export-import#general-limitations)
+# MAGIC * [Databricks limitations](https://github.com/amesar/mlflow-export-import#databricks-limitations)
 # MAGIC 
 # MAGIC #### Setup
 # MAGIC 
@@ -68,4 +64,4 @@
 
 # COMMAND ----------
 
-# MAGIC %md Last updated: 2022-03-01
+# MAGIC %md Last updated: 2022-03-16
