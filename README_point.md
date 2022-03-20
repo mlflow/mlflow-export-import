@@ -191,8 +191,20 @@ Sample run.json:
     "max_leaf_nodes": "32"
   },
   "metrics": {
-    "mae": 0.5845562996214364,
-    "r2": 0.28719674214710467,
+    "rmse": [
+      {
+        "value": 0.7367947360663162,
+        "timestamp": 1647391746393,
+        "step": 0
+      }
+    ],
+   "r2": [
+      {
+        "value": 0.28100217442439346,
+        "timestamp": 1647391746422,
+        "step": 0
+      }
+    ]
   },
   "tags": {
     "mlflow.source.git.commit": "a42b9682074f4f07f1cb2cf26afedee96f357f83",
