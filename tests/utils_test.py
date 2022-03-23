@@ -4,6 +4,7 @@ import uuid
 import mlflow
 import mlflow.sklearn
 from sklearn_utils import create_sklearn_model
+from mlflow_export_import.common import model_utils
 
 print("Mlflow path:", mlflow.__file__)
 print("MLflow version:", mlflow.__version__)
@@ -27,7 +28,7 @@ def mk_uuid():
 
 def create_experiment():
     global exp_count
-    exp_name = f"test_exp_{mk_uuid()}_{exp_count}"
+    exp_name = f"test_exim_{mk_uuid()}_{exp_count}"
     exp_count += 1
     mlflow.set_experiment(exp_name)
     exp = client.get_experiment_by_name(exp_name)
@@ -70,6 +71,10 @@ def delete_experiment(exp):
 def delete_experiments():
     for exp in client.list_experiments():
         client.delete_experiment(exp.experiment_id)
+
+def delete_models():
+    for model in client.list_registered_models(max_results=1000):
+        model_utils.delete_model(client, model.name)
 
 def compare_dirs(d1, d2):
     from filecmp import dircmp
