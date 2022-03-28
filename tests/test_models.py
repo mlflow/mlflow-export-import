@@ -16,7 +16,7 @@ def test_export_import_model():
     exporter.export_model(model_name_src, utils_test.output_dir)
 
     model_name_dst = f"{model_name_src}_imported"
-    experiment_name =  f"exp_{model_name_dst}"
+    experiment_name =  model_name_dst
     importer = ModelImporter()
     importer.import_model(model_name_dst, utils_test.output_dir, experiment_name, delete_model=True, verbose=False, sleep_time=10)
     model_dst = client.get_registered_model(model_name_dst)
@@ -41,7 +41,7 @@ def test_export_import_model_stages():
     exporter.export_model(model_name_src, utils_test.output_dir)
 
     model_name_dst = f"{model_name_src}_imported"
-    experiment_name =  f"exp_{model_name_dst}"
+    experiment_name =  model_name_dst
     importer = ModelImporter()
     importer.import_model(model_name_dst, utils_test.output_dir, experiment_name, delete_model=True, verbose=False, sleep_time=10)
     model_dst = client.get_registered_model(model_name_dst)
