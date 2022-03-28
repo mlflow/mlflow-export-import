@@ -1,7 +1,7 @@
 import mlflow
 from mlflow_export_import.common.list_objects_iterator import ListExperimentsIterator
 from mlflow_export_import.common.list_objects_iterator import ListRegisteredModelsIterator
-from utils_test import create_experiment, mk_uuid, delete_experiments, delete_models
+from utils_test import create_experiment, mk_uuid, delete_experiments, delete_models, mk_test_object_name
 
 client = mlflow.tracking.MlflowClient()
 
@@ -52,7 +52,7 @@ def _create_models(num_models):
     models = client.list_registered_models()
     assert len(models) == 0
     for _ in range(0,num_models):
-        model_name = f"test_exim_{mk_uuid()}"
+        model_name = mk_test_object_name()
         client.create_registered_model(model_name)
 
 def _run_test_list_models(num_models, max_results):

@@ -6,8 +6,6 @@ import compare_utils
 
 client = mlflow.tracking.MlflowClient()
 
-output_dir = "out"
-
 def test_export_import_model():
     run_src = _create_run()
     exporter = ModelExporter()
@@ -15,12 +13,12 @@ def test_export_import_model():
     model_src = client.create_registered_model(model_name_src)
     source = f"{run_src.info.artifact_uri}/model"
     client.create_model_version(model_name_src, source, run_src.info.run_id)
-    exporter.export_model(model_name_src, output_dir)
+    exporter.export_model(model_name_src, utils_test.output_dir)
 
     model_name_dst = f"{model_name_src}_imported"
     experiment_name =  f"exp_{model_name_dst}"
     importer = ModelImporter()
-    importer.import_model(model_name_dst, output_dir, experiment_name, delete_model=True, verbose=False, sleep_time=10)
+    importer.import_model(model_name_dst, utils_test.output_dir, experiment_name, delete_model=True, verbose=False, sleep_time=10)
     model_dst = client.get_registered_model(model_name_dst)
 
     model_src = client.get_registered_model(model_name_src)
@@ -40,12 +38,12 @@ def test_export_import_model_stages():
     vr_staging_src = _create_version(model_name_src, "Staging")
     vr_prod_src = _create_version(model_name_src, "Production")
     _create_version(model_name_src, "Archived")
-    exporter.export_model(model_name_src, output_dir)
+    exporter.export_model(model_name_src, utils_test.output_dir)
 
     model_name_dst = f"{model_name_src}_imported"
     experiment_name =  f"exp_{model_name_dst}"
     importer = ModelImporter()
-    importer.import_model(model_name_dst, output_dir, experiment_name, delete_model=True, verbose=False, sleep_time=10)
+    importer.import_model(model_name_dst, utils_test.output_dir, experiment_name, delete_model=True, verbose=False, sleep_time=10)
     model_dst = client.get_registered_model(model_name_dst)
 
     model_dst = client.get_registered_model(model_name_dst)
@@ -89,7 +87,7 @@ def _compare_versions(vr_src, vr_dst):
     assert vr_src.run_id != vr_dst.run_id
     run_src = client.get_run(vr_src.run_id)
     run_dst = client.get_run(vr_dst.run_id)
-    compare_utils.compare_runs(client, output_dir, run_src, run_dst)
+    compare_utils.compare_runs(client, utils_test.output_dir, run_src, run_dst)
 
 
 from mlflow_export_import.model.import_model import _extract_model_path

@@ -1,6 +1,6 @@
 import os
 import shutil
-import uuid
+import shortuuid
 import mlflow
 import mlflow.sklearn
 from sklearn_utils import create_sklearn_model
@@ -24,11 +24,16 @@ def init_output_dirs():
     os.makedirs(os.path.join(output_dir,"run2"))
 
 def mk_uuid():
-    return str(uuid.uuid4())
+    return shortuuid.uuid()
+
+TEST_OBJECT_PREFIX = f"test_exim_" 
+
+def mk_test_object_name():
+    return f"{TEST_OBJECT_PREFIX}_{mk_uuid()}_{exp_count}"
 
 def create_experiment():
     global exp_count
-    exp_name = f"test_exim_{mk_uuid()}_{exp_count}"
+    exp_name = f"{mk_test_object_name()}_{exp_count}"
     exp_count += 1
     mlflow.set_experiment(exp_name)
     exp = client.get_experiment_by_name(exp_name)
@@ -70,10 +75,12 @@ def delete_experiment(exp):
 
 def delete_experiments():
     for exp in client.list_experiments():
+        ##if exp.name.startswith(TEST_OBJECT_PREFIX):
         client.delete_experiment(exp.experiment_id)
 
 def delete_models():
     for model in client.list_registered_models(max_results=1000):
+        ##if model.name.startswith(TEST_OBJECT_PREFIX):
         model_utils.delete_model(client, model.name)
 
 def compare_dirs(d1, d2):

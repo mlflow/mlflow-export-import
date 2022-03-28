@@ -1,7 +1,7 @@
 import os
 import mlflow
 from mlflow_export_import.bulk import bulk_utils
-from utils_test import create_output_dir, create_experiment, output_dir, mk_uuid
+from utils_test import create_output_dir, create_experiment, output_dir, mk_uuid, delete_experiments
 from sklearn_utils import create_sklearn_model
 from compare_utils import compare_runs
 
@@ -35,10 +35,6 @@ def create_test_experiment(num_runs):
     for j in range(num_runs):
         _create_simple_run(j)
     return exp
-
-def _delete_experiments():
-    for exp in client.list_experiments():
-        client.delete_experiment(exp.experiment_id)
 
 # == Export/import Experiments tests
 
@@ -80,7 +76,7 @@ def test_get_experiment_ids_from_comma_delimited_string():
 
 def test_get_experiment_ids_from_all_string():
     create_output_dir()
-    _delete_experiments()
+    delete_experiments()
     exps = [ create_test_experiment(3), create_test_experiment(4) ]
     exp_ids = bulk_utils.get_experiment_ids("all")
     assert exp_ids == [ exp.experiment_id for exp in exps ]

@@ -1,6 +1,6 @@
 import os
 import mlflow
-from utils_test import create_output_dir, output_dir, mk_uuid, delete_experiments, delete_models
+from utils_test import create_output_dir, output_dir, delete_experiments, delete_models, mk_test_object_name
 from compare_utils import compare_runs
 
 from mlflow_export_import.model.export_model import ModelExporter
@@ -30,7 +30,7 @@ def _rename_model_name(model_name):
 
 def _create_model():
     exp = create_test_experiment(num_experiments)
-    model_name = f"test_exim_{mk_uuid()}"
+    model_name = mk_test_object_name()
     model = client.create_registered_model(model_name)
     for run in client.search_runs([exp.experiment_id]):
         source = f"{run.info.artifact_uri}/model"

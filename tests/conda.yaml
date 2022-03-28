@@ -6,5 +6,6 @@ dependencies:
 - pip:
     - mlflow>=1.15.0
     - pytest==5.3.5
-    - scikit-learn==0.20.3
+    - shortuuid
+    - scikit-learn>==0.20.3
     - coverage
