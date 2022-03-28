@@ -12,7 +12,7 @@ from test_bulk_experiments import create_test_experiment
 # == Setup
 
 notebook_formats = "SOURCE,DBC"
-model_prefix = "Original"
+model_suffix = "Original"
 num_models = 1
 num_experiments = 1
 exporter = ModelExporter() 
@@ -26,7 +26,7 @@ def _init():
 # == Export/import registered model tests
 
 def _rename_model_name(model_name):
-    return f"{model_prefix}_{model_name}"
+    return f"{model_name}_{model_suffix}"
 
 def _create_model():
     exp = create_test_experiment(num_experiments)

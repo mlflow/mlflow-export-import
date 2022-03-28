@@ -9,7 +9,7 @@ client = mlflow.tracking.MlflowClient()
 def test_export_import_model():
     run_src = _create_run()
     exporter = ModelExporter()
-    model_name_src = f"model_{utils_test.mk_uuid()}"
+    model_name_src = utils_test.mk_test_object_name()
     model_src = client.create_registered_model(model_name_src)
     source = f"{run_src.info.artifact_uri}/model"
     client.create_model_version(model_name_src, source, run_src.info.run_id)
@@ -30,7 +30,7 @@ def test_export_import_model():
 
 def test_export_import_model_stages():
     exporter = ModelExporter(stages=["Production","Staging"])
-    model_name_src = f"model_{utils_test.mk_uuid()}"
+    model_name_src = utils_test.mk_test_object_name()
     model_src = client.create_registered_model(model_name_src)
 
     _create_version(model_name_src, "Production")

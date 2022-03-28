@@ -9,7 +9,7 @@ from mlflow_export_import.bulk.export_experiments import export_experiments
 from mlflow_export_import.bulk.import_experiments import import_experiments
 
 notebook_formats = "SOURCE,DBC"
-exp_prefix = "Imported_"
+exp_suffix = "_Imported"
 
 # == Setup
 
@@ -48,13 +48,13 @@ def _run_test(compare_func, export_metadata_tags=False, use_threads=False):
         notebook_formats=notebook_formats,
         use_threads=use_threads)
 
-    import_experiments(output_dir, experiment_name_prefix=exp_prefix, use_src_user_id=False, import_metadata_tags=False, use_threads=False)
+    import_experiments(output_dir, experiment_name_suffix=exp_suffix, use_src_user_id=False, import_metadata_tags=False, use_threads=False)
 
     base_dir = os.path.join(output_dir,"test_compare_runs")
     os.makedirs(base_dir)
 
     for exp1 in exps:
-        exp2 = client.get_experiment_by_name(exp_prefix + exp1.name)
+        exp2 = client.get_experiment_by_name(exp1.name + exp_suffix)
         for run1 in client.search_runs(exp1.experiment_id, ""):
             tag = run1.data.tags["run_index"]
             run2 = client.search_runs(exp2.experiment_id, f"tags.run_index = '{tag}'")[0]

@@ -10,7 +10,6 @@ print("Mlflow path:", mlflow.__file__)
 print("MLflow version:", mlflow.__version__)
 
 client = mlflow.tracking.MlflowClient()
-exp_count = 0
 output_dir = "out"
 
 def create_output_dir():
@@ -26,15 +25,13 @@ def init_output_dirs():
 def mk_uuid():
     return shortuuid.uuid()
 
-TEST_OBJECT_PREFIX = f"test_exim_" 
+TEST_OBJECT_PREFIX = f"test_exim" 
 
 def mk_test_object_name():
-    return f"{TEST_OBJECT_PREFIX}_{mk_uuid()}_{exp_count}"
+    return f"{TEST_OBJECT_PREFIX}_{mk_uuid()}"
 
 def create_experiment():
-    global exp_count
-    exp_name = f"{mk_test_object_name()}_{exp_count}"
-    exp_count += 1
+    exp_name = f"{mk_test_object_name()}"
     mlflow.set_experiment(exp_name)
     exp = client.get_experiment_by_name(exp_name)
     for info in client.list_run_infos(exp.experiment_id):

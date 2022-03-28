@@ -16,7 +16,7 @@ def _import_experiment(importer, exp_name, exp_input_dir):
         import traceback
         traceback.print_exc()
 
-def import_experiments(input_dir, experiment_name_prefix, use_src_user_id, import_metadata_tags, use_threads): 
+def import_experiments(input_dir, experiment_name_suffix, use_src_user_id, import_metadata_tags, use_threads): 
     path = os.path.join(input_dir,"manifest.json")
     with open(path, "r") as f:
         dct = json.loads(f.read())
@@ -30,15 +30,15 @@ def import_experiments(input_dir, experiment_name_prefix, use_src_user_id, impor
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for exp in dct["experiments"]:
             exp_input_dir = os.path.join(input_dir,exp["id"])
-            exp_name = experiment_name_prefix + exp["name"] if experiment_name_prefix else exp["name"]
+            exp_name = exp["name"] + experiment_name_suffix if experiment_name_suffix else exp["name"]
             executor.submit(_import_experiment, importer, exp_name, exp_input_dir)
 
 @click.command()
 @click.option("--input-dir", 
     help="Input directory.", required=True, type=str
 )
-@click.option("--experiment-name-prefix", 
-    help="If specified, added as prefix to experiment name.", 
+@click.option("--experiment-name-suffix", 
+    help="If specified, added as suffix to experiment name.", 
     default=None, 
     type=str, 
    show_default=True
@@ -62,11 +62,11 @@ def import_experiments(input_dir, experiment_name_prefix, use_src_user_id, impor
     show_default=True
 )
 
-def main(input_dir, experiment_name_prefix, use_src_user_id, import_metadata_tags, use_threads): 
+def main(input_dir, experiment_name_suffix, use_src_user_id, import_metadata_tags, use_threads): 
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    import_experiments(input_dir, experiment_name_prefix, use_src_user_id, import_metadata_tags, use_threads)
+    import_experiments(input_dir, experiment_name_suffix, use_src_user_id, import_metadata_tags, use_threads)
 
 if __name__ == "__main__":
     main()
