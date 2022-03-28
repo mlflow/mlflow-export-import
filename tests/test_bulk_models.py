@@ -46,7 +46,7 @@ def _run_test(compare_func, import_metadata_tags=False, use_threads=False):
     exp_ids = [ exp.experiment_id for exp in client.list_experiments() ]
     exps = client.list_experiments() 
     for exp in exps:
-        client.rename_experiment(exp.experiment_id, f"Original_{exp.name}")
+        client.rename_experiment(exp.experiment_id, f"{exp.name}_{model_suffix}")
 
     import_all(output_dir,
         delete_model=False,
