@@ -67,17 +67,20 @@ def create_runs():
         mlflow.set_tag("t1", "hi")
     return client.search_runs(run.info.experiment_id, "")
 
+def list_experiments():
+    return [ exp for exp in client.list_experiments() if exp.name.startswith(TEST_OBJECT_PREFIX) ]
+
 def delete_experiment(exp):
     client.delete_experiment(exp.experiment_id)
 
 def delete_experiments():
     for exp in client.list_experiments():
-        ##if exp.name.startswith(TEST_OBJECT_PREFIX):
+        #if exp.name.startswith(TEST_OBJECT_PREFIX):
         client.delete_experiment(exp.experiment_id)
 
 def delete_models():
     for model in client.list_registered_models(max_results=1000):
-        ##if model.name.startswith(TEST_OBJECT_PREFIX):
+        #if model.name.startswith(TEST_OBJECT_PREFIX):
         model_utils.delete_model(client, model.name)
 
 def compare_dirs(d1, d2):

@@ -1,7 +1,7 @@
 import mlflow
 from mlflow_export_import.common.list_objects_iterator import ListExperimentsIterator
 from mlflow_export_import.common.list_objects_iterator import ListRegisteredModelsIterator
-from utils_test import create_experiment, mk_uuid, delete_experiments, delete_models, mk_test_object_name
+from utils_test import create_experiment, mk_uuid, delete_experiments, delete_models, mk_test_object_name, list_experiments
 
 client = mlflow.tracking.MlflowClient()
 
@@ -16,14 +16,14 @@ def _create_experiment(num_runs=5):
 
 def _create_experiments(num_experiments):
     delete_experiments()
-    experiments = client.list_experiments()
+    experiments = list_experiments()
     assert len(experiments) == 0
     for _ in range(0,num_experiments):
         _create_experiment()
 
 def _run_test_list_experiments(num_experiments, max_results):
     _create_experiments(num_experiments)
-    experiments1 = client.list_experiments()
+    experiments1 = list_experiments()
     experiments2 = ListExperimentsIterator(client, max_results)
     assert len(experiments1) == len(list(experiments2))
 
@@ -40,7 +40,7 @@ def test_list_experiments_max_results_custom():
     num_experiments = 101
     max_results = 20
     _create_experiments(num_experiments)
-    experiments1 = client.list_experiments(max_results=num_experiments)
+    experiments1 = list_experiments()
     assert len(experiments1) == num_experiments
     experiments2 = ListExperimentsIterator(client, max_results)
     assert len(experiments1) == len(list(experiments2))

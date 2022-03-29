@@ -1,6 +1,6 @@
 import os
 import mlflow
-from utils_test import create_output_dir, output_dir, delete_experiments, delete_models, mk_test_object_name
+from utils_test import create_output_dir, output_dir, delete_experiments, delete_models, mk_test_object_name, list_experiments
 from compare_utils import compare_runs
 
 from mlflow_export_import.model.export_model import ModelExporter
@@ -43,8 +43,7 @@ def _run_test(compare_func, import_metadata_tags=False, use_threads=False):
     export_models(model_names, output_dir, notebook_formats, stages="None", export_all_runs=False, use_threads=False)
     for model_name in model_names:
         client.rename_registered_model(model_name,_rename_model_name(model_name))
-    exp_ids = [ exp.experiment_id for exp in client.list_experiments() ]
-    exps = client.list_experiments() 
+    exps = list_experiments() 
     for exp in exps:
         client.rename_experiment(exp.experiment_id, f"{exp.name}_{model_suffix}")
 
@@ -58,6 +57,7 @@ def _run_test(compare_func, import_metadata_tags=False, use_threads=False):
     test_dir = os.path.join(output_dir,"test_compare_runs")
     os.makedirs(test_dir)
 
+    exp_ids = [ exp.experiment_id for exp in exps ]
     models2 = client.search_registered_models("name like 'model_%'")
     for model2 in models2:
         model2 = client.get_registered_model(model2.name)
