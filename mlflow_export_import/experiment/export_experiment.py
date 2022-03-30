@@ -7,7 +7,7 @@ import click
 import mlflow
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import mlflow_utils
-from mlflow_export_import.common.search_runs_iterator import SearchRunsIterator
+from mlflow_export_import.common.iterators import SearchRunsIterator
 from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils, click_doc
 

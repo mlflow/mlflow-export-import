@@ -5,7 +5,7 @@ Copies an experiment from one MLflow server to another.
 import click
 from mlflow.utils.annotations import deprecated
 from mlflow_export_import.common import mlflow_utils
-from mlflow_export_import.common.search_runs_iterator import SearchRunsIterator
+from mlflow_export_import.common.iterators import SearchRunsIterator
 from mlflow_export_import.run.copy_run import RunCopier
 from mlflow_export_import import BaseCopier, create_client
 from mlflow_export_import import utils, click_doc

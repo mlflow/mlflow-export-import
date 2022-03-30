@@ -1,6 +1,6 @@
 import mlflow
-from mlflow_export_import.common.list_objects_iterator import ListRegisteredModelsIterator
-from mlflow_export_import.common.list_objects_iterator import ListExperimentsIterator
+from mlflow_export_import.common.iterators import ListRegisteredModelsIterator
+from mlflow_export_import.common.iterators import ListExperimentsIterator
 
 client = mlflow.tracking.MlflowClient()
 
