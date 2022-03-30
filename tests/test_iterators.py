@@ -1,8 +1,8 @@
 import mlflow
-from mlflow_export_import.common2.iterators import SearchRunsIterator
-from mlflow_export_import.common2.iterators import SearchRegisteredModelsIterator
-from mlflow_export_import.common2.iterators import ListExperimentsIterator
-from mlflow_export_import.common2.iterators import ListRegisteredModelsIterator
+from mlflow_export_import.common.iterators import SearchRunsIterator
+from mlflow_export_import.common.iterators import SearchRegisteredModelsIterator
+from mlflow_export_import.common.iterators import ListExperimentsIterator
+from mlflow_export_import.common.iterators import ListRegisteredModelsIterator
 from utils_test import create_experiment, delete_experiments, delete_models, mk_test_object_name, list_experiments, TEST_OBJECT_PREFIX
 
 client = mlflow.tracking.MlflowClient()
