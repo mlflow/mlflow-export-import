@@ -161,6 +161,5 @@ def test_SearchRegisteredModelsIterator_like():
         new_name = models[j].name.replace(TEST_OBJECT_PREFIX, new_prefix)
         client.rename_registered_model(models[j].name, new_name)
     filter = f"name like '{new_prefix}%'"
-    print(">> filter:",filter)
     models2 = SearchRegisteredModelsIterator(client, max_results, filter)
     assert 4 == len(list(models2))
