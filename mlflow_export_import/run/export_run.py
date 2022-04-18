@@ -17,24 +17,27 @@ from mlflow_export_import import utils, click_doc
 print("MLflow Version:", mlflow.version.VERSION)
 print("MLflow Tracking URI:", mlflow.get_tracking_uri())
 
-class RunExporter():
-    def __init__(self, mlflow_client=None, export_metadata_tags=False, notebook_formats=[]):
+
+class RunExporter:
+    def __init__(self, mlflow_client=None, export_metadata_tags=False, notebook_formats=None):
         """
         :param mlflow_client: MLflow client or if None create default client.
         :param export_metadata_tags: Export source run metadata tags.
         :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
         """
+        if notebook_formats is None:
+            notebook_formats = []
         self.mlflow_client = mlflow_client or mlflow.tracking.MlflowClient()
         self.dbx_client = DatabricksHttpClient()
-        print("Databricks REST client:",self.dbx_client)
+        print("Databricks REST client:", self.dbx_client)
         self.export_metadata_tags = export_metadata_tags
         self.notebook_formats = notebook_formats
 
-    def get_metrics_with_steps(self, run):
+    def _get_metrics_with_steps(self, run):
         metrics_with_steps = {}
         for metric in run.data.metrics.keys():
             metric_history = self.mlflow_client.get_metric_history(run.info.run_id,metric)
-            lst = [ utils.strip_underscores(m) for m in metric_history ]
+            lst = [utils.strip_underscores(m) for m in metric_history]
             for x in lst:
                 del x["key"] 
             metrics_with_steps[metric] = lst
@@ -49,17 +52,18 @@ class RunExporter():
         fs = _filesystem.get_filesystem(output_dir)
         run = self.mlflow_client.get_run(run_id)
         fs.mkdirs(output_dir)
-        tags =  utils.create_tags_for_metadata(self.mlflow_client, run, self.export_metadata_tags)
-        dct = { "export_info": {
-                    "mlflow_version": mlflow.__version__,
-                    "mlflow_tracking_uri": mlflow.get_tracking_uri(),
-                    "export_time": utils.get_now_nice() },
-                "info": utils.strip_underscores(run.info) , 
-                "params": run.data.params,
-                "metrics": self.get_metrics_with_steps(run),
-                "tags": tags,
-              }
-        path = os.path.join(output_dir,"run.json")
+        tags = utils.create_tags_for_metadata(self.mlflow_client, run, self.export_metadata_tags)
+        dct = {
+            "export_info": {
+                "mlflow_version": mlflow.__version__,
+                "mlflow_tracking_uri": mlflow.get_tracking_uri(),
+                "export_time": utils.get_now_nice()},
+            "info": utils.strip_underscores(run.info),
+            "params": run.data.params,
+            "metrics": self._get_metrics_with_steps(run),
+            "tags": tags,
+        }
+        path = os.path.join(output_dir, "run.json")
         utils.write_json_file(fs, path, dct)
 
         # copy artifacts
@@ -69,21 +73,21 @@ class RunExporter():
             artifacts = self.mlflow_client.list_artifacts(run.info.run_id)
             if len(artifacts) > 0: # Because of https://github.com/mlflow/mlflow/issues/2839
                 fs.mkdirs(dst_path)
-                self.mlflow_client.download_artifacts(run.info.run_id,"", dst_path=mk_local_path(dst_path))
+                self.mlflow_client.download_artifacts(run.info.run_id, "", dst_path=mk_local_path(dst_path))
             notebook = tags.get(TAG_NOTEBOOK_PATH, None)
             if notebook is not None:
                 if len(self.notebook_formats) > 0:
-                    self.export_notebook(output_dir, notebook, run.data.tags, fs)
+                    self._export_notebook(output_dir, notebook, run.data.tags, fs)
             elif len(self.notebook_formats) > 0:
                 print(f"WARNING: Cannot export notebook since tag '{TAG_NOTEBOOK_PATH}' is not set.")
             return True
         except Exception as e:
-            print("ERROR: run_id:",run.info.run_id,"Exception:",e)
+            print("ERROR: run_id:", run.info.run_id, "Exception:", e)
             traceback.print_exc()
             return False
 
-    def export_notebook(self, output_dir, notebook, tags, fs):
-        notebook_dir = os.path.join(output_dir,"artifacts","notebooks")
+    def _export_notebook(self, output_dir, notebook, tags, fs):
+        notebook_dir = os.path.join(output_dir, "artifacts", "notebooks")
         fs.mkdirs(notebook_dir)
         revision_id = tags["mlflow.databricks.notebookRevisionID"]
         notebook_path = tags["mlflow.databricks.notebookPath"]
@@ -93,11 +97,11 @@ class RunExporter():
            "mlflow.databricks.notebookPath": notebook_path,
            "mlflow.databricks.export-notebook-revision": revision_id }
         path = os.path.join(notebook_dir, "manifest.json")
-        fs.write(path, (json.dumps(manifest,indent=2)+"\n"))
+        fs.write(path, (json.dumps(manifest, indent=2)+"\n"))
         for format in self.notebook_formats:
-            self.export_notebook_format(notebook_dir, notebook, format, format.lower(), notebook_name, revision_id)
+            self._export_notebook_format(notebook_dir, notebook, format, format.lower(), notebook_name, revision_id)
 
-    def export_notebook_format(self, notebook_dir, notebook, format, extension, notebook_name, revision_id):
+    def _export_notebook_format(self, notebook_dir, notebook, format, extension, notebook_name, revision_id):
         params = { 
             "path": notebook, 
             "direct_download": True,
