@@ -11,14 +11,16 @@ from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils, click_doc
 
 class ModelExporter():
-    def __init__(self,  mlflow_client=None, export_metadata_tags=False, notebook_formats=[], stages=None, export_run=True):
+    def __init__(self,  mlflow_client=None, export_metadata_tags=False, notebook_formats=None, stages=None, export_run=True):
         """
         :param mlflow_client: MLflow client or if None create default client.
         :param export_metadata_tags: Export source run metadata tags.
         :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
         :param stages: Stages to export. Default is all stages. Values are Production, Staging, Archived and None.
-        :param export_runs: Export the run that generated a registered model's version.
+        :param export_run: Export the run that generated a registered model's version.
         """
+        if notebook_formats is None:
+            notebook_formats = []
         self.mlflow_client = mlflow_client or mlflow.tracking.MlflowClient()
         self.http_client = MlflowHttpClient()
         self.run_exporter = RunExporter(self.mlflow_client, export_metadata_tags=export_metadata_tags, notebook_formats=notebook_formats)
@@ -35,7 +37,7 @@ class ModelExporter():
             self._export_model(model_name, output_dir)
             return True, model_name
         except Exception as e:
-            print("ERROR:",e)
+            print("ERROR:", e)
             return False, model_name
 
     def _export_model(self, model_name, output_dir):
@@ -52,7 +54,7 @@ class ModelExporter():
                 continue
             run_id = vr.run_id
             opath = os.path.join(output_dir,run_id)
-            opath = opath.replace("dbfs:","/dbfs")
+            opath = opath.replace("dbfs:", "/dbfs")
             dct = { "version": vr.version, "stage": vr.current_stage, "run_id": run_id }
             print(f"Exporting: {dct}")
             manifest.append(dct)
@@ -81,9 +83,9 @@ class ModelExporter():
         from mlflow.entities.model_registry import model_version_stages
         if stages is None:
             return []
-        if isinstance(stages,str):
+        if isinstance(stages, str):
             stages = stages.split(",")
-        stages = [ stage.lower() for stage in stages ]
+        stages = [stage.lower() for stage in stages]
         for stage in stages:
             if stage not in model_version_stages._CANONICAL_MAPPING:
                 print(f"WARNING: stage '{stage}' must be one of: {model_version_stages.ALL_STAGES}")
