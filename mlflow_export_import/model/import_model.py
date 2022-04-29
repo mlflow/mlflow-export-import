@@ -80,6 +80,15 @@ class ModelImporter(BaseModelImporter):
         super().__init__(run_importer, await_creation_for=await_creation_for)
 
     def import_model(self, model_name, input_dir, experiment_name, delete_model=False, verbose=False, sleep_time=30):
+        """
+        :param model_name: Model name.
+        :param input_dir: Input directory.
+        :param experiment_name: The name of the experiment
+        :param delete_model: Delete current model before importing versions.
+        :param verbose: Verbose.
+        :param sleep_time: Seconds to wait for model version crreation.
+        :return: Model import manifest.
+        """
         model_dct = self._import_model(model_name, input_dir, delete_model, verbose, sleep_time)
         mlflow.set_experiment(experiment_name)
         print("Importing versions:")
@@ -126,6 +135,14 @@ class AllModelImporter(BaseModelImporter):
         self.run_info_map = run_info_map
 
     def import_model(self, model_name, input_dir, delete_model=False, verbose=False, sleep_time=30):
+        """
+        :param model_name: Model name.
+        :param input_dir: Input directory.
+        :param delete_model: Delete current model before importing versions.
+        :param verbose: Verbose.
+        :param sleep_time: Seconds to wait for model version crreation.
+        :return: Model import manifest.
+        """
         model_dct = self._import_model(model_name, input_dir, delete_model, verbose, sleep_time)
         print("Importing latest versions:")
         for vr in model_dct["latest_versions"]:
