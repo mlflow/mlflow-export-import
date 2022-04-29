@@ -14,7 +14,8 @@ TAG_PARENT_ID = "mlflow.parentRunId"
 # Databricks tags that cannot be set
 _databricks_skip_tags = set([
   "mlflow.user",
-  "mlflow.log-model.history"
+  "mlflow.log-model.history",
+  "mlflow.rootRunId"
   ])
 
 def create_mlflow_tags_for_databricks_import(tags):
