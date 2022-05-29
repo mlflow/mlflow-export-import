@@ -95,7 +95,7 @@ from mlflow_export_import.model.import_model import _extract_model_path
 run_id = "48cf29167ddb4e098da780f0959fb4cf"
 model_path = "models/my_model"
 
-def _test_extract_model_path_databricks(mlflow_server):
+def test_extract_model_path_databricks(mlflow_server):
     source = f"dbfs:/databricks/mlflow-tracking/4072937019901104/{run_id}/artifacts/{model_path}"
     _test_extract_model_path(source)
 
