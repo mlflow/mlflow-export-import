@@ -32,13 +32,6 @@ def compare_runs_no_tags(client, output_dir, run1, run2):
 
 def compare_runs(client, output_dir, run1, run2):
     compare_runs_no_tags(client, output_dir, run1, run2) 
-    compare_tags(run1.data.tags, run2.data.tags)
-
-def compare_tags(tags1, tags2):
-    tags1 = tags1.copy()
-    tags1.pop("mlflow.log-model.history",None) # sklearn.autolog adds this. TODO: Semantics? To copy this tag to dst run maybe and tweak run ID?
-    #dump_tags(tags1,"Run1")
-    #dump_tags(tags2,"Run2")
 
 def dump_runs(run1, run2):
     print("======= Run1")

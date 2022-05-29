@@ -4,162 +4,161 @@ from mlflow_export_import.common.iterators import SearchRegisteredModelsIterator
 from mlflow_export_import.common.iterators import ListExperimentsIterator
 from mlflow_export_import.common.iterators import ListRegisteredModelsIterator
 from utils_test import create_experiment, delete_experiments, delete_models, mk_test_object_name, list_experiments, TEST_OBJECT_PREFIX
-
-client = mlflow.tracking.MlflowClient()
+from init_tests import mlflow_server
 
 # ==== List experiments
 
-def _create_experiment(num_runs=5):
-    experiment = create_experiment()
+def _create_experiment(client, num_runs=5):
+    experiment = create_experiment(client)
     for _ in range(0, num_runs):
         with mlflow.start_run():
             mlflow.log_metric("m1", 0.1)
     return experiment
 
-def _create_experiments(num_experiments):
-    delete_experiments()
-    experiments = list_experiments()
+def _create_experiments(client, num_experiments):
+    delete_experiments(client)
+    experiments = list_experiments(client)
     assert len(experiments) == 0
     for _ in range(0,num_experiments):
-        _create_experiment()
+        _create_experiment(client)
 
-def _run_test_list_experiments(num_experiments, max_results):
-    _create_experiments(num_experiments)
-    experiments1 = list_experiments()
+def _run_test_list_experiments(client, num_experiments, max_results):
+    _create_experiments(client, num_experiments)
+    experiments1 = list_experiments(client)
     experiments2 = ListExperimentsIterator(client, max_results)
     assert len(experiments1) == len(list(experiments2))
 
-def test_list_experiments_max_results_LT_num_experiments():
-    _run_test_list_experiments(10, 5)
+def test_list_experiments_max_results_LT_num_experiments(mlflow_server):
+    _run_test_list_experiments(mlflow_server.client, 10, 5)
 
-def test_list_experiments_max_results_EQ_num_experiments():
-    _run_test_list_experiments(10, 10)
+def test_list_experiments_max_results_EQ_num_experiments(mlflow_server):
+    _run_test_list_experiments(mlflow_server.client, 10, 10)
 
-def test_list_experiments_max_results_GT_num_experiments():
-    _run_test_list_experiments(10, 20)
+def test_list_experiments_max_results_GT_num_experiments(mlflow_server):
+    _run_test_list_experiments(mlflow_server.client, 10, 20)
 
-def test_list_experiments_max_results_custom():
+def test_list_experiments_max_results_custom(mlflow_server):
     num_experiments = 101
     max_results = 20
-    _create_experiments(num_experiments)
-    experiments1 = list_experiments()
+    _create_experiments(mlflow_server.client, num_experiments)
+    experiments1 = list_experiments(mlflow_server.client)
     assert len(experiments1) == num_experiments
-    experiments2 = ListExperimentsIterator(client, max_results)
+    experiments2 = ListExperimentsIterator(mlflow_server.client, max_results)
     assert len(experiments1) == len(list(experiments2))
 
 # ==== List registered models
 
-def _create_models(num_models):
-    delete_models()
+def _create_models(client, num_models):
+    delete_models(client)
     models = client.list_registered_models()
     assert len(models) == 0
     for _ in range(0,num_models):
         model_name = mk_test_object_name()
         client.create_registered_model(model_name)
 
-def _run_test_list_models(num_models, max_results):
-    _create_models(num_models)
+def _run_test_list_models(client, num_models, max_results):
+    _create_models(client, num_models)
     models1 = client.list_registered_models()
     assert len(models1) == num_models
     models2 = ListRegisteredModelsIterator(client, max_results)
     assert len(models1) == len(list(models2))
 
-def test_list_models_max_results_LT_num_models():
-    _run_test_list_models(10, 5)
+def test_list_models_max_results_LT_num_models(mlflow_server):
+    _run_test_list_models(mlflow_server.client, 10, 5)
 
-def test_list_models_max_results_EQ_num_models():
-    _run_test_list_models(10, 10)
+def test_list_models_max_results_EQ_num_models(mlflow_server):
+    _run_test_list_models(mlflow_server.client, 10, 10)
 
-def test_list_models_max_results_GT_num_models():
-    _run_test_list_models(10, 20)
+def test_list_models_max_results_GT_num_models(mlflow_server):
+    _run_test_list_models(mlflow_server.client, 10, 20)
 
-def test_list_models_max_results_custom():
+def test_list_models_max_results_custom(mlflow_server):
     num_models = 101
     max_results = 20
-    _create_models(num_models)
-    models1 = client.list_registered_models(max_results=num_models)
+    _create_models(mlflow_server.client, num_models)
+    models1 = mlflow_server.client.list_registered_models(max_results=num_models)
     assert len(models1) == num_models
-    models2 = ListRegisteredModelsIterator(client, max_results)
+    models2 = ListRegisteredModelsIterator(mlflow_server.client, max_results)
     assert len(models1) == len(list(models2))
 
-def test_list_models_max_results_non_default():
+def test_list_models_max_results_non_default(mlflow_server):
     MAX_RESULTS_DEFAULT = 100
     num_models = 101
     max_results = 20
-    _create_models(num_models)
-    models1 = client.list_registered_models()
+    _create_models(mlflow_server.client, num_models)
+    models1 = mlflow_server.client.list_registered_models()
     assert len(models1) == MAX_RESULTS_DEFAULT
-    models2 = ListRegisteredModelsIterator(client, max_results)
+    models2 = ListRegisteredModelsIterator(mlflow_server.client, max_results)
     assert len(list(models2)) == num_models
 
 # ==== SearchRunsIterator
 
-def _create_runs(num_runs):
-    exp = create_experiment()
+def _create_runs(client, num_runs):
+    exp = create_experiment(client, )
     for _ in range(0, num_runs):
         with mlflow.start_run():
             mlflow.log_metric("m1", 0.1)
     return exp
 
-def test_SearchRunsIterator():
+def test_SearchRunsIterator(mlflow_server):
     num_runs = 120
     max_results = 22
-    exp = _create_runs(num_runs)
-    infos = client.list_run_infos(exp.experiment_id)
+    exp = _create_runs(mlflow_server.client, num_runs)
+    infos = mlflow_server.client.list_run_infos(exp.experiment_id)
     assert num_runs == len(infos)
-    iterator = SearchRunsIterator(client, exp.experiment_id, max_results)
+    iterator = SearchRunsIterator(mlflow_server.client, exp.experiment_id, max_results)
     runs = list(iterator)
     assert num_runs == len(runs)
 
-def test_SearchRunsIterator_empty():
+def test_SearchRunsIterator_empty(mlflow_server):
     num_runs = 0
     max_results = 22
-    exp = _create_runs(num_runs)
-    infos = client.list_run_infos(exp.experiment_id)
+    exp = _create_runs(mlflow_server.client, num_runs)
+    infos = mlflow_server.client.list_run_infos(exp.experiment_id)
     assert num_runs == len(infos)
-    iterator = SearchRunsIterator(client, exp.experiment_id, max_results)
+    iterator = SearchRunsIterator(mlflow_server.client, exp.experiment_id, max_results)
     runs = list(iterator)
     assert num_runs == len(runs)
 
 # Stress test - connection timeout
-def test_SearchRunsIterator_many():
+def test_SearchRunsIterator_many(mlflow_server):
     num_runs = 1200
     max_results = 500
-    exp = _create_runs(num_runs)
-    infos = client.list_run_infos(exp.experiment_id)
+    exp = _create_runs(mlflow_server.client, num_runs)
+    infos = mlflow_server.client.list_run_infos(exp.experiment_id)
     assert len(infos) == 1000
-    iterator = SearchRunsIterator(client, exp.experiment_id, max_results)
+    iterator = SearchRunsIterator(mlflow_server.client, exp.experiment_id, max_results)
     runs = list(iterator)
     assert num_runs == len(runs)
 
-# ==== SearchRegisteredModelsIterator - XX
+# ==== SearchRegisteredModelsIterator
 
-def _init_test_SearchRegisteredModelsIterator():
-    delete_experiments()
-    delete_models()
+def _init_test_SearchRegisteredModelsIterator(client):
+    delete_experiments(client)
+    delete_models(client)
 
-def test_SearchRegisteredModelsIterator_all():
-    _init_test_SearchRegisteredModelsIterator()
+def test_SearchRegisteredModelsIterator_all(mlflow_server):
+    _init_test_SearchRegisteredModelsIterator(mlflow_server.client)
     num_models = 100
     max_results = 20
-    _create_models(num_models)
+    _create_models(mlflow_server.client, num_models)
 
-    models1 = ListRegisteredModelsIterator(client, max_results)
+    models1 = ListRegisteredModelsIterator(mlflow_server.client, max_results)
     models1 = list(models1)
     assert num_models == len(models1)
-    models2 = SearchRegisteredModelsIterator(client, max_results)
+    models2 = SearchRegisteredModelsIterator(mlflow_server.client, max_results)
     assert len(models1) == len(list(models2))
 
-def test_SearchRegisteredModelsIterator_like():
-    _init_test_SearchRegisteredModelsIterator()
+def test_SearchRegisteredModelsIterator_like(mlflow_server):
+    _init_test_SearchRegisteredModelsIterator(mlflow_server.client)
     num_models = 10
     max_results = 5
-    _create_models(num_models)
-    models = list(ListRegisteredModelsIterator(client, max_results))
+    _create_models(mlflow_server.client, num_models)
+    models = list(ListRegisteredModelsIterator(mlflow_server.client, max_results))
     new_prefix = f"{TEST_OBJECT_PREFIX}_new"
     for j in range(0,4):
         new_name = models[j].name.replace(TEST_OBJECT_PREFIX, new_prefix)
-        client.rename_registered_model(models[j].name, new_name)
+        mlflow_server.client.rename_registered_model(models[j].name, new_name)
     filter = f"name like '{new_prefix}%'"
-    models2 = SearchRegisteredModelsIterator(client, max_results, filter)
+    models2 = SearchRegisteredModelsIterator(mlflow_server.client, max_results, filter)
     assert 4 == len(list(models2))
