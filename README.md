@@ -1,7 +1,7 @@
 # MLflow Export Import
 
 This package provides tools to export and import MLflow objects (runs, experiments or registered models) from one MLflow tracking server (Databricks workspace) to another.
-See the [Databricks MLflow Object Relationships](https://github.com/amesar/mlflow-resources/blob/master/slides/Databricks_MLflow_Object_Relationships.pdf) slide deck.
+See the [Databricks MLflow Object Relationships](https://github.com/mlflow/mlflow-resources/blob/master/slides/Databricks_MLflow_Object_Relationships.pdf) slide deck.
 
 ## Useful Links
   * [Point tools README](README_point.md)
@@ -125,12 +125,12 @@ There are two different ways to install the package.
 #### 1. Install from github directly
 
 ```
-pip install git+https:///github.com/amesar/mlflow-export-import/#egg=mlflow-export-import
+pip install git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
 ```
 
 #### 2. Install from github clone
 ```
-git clone https://github.com/amesar/mlflow-export-import
+git clone https://github.com/mlflow/mlflow-export-import
 cd mlflow-export-import
 pip install -e .
 ```
@@ -145,7 +145,7 @@ There are two different ways to install the package.
 
 
 ```
-pip install git+https:///github.com/amesar/mlflow-export-import/#egg=mlflow-export-import
+pip install git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
 ```
 
 #### 2. Install package as a wheel on cluster
