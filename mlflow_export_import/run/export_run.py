@@ -17,17 +17,16 @@ from mlflow_export_import import utils, click_doc
 print("MLflow Version:", mlflow.version.VERSION)
 print("MLflow Tracking URI:", mlflow.get_tracking_uri())
 
-
 class RunExporter:
-    def __init__(self, mlflow_client=None, export_metadata_tags=False, notebook_formats=None):
+    def __init__(self, mlflow_client, export_metadata_tags=False, notebook_formats=None):
         """
-        :param mlflow_client: MLflow client or if None create default client.
+        :param mlflow_client: MLflow client.
         :param export_metadata_tags: Export source run metadata tags.
         :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
         """
         if notebook_formats is None:
             notebook_formats = []
-        self.mlflow_client = mlflow_client or mlflow.tracking.MlflowClient()
+        self.mlflow_client = mlflow_client
         self.dbx_client = DatabricksHttpClient()
         print("Databricks REST client:", self.dbx_client)
         self.export_metadata_tags = export_metadata_tags
@@ -143,8 +142,9 @@ def main(run_id, output_dir, export_metadata_tags, notebook_formats):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
+    client = mlflow.tracking.MlflowClient()
     exporter = RunExporter(
-      mlflow_client=None, 
+      client,
       export_metadata_tags=export_metadata_tags, 
       notebook_formats=utils.string_to_list(notebook_formats))
     exporter.export_run(run_id, output_dir)

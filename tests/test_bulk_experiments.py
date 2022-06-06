@@ -10,7 +10,6 @@ from mlflow_export_import.bulk.import_experiments import import_experiments
 from init_tests import mlflow_server
 
 notebook_formats = "SOURCE,DBC"
-exp_suffix = "_Imported"
 
 # == Setup
 
@@ -38,48 +37,50 @@ def create_test_experiment(client, num_runs):
 
 # == Export/import Experiments tests
 
-def _run_test(client, output_dir, compare_func, export_metadata_tags=False, use_threads=False):
-    exps = [ create_test_experiment(client, 3), create_test_experiment(client, 4) ]
+def _run_test(mlflow_server, compare_func, export_metadata_tags=False, use_threads=False):
+    exps = [ create_test_experiment(mlflow_server.client_src, 3), create_test_experiment(mlflow_server.client_src, 4) ]
     exp_names = [ exp.name for exp in exps ]
-    export_experiments(experiments=exp_names,
-        output_dir=output_dir,
-        export_metadata_tags=export_metadata_tags,
-        notebook_formats=notebook_formats,
-        use_threads=use_threads)
+    export_experiments(mlflow_server.client_src,
+        experiments = exp_names,
+        output_dir = mlflow_server.output_dir,
+        export_metadata_tags = export_metadata_tags,
+        notebook_formats = notebook_formats,
+        use_threads = use_threads)
 
-    import_experiments(output_dir, experiment_name_suffix=exp_suffix, use_src_user_id=False, import_metadata_tags=False, use_threads=False)
+    import_experiments(mlflow_server.client_dst, mlflow_server.output_dir, use_src_user_id=False, import_metadata_tags=False, use_threads=False)
 
-    base_dir = os.path.join(output_dir,"test_compare_runs")
+    base_dir = os.path.join(mlflow_server.output_dir,"test_compare_runs")
     os.makedirs(base_dir, exist_ok=True)
 
     for exp1 in exps:
-        exp2 = client.get_experiment_by_name(exp1.name + exp_suffix)
-        for run1 in client.search_runs(exp1.experiment_id, ""):
+        ##exp2 = mlflow_server.client_dst.get_experiment_by_name(exp1.name + exp_suffix)
+        exp2 = mlflow_server.client_dst.get_experiment_by_name(exp1.name)
+        for run1 in mlflow_server.client_src.search_runs(exp1.experiment_id, ""):
             tag = run1.data.tags["run_index"]
-            run2 = client.search_runs(exp2.experiment_id, f"tags.run_index = '{tag}'")[0]
+            run2 = mlflow_server.client_dst.search_runs(exp2.experiment_id, f"tags.run_index = '{tag}'")[0]
             odir = os.path.join(base_dir,run1.info.experiment_id)
-            compare_func(client, odir, run1, run2)
+            compare_func(mlflow_server.client_src, odir, run1, run2)
 
 def test_exp_basic(mlflow_server):
-    _run_test(mlflow_server.client, mlflow_server.output_dir, compare_runs)
+    _run_test(mlflow_server, compare_runs)
 
 def test_exp_basic_threads(mlflow_server):
-    _run_test(mlflow_server.client, mlflow_server.output_dir, compare_runs, use_threads=True)
+    _run_test(mlflow_server, compare_runs, use_threads=True)
 
 def test_exp_import_metadata_tags(mlflow_server): 
-    _run_test(mlflow_server.client, mlflow_server.output_dir, compare_runs, export_metadata_tags=True)
+    _run_test(mlflow_server, compare_runs, export_metadata_tags=True)
 
-def test_get_experiment_ids_from_comma_delimited_string():
-    exp_ids = bulk_utils.get_experiment_ids("exp1,exp2,exp3")
+def test_get_experiment_ids_from_comma_delimited_string(mlflow_server):
+    exp_ids = bulk_utils.get_experiment_ids(mlflow_server.client_src, "exp1,exp2,exp3")
     assert len(exp_ids) == 3
 
 def test_get_experiment_ids_from_all_string(mlflow_server):
-    delete_experiments(mlflow_server.client)
-    exps = [ create_test_experiment(mlflow_server.client, 3), create_test_experiment(mlflow_server.client, 4) ]
-    exp_ids = bulk_utils.get_experiment_ids("all")
+    delete_experiments(mlflow_server.client_src)
+    exps = [ create_test_experiment(mlflow_server.client_src, 3), create_test_experiment(mlflow_server.client_src, 4) ]
+    exp_ids = bulk_utils.get_experiment_ids(mlflow_server.client_src, "all")
     assert exp_ids == [ exp.experiment_id for exp in exps ]
 
 def test_get_experiment_ids_from_list(mlflow_server):
     exp_ids1 = ["exp1","exp2","exp3"]
-    exp_ids2 = bulk_utils.get_experiment_ids(exp_ids1)
+    exp_ids2 = bulk_utils.get_experiment_ids(mlflow_server.client_src, exp_ids1)
     assert exp_ids1 == exp_ids2

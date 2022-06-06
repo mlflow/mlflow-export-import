@@ -1,10 +1,7 @@
-import mlflow
 from mlflow_export_import.common.iterators import ListRegisteredModelsIterator
 from mlflow_export_import.common.iterators import ListExperimentsIterator
 
-client = mlflow.tracking.MlflowClient()
-
-def get_experiment_ids(experiment_ids):
+def get_experiment_ids(client, experiment_ids):
     """
     Return a list experiment IDS
     """
@@ -22,7 +19,7 @@ def get_experiment_ids(experiment_ids):
         return experiment_ids
         #raise MlflowExportImportException(f"Argument to get_experiment_ids() is of type '{type(experiment_ids)}. Must must be a string or list")
 
-def get_model_names(model_names):
+def get_model_names(client, model_names):
     if isinstance(model_names,str):
         if model_names == "all":
             model_names = [ model.name for model in ListRegisteredModelsIterator(client) ]

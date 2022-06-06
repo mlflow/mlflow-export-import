@@ -12,13 +12,13 @@ from mlflow_export_import.common import model_utils
 
 class BaseModelImporter():
     """ Base class of ModelImporter subclasses. """
-    def __init__(self, mlflow_client=None, run_importer=None, await_creation_for=None):
+    def __init__(self, mlflow_client, run_importer=None, await_creation_for=None):
         """
         :param mlflow_client: MLflow client or if None create default client.
         :param run_importer: RunImporter instance.
         :param await_creation_for: Seconds to wait for model version crreation.
         """
-        self.mlflow_client = mlflow_client or mlflow.tracking.MlflowClient()
+        self.mlflow_client = mlflow_client 
         self.run_importer = run_importer if run_importer else RunImporter(self.mlflow_client, mlmodel_fix=True)
         self.await_creation_for = await_creation_for 
 
@@ -76,8 +76,8 @@ class BaseModelImporter():
 
 class ModelImporter(BaseModelImporter):
     """ Low-level 'point' model importer  """
-    def __init__(self, run_importer=None, await_creation_for=None):
-        super().__init__(run_importer, await_creation_for=await_creation_for)
+    def __init__(self, mlflow_client, run_importer=None, await_creation_for=None):
+        super().__init__(mlflow_client, run_importer, await_creation_for=await_creation_for)
 
     def import_model(self, model_name, input_dir, experiment_name, delete_model=False, verbose=False, sleep_time=30):
         """
@@ -130,8 +130,8 @@ class ModelImporter(BaseModelImporter):
 
 class AllModelImporter(BaseModelImporter):
     """ High-level 'bulk' model importer  """
-    def __init__(self, run_info_map, run_importer=None, await_creation_for=None):
-        super().__init__(run_importer, await_creation_for=await_creation_for)
+    def __init__(self, mlflow_client, run_info_map, run_importer=None, await_creation_for=None):
+        super().__init__(mlflow_client, run_importer, await_creation_for=await_creation_for)
         self.run_info_map = run_info_map
 
     def import_model(self, model_name, input_dir, delete_model=False, verbose=False, sleep_time=30):
@@ -219,7 +219,8 @@ def main(input_dir, model, experiment_name, delete_model, await_creation_for, ve
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    importer = ModelImporter(await_creation_for=await_creation_for)
+    client = mlflow.tracking.MlflowClient()
+    importer = ModelImporter(client, await_creation_for=await_creation_for)
     importer.import_model(model, input_dir, experiment_name, delete_model, verbose, sleep_time)
 
 if __name__ == "__main__":

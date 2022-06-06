@@ -1,12 +1,9 @@
-
 import mlflow
 from mlflow_export_import.bulk import bulk_utils
 
-client = mlflow.tracking.MlflowClient()
-
-def get_experiments_runs_of_models(model_names, show_experiments=False, show_runs=False):
+def get_experiments_runs_of_models(client, model_names, show_experiments=False, show_runs=False):
     """ Get experiments and runs to to export. """
-    model_names = bulk_utils.get_model_names(model_names)
+    model_names = bulk_utils.get_model_names(client, model_names)
     print("Models:")
     for model_name in model_names:
         print(f"  {model_name}")

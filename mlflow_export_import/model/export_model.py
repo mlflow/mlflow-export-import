@@ -11,7 +11,7 @@ from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils, click_doc
 
 class ModelExporter():
-    def __init__(self,  mlflow_client=None, export_metadata_tags=False, notebook_formats=None, stages=None, export_run=True):
+    def __init__(self,  mlflow_client, export_metadata_tags=False, notebook_formats=None, stages=None, export_run=True):
         """
         :param mlflow_client: MLflow client or if None create default client.
         :param export_metadata_tags: Export source run metadata tags.
@@ -21,7 +21,7 @@ class ModelExporter():
         """
         if notebook_formats is None:
             notebook_formats = []
-        self.mlflow_client = mlflow_client or mlflow.tracking.MlflowClient()
+        self.mlflow_client = mlflow_client
         self.http_client = MlflowHttpClient()
         self.run_exporter = RunExporter(self.mlflow_client, export_metadata_tags=export_metadata_tags, notebook_formats=notebook_formats)
         self.stages = self._normalize_stages(stages)
@@ -118,7 +118,8 @@ def main(model, output_dir, stages, notebook_formats):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    exporter = ModelExporter(stages=stages, notebook_formats=utils.string_to_list(notebook_formats))
+    client = mlflow.tracking.MlflowClient()
+    exporter = ModelExporter(client, stages=stages, notebook_formats=utils.string_to_list(notebook_formats))
     exporter.export_model(model, output_dir)
 
 if __name__ == "__main__":

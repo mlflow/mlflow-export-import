@@ -5,6 +5,7 @@ Export the entire tracking server - all registerered models, experiments, runs a
 import os
 import time
 import click
+import mlflow
 from mlflow_export_import.bulk.export_models import export_models
 from mlflow_export_import.bulk.export_experiments import export_experiments
 from mlflow_export_import import click_doc
@@ -36,12 +37,17 @@ def main(output_dir, notebook_formats, use_threads):
     for k,v in locals().items():
         print(f"  {k}: {v}")
     start_time = time.time()
-    export_experiments(experiments="all",
+    client = mlflow.tracking.MlflowClient()
+    export_experiments(
+        client,
+        experiments="all",
         output_dir=os.path.join(output_dir,"experiments"),
         export_metadata_tags=True,
         notebook_formats=notebook_formats,
         use_threads=use_threads)
-    export_models(model_names="all", 
+    export_models(
+        client,
+        model_names="all", 
         output_dir=os.path.join(output_dir,"models"),
         notebook_formats=notebook_formats, 
         stages=ALL_STAGES, 

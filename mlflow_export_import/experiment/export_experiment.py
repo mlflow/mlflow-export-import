@@ -12,13 +12,13 @@ from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils, click_doc
 
 class ExperimentExporter():
-    def __init__(self, mlflow_client=None, export_metadata_tags=False, notebook_formats=[]):
+    def __init__(self, mlflow_client, export_metadata_tags=False, notebook_formats=[]):
         """
-        :param mlflow_client: MLflow client or if None create default client.
+        :param mlflow_client: MLflow client.
         :param export_metadata_tags: Export source run metadata tags.
         :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
         """
-        self.mlflow_client = mlflow_client or mlflow.tracking.MlflowClient()
+        self.mlflow_client = mlflow_client
         self.run_exporter = RunExporter(self.mlflow_client, export_metadata_tags, notebook_formats)
 
     def export_experiment(self, exp_id_or_name, output_dir, run_ids=None):
@@ -103,8 +103,9 @@ def main(experiment, output_dir, export_metadata_tags, notebook_formats):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
+    client = mlflow.tracking.MlflowClient()
     exporter = ExperimentExporter(
-        mlflow_client=None, 
+        client,
         export_metadata_tags=export_metadata_tags, 
         notebook_formats=utils.string_to_list(notebook_formats))
     exporter.export_experiment(experiment, output_dir)

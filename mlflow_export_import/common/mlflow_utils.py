@@ -23,7 +23,6 @@ def get_mlflow_host_token():
     try:
         from mlflow_export_import.common import databricks_cli_utils
         profile = os.environ.get("MLFLOW_PROFILE",None)
-        ##host_token = databricks_cli_utils.get_host_token(profile)
         return databricks_cli_utils.get_host_token(profile)
     #except databricks_cli.utils.InvalidConfigurationError as e:
     except Exception as e: # TODO: make more specific
@@ -47,15 +46,21 @@ def create_workspace_dir(dbx_client, workspace_dir):
     print(f"Creating Databricks workspace directory '{workspace_dir}'")
     dbx_client.post("workspace/mkdirs", { "path": workspace_dir })
 
-def set_experiment(dbx_client, exp_name):
+def set_experiment(mlflow_client, dbx_client, exp_name):
     """
     Set experiment name. 
     For Databricks, create the workspace directory if it doesn't exist.
+    :return: Experiment ID
     """
     from mlflow_export_import import utils
     if utils.importing_into_databricks():
         create_workspace_dir(dbx_client, os.path.dirname(exp_name))
-    mlflow.set_experiment(exp_name)
+    try:
+        return mlflow_client.create_experiment(exp_name)
+    except Exception:
+        exp = mlflow_client.get_experiment_by_name(exp_name)
+        return exp.experiment_id
+
 
 # BUG
 def _get_experiment(mlflow_client, exp_id_or_name):

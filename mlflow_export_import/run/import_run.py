@@ -21,10 +21,10 @@ from mlflow_export_import.run import run_data_importer
 from mlflow_export_import.common import MlflowExportImportException
 
 class RunImporter():
-    def __init__(self, mlflow_client=None, mlmodel_fix=True, use_src_user_id=False, \
+    def __init__(self, mlflow_client, mlmodel_fix=True, use_src_user_id=False, \
             import_metadata_tags=False, dst_notebook_dir_add_run_id=False):
         """ 
-        :param mlflow_client: MLflow client or if None create default client.
+        :param mlflow_client: MLflow client.
         :param mlmodel_fix: Add correct run ID in destination MLmodel artifact. 
                             Can be expensive for deeply nested artifacts.
         :param use_src_user_id: Set the destination user ID to the source user ID. 
@@ -34,7 +34,7 @@ class RunImporter():
         :param dst_notebook_dir: Databricks destination workpsace directory for notebook import.
         :param dst_notebook_dir_add_run_id: Add the run ID to the destination notebook directory.
         """
-        self.mlflow_client = mlflow_client or mlflow.tracking.MlflowClient()
+        self.mlflow_client = mlflow_client
         self.mlmodel_fix = mlmodel_fix
         self.use_src_user_id = use_src_user_id
         self.import_metadata_tags = import_metadata_tags
@@ -58,8 +58,8 @@ class RunImporter():
         return res
 
     def _import_run(self, dst_exp_name, input_dir, dst_notebook_dir):
-        mlflow_utils.set_experiment(self.dbx_client, dst_exp_name)
-        exp = self.mlflow_client.get_experiment_by_name(dst_exp_name)
+        exp_id = mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, dst_exp_name)
+        exp = self.mlflow_client.get_experiment(exp_id)
         src_run_path = os.path.join(input_dir,"run.json")
         src_run_dct = utils.read_json_file(src_run_path)
 
@@ -73,6 +73,7 @@ class RunImporter():
             if self.mlmodel_fix:
                 self._update_mlmodel_run_id(run_id)
             self.mlflow_client.set_terminated(run_id, RunStatus.to_string(RunStatus.FINISHED))
+            run = self.mlflow_client.get_run(run_id)
         except Exception as e:
             self.mlflow_client.set_terminated(run_id, RunStatus.to_string(RunStatus.FAILED))
             import traceback
@@ -191,8 +192,9 @@ def main(input_dir, experiment_name, mlmodel_fix, use_src_user_id, \
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
+    client = mlflow.tracking.MlflowClient()
     importer = RunImporter(
-        mlflow_client=None, 
+        client,
         mlmodel_fix=mlmodel_fix, 
         use_src_user_id=use_src_user_id, 
         import_metadata_tags=import_metadata_tags, 

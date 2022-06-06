@@ -13,14 +13,14 @@ from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common.http_client import DatabricksHttpClient
 
 class ExperimentImporter():
-    def __init__(self, mlflow_client=None, mlmodel_fix=True, use_src_user_id=False, import_metadata_tags=False):
+    def __init__(self, mlflow_client, mlmodel_fix=True, use_src_user_id=False, import_metadata_tags=False):
         """
-        :param mlflow_client: MLflow client or if None create default client.
+        :param mlflow_client: MLflow client.
         :param use_src_user_id: Set the destination user ID to the source user ID.
                                 Source user ID is ignored when importing into
         :param import_metadata_tags: Import mlflow_export_import tags.
         """
-        self.mlflow_client = mlflow_client or mlflow.tracking.MlflowClient()
+        self.mlflow_client = mlflow_client
         self.run_importer = RunImporter(self.mlflow_client, mlmodel_fix=mlmodel_fix, \
             use_src_user_id=use_src_user_id, \
             import_metadata_tags=import_metadata_tags, dst_notebook_dir_add_run_id=True)
@@ -33,7 +33,7 @@ class ExperimentImporter():
         :param: input_dir: Source experiment directory.
         :return: A map of source run IDs and destination run.info.
         """
-        mlflow_utils.set_experiment(self.dbx_client, exp_name)
+        mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, exp_name)
         manifest_path = os.path.join(input_dir,"manifest.json")
         dct = utils.read_json_file(manifest_path)
         run_ids = dct["export_info"]["ok_runs"]
@@ -93,8 +93,9 @@ def main(input_dir, experiment_name, just_peek, use_src_user_id, import_metadata
     if just_peek:
         peek_at_experiment(input_dir)
     else:
+        client = mlflow.tracking.MlflowClient()
         importer = ExperimentImporter(
-            mlflow_client=None, 
+            client,
             use_src_user_id=use_src_user_id, 
             import_metadata_tags=import_metadata_tags)
         importer.import_experiment(experiment_name, input_dir, dst_notebook_dir)

@@ -9,13 +9,6 @@ from mlflow_export_import.common import model_utils
 print("Mlflow path:", mlflow.__file__)
 print("MLflow version:", mlflow.__version__)
 
-#client = mlflow.tracking.MlflowClient()
-#output_dir = "out"
-
-def create_output_dir(output_dir):
-    if os.path.exists(output_dir):
-        shutil.rmtree(output_dir)
-    os.makedirs(output_dir)
 
 def init_output_dirs(output_dir):
     create_output_dir(output_dir)
@@ -25,7 +18,7 @@ def init_output_dirs(output_dir):
 def mk_uuid():
     return shortuuid.uuid()
 
-TEST_OBJECT_PREFIX = f"test_exim" 
+TEST_OBJECT_PREFIX = "test_exim" 
 
 def mk_test_object_name():
     return f"{TEST_OBJECT_PREFIX}_{mk_uuid()}"
@@ -57,6 +50,7 @@ def create_simple_run(client, use_metric_steps=False):
         mlflow.log_artifact("info.txt")
         mlflow.log_artifact("info.txt", "dir2")
         mlflow.log_metric("m1", 0.1)
+    run = client.get_run(run.info.run_id)
     return exp, run
 
 def create_runs(client):
@@ -75,13 +69,27 @@ def delete_experiment(client, exp):
 
 def delete_experiments(client):
     for exp in client.list_experiments():
-        #if exp.name.startswith(TEST_OBJECT_PREFIX):
-        client.delete_experiment(exp.experiment_id)
+        if exp.name.startswith(TEST_OBJECT_PREFIX) or exp.experiment_id=="0":
+            client.delete_experiment(exp.experiment_id)
 
 def delete_models(client):
     for model in client.list_registered_models(max_results=1000):
-        #if model.name.startswith(TEST_OBJECT_PREFIX):
-        model_utils.delete_model(client, model.name)
+        if model.name.startswith(TEST_OBJECT_PREFIX):
+            model_utils.delete_model(client, model.name)
+
+def delete_experiments_and_models(mlflow_server):
+    delete_experiments(mlflow_server.client_src)
+    delete_experiments(mlflow_server.client_dst)
+    delete_models(mlflow_server.client_src)
+    delete_models(mlflow_server.client_dst)
+    if os.path.exists(mlflow_server.output_dir):
+        shutil.rmtree(mlflow_server.output_dir)
+    os.makedirs(mlflow_server.output_dir)
+
+def create_output_dir(output_dir):
+    if os.path.exists(output_dir):
+        shutil.rmtree(output_dir)
+    os.makedirs(output_dir)
 
 def compare_dirs(d1, d2):
     from filecmp import dircmp
@@ -102,3 +110,12 @@ def dump_tags(tags, msg=""):
     tags = dict(sorted(tags.items()))
     for k,v in tags.items():
         print(f"  {k}: {v}")
+
+def create_dst_experiment_name(experiment_name):
+    #return f"{experiment_name}_imported" 
+    return experiment_name
+
+def create_dst_model_name(model_name):
+    #return f"{model_name}_imported"
+    return model_name
+
