@@ -1,13 +1,13 @@
 
 # ===========================================================
 #
-# Script to run tests against a source and destination tracking server.
-# Expects the source and destination server port numbers as an arguments.
+# Script to run tests against a source and destination MLflow tracking server.
+# Expects the source and destination server port numbers as arguments.
 #
 # Does the following:
-#  1. Launches an MLflow tracking server in the background
-#  2. Runs tests against the server with pytest
-#  3. Kills the MLflow tracking server
+#  1. Launches a source and destination tracking server in the background.
+#  2. Runs tests against the tracking servers with pytest.
+#  3. Kills the tracking servers.
 #
 # Example:
 #
@@ -40,7 +40,6 @@ run_tests() {
   message "STAGE 2: RUN TESTS"
   export PYTHONPATH=..:.
   py.test -s test_*.py
-  ##py.test -s test_bulk_experiments.py
 }
 
 launch_server() {
