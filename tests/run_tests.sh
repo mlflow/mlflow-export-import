@@ -39,8 +39,7 @@ message() {
 run_tests() {
   message "STAGE 2: RUN TESTS"
   export PYTHONPATH=..:.
-  ##py.test -s test_*.py
-  py.test -s test_models.py
+  py.test -s test_*.py
 }
 
 launch_server() {
