@@ -9,7 +9,7 @@ def compare_run_import_metadata_tags(client, output_dir, run1, run2):
     compare_runs_no_tags(client, output_dir, run1, run2)
     exp = client.get_experiment(run1.info.experiment_id)
     metadata_tags2 = { k:v for k,v in run2.data.tags.items() if k.startswith("mlflow_export_import.metadata") }
-    assert run1.info.experiment_id == metadata_tags2["mlflow_export_import.metadata.experiment_id"] ## FAILS
+    assert run1.info.experiment_id == metadata_tags2["mlflow_export_import.metadata.experiment_id"]
     assert exp.name == metadata_tags2["mlflow_export_import.metadata.experiment_name"]
     assert run1.info.run_id == metadata_tags2["mlflow_export_import.metadata.run_id"]
     assert run1.info.user_id == metadata_tags2["mlflow_export_import.metadata.user_id"]

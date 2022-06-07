@@ -77,14 +77,14 @@ def delete_models(client):
         if model.name.startswith(TEST_OBJECT_PREFIX):
             model_utils.delete_model(client, model.name)
 
-def delete_experiments_and_models(mlflow_server):
-    delete_experiments(mlflow_server.client_src)
-    delete_experiments(mlflow_server.client_dst)
-    delete_models(mlflow_server.client_src)
-    delete_models(mlflow_server.client_dst)
-    if os.path.exists(mlflow_server.output_dir):
-        shutil.rmtree(mlflow_server.output_dir)
-    os.makedirs(mlflow_server.output_dir)
+def delete_experiments_and_models(mlflow_context):
+    delete_experiments(mlflow_context.client_src)
+    delete_experiments(mlflow_context.client_dst)
+    delete_models(mlflow_context.client_src)
+    delete_models(mlflow_context.client_dst)
+    if os.path.exists(mlflow_context.output_dir):
+        shutil.rmtree(mlflow_context.output_dir)
+    os.makedirs(mlflow_context.output_dir)
 
 def create_output_dir(output_dir):
     if os.path.exists(output_dir):

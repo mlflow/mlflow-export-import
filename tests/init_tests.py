@@ -18,15 +18,15 @@ print("MLFLOW_TRACKING_URI_DST:",uri_dst)
 client_dst = mlflow.tracking.MlflowClient(uri_dst)
 print("client_dst:",client_dst)
 
-MlflowServer = namedtuple(
-    "MlflowServer",
+MlflowContext = namedtuple(
+    "MlflowContext",
     ["client_src", "client_dst", "output_dir"]
 )
 
 @pytest.fixture(scope="session")
-def mlflow_server():
+def mlflow_context():
     with tempfile.TemporaryDirectory() as tmpdir:
         assert mlflow.get_tracking_uri() is not None
-        yield MlflowServer(
+        yield MlflowContext(
             client_src, client_dst, tmpdir
         )
