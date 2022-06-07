@@ -39,12 +39,13 @@ message() {
 run_tests() {
   message "STAGE 2: RUN TESTS"
   export PYTHONPATH=..:.
-  py.test -s test_*.py
+  ##py.test -s test_*.py
+  py.test -s test_models.py
 }
 
 launch_server() {
   port=$1
-  message "STAGE 1: LAUNCH TRACKING SERVER"
+  message "STAGE 1: LAUNCH TRACKING SERVER on port $port"
   rm mlflow_${port}.db
   rm -rf mlruns_${port}
   mlflow server \
@@ -55,13 +56,15 @@ launch_server() {
 
 kill_server() {
   port=$1
-  message "STAGE 3: KILL TRACKING SERVER - PORT=${port}"
+  message "STAGE 3: KILL TRACKING SERVER on port ${port}"
   echo "Killing MLflow Tracking Server pids:"
   pids=`lsof -n -i :${port} | awk '{ print ( $2 ) }' | grep -v PID`
   for pid in $pids ; do
     echo "  Killing PID=$pid"
     kill $pid
     done
+  rm -rf mlruns_${port}
+  rm  mlflow_${port}.db
 }
 
 run() {
