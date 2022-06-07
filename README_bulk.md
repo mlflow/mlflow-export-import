@@ -45,11 +45,7 @@ export-all --output-dir out
 
 ### Import
 
-Use the `import-models` script described below in the `Import registerd models` section.
-
-```
-import-models --input-dir out
-```
+TODO. See https://github.com/mlflow/mlflow-export-import/issues/7.
 
 ## Registered models
 
