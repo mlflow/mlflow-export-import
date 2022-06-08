@@ -5,7 +5,7 @@ from mlflow_export_import.common.dump_run import dump_run
 
 # == Compare runs
 
-def compare_run_import_metadata_tags(client, output_dir, run1, run2):
+def compare_run_with_metadata_tags(client, output_dir, run1, run2):
     compare_runs_no_tags(client, output_dir, run1, run2)
     exp = client.get_experiment(run1.info.experiment_id)
     metadata_tags2 = { k:v for k,v in run2.data.tags.items() if k.startswith("mlflow_export_import.metadata") }

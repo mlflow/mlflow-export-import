@@ -140,8 +140,6 @@ Options:
                                   user ID. Source user ID is ignored when
                                   importing into Databricks since setting it
                                   is not allowed.  [default: False]
-  --import-metadata-tags BOOLEAN  Import mlflow_export_import tags.  [default:
-                                  False]
   --use-threads BOOLEAN           Process the export/import in parallel using
                                   threads.  [default: False]
 ```
@@ -324,7 +322,6 @@ Options:
                                   user ID. Source user ID is ignored when
                                   importing into Databricks since setting it
                                   is not allowed.  [default: False]
-  --import-metadata-tags BOOLEAN  Import mlflow_tools tags.  [default: False]
   --use-threads BOOLEAN           Process the export/import in parallel using
                                   threads.  [default: False]
 ```

@@ -25,7 +25,7 @@ def _create_model(client):
         client.create_model_version(model_name, source, run.info.run_id)
     return model.name
 
-def _run_test(mlflow_context, compare_func, import_metadata_tags=False, use_threads=False):
+def _run_test(mlflow_context, compare_func, use_threads=False):
     delete_experiments_and_models(mlflow_context)
     model_names = [ _create_model(mlflow_context.client_src) for j in range(0,num_models) ]
     export_models(mlflow_context.client_src,
@@ -41,7 +41,6 @@ def _run_test(mlflow_context, compare_func, import_metadata_tags=False, use_thre
         mlflow_context.output_dir,
         delete_model=False,
         use_src_user_id=False,
-        import_metadata_tags=import_metadata_tags,
         verbose=False,
         use_threads=use_threads)
 
@@ -70,8 +69,8 @@ def test_basic(mlflow_context):
 def test_exp_basic_threads(mlflow_context):
     _run_test(mlflow_context, compare_runs, use_threads=True)
 
-def test_exp_import_metadata_tags(mlflow_context):
-    _run_test(mlflow_context, compare_runs, import_metadata_tags=True)
+def test_exp_with_metadata_tags(mlflow_context):
+    _run_test(mlflow_context, compare_runs)
 
 
 def test_get_model_names_from_comma_delimited_string(mlflow_context):

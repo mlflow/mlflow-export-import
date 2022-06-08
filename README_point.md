@@ -111,7 +111,6 @@ Options:
                                   user ID. Source user ID is ignored when
                                   importing into Databricks since setting it
                                   is not allowed.
-  --import-metadata-tags BOOLEAN  Import mlflow_export_import tags
   --dst-notebook-dir TEXT         Databricks destination workpsace base
                                   directory for notebook. A run ID will be
                                   added to contain the run's notebook.
@@ -244,7 +243,6 @@ Options:
                                   importing into Databricks since setting it
                                   is not allowed.  [default: False]
 
-  --import-metadata-tags BOOLEAN  Import mlflow_export_import tags.  [default: False]
   --dst-notebook-dir TEXT         Databricks destination workpsace directory
                                   for notebook import.
   --dst-notebook-dir-add-run-id TEXT

@@ -13,17 +13,16 @@ from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common.http_client import DatabricksHttpClient
 
 class ExperimentImporter():
-    def __init__(self, mlflow_client, mlmodel_fix=True, use_src_user_id=False, import_metadata_tags=True):
+    def __init__(self, mlflow_client, mlmodel_fix=True, use_src_user_id=False):
         """
         :param mlflow_client: MLflow client.
         :param use_src_user_id: Set the destination user ID to the source user ID.
                                 Source user ID is ignored when importing into
-        :param import_metadata_tags: Import mlflow_export_import tags.
         """
         self.mlflow_client = mlflow_client
         self.run_importer = RunImporter(self.mlflow_client, mlmodel_fix=mlmodel_fix, \
             use_src_user_id=use_src_user_id, \
-            import_metadata_tags=import_metadata_tags, dst_notebook_dir_add_run_id=True)
+            dst_notebook_dir_add_run_id=True)
         print("MLflowClient:",self.mlflow_client)
         self.dbx_client = DatabricksHttpClient()
 
@@ -74,11 +73,6 @@ class ExperimentImporter():
     type=bool, 
     default=False
 )
-@click.option("--import-metadata-tags", 
-    help="Import mlflow_export_import tags", 
-    type=bool, 
-    default=True
-)
 @click.option("--dst-notebook-dir",
     help="Databricks destination workpsace base directory for notebook. A run ID will be added to contain the run's notebook.",
     type=str,
@@ -86,7 +80,7 @@ class ExperimentImporter():
     show_default=True
 )
 
-def main(input_dir, experiment_name, just_peek, use_src_user_id, import_metadata_tags, dst_notebook_dir):
+def main(input_dir, experiment_name, just_peek, use_src_user_id, dst_notebook_dir):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
@@ -96,8 +90,7 @@ def main(input_dir, experiment_name, just_peek, use_src_user_id, import_metadata
         client = mlflow.tracking.MlflowClient()
         importer = ExperimentImporter(
             client,
-            use_src_user_id=use_src_user_id, 
-            import_metadata_tags=import_metadata_tags)
+            use_src_user_id=use_src_user_id)
         importer.import_experiment(experiment_name, input_dir, dst_notebook_dir)
 
 if __name__ == "__main__":

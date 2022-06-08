@@ -31,7 +31,7 @@ def _run_test_list_experiments(client, num_experiments, max_results):
     experiments2 = ListExperimentsIterator(client, max_results)
     assert len(experiments1) == len(list(experiments2))
 
-def ___test_list_experiments_max_results_LT_num_experiments(mlflow_context):
+def test_list_experiments_max_results_LT_num_experiments(mlflow_context):
     _run_test_list_experiments(mlflow_context.client_src, 10, 5)
 
 def test_list_experiments_max_results_EQ_num_experiments(mlflow_context):

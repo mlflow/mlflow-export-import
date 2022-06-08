@@ -69,13 +69,11 @@ def delete_experiment(client, exp):
 
 def delete_experiments(client):
     for exp in client.list_experiments():
-        if exp.name.startswith(TEST_OBJECT_PREFIX) or exp.experiment_id=="0":
-            client.delete_experiment(exp.experiment_id)
+        client.delete_experiment(exp.experiment_id)
 
 def delete_models(client):
     for model in client.list_registered_models(max_results=1000):
-        if model.name.startswith(TEST_OBJECT_PREFIX):
-            model_utils.delete_model(client, model.name)
+        model_utils.delete_model(client, model.name)
 
 def delete_experiments_and_models(mlflow_context):
     delete_experiments(mlflow_context.client_src)

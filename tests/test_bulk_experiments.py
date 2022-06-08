@@ -47,7 +47,7 @@ def _run_test(mlflow_context, compare_func, export_metadata_tags=False, use_thre
         notebook_formats = notebook_formats,
         use_threads = use_threads)
 
-    import_experiments(mlflow_context.client_dst, mlflow_context.output_dir, use_src_user_id=False, import_metadata_tags=False, use_threads=False)
+    import_experiments(mlflow_context.client_dst, mlflow_context.output_dir, use_src_user_id=False, use_threads=False)
 
     base_dir = os.path.join(mlflow_context.output_dir,"test_compare_runs")
     os.makedirs(base_dir, exist_ok=True)
@@ -66,7 +66,7 @@ def test_exp_basic(mlflow_context):
 def test_exp_basic_threads(mlflow_context):
     _run_test(mlflow_context, compare_runs, use_threads=True)
 
-def test_exp_import_metadata_tags(mlflow_context): 
+def test_exp_with_metadata_tags(mlflow_context): 
     _run_test(mlflow_context, compare_runs, export_metadata_tags=True)
 
 def test_get_experiment_ids_from_comma_delimited_string(mlflow_context):

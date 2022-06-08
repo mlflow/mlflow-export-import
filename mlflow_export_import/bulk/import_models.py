@@ -20,12 +20,12 @@ def _remap(run_info_map):
             res[src_run_id] = run_info
     return res
 
-def _import_experiments(client, input_dir, use_src_user_id, import_metadata_tags):
+def _import_experiments(client, input_dir, use_src_user_id):
     start_time = time.time()
     manifest_path = os.path.join(input_dir,"experiments","manifest.json")
     manifest = utils.read_json_file(manifest_path)
     exps = manifest["experiments"]
-    importer = ExperimentImporter(client, use_src_user_id, import_metadata_tags)
+    importer = ExperimentImporter(client, use_src_user_id)
     print("Experiments:")
     for exp in exps: 
         print(" ",exp)
@@ -66,9 +66,9 @@ def _import_models(client, input_dir, run_info_map, delete_model, verbose, use_t
     duration = round(time.time() - start_time, 1)
     return { "models": len(models), "duration": duration }
 
-def import_all(client, input_dir, delete_model, use_src_user_id, import_metadata_tags, verbose, use_threads):
+def import_all(client, input_dir, delete_model, use_src_user_id, verbose, use_threads):
     start_time = time.time()
-    exp_res = _import_experiments(client, input_dir, use_src_user_id, import_metadata_tags)
+    exp_res = _import_experiments(client, input_dir, use_src_user_id)
     run_info_map = _remap(exp_res[0])
     model_res = _import_models(client, input_dir, run_info_map, delete_model, verbose, use_threads)
     duration = round(time.time() - start_time, 1)
@@ -99,12 +99,6 @@ def import_all(client, input_dir, delete_model, use_src_user_id, import_metadata
 )
 @click.option("--use-src-user-id", 
     help=click_doc.use_src_user_id, 
-    type=bool, 
-    default=False, 
-    show_default=True
-)
-@click.option("--import-metadata-tags", 
-    help=click_doc.import_metadata_tags, 
     type=bool, 
     default=False, 
     show_default=True
