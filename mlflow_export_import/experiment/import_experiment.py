@@ -13,7 +13,7 @@ from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common.http_client import DatabricksHttpClient
 
 class ExperimentImporter():
-    def __init__(self, mlflow_client, mlmodel_fix=True, use_src_user_id=False, import_metadata_tags=False):
+    def __init__(self, mlflow_client, mlmodel_fix=True, use_src_user_id=False, import_metadata_tags=True):
         """
         :param mlflow_client: MLflow client.
         :param use_src_user_id: Set the destination user ID to the source user ID.
@@ -77,7 +77,7 @@ class ExperimentImporter():
 @click.option("--import-metadata-tags", 
     help="Import mlflow_export_import tags", 
     type=bool, 
-    default=False
+    default=True
 )
 @click.option("--dst-notebook-dir",
     help="Databricks destination workpsace base directory for notebook. A run ID will be added to contain the run's notebook.",

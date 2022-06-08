@@ -22,7 +22,7 @@ from mlflow_export_import.common import MlflowExportImportException
 
 class RunImporter():
     def __init__(self, mlflow_client, mlmodel_fix=True, use_src_user_id=False, \
-            import_metadata_tags=False, dst_notebook_dir_add_run_id=False):
+            import_metadata_tags=True, dst_notebook_dir_add_run_id=False):
         """ 
         :param mlflow_client: MLflow client.
         :param mlmodel_fix: Add correct run ID in destination MLmodel artifact. 
@@ -172,7 +172,7 @@ class RunImporter():
 @click.option("--import-metadata-tags",
     help=click_doc.import_metadata_tags, 
     type=bool, 
-    default=False, 
+    default=True, 
     show_default=True
 )
 @click.option("--dst-notebook-dir",
