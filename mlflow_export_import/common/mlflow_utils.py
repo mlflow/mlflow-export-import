@@ -1,5 +1,6 @@
 import os
 import mlflow
+from mlflow_export_import.common import MlflowExportImportException
 
 def dump_mlflow_info():
     print("MLflow Info:")
@@ -36,7 +37,7 @@ def get_experiment(mlflow_client, exp_id_or_name):
         try:
             exp = mlflow_client.get_experiment(exp_id_or_name)
         except Exception:
-            raise Exception(f"Cannot find experiment ID or name '{exp_id_or_name}'. Client: {mlflow_client}'")
+            raise MlflowExportImportException(f"Cannot find experiment ID or name '{exp_id_or_name}'. Client: {mlflow_client}'")
     return exp
 
 def create_workspace_dir(dbx_client, workspace_dir):
@@ -69,5 +70,5 @@ def _get_experiment(mlflow_client, exp_id_or_name):
     except Exception:
         exp = mlflow_client.get_experiment_by_name(exp_id_or_name)
     if exp is None:
-        raise Exception(f"Cannot find experiment ID or name '{exp_id_or_name}'. Client: {mlflow_client}'")
+        raise MlflowExportImportException(f"Cannot find experiment ID or name '{exp_id_or_name}'. Client: {mlflow_client}'")
     return exp
