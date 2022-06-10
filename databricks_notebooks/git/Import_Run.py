@@ -34,8 +34,9 @@ print("experiment_name:",experiment_name)
 
 # COMMAND ----------
 
+import mlflow
 from mlflow_export_import.run.import_run import RunImporter
-importer = RunImporter()
+importer = RunImporter(mlflow.tracking.MlflowClient())
 run, _ = importer.import_run(experiment_name, input_dir)
 run.info.run_id
 
