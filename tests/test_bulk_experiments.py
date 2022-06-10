@@ -35,6 +35,27 @@ def create_test_experiment(client, num_runs):
         _create_simple_run(j)
     return exp
 
+# == Compare
+
+def compare_experiments(mlflow_context, compare_func):
+    exps1 = sorted(mlflow_context.client_src.list_experiments(), key=lambda x: x.name)
+    exps2 = sorted(mlflow_context.client_dst.list_experiments(), key=lambda x: x.name)
+    assert len(exps1) == len(exps2)
+    for x in zip(exps1, exps2):
+        exp1, exp2 = x[0], x[1]
+        assert exp1.name == exp2.name
+        runs1 = mlflow_context.client_src.list_run_infos(exp1.experiment_id)
+        runs2 = mlflow_context.client_dst.list_run_infos(exp2.experiment_id)
+        assert len(runs1) == len(runs2)
+    for run1 in mlflow_context.client_src.search_runs(exp1.experiment_id, ""):
+        tag = run1.data.tags["run_index"]
+        run2 = mlflow_context.client_dst.search_runs(exp2.experiment_id, f"tags.run_index = '{tag}'")[0]
+        #assert run1.data.tags["tags.run_index] = run2.data.tags["tags.run_index]
+        base_dir = os.path.join(mlflow_context.output_dir,"test_compare_runs")
+        os.makedirs(base_dir, exist_ok=True)
+        odir = os.path.join(base_dir,run1.info.experiment_id)
+        compare_func(mlflow_context.client_src, odir, run1, run2)
+
 # == Export/import Experiments tests
 
 def _run_test(mlflow_context, compare_func, export_metadata_tags=False, use_threads=False):
@@ -48,17 +69,8 @@ def _run_test(mlflow_context, compare_func, export_metadata_tags=False, use_thre
         use_threads = use_threads)
 
     import_experiments(mlflow_context.client_dst, mlflow_context.output_dir, use_src_user_id=False, use_threads=False)
+    compare_experiments(mlflow_context, compare_func)
 
-    base_dir = os.path.join(mlflow_context.output_dir,"test_compare_runs")
-    os.makedirs(base_dir, exist_ok=True)
-
-    for exp1 in exps:
-        exp2 = mlflow_context.client_dst.get_experiment_by_name(exp1.name)
-        for run1 in mlflow_context.client_src.search_runs(exp1.experiment_id, ""):
-            tag = run1.data.tags["run_index"]
-            run2 = mlflow_context.client_dst.search_runs(exp2.experiment_id, f"tags.run_index = '{tag}'")[0]
-            odir = os.path.join(base_dir,run1.info.experiment_id)
-            compare_func(mlflow_context.client_src, odir, run1, run2)
 
 def test_exp_basic(mlflow_context):
     _run_test(mlflow_context, compare_runs)

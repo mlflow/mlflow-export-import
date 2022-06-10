@@ -12,12 +12,32 @@ from init_tests import mlflow_context
 
 notebook_formats = "SOURCE,DBC"
 num_models = 1
-num_experiments = 1
+num_runs = 1
 
 # == Export/import registered model tests
 
+def compare_models(mlflow_context, compare_func):
+    test_dir = os.path.join(mlflow_context.output_dir, "test_compare_runs")
+    exps = list_experiments(mlflow_context.client_src)
+    exp_ids = [ exp.experiment_id for exp in exps ]
+    #models2 = mlflow_context.client_dst.search_registered_models()
+    models2 = mlflow_context.client_dst.list_registered_models()
+    assert len(models2) > 0
+    for model2 in models2:
+        model2 = mlflow_context.client_dst.get_registered_model(model2.name)
+        versions = mlflow_context.client_dst.get_latest_versions(model2.name)
+        for vr in versions:
+            run2 = mlflow_context.client_dst.get_run(vr.run_id)
+            tag = run2.data.tags["my_uuid"]
+            filter = f"tags.my_uuid = '{tag}'"
+            run1 = mlflow_context.client_src.search_runs(exp_ids, filter)[0]
+            tdir = os.path.join(test_dir,run2.info.run_id)
+            os.makedirs(tdir)
+            assert run1.info.run_id != run2.info.run_id
+            compare_func(mlflow_context.client_src, tdir, run1, run2)
+
 def _create_model(client):
-    exp = create_test_experiment(client, num_experiments)
+    exp = create_test_experiment(client, num_runs)
     model_name = mk_test_object_name()
     model = client.create_registered_model(model_name)
     for run in client.search_runs([exp.experiment_id]):
@@ -35,7 +55,6 @@ def _run_test(mlflow_context, compare_func, use_threads=False):
         stages="None", 
         export_all_runs=False, 
         use_threads=False)
-    exps = list_experiments(mlflow_context.client_src)
 
     import_all(mlflow_context.client_dst,
         mlflow_context.output_dir,
@@ -44,24 +63,8 @@ def _run_test(mlflow_context, compare_func, use_threads=False):
         verbose=False,
         use_threads=use_threads)
 
-    test_dir = os.path.join(mlflow_context.output_dir,"test_compare_runs")
+    compare_models(mlflow_context, compare_func)
 
-    exp_ids = [ exp.experiment_id for exp in exps ]
-    #models2 = mlflow_context.client_dst.search_registered_models()
-    models2 = mlflow_context.client_dst.list_registered_models()
-    assert len(models2) > 0
-    for model2 in models2:
-        model2 = mlflow_context.client_dst.get_registered_model(model2.name)
-        versions = mlflow_context.client_dst.get_latest_versions(model2.name)
-        for vr in versions:
-            run2 = mlflow_context.client_dst.get_run(vr.run_id)
-            tag = run2.data.tags["my_uuid"]
-            filter = f"tags.my_uuid = '{tag}'"
-            run1 = mlflow_context.client_src.search_runs(exp_ids, filter)[0]
-            tdir = os.path.join(test_dir,run2.info.run_id)
-            os.makedirs(tdir)
-            assert run1.info.run_id != run2.info.run_id
-            compare_func(mlflow_context.client_src, tdir, run1, run2)
 
 def test_basic(mlflow_context):
     _run_test(mlflow_context, compare_runs)
