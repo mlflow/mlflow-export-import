@@ -13,12 +13,12 @@
 # MAGIC * For details see:
 # MAGIC   * [MLflow Export Import](https://databricks.atlassian.net/wiki/spaces/UN/pages/800754006/MLflow+Export+Import) - Databricks wiki page
 # MAGIC   * Github code:
-# MAGIC     * Source code: https://github.com/amesar/mlflow-export-import
-# MAGIC     * Databricks notebooks: https://github.com/amesar/mlflow-export-import/tree/master/databricks_notebooks
+# MAGIC     * Source code: https://github.com/mlflow/mlflow-export-import
+# MAGIC     * Databricks notebooks: https://github.com/mlflow/mlflow-export-import/tree/master/databricks_notebooks
 # MAGIC   
 # MAGIC #### Architecture
 # MAGIC 
-# MAGIC <img src="https://github.com/amesar/mlflow-export-import/blob/master/architecture.png?raw=true"  width="700" />
+# MAGIC <img src="https://github.com/mlflow/mlflow-export-import/blob/master/architecture.png?raw=true"  width="700" />
 # MAGIC 
 # MAGIC #### Notebooks
 # MAGIC * Run
@@ -41,19 +41,19 @@
 # MAGIC 
 # MAGIC There are two different ways to install the package.
 # MAGIC 
-# MAGIC ##### Install package in notebook
+# MAGIC ##### 1. Install package in notebook
 # MAGIC 
-# MAGIC This is the default executed in the [Common]($./Common) notebook.
+# MAGIC This is the default that is executed in the [Common]($./Common) notebook. Preferred.
 # MAGIC 
 # MAGIC [Install notebook-scoped libraries with %pip](https://docs.databricks.com/libraries/notebooks-python-libraries.html#install-notebook-scoped-libraries-with-pip).
 # MAGIC 
 # MAGIC ```
-# MAGIC pip install git+https:///github.com/amesar/mlflow-export-import/#egg=mlflow-export-import
+# MAGIC pip install git+mlflo`https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
 # MAGIC ```
 # MAGIC 
-# MAGIC ##### Install package as a wheel on cluster 
+# MAGIC ##### 2. Install package as a wheel on cluster 
 # MAGIC 
-# MAGIC Build the wheel artifact on your laptop, upload it to DBFS and then [install it on your cluster](https://docs.databricks.com/libraries/cluster-libraries.html).
+# MAGIC Build the wheel artifact on your laptop, upload it to DBFS and then [install it on your cluster](https://docs.databricks.com/libraries/cluster-libraries.html). Note that will have to comment out the `pip install` in he [Common]($./Common) notebook.
 # MAGIC 
 # MAGIC ```
 # MAGIC python setup.py bdist_wheel
@@ -64,4 +64,4 @@
 
 # COMMAND ----------
 
-# MAGIC %md Last updated: 2022-03-16
+# MAGIC %md Last updated: 2022-06-08
