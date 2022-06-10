@@ -110,7 +110,7 @@ def import_all(client, input_dir, delete_model, use_src_user_id, verbose, use_th
     show_default=True
 )
 
-def main(input_dir, delete_model, use_src_user_id, import_metadata_tags, verbose, use_threads):
+def main(input_dir, delete_model, use_src_user_id, verbose, use_threads):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
@@ -120,7 +120,6 @@ def main(input_dir, delete_model, use_src_user_id, import_metadata_tags, verbose
         input_dir, 
         delete_model=delete_model, 
         use_src_user_id=use_src_user_id, 
-        import_metadata_tags=import_metadata_tags, 
         verbose=verbose, 
         use_threads=use_threads)
 
