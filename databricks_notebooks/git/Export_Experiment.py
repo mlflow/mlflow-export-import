@@ -4,7 +4,7 @@
 # MAGIC ##### Overview
 # MAGIC * Exports an experiment and its runs (artifacts too) to a DBFS directory.
 # MAGIC * Output file `manifest.json` contains top-level experiment metadata.
-# MAGIC * Each run and its artifacts are stored as a sub-directory.
+# MAGIC * Each run and its artifacts are stored as a sub-directory whose name is that of the run_id.
 # MAGIC * Notebooks also can be exported in several formats.
 # MAGIC 
 # MAGIC #### Output folder
@@ -72,7 +72,9 @@ if len(output_dir)==0: raise Exception("ERROR: DBFS destination is required")
 import mlflow
 from mlflow_export_import.common import mlflow_utils 
 
-experiment = mlflow_utils.get_experiment(mlflow.tracking.MlflowClient(), experiment_id_or_name)
+client = mlflow.tracking.MlflowClient()
+
+experiment = mlflow_utils.get_experiment(client, experiment_id_or_name)
 
 output_dir = f"{output_dir}/{experiment.experiment_id}"
 
@@ -105,7 +107,8 @@ dbutils.fs.rm(output_dir, False)
 
 from mlflow_export_import.experiment.export_experiment import ExperimentExporter
 
-exporter = ExperimentExporter(notebook_formats=formats, 
+exporter = ExperimentExporter(client,
+                              notebook_formats=formats, 
                               export_metadata_tags=export_metadata_tags)
 exporter.export_experiment(experiment.experiment_id, output_dir)
 
