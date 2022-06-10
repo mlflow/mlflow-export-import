@@ -91,7 +91,8 @@ dbutils.fs.rm(output_dir, True)
 # COMMAND ----------
 
 from mlflow_export_import.run.export_run import RunExporter
-exporter = RunExporter(notebook_formats=formats, 
+exporter = RunExporter(mlflow.tracking.MlflowClient(),
+                       notebook_formats=formats, 
                        export_metadata_tags=export_metadata_tags)
 exporter.export_run(run_id, output_dir)
 
