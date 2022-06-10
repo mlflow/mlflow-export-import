@@ -5,8 +5,6 @@ export_metadata_tags = "Export source run metadata tags."
 
 import_mlflow_tags = "Import mlflow tags."
 
-import_metadata_tags = "Import mlflow_export_import tags."
-
 notebook_formats = "Notebook formats. Values are SOURCE, HTML, JUPYTER or DBC (comma seperated)."
 
 model_stages = "Stages to export (comma seperated). Default is all stages. Values are Production, Staging, Archived and None."
