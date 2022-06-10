@@ -21,9 +21,6 @@ experiment_name = dbutils.widgets.get("Destination experiment name")
 dbutils.widgets.text("DBFS input folder", "") 
 input_dir = dbutils.widgets.get("DBFS input folder")
 
-dbutils.widgets.dropdown("Import metadata tags","no",["yes","no"])
-import_metadata_tags = dbutils.widgets.get("Import metadata tags") == "yes"
-
 dbutils.widgets.dropdown("Just peek","no",["yes","no"])
 just_peek = dbutils.widgets.get("Just peek") == "yes"
 
@@ -31,7 +28,6 @@ if len(input_dir)==0: raise Exception("ERROR: Input is required")
 
 print("input_dir:",input_dir)
 print("experiment_name:",experiment_name)
-print("import_metadata_tags:",import_metadata_tags)
 print("just_peek:",just_peek)
 
 # COMMAND ----------
@@ -39,7 +35,7 @@ print("just_peek:",just_peek)
 from mlflow_export_import.experiment.import_experiment import ExperimentImporter
 from mlflow_export_import import peek_at_experiment
 
-importer = ExperimentImporter(import_metadata_tags=import_metadata_tags)
+importer = ExperimentImporter(mlflow.tracking.MlflowClient())
 peek_at_experiment(input_dir)
 
 # COMMAND ----------

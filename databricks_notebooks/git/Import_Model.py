@@ -59,7 +59,7 @@ print("experiment_name:",experiment_name)
 # COMMAND ----------
 
 from mlflow_export_import.model.import_model import ModelImporter
-importer = ModelImporter()
+importer = ModelImporter(mlflow.tracking.MlflowClient())
 importer.import_model(model_name, input_dir, experiment_name, delete_model=True)
 
 # COMMAND ----------

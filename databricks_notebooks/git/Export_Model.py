@@ -81,12 +81,8 @@ dbutils.fs.mkdirs(output_dir)
 # COMMAND ----------
 
 from mlflow_export_import.model.export_model import ModelExporter
-exporter = ModelExporter()
+exporter = ModelExporter(mlflow.tracking.MlflowClient())
 exporter.export_model(model_name, output_dir)
-
-# COMMAND ----------
-
-# MAGIC %sh ls -l /dbfs/mnt/andre-work/exim/models/andre_02_Sklearn_Train_Predict/ec7bc29448b54ea497cd88dbcd46a155/run.json
 
 # COMMAND ----------
 
@@ -112,7 +108,7 @@ os.environ['OUTPUT_DIR'] = output_dir
 
 # COMMAND ----------
 
-# MAGIC %md #### Display run information
+# MAGIC %md #### Display exported run information
 
 # COMMAND ----------
 
