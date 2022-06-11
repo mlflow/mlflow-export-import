@@ -30,9 +30,6 @@ Options:
   --output-dir TEXT               Output directory.  [required]
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
                                   JUPYTER or DBC (comma seperated).  [default: ]
-  --export-notebook-revision BOOLEAN
-                                  Export the run's notebook revision.
-                                  Experimental not yet publicly available.
                                   [default: False]
   --use-threads BOOLEAN           Process the export/import in parallel using
                                   threads.  [default: False]
@@ -93,9 +90,6 @@ Options:
                                   JUPYTER or DBC (comma seperated).  [default: ]
   --export-all-runs BOOLEAN       Export all runs of experiment or just runs
                                   associated with registered model versions.
-  --export-notebook-revision BOOLEAN
-                                  Export the run's notebook revision.
-                                  Experimental not yet publicly available.
                                   [default: False]
   --use-threads BOOLEAN           Process the export/import in parallel using
                                   threads.  [default: False]
@@ -168,9 +162,6 @@ Options:
   --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: False]
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
                                   JUPYTER or DBC (comma seperated).  [default: ]
-  --export-notebook-revision BOOLEAN
-                                  Export the run's notebook revision.
-                                  Experimental not yet publicly available.
                                   [default: False]
   --use-threads BOOLEAN           Process the export/import in parallel using
 ```

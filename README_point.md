@@ -36,10 +36,6 @@ Options:
   --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: False]
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
                                   JUPYTER or DBC (comma seperated).  [default: ]
-  --export-notebook-revision BOOLEAN
-                                  Export the run's notebook revision.
-                                  Experimental not yet publicly available.
-                                  [default: False]
 ```
 
 #### Examples
@@ -151,10 +147,6 @@ Options:
   --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: False] 
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
                                   JUPYTER or DBC (comma seperated).  [default: ]
-  --export-notebook-revision BOOLEAN
-                                  Export the run's notebook revision.
-                                  Experimental not yet publicly available.
-                                  [default: False]
 ```
 
 
@@ -294,10 +286,6 @@ Options:
                                   Staging, Archived and None
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
                                   JUPYTER or DBC (comma seperated).  [default: ]
-  --export-notebook-revision BOOLEAN
-                                  Export the run's notebook revision.
-                                  Experimental not yet publicly available.
-                                  [default: False]
 ```
 
 #### Example
