@@ -1,5 +1,6 @@
 from mlflow_export_import.model.export_model import ModelExporter
 from mlflow_export_import.model.import_model import ModelImporter
+from mlflow_export_import import utils
 import utils_test 
 import compare_utils
 from init_tests import mlflow_context
@@ -7,7 +8,7 @@ from init_tests import mlflow_context
 def test_export_import_model(mlflow_context):
     run_src = _create_run(mlflow_context.client_src)
     exporter = ModelExporter(mlflow_context.client_src)
-    model_name_src = utils_test.mk_test_object_name()
+    model_name_src = utils_test.mk_test_object_name_default()
     model_src = mlflow_context.client_src.create_registered_model(model_name_src)
     source = f"{run_src.info.artifact_uri}/model"
     mlflow_context.client_src.create_model_version(model_name_src, source, run_src.info.run_id)
@@ -25,10 +26,9 @@ def test_export_import_model(mlflow_context):
     _compare_models(model_src, model_dst)
     _compare_version_lists(mlflow_context, mlflow_context.output_dir, model_src.latest_versions, model_dst.latest_versions)
 
-
 def test_export_import_model_stages(mlflow_context):
     exporter = ModelExporter(mlflow_context.client_src, stages=["Production","Staging"])
-    model_name_src = utils_test.mk_test_object_name()
+    model_name_src = utils_test.mk_test_object_name_default()
     model_src = mlflow_context.client_src.create_registered_model(model_name_src)
 
     _create_version(mlflow_context.client_src, model_name_src, "Production")
@@ -57,6 +57,7 @@ def test_export_import_model_stages(mlflow_context):
         [vr_prod_src, vr_staging_src],
         [vr_prod_dst, vr_staging_dst])
 
+
 def _create_version(client, model_name, stage=None):
     run = _create_run(client)
     source = f"{run.info.artifact_uri}/model"
@@ -80,10 +81,11 @@ def _compare_version_lists(mlflow_context, output_dir, versions_src, versions_ds
 def _compare_versions(mlflow_context, output_dir, vr_src, vr_dst):
     assert vr_src.current_stage == vr_dst.current_stage
     assert vr_src.description == vr_dst.description
-    #assert vr_src.name == vr_dst.name # TODO: if in different tracking servers
+    assert vr_src.name == vr_dst.name
     assert vr_src.status == vr_dst.status
     assert vr_src.status_message == vr_dst.status_message
-    #assert vr_src.user_id == vr_dst.user_id # Only for open source MLflow
+    if not utils.importing_into_databricks():
+        assert vr_src.user_id == vr_dst.user_id 
     assert vr_src.run_id != vr_dst.run_id
     run_src = mlflow_context.client_src.get_run(vr_src.run_id)
     run_dst = mlflow_context.client_dst.get_run(vr_dst.run_id)
@@ -93,7 +95,7 @@ def _compare_versions(mlflow_context, output_dir, vr_src, vr_dst):
 from mlflow_export_import.model.import_model import _extract_model_path
 
 run_id = "48cf29167ddb4e098da780f0959fb4cf"
-model_path = "models/my_model"
+model_path = "models:/my_model"
 
 def test_extract_model_path_databricks(mlflow_context):
     source = f"dbfs:/databricks/mlflow-tracking/4072937019901104/{run_id}/artifacts/{model_path}"
