@@ -54,7 +54,6 @@ def _import_models(client, input_dir, run_info_map, delete_model, verbose, use_t
     models_dir = os.path.join(input_dir, "models")
     manifest_path = os.path.join(models_dir,"manifest.json")
     manifest = utils.read_json_file(manifest_path)
-    from pprint import pformat
     models = manifest["ok_models"]
     importer = AllModelImporter(client, run_info_map)
 

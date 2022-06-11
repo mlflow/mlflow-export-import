@@ -79,6 +79,8 @@ def read_json_file(path):
         return json.loads(f.read())
 
 def string_to_list(list_as_string):
+    if list_as_string == None:
+        return []
     lst = list_as_string.split(",")
     if "" in lst: lst.remove("")
     return lst

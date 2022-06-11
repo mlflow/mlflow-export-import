@@ -36,7 +36,7 @@ def _export_experiment(client, exp_id_or_name, output_dir, exporter, export_resu
         traceback.print_exc()
     return ok_runs, failed_runs
 
-def export_experiments(client, experiments, output_dir, export_metadata_tags, notebook_formats, use_threads=False):
+def export_experiments(client, experiments, output_dir, export_metadata_tags=False, notebook_formats=None, use_threads=False):
     """
     :param: experiments: Can be either:
       - List of experiment names 

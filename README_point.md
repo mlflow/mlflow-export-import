@@ -281,11 +281,13 @@ export-model --help
 Options:
   --model TEXT       Registered model name.  [required]
   --output-dir TEXT  Output directory.  [required]
+  --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default:
+  --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
+                                  JUPYTER or DBC (comma seperated).  [default: ]
+                                  True]
   --stages TEXT                   Stages to export (comma seperated). Default
                                   is all stages. Values are Production,
                                   Staging, Archived and None
-  --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
-                                  JUPYTER or DBC (comma seperated).  [default: ]
 ```
 
 #### Example

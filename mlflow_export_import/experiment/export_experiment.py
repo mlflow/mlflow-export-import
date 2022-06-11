@@ -12,7 +12,7 @@ from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils, click_doc
 
 class ExperimentExporter():
-    def __init__(self, mlflow_client, export_metadata_tags=True, notebook_formats=[]):
+    def __init__(self, mlflow_client, export_metadata_tags=True, notebook_formats=None):
         """
         :param mlflow_client: MLflow client.
         :param export_metadata_tags: Export source run metadata tags.

@@ -27,6 +27,7 @@ export-all --help
 
 Options:
   --output-dir TEXT               Output directory.  [required]
+  --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: True]
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
                                   JUPYTER or DBC (comma seperated).  [default: ]
                                   [default: False]
@@ -106,15 +107,15 @@ Options:
   --models TEXT                   Models to export. Values are 'all', comma
                                   seperated list of models or model prefix
                                   with * ('sklearn*'). Default is 'all'
+  --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: True]
+  --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
+                                  JUPYTER or DBC (comma seperated).
   --stages TEXT                   Stages to export (comma seperated). Default
                                   is all stages. Values are Production,
                                   Staging, Archived and None.
-  --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
-                                  JUPYTER or DBC (comma seperated).  [default: ]
   --export-all-runs BOOLEAN       Export all runs of experiment or just runs
                                   associated with registered model versions.
-                                  [default: False]
-  --use-threads BOOLEAN           Process the export/import in parallel using
+  --use-threads BOOLEAN           Process export/import in parallel using
                                   threads.  [default: False]
 ```
 

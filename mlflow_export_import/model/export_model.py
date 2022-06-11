@@ -19,8 +19,6 @@ class ModelExporter():
         :param stages: Stages to export. Default is all stages. Values are Production, Staging, Archived and None.
         :param export_run: Export the run that generated a registered model's version.
         """
-        if notebook_formats is None:
-            notebook_formats = []
         self.mlflow_client = mlflow_client
         self.http_client = MlflowHttpClient()
         self.run_exporter = RunExporter(self.mlflow_client, export_metadata_tags=export_metadata_tags, notebook_formats=notebook_formats)
@@ -102,10 +100,11 @@ class ModelExporter():
     type=str,
     required=True
 )
-@click.option("--stages", 
-    help=click_doc.model_stages, 
-    type=str,
-    required=False
+@click.option("--export-metadata-tags",
+    help=click_doc.export_metadata_tags,
+    type=bool,
+    default=True,
+    show_default=True
 )
 @click.option("--notebook-formats", 
     help=click_doc.notebook_formats, 
@@ -113,13 +112,18 @@ class ModelExporter():
     default="", 
     show_default=True
 )
+@click.option("--stages", 
+    help=click_doc.model_stages, 
+    type=str,
+    required=False
+)
 
-def main(model, output_dir, stages, notebook_formats):
+def main(model, output_dir, export_metadata_tags, notebook_formats, stages):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
     client = mlflow.tracking.MlflowClient()
-    exporter = ModelExporter(client, stages=stages, notebook_formats=utils.string_to_list(notebook_formats))
+    exporter = ModelExporter(client, export_metadata_tags=export_metadata_tags, notebook_formats=utils.string_to_list(notebook_formats), stages=stages)
     exporter.export_model(model, output_dir)
 
 if __name__ == "__main__":
