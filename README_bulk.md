@@ -2,9 +2,9 @@
 
 ## Overview
 
-Three types of bulk tools:
+Three sets of bulk tools:
 * All - all MLflow objects of the tracking server.
-* Registered models - models and their versions' runs and experiments.
+* Registered models - models and their versions' run and the run's experiment.
 * Experiments.
 
 Notes:
@@ -16,9 +16,8 @@ Notes:
 
 ### Export
 
-**Note: WIP.**
-
-Exports all MLflow objects of the tracking server (Databricks workspace) - all models, experiments and runs as well as a run's Databricks notebook (best effort).
+Exports all MLflow objects of the tracking server (Databricks workspace) - all models, experiments and runs.
+If you are exporting from Databricks the notebook is also exported.
 
 Source: [export_all.py](mlflow_export_import/bulk/export_all.py).
 
@@ -42,22 +41,46 @@ export-all --output-dir out
 
 ### Import
 
-TODO. See https://github.com/mlflow/mlflow-export-import/issues/7.
+Use import-models to import all exported MLflow objects. The exported output directory is the same for export-all and export-models.
 
 ## Registered models
 
-Tools that copy models and their versions' runs along with the runs' experiment.
+Tools that copy registered models and their versions' runs along with the runs' experiment.
 
 **Scripts**
 * `export-models` - exports registered models and their versions' backing run along with the experiment that the run belongs to.
 * `import-models` - imports models and their runs and experiments from the above exported directory.
 
-**Top-level output directory structure of an export**
+**Output directory structure of models export**
 
 ```
-+---experiments
-+---models
++-manifest.json
+|
++-experiments/
+| +-manifest.json
+| +-1/
+| | +-manifest.json
+| | +-5bd3b8a44faf4803989544af5cb4d66e/
+| | | +-run.json
+| | | +-artifacts/
+| | | | +-sklearn-model/
+| | | |   +-requirements.txt
+| | | |   +-python_env.yaml
+| | | |   +-model.pkl
+| | | |   +-conda.yaml
+| | | |   +-MLmodel
+| | +-4273c31c45744ec385f3654c63c31360
+| | | +-run.json
+| | | . . .
+| 
++-models/
+| +-manifest.json
+| +-sklearn_iris/
+| | +-model.json
 ```
+
+| +-4273c31c45744ec385f3654c63c31360/
+| | +-run.json
 
 For further directory structure see the `point` tool sections for experiments and models further below.
 
@@ -146,6 +169,25 @@ import-models  --input-dir out
 ## Experiments 
 
 Export/import experiments to a directory.
+
+**Output directory structure of models export**
+```
++-manifest.json
+
++-manifest.json
+| +-5bd3b8a44faf4803989544af5cb4d66e/
+| | +-run.json
+| | +-artifacts/
+| | | +-sklearn-model/
+| | |   +-requirements.txt
+| | |   +-python_env.yaml
+| | |   +-model.pkl
+| | |   +-conda.yaml
+| | |   +-MLmodel
+| +-4273c31c45744ec385f3654c63c31360/
+| | +-run.json
+| | +- . . .
+```
 
 ### Export experiments
 
