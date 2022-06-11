@@ -13,7 +13,7 @@ from mlflow_export_import.bulk import write_export_manifest_file
 
 ALL_STAGES = "Production,Staging,Archive,None" 
 
-def export_all(output_dir, notebook_formats, use_threads):
+def export_all(output_dir, export_metadata_tags=False, notebook_formats="", use_threads=False):
     start_time = time.time()
     client = mlflow.tracking.MlflowClient()
     export_models(
@@ -27,7 +27,7 @@ def export_all(output_dir, notebook_formats, use_threads):
         client,
         experiments="all",
         output_dir=os.path.join(output_dir,"experiments"),
-        export_metadata_tags=True,
+        export_metadata_tags=export_metadata_tags,
         notebook_formats=notebook_formats,
         use_threads=use_threads)
     duration = round(time.time() - start_time, 1)
