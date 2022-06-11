@@ -11,4 +11,4 @@ model_stages = "Stages to export (comma seperated). Default is all stages. Value
 
 delete_model = "First delete the model if it exists and all its versions."
 
-use_threads = "Process the export/import in parallel using threads."
+use_threads = "Process export/import in parallel using threads."
