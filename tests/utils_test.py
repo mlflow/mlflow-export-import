@@ -20,10 +20,10 @@ def mk_uuid():
 
 TEST_OBJECT_PREFIX = "test_exim" 
 
-def mk_test_object_name():
+def mk_test_object_name_default():
     return f"{TEST_OBJECT_PREFIX}_{mk_uuid()}"
 
-def create_experiment(client):
+def create_experiment(client, mk_test_object_name=mk_test_object_name_default):
     exp_name = f"{mk_test_object_name()}"
     mlflow.set_experiment(exp_name)
     exp = client.get_experiment_by_name(exp_name)
@@ -112,6 +112,5 @@ def create_dst_experiment_name(experiment_name):
     return experiment_name
 
 def create_dst_model_name(model_name):
-    #return f"{model_name}_imported"
     return model_name
 

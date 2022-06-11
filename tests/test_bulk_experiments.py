@@ -1,7 +1,7 @@
 import os
 import mlflow
 from mlflow_export_import.bulk import bulk_utils
-from utils_test import create_experiment, mk_uuid, delete_experiments
+from utils_test import create_experiment, mk_uuid, delete_experiments, mk_test_object_name_default
 from sklearn_utils import create_sklearn_model
 from compare_utils import compare_runs
 
@@ -29,8 +29,8 @@ def _create_simple_run(idx):
         mlflow.log_artifact("info.txt","dir2")
         mlflow.log_metric("m1", idx)
 
-def create_test_experiment(client, num_runs):
-    exp = create_experiment(client)
+def create_test_experiment(client, num_runs, mk_test_object_name=mk_test_object_name_default):
+    exp = create_experiment(client, mk_test_object_name)
     for j in range(num_runs):
         _create_simple_run(j)
     return exp

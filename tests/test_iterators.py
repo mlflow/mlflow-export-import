@@ -6,7 +6,7 @@ from mlflow_export_import.common.iterators import SearchRunsIterator
 from mlflow_export_import.common.iterators import SearchRegisteredModelsIterator
 from mlflow_export_import.common.iterators import ListExperimentsIterator
 from mlflow_export_import.common.iterators import ListRegisteredModelsIterator
-from utils_test import create_experiment, delete_experiments, delete_models, mk_test_object_name, list_experiments, TEST_OBJECT_PREFIX
+from utils_test import create_experiment, delete_experiments, delete_models, mk_test_object_name_default, list_experiments, TEST_OBJECT_PREFIX
 from init_tests import mlflow_context
 
 # ==== List experiments
@@ -56,7 +56,7 @@ def _create_models(client, num_models):
     models = client.list_registered_models()
     assert len(models) == 0
     for _ in range(0,num_models):
-        model_name = mk_test_object_name()
+        model_name = mk_test_object_name_default()
         client.create_registered_model(model_name)
 
 def _run_test_list_models(client, num_models, max_results):
