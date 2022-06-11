@@ -66,7 +66,7 @@ def _import_models(client, input_dir, run_info_map, delete_model, verbose, use_t
     duration = round(time.time() - start_time, 1)
     return { "models": len(models), "duration": duration }
 
-def import_all(client, input_dir, delete_model, use_src_user_id, verbose, use_threads):
+def import_all(client, input_dir, delete_model, use_src_user_id=False, verbose=False, use_threads=False):
     start_time = time.time()
     exp_res = _import_experiments(client, input_dir, use_src_user_id)
     run_info_map = _remap(exp_res[0])
