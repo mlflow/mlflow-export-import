@@ -3,6 +3,7 @@ Run dump utilities.
 """
 
 import time
+import click
 import mlflow
 
 INDENT = "  "
@@ -74,13 +75,14 @@ def dump_artifacts(run_id, path, level, max_level, indent):
             num_artifacts += 1
     return num_bytes,num_artifacts
 
+@click.command()
+@click.option("--run-id", help="Run ID.", required=True)
+@click.option("--artifact-max-level", help="Number of artifact levels to recurse.", default=1, type=int)
+
+def main(run_id, artifact_max_level):
+    print("Options:")
+    for k,v in locals().items(): print(f"  {k}: {v}")
+    dump_run_id(run_id, artifact_max_level)
+
 if __name__ == "__main__":
-    from argparse import ArgumentParser
-    parser = ArgumentParser()
-    parser.add_argument("--run_id", dest="run_id", help="Run ID", required=True)
-    parser.add_argument("--artifact_max_level", dest="artifact_max_level", help="Number of artifact levels to recurse", required=False, default=1, type=int)
-    args = parser.parse_args()
-    print("Arguments:")
-    for arg in vars(args):
-        print(f"  {arg}: {getattr(args, arg)}")
-    dump_run_id(args.run_id, args.artifact_max_level)
+    main()
