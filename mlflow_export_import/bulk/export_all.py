@@ -44,7 +44,7 @@ def export_all(output_dir, export_metadata_tags=False, notebook_formats=None, us
 @click.option("--export-metadata-tags",
     help=click_doc.export_metadata_tags,
     type=bool,
-    default=True,
+    default=False,
     show_default=True
 )
 @click.option("--notebook-formats", 

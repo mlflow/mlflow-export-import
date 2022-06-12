@@ -103,7 +103,7 @@ class ModelExporter():
 @click.option("--export-metadata-tags",
     help=click_doc.export_metadata_tags,
     type=bool,
-    default=True,
+    default=False,
     show_default=True
 )
 @click.option("--notebook-formats", 
