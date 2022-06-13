@@ -6,8 +6,9 @@ import pandas as pd
 import mlflow
 from . import mk_local_path
 
-TAG_PREFIX_METADATA = "mlflow_export_import.metadata"
-TAG_PREFIX_SRC_RUN = "mlflow_export_import.source_run"
+TAG_PREFIX_EXPORT_IMPORT_RUN_INFO = "mlflow_export_import.run_info"
+TAG_PREFIX_EXPORT_IMPORT_METADATA = "mlflow_export_import.metadata"
+TAG_PREFIX_EXPORT_IMPORT_MLFLOW = "mlflow_export_import.mlflow"
 TAG_PREFIX_MLFLOW = "mlflow."
 TAG_PARENT_ID = "mlflow.parentRunId"
 
@@ -25,30 +26,31 @@ def create_mlflow_tags_for_databricks_import(tags):
 
 def create_tags_for_metadata(src_client, run, export_metadata_tags):
     """ Create destination tags from source run """
+    mlflow_system_tags = { k:v for k,v in run.data.tags.items() if k.startswith(TAG_PREFIX_MLFLOW) }
     tags = run.data.tags.copy()
-    for k in _databricks_skip_tags:
-        tags.pop(k, None)
+    if importing_into_databricks():
+        for k in _databricks_skip_tags:
+            tags.pop(k, None)
     if export_metadata_tags:
         uri = mlflow.tracking.get_tracking_uri()
-        tags[TAG_PREFIX_METADATA+".tracking_uri"] = uri
+        tags[TAG_PREFIX_EXPORT_IMPORT_METADATA+".tracking_uri"] = uri
         dbx_host = os.environ.get("DATABRICKS_HOST",None)
         if dbx_host is not None:
-            tags[TAG_PREFIX_METADATA+".DATABRICKS_HOST"] = dbx_host
+            tags[TAG_PREFIX_EXPORT_IMPORT_METADATA+".DATABRICKS_HOST"] = dbx_host
+
         now = int(time.time()+.5)
         snow = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(now))
-        tags[TAG_PREFIX_METADATA+".timestamp"] = str(now)
-        tags[TAG_PREFIX_METADATA+".timestamp_nice"] = snow
-        tags[TAG_PREFIX_METADATA+".user_id"] = run.info.user_id
-        tags[TAG_PREFIX_METADATA+".run_id"] =  str(run.info.run_id)
-        tags[TAG_PREFIX_METADATA+".experiment_id"] = run.info.experiment_id
-        tags[TAG_PREFIX_METADATA+".artifact_uri"] = run.info.artifact_uri
-        tags[TAG_PREFIX_METADATA+".status"] = run.info.status
-        tags[TAG_PREFIX_METADATA+".lifecycle_stage"] = run.info.lifecycle_stage
-        tags[TAG_PREFIX_METADATA+".start_time"] = run.info.start_time
-        tags[TAG_PREFIX_METADATA+".end_time"] = run.info.end_time
-        #tags[TAG_PREFIX_METADATA+".status"] = run.info.status
+        tags[TAG_PREFIX_EXPORT_IMPORT_METADATA+".timestamp"] = str(now)
+        tags[TAG_PREFIX_EXPORT_IMPORT_METADATA+".timestamp_nice"] = snow
         exp = src_client.get_experiment(run.info.experiment_id)
-        tags[TAG_PREFIX_METADATA+".experiment_name"] = exp.name
+
+        tags[TAG_PREFIX_EXPORT_IMPORT_METADATA+".experiment_name"] = exp.name
+        for k,v in strip_underscores(run.info).items():
+            tags[f"{TAG_PREFIX_EXPORT_IMPORT_RUN_INFO}.{k}"] = str(v) # NOTE: tag values must be strings
+
+        for k,v in mlflow_system_tags.items():
+            tags[k.replace(TAG_PREFIX_MLFLOW,TAG_PREFIX_EXPORT_IMPORT_MLFLOW+".")] = v
+
     tags = { k:v for k,v in sorted(tags.items()) }
     return tags
 

@@ -21,7 +21,7 @@ print("client_dst:",client_dst)
 
 MlflowContext = namedtuple(
     "MlflowContext",
-    ["client_src", "client_dst", "output_dir"]
+    ["client_src", "client_dst", "output_dir", "output_run_dir"]
 )
 
 @pytest.fixture(scope="session")
@@ -34,5 +34,5 @@ def mlflow_context():
         else:
             output_dir = tmpdir
         yield MlflowContext(
-            client_src, client_dst, output_dir
+            client_src, client_dst, output_dir, os.path.join(output_dir,"run")
         )

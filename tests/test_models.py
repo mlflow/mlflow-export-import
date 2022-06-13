@@ -89,7 +89,7 @@ def _compare_versions(mlflow_context, output_dir, vr_src, vr_dst):
     assert vr_src.run_id != vr_dst.run_id
     run_src = mlflow_context.client_src.get_run(vr_src.run_id)
     run_dst = mlflow_context.client_dst.get_run(vr_dst.run_id)
-    compare_utils.compare_runs(mlflow_context.client_src, output_dir, run_src, run_dst)
+    compare_utils.compare_runs(mlflow_context.client_src, mlflow_context.client_dst, output_dir, run_src, run_dst)
 
 
 from mlflow_export_import.model.import_model import _extract_model_path

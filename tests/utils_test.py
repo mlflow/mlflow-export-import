@@ -6,14 +6,21 @@ import mlflow.sklearn
 from sklearn_utils import create_sklearn_model
 from mlflow_export_import.common import model_utils
 
-print("Mlflow path:", mlflow.__file__)
 print("MLflow version:", mlflow.__version__)
-
 
 def init_output_dirs(output_dir):
     create_output_dir(output_dir)
-    os.makedirs(os.path.join(output_dir, "run1"))
-    os.makedirs(os.path.join(output_dir, "run2"))
+    return create_run_artifact_dirs(output_dir)
+
+def create_run_artifact_dirs(output_dir):
+    dir1 = create_run_artifact_dir(output_dir, "run1")
+    dir2 = create_run_artifact_dir(output_dir, "run2")
+    return dir1, dir2
+
+def create_run_artifact_dir(output_dir, run_name):
+    dir = os.path.join(output_dir, "artifacts", run_name)
+    create_output_dir(dir)
+    return dir
 
 def mk_uuid():
     return shortuuid.uuid()
@@ -31,11 +38,11 @@ def create_experiment(client, mk_test_object_name=mk_test_object_name_default):
         client.delete_run(info.run_id)
     return exp
 
-def create_simple_run(client, use_metric_steps=False):
+def create_simple_run(client, run_name=None, use_metric_steps=False):
     exp = create_experiment(client)
     max_depth = 4
     model = create_sklearn_model(max_depth)
-    with mlflow.start_run(run_name="my_run") as run:
+    with mlflow.start_run(run_name=run_name) as run:
         mlflow.log_param("max_depth",max_depth)
         if use_metric_steps:
             for j in range(0,5):
@@ -99,7 +106,7 @@ def compare_dirs(d1, d2):
             if not _compare_dirs(sub_dcmp):
                 return False
         return True
-    return _compare_dirs(dircmp(d1,d2))
+    return _compare_dirs(dircmp(d1, d2))
 
 def dump_tags(tags, msg=""):
     print(f"==== {len(tags)} Tags:",msg)
@@ -113,4 +120,3 @@ def create_dst_experiment_name(experiment_name):
 
 def create_dst_model_name(model_name):
     return model_name
-

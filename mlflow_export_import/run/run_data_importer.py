@@ -41,7 +41,7 @@ def log_tags(client, run_dct, run_id, batch_size, in_databricks, src_user_id, us
     def get_data(run_dct, args):
         tags = run_dct["tags"]
         tags = utils.create_mlflow_tags_for_databricks_import(tags) # remove "mlflow" tags that cannot be imported into Databricks
-        tags = [ RunTag(k,str(v)) for k,v in tags.items() ]
+        tags = [ RunTag(k,v) for k,v in tags.items() ]
         if not in_databricks:
             utils.set_dst_user_id(tags, args["src_user_id"], args["use_src_user_id"])
         return tags

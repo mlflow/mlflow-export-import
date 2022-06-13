@@ -68,7 +68,7 @@ class RunImporter():
         run_id = run.info.run_id
         try:
             self._import_run_data(src_run_dct, run_id, src_run_dct["info"]["user_id"])
-            path = os.path.join(input_dir,"artifacts")
+            path = os.path.join(input_dir, "artifacts")
             if os.path.exists(_filesystem.mk_local_path(path)):
                 self.mlflow_client.log_artifacts(run_id, mk_local_path(path))
             if self.mlmodel_fix:

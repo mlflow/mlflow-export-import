@@ -97,15 +97,98 @@ Full object referential integrity is maintained as well as the original MLflow o
 
 `export-metadata-tags` - Creates metadata tags (starting with `mlflow_export_import.metadata`) that contain export information. These are the source `mlflow` tags in addition to other information. This is useful for provenance and auditing purposes in regulated industries.
 
-```
-Name                                          Value
-mlflow_export_import.metadata.timestamp       1551037752
-mlflow_export_import.metadata.timestamp_nice  2019-02-24 19:49:12
-mlflow_export_import.metadata.experiment_id   2
-mlflow_export_import.metadata.experiment-name sklearn_wine
-mlflow_export_import.metadata.run-id          50fa90e751eb4b3f9ba9cef0efe8ea30
-mlflow_export_import.metadata.tracking_uri    http://localhost:5000
-```
+`export-metadata-tags` - Exports metadata tags (starting with `mlflow_export_import.metadata`) that contain source run information such as `mlflow_export_import.metadata.run-id`. These are the source `mlflow.` tags in addition to other information. This is useful for provenance and auditing purposes in regulated industries.
+
+### Mlflow Export Import Tags
+
+If the `export-metadata-tags` option is set on an export tool, three sets of source run tags will be saved under the `mlflow_export_import.` prefix.
+* **MLflow system tags.** All source MLflow system tags starting with `mlflow.` will be saved under the `mlflow_export_import.mlflow.` prefix.
+  * For example, the source tag `mlflow.source.type` becomes the destination tag `mlflow_export_import.mlflow.source.type`.
+* **RunInfo field tags.** Soure [RunInfo](https://mlflow.org/docs/latest/python_api/mlflow.entities.html#mlflow.entities.RunInfo) fields are captured in tags starting with `mlflow_export_import.run_info`.
+  * Note that MLflow tag values must be a string, so non-string `RunInfo` fields are cast to a string such as `start_time`.
+* **Metadata tags.** Tags indicating source export metadata information such as `mlflow_export_import.metadata.tracking_uri`.
+
+#### Open Source Mlflow Export Import Tags
+
+See [sample run tags](samples/oss_mlflow/experiments/sklearn_wine/77a09d17edcf47e985403241c576debb/run.json)
+
+##### MLflow system tags
+
+|Tag | Value |
+|----|-------|
+| mlflow_export_import.mlflow.log-model.history | [{\run_id\: \77a09d17edcf47e985403241c576debb\ | \artifact_path\: \model\, \utc_time_created\: \2022-06-12 03:34:39.289551\, \flavors\: {\python_function\: {\model_path\: \model.pkl\, \loader_module\: \mlflow.sklearn\, \python_version\: \3.7.6\, \env\: \conda.yaml\}, \sklearn\: {\pickled_model\: \model.pkl\, \sklearn_version\: \1.0.2\, \serialization_format\: \cloudpickle\, \code\: null}}, \model_uuid\: \38c43fc59c734b0a80704ac3214ea2c3\, \mlflow_version\: \1.26.1\}, {\run_id\: \77a09d17edcf47e985403241c576debb\, \artifact_path\: \onnx-model\, \utc_time_created\: \2022-06-12 03:34:42.110784\, \flavors\: {\python_function\: {\loader_module\: \mlflow.onnx\, \python_version\: \3.7.6\, \data\: \model.onnx\, \env\: \conda.yaml\}, \onnx\: {\onnx_version\: \1.10.2\, \data\: \model.onnx\, \providers\: [\CUDAExecutionProvider\, \CPUExecutionProvider\], \code\: null}}, \model_uuid\: \ddf79625e4d241b7813e601f31b1222f\, \mlflow_version\: \1.26.1\}],
+| mlflow_export_import.mlflow.runName | train.sh |
+| mlflow_export_import.mlflow.source.git.commit | 67fb8f823ec794902cdbb67be653a6155a0b5172 |
+| mlflow_export_import.mlflow.source.name | /Users/andre/git/mlflow-examples/python/sklearn/wine_quality/train.py |
+| mlflow_export_import.mlflow.source.type | LOCAL |
+| mlflow_export_import.mlflow.user | andre |
+
+##### MLflow RunInfo tags
+
+|Tag | Value |
+|----|-------|
+| mlflow_export_import.run_info.artifact_uri | /opt/mlflow/server/mlruns/2/77a09d17edcf47e985403241c576debb/artifacts |
+| mlflow_export_import.run_info.end_time | 1655004883611 |
+| mlflow_export_import.run_info.experiment_id | 2 |
+| mlflow_export_import.run_info.lifecycle_stage | active |
+| mlflow_export_import.run_info.run_id | 77a09d17edcf47e985403241c576debb |
+| mlflow_export_import.run_info.start_time | 1655004878844 |
+| mlflow_export_import.run_info.status | FINISHED |
+| mlflow_export_import.run_info.user_id | andre |
+
+##### Metadata tags
+
+|Tag | Value |
+|----|-------|
+| mlflow_export_import.metadata.experiment_name | sklearn_wine |
+| mlflow_export_import.metadata.timestamp | 1655007510 |
+| mlflow_export_import.metadata.timestamp_nice | 2022-06-12 04:18:30 |
+| mlflow_export_import.metadata.tracking_uri | http://127.0.0.1:5020 |
+
+### Databricks MLflow metadata tags
+
+See [sample run tags](https://github.com/mlflow/mlflow-export-import/blob/master/samples/databricks/experiments/sklearn_wine/16c36560c57a43fdb46e98f88a8d8819/run.json).
+
+##### MLflow system tags
+
+|Tag | Value | 
+|----|-------|
+| mlflow_export_import.mlflow.databricks.cluster.id         | 0318-151752-abed99                                                                                             |
+| mlflow_export_import.mlflow.databricks.cluster.info       | {"cluster_name":"Shared Autoscaling Americas","spark_version":"10.2.x-cpu-ml-scala2.12","node_type_id":"i3.2xl |
+| mlflow_export_import.mlflow.databricks.cluster.libraries  | {"installable":[],"redacted":[]}                                                                               |
+| mlflow_export_import.mlflow.databricks.notebook.commandID | 6101304639030907941_7207589773925520000_e458c0ed7c5c4e52b020b1b92d39b308                                       |
+| mlflow_export_import.mlflow.databricks.notebookID         | 3532228                                                                                                        |
+| mlflow_export_import.mlflow.databricks.notebookPath       | /Users/andre@mycompany.com/mlflow/02a_Sklearn_Train_Predict    |
+| mlflow_export_import.mlflow.databricks.notebookRevisionID | 1647395473565                                                                                                  |
+| mlflow_export_import.mlflow.databricks.webappURL          | https://demo.cloud.databricks.com                                                                              |
+| mlflow_export_import.mlflow.log-model.history             | [{"artifact_path":"sklearn-model","signature":{"inputs":"[{\"name\": \"fixed acidity\", \"type\": \"double\"}, |
+| mlflow_export_import.mlflow.runName                       | sklearn                                                                                                        |
+| mlflow_export_import.mlflow.source.name                   | /Users/andre@mycompany.com/mlflow/02a_Sklearn_Train_Predict    |
+| mlflow_export_import.mlflow.source.type                   | NOTEBOOK                                                                                                       |
+| mlflow_export_import.mlflow.user                          | andre@mycompany.com                                                                                 |
+
+
+##### MLflow RunInfo tags
+
+|Tag | Value | 
+|----|-------|
+| mlflow_export_import.run_info.artifact_uri                | dbfs:/databricks/mlflow/3532228/826a19c33d8c461ebf91aa90c25a5dd8/artifacts |
+| mlflow_export_import.run_info.end_time                    | 1647395473410                                                              |
+| mlflow_export_import.run_info.experiment_id               | 3532228                                                                    |
+| mlflow_export_import.run_info.lifecycle_stage             | active                                                                     |
+| mlflow_export_import.run_info.run_id                      | 826a19c33d8c461ebf91aa90c25a5dd8                                           |
+| mlflow_export_import.run_info.run_uuid                    | 826a19c33d8c461ebf91aa90c25a5dd8                                           |
+| mlflow_export_import.run_info.start_time                  | 1647395462575                                                              |
+| mlflow_export_import.run_info.status                      | FINISHED                                                                   |
+| mlflow_export_import.run_info.user_id                     |                                                                            |
+
+##### Metadata tags
+|Tag | Value | 
+|----|-------|
+| mlflow_export_import.metadata.experiment_name             | /Users/andre@mycompany.com/mlflow/02a_Sklearn_Train_Predict    |
+| mlflow_export_import.metadata.timestamp                   | 1655148303 |
+| mlflow_export_import.metadata.timestamp_nice              | 2022-06-13 19:25:03 |
+| mlflow_export_import.metadata.tracking_uri                | databricks |
 
 ## Setup
 
