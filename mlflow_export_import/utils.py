@@ -24,6 +24,20 @@ def create_mlflow_tags_for_databricks_import(tags):
         tags = { k:v for k,v in tags.items() if not k in _databricks_skip_tags }
     return tags
 
+def _create_metadata_tags(src_client, tags, run):
+    tags[TAG_PREFIX_EXPORT_IMPORT_METADATA+".mlflow_version"] = mlflow.__version__
+    uri = mlflow.tracking.get_tracking_uri()
+    tags[TAG_PREFIX_EXPORT_IMPORT_METADATA+".tracking_uri"] = uri
+    dbx_host = os.environ.get("DATABRICKS_HOST",None)
+    if dbx_host is not None:
+        tags[TAG_PREFIX_EXPORT_IMPORT_METADATA+".DATABRICKS_HOST"] = dbx_host
+    now = int(time.time()+.5)
+    snow = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(now))
+    tags[TAG_PREFIX_EXPORT_IMPORT_METADATA+".timestamp"] = str(now)
+    tags[TAG_PREFIX_EXPORT_IMPORT_METADATA+".timestamp_nice"] = snow
+    exp = src_client.get_experiment(run.info.experiment_id)
+    tags[TAG_PREFIX_EXPORT_IMPORT_METADATA+".experiment_name"] = exp.name
+
 def create_tags_for_metadata(src_client, run, export_source_tagss):
     """ Create destination tags from source run """
     mlflow_system_tags = { k:v for k,v in run.data.tags.items() if k.startswith(TAG_PREFIX_MLFLOW) }
@@ -32,19 +46,8 @@ def create_tags_for_metadata(src_client, run, export_source_tagss):
         for k in _databricks_skip_tags:
             tags.pop(k, None)
     if export_source_tagss:
-        uri = mlflow.tracking.get_tracking_uri()
-        tags[TAG_PREFIX_EXPORT_IMPORT_METADATA+".tracking_uri"] = uri
-        dbx_host = os.environ.get("DATABRICKS_HOST",None)
-        if dbx_host is not None:
-            tags[TAG_PREFIX_EXPORT_IMPORT_METADATA+".DATABRICKS_HOST"] = dbx_host
+        _create_metadata_tags(src_client, tags, run)
 
-        now = int(time.time()+.5)
-        snow = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(now))
-        tags[TAG_PREFIX_EXPORT_IMPORT_METADATA+".timestamp"] = str(now)
-        tags[TAG_PREFIX_EXPORT_IMPORT_METADATA+".timestamp_nice"] = snow
-        exp = src_client.get_experiment(run.info.experiment_id)
-
-        tags[TAG_PREFIX_EXPORT_IMPORT_METADATA+".experiment_name"] = exp.name
         for k,v in strip_underscores(run.info).items():
             tags[f"{TAG_PREFIX_EXPORT_IMPORT_RUN_INFO}.{k}"] = str(v) # NOTE: tag values must be strings
 

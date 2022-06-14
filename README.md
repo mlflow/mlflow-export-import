@@ -148,10 +148,11 @@ See [sample run tags](samples/oss_mlflow/experiments/sklearn_wine/77a09d17edcf47
 
 |Tag | Value | Description |
 |----|-------|-------------|
+| mlflow_export_import.metadata.mlflow_version | 1.26.1 | MLflow version |
+| mlflow_export_import.metadata.tracking_uri | http://127.0.0.1:5020 | Source tracking server URI |
 | mlflow_export_import.metadata.experiment_name | sklearn_wine | Name of experiment |
 | mlflow_export_import.metadata.timestamp | 1655007510 | Time when run was exported |
 | mlflow_export_import.metadata.timestamp_nice | 2022-06-12 04:18:30 | ibid |
-| mlflow_export_import.metadata.tracking_uri | http://127.0.0.1:5020 | Source tracking server URI |
 
 ### Databricks MLflow source tags
 
@@ -193,10 +194,11 @@ See [sample run tags](samples/databricks/experiments/sklearn_wine/f2e3f75c845d43
 ##### Metadata tags
 |Tag | Value | 
 |----|-------|
+| mlflow_export_import.metadata.mlflow_version | 1.26.1 | 
+| mlflow_export_import.metadata.tracking_uri                | databricks |
 | mlflow_export_import.metadata.experiment_name             | /Users/andre@mycompany.com/mlflow/02a_Sklearn_Train_Predict    |
 | mlflow_export_import.metadata.timestamp                   | 1655148303 |
 | mlflow_export_import.metadata.timestamp_nice              | 2022-06-13 19:25:03 |
-| mlflow_export_import.metadata.tracking_uri                | databricks |
 
 ## Setup
 
