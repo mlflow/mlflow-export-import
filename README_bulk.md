@@ -27,7 +27,11 @@ export-all --help
 
 Options:
   --output-dir TEXT               Output directory.  [required]
-  --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: True]
+  --export-source-tagss BOOLEAN  Export source run information (RunInfo,
+                                 MLflow system tags starting with 'mlflow' and
+                                 metadata) under the 'mlflow_export_import'
+                                 tag prefix. See README.md for more details.
+                                 [default: False]
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
                                   JUPYTER or DBC (comma seperated).  [default: ]
                                   [default: False]
@@ -107,7 +111,11 @@ Options:
   --models TEXT                   Models to export. Values are 'all', comma
                                   seperated list of models or model prefix
                                   with * ('sklearn*'). Default is 'all'
-  --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: True]
+  --export-source-tagss BOOLEAN  Export source run information (RunInfo,
+                                 MLflow system tags starting with 'mlflow' and
+                                 metadata) under the 'mlflow_export_import'
+                                 tag prefix. See README.md for more details.
+                                 [default: False]
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
                                   JUPYTER or DBC (comma seperated).
   --stages TEXT                   Stages to export (comma seperated). Default
@@ -202,7 +210,11 @@ Options:
   --experiments TEXT              Experiment names or IDs (comma delimited).
                                   'all' will export all experiments.  [required]
   --output-dir TEXT               Output directory.  [required]
-  --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: False]
+  --export-source-tagss BOOLEAN  Export source run information (RunInfo,
+                                 MLflow system tags starting with 'mlflow' and
+                                 metadata) under the 'mlflow_export_import'
+                                 tag prefix. See README.md for more details.
+                                 [default: False]
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
                                   JUPYTER or DBC (comma seperated).  [default: ]
                                   [default: False]

@@ -33,7 +33,11 @@ export-experiment --help
 Options:
   --experiment TEXT               Experiment name or ID.  [required]
   --output-dir TEXT               Output directory.  [required]
-  --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: False]
+  --export-source-tagss BOOLEAN  Export source run information (RunInfo,
+                                 MLflow system tags starting with 'mlflow' and
+                                 metadata) under the 'mlflow_export_import'
+                                 tag prefix. See README.md for more details.
+                                 [default: False]
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
                                   JUPYTER or DBC (comma seperated).  [default: ]
 ```
@@ -144,7 +148,11 @@ export-run --help
 Options:
   --run-id TEXT                   Run ID.  [required]
   --output-dir TEXT               Output directory.  [required]
-  --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default: False] 
+  --export-source-tagss BOOLEAN  Export source run information (RunInfo,
+                                 MLflow system tags starting with 'mlflow' and
+                                 metadata) under the 'mlflow_export_import'
+                                 tag prefix. See README.md for more details.
+                                 [default: False]
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
                                   JUPYTER or DBC (comma seperated).  [default: ]
 ```
@@ -281,7 +289,11 @@ export-model --help
 Options:
   --model TEXT       Registered model name.  [required]
   --output-dir TEXT  Output directory.  [required]
-  --export-metadata-tags BOOLEAN  Export source run metadata tags.  [default:
+  --export-source-tagss BOOLEAN  Export source run information (RunInfo,
+                                 MLflow system tags starting with 'mlflow' and
+                                 metadata) under the 'mlflow_export_import'
+                                 tag prefix. See README.md for more details.
+                                 [default: False]
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
                                   JUPYTER or DBC (comma seperated).  [default: ]
                                   True]

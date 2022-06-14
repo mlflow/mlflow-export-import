@@ -24,14 +24,14 @@ def create_mlflow_tags_for_databricks_import(tags):
         tags = { k:v for k,v in tags.items() if not k in _databricks_skip_tags }
     return tags
 
-def create_tags_for_metadata(src_client, run, export_metadata_tags):
+def create_tags_for_metadata(src_client, run, export_source_tagss):
     """ Create destination tags from source run """
     mlflow_system_tags = { k:v for k,v in run.data.tags.items() if k.startswith(TAG_PREFIX_MLFLOW) }
     tags = run.data.tags.copy()
     if importing_into_databricks():
         for k in _databricks_skip_tags:
             tags.pop(k, None)
-    if export_metadata_tags:
+    if export_source_tagss:
         uri = mlflow.tracking.get_tracking_uri()
         tags[TAG_PREFIX_EXPORT_IMPORT_METADATA+".tracking_uri"] = uri
         dbx_host = os.environ.get("DATABRICKS_HOST",None)

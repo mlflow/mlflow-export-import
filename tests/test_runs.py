@@ -27,7 +27,7 @@ def test_run_basic(mlflow_context):
 
 def test_run_with_metadata_tags(mlflow_context):
     run1, run2 = init_run_test(mlflow_context, 
-        RunExporter(mlflow_context.client_src, export_metadata_tags=True), 
+        RunExporter(mlflow_context.client_src, export_source_tagss=True), 
         RunImporter(mlflow_context.client_dst, mlmodel_fix=mlmodel_fix), 
         "test_run_with_metadata_tags",
         verbose=False)

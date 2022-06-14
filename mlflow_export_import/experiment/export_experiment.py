@@ -12,14 +12,14 @@ from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils, click_doc
 
 class ExperimentExporter():
-    def __init__(self, mlflow_client, export_metadata_tags=False, notebook_formats=None):
+    def __init__(self, mlflow_client, export_source_tagss=False, notebook_formats=None):
         """
         :param mlflow_client: MLflow client.
-        :param export_metadata_tags: Export source run metadata tags.
+        :param export_source_tagss: Export source run metadata tags.
         :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
         """
         self.mlflow_client = mlflow_client
-        self.run_exporter = RunExporter(self.mlflow_client, export_metadata_tags, notebook_formats)
+        self.run_exporter = RunExporter(self.mlflow_client, export_source_tagss, notebook_formats)
 
     def export_experiment(self, exp_id_or_name, output_dir, run_ids=None):
         """
@@ -86,8 +86,8 @@ class ExperimentExporter():
     type=str,
     required=True
 )
-@click.option("--export-metadata-tags",
-    help=click_doc.export_metadata_tags, 
+@click.option("--export-source-tagss",
+    help=click_doc.export_source_tagss, 
     type=bool, 
     default=False, 
     show_default=True
@@ -99,14 +99,14 @@ class ExperimentExporter():
     show_default=True
 )
 
-def main(experiment, output_dir, export_metadata_tags, notebook_formats):
+def main(experiment, output_dir, export_source_tagss, notebook_formats):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
     client = mlflow.tracking.MlflowClient()
     exporter = ExperimentExporter(
         client,
-        export_metadata_tags=export_metadata_tags, 
+        export_source_tagss=export_source_tagss, 
         notebook_formats=utils.string_to_list(notebook_formats))
     exporter.export_experiment(experiment, output_dir)
 

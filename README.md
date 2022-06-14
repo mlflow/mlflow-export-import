@@ -73,21 +73,22 @@ Full object referential integrity is maintained as well as the original MLflow o
 
 #### Importing Notebooks
 
-* Partial functionality due to Databricks API limitations.
-* The Databricks API does not support:
+* Partial functionality due to Databricks REST API limitations.
+* The Databricks REST API does not support:
   * Importing a notebook with its entire revision history.
   * Linking an imported run with a given notebook revision.
-* When you import a run, the link to its source notebook revision ID will not exist and thus the UI will point to a dead link.
+* When you import a run, the link to its source notebook revision ID will be a dead link and therefore the UI link is broken.
 * As a convenience, the import tools allows you to import the exported notebook into Databricks. For more details, see:
   *  [README_point - Import run](README_point.md#Import-run)
   *  [README_point - Import experiment](README_point.md#Import-Experiment)
-* The imported notebook cannot be attached to the run that created it.
-* If you have several runs that point to different revisions of the same notebook, each imported run will be attached a different notebook.
+* The imported notebook cannot be attached to the new run that it is associated with.
 * You must export a notebook in the SOURCE format for the notebook to be imported.
 
 
 #### Used ID
-* When importing a run or experiment, for open source MLflow you can specify the user owner. For Databricks import you cannot - the owner will be based on the personal access token (PAT) of the import user.
+* When importing a run or experiment, for open source MLflow you can specify the user owner. 
+* OSS MLflow - the destination run `mlflow.user` tag will be the same as the source `mlflow.user` tag since OSS MLflow allows you to set this tag.
+* Databricks MLflow - you cannot set the `mlflow.user` tag.  The `mlflow.user` will be based on the personal access token (PAT) of the importing user.
 
 ## Common options details 
 
@@ -95,18 +96,25 @@ Full object referential integrity is maintained as well as the original MLflow o
 
 `use-src-user-id` -  Set the destination user ID to the source user ID. Source user ID is ignored when importing into Databricks since the user is automatically picked up from your Databricks access token.
 
-`export-metadata-tags` - Creates metadata tags (starting with `mlflow_export_import.metadata`) that contain export information. These are the source `mlflow` tags in addition to other information. This is useful for provenance and auditing purposes in regulated industries.
+`export-source-tags` - Exports source information under the `mlflow_export_import` tag prefix. See section below for details.
 
-`export-metadata-tags` - Exports metadata tags (starting with `mlflow_export_import.metadata`) that contain source run information such as `mlflow_export_import.metadata.run-id`. These are the source `mlflow.` tags in addition to other information. This is useful for provenance and auditing purposes in regulated industries.
+### MLflow Export Import Source Run Tags - `mlflow_export_import`
 
-### Mlflow Export Import Tags
+For governance purposes, original source run information is saved under the `mlflow_export_import` tag prefix. When you import a run, the values of `RunInfo` are auto-generated for you as well as some tags. 
 
-If the `export-metadata-tags` option is set on an export tool, three sets of source run tags will be saved under the `mlflow_export_import.` prefix.
-* **MLflow system tags.** All source MLflow system tags starting with `mlflow.` will be saved under the `mlflow_export_import.mlflow.` prefix.
-  * For example, the source tag `mlflow.source.type` becomes the destination tag `mlflow_export_import.mlflow.source.type`.
-* **RunInfo field tags.** Soure [RunInfo](https://mlflow.org/docs/latest/python_api/mlflow.entities.html#mlflow.entities.RunInfo) fields are captured in tags starting with `mlflow_export_import.run_info`.
-  * Note that MLflow tag values must be a string, so non-string `RunInfo` fields are cast to a string such as `start_time`.
-* **Metadata tags.** Tags indicating source export metadata information such as `mlflow_export_import.metadata.tracking_uri`.
+This is useful for governance, provenance and auditing purposes for regulated industries such as finance and HLS (health case and life science) industries.
+
+If the `export-source-tags` option is set on an export tool, three sets of source run tags will be saved under the `mlflow_export_import` prefix.
+
+* **MLflow system tags.** Prefix: `mlflow_export_import.mlflow`. Saves all source MLflow system tags starting with `mlflow.` 
+  * For example, the source tag `mlflow.source.type` is saved as the destination tag `mlflow_export_import.mlflow.source.type`.
+
+* **RunInfo field tags.** Prefix: `mlflow_export_import.run_info`. Saves all source [RunInfo](https://mlflow.org/docs/latest/python_api/mlflow.entities.html#mlflow.entities.RunInfo) fields.
+  * For example RunInfo.run_id is stored as `mlflow_export_import.run_info.run_id`.
+  * Note that since MLflow tag values must be a string, non-string `RunInfo` fields (int) are cast to a string such as `start_time`.
+
+* **Metadata tags.** Prefix: `mlflow_export_import.metadata`.  Tags indicating source export metadata information 
+  * Example: `mlflow_export_import.metadata.tracking_uri`.
 
 #### Open Source Mlflow Export Import Tags
 
@@ -138,16 +146,16 @@ See [sample run tags](samples/oss_mlflow/experiments/sklearn_wine/77a09d17edcf47
 
 ##### Metadata tags
 
-|Tag | Value |
-|----|-------|
-| mlflow_export_import.metadata.experiment_name | sklearn_wine |
-| mlflow_export_import.metadata.timestamp | 1655007510 |
-| mlflow_export_import.metadata.timestamp_nice | 2022-06-12 04:18:30 |
-| mlflow_export_import.metadata.tracking_uri | http://127.0.0.1:5020 |
+|Tag | Value | Description |
+|----|-------|-------------|
+| mlflow_export_import.metadata.experiment_name | sklearn_wine | Name of experiment |
+| mlflow_export_import.metadata.timestamp | 1655007510 | Time when run was exported |
+| mlflow_export_import.metadata.timestamp_nice | 2022-06-12 04:18:30 | ibid |
+| mlflow_export_import.metadata.tracking_uri | http://127.0.0.1:5020 | Source tracking server URI |
 
-### Databricks MLflow metadata tags
+### Databricks MLflow source tags
 
-See [sample run tags](https://github.com/mlflow/mlflow-export-import/blob/master/samples/databricks/experiments/sklearn_wine/16c36560c57a43fdb46e98f88a8d8819/run.json).
+See [sample run tags](samples/databricks/experiments/sklearn_wine/f2e3f75c845d4365addbc9c0262a58a5/run.json).
 
 ##### MLflow system tags
 

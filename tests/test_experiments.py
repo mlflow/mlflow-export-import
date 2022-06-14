@@ -33,6 +33,6 @@ def test_exp_basic(mlflow_context):
 
 def test_exp_with_metadata_tags(mlflow_context):
     run1, run2 = init_exp_test(mlflow_context,
-       ExperimentExporter(mlflow_context.client_src, export_metadata_tags=True), 
+       ExperimentExporter(mlflow_context.client_src, export_source_tagss=True), 
        ExperimentImporter(mlflow_context.client_dst), verbose=False)
     compare_run_with_metadata_tags(mlflow_context.client_src, mlflow_context.client_dst, mlflow_context.output_dir, run1, run2)
