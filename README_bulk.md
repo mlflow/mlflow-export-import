@@ -46,7 +46,13 @@ export-all --output-dir out
 
 ### Import
 
-Use import-models to import all exported MLflow objects. The exported output directory is the same for export-all and export-models.
+`import-all` is a console script that invokes [import-models](#Import-registered-models) to import all exported MLflow objects.
+The exported output directory is the same structure for both `export-all` and `export-models`.
+
+#### Examples
+```
+import-all --input-dir out
+```
 
 ## Registered models
 
