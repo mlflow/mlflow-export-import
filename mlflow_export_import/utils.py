@@ -38,14 +38,14 @@ def _create_metadata_tags(src_client, tags, run):
     exp = src_client.get_experiment(run.info.experiment_id)
     tags[TAG_PREFIX_EXPORT_IMPORT_METADATA+".experiment_name"] = exp.name
 
-def create_tags_for_metadata(src_client, run, export_source_tagss):
+def create_tags_for_metadata(src_client, run, export_source_tags):
     """ Create destination tags from source run """
     mlflow_system_tags = { k:v for k,v in run.data.tags.items() if k.startswith(TAG_PREFIX_MLFLOW) }
     tags = run.data.tags.copy()
     if importing_into_databricks():
         for k in _databricks_skip_tags:
             tags.pop(k, None)
-    if export_source_tagss:
+    if export_source_tags:
         _create_metadata_tags(src_client, tags, run)
 
         for k,v in strip_underscores(run.info).items():
