@@ -18,10 +18,10 @@ print("MLflow Version:", mlflow.version.VERSION)
 print("MLflow Tracking URI:", mlflow.get_tracking_uri())
 
 class RunExporter:
-    def __init__(self, mlflow_client, export_source_tagss=False, notebook_formats=None):
+    def __init__(self, mlflow_client, export_source_tags=False, notebook_formats=None):
         """
         :param mlflow_client: MLflow client.
-        :param export_source_tagss: Export source run metadata tags.
+        :param export_source_tags: Export source run metadata tags.
         :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
         """
         if notebook_formats is None:
@@ -29,7 +29,7 @@ class RunExporter:
         self.mlflow_client = mlflow_client
         self.dbx_client = DatabricksHttpClient()
         print("Databricks REST client:", self.dbx_client)
-        self.export_source_tagss = export_source_tagss
+        self.export_source_tags = export_source_tags
         self.notebook_formats = notebook_formats
 
     def _get_metrics_with_steps(self, run):
@@ -51,7 +51,7 @@ class RunExporter:
         fs = _filesystem.get_filesystem(output_dir)
         run = self.mlflow_client.get_run(run_id)
         fs.mkdirs(output_dir)
-        tags = utils.create_tags_for_metadata(self.mlflow_client, run, self.export_source_tagss)
+        tags = utils.create_tags_for_metadata(self.mlflow_client, run, self.export_source_tags)
         dct = {
             "export_info": {
                 "mlflow_version": mlflow.__version__,
@@ -125,8 +125,8 @@ class RunExporter:
     type=str,
     required=True
 )
-@click.option("--export-source-tagss", 
-    help=click_doc.export_source_tagss, 
+@click.option("--export-source-tags", 
+    help=click_doc.export_source_tags, 
     type=bool, 
     default=False, 
     show_default=True
@@ -138,14 +138,14 @@ class RunExporter:
     show_default=True
 )
 
-def main(run_id, output_dir, export_source_tagss, notebook_formats):
+def main(run_id, output_dir, export_source_tags, notebook_formats):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
     client = mlflow.tracking.MlflowClient()
     exporter = RunExporter(
       client,
-      export_source_tagss=export_source_tagss, 
+      export_source_tags=export_source_tags, 
       notebook_formats=utils.string_to_list(notebook_formats))
     exporter.export_run(run_id, output_dir)
 
