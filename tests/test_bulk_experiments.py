@@ -4,7 +4,6 @@ from mlflow_export_import.bulk import bulk_utils
 from utils_test import create_experiment, mk_uuid, delete_experiments, mk_test_object_name_default
 from sklearn_utils import create_sklearn_model
 from compare_utils import compare_runs
-
 from mlflow_export_import.bulk.export_experiments import export_experiments
 from mlflow_export_import.bulk.import_experiments import import_experiments
 from init_tests import mlflow_context
@@ -15,18 +14,18 @@ notebook_formats = "SOURCE,DBC"
 
 mlmodel_fix = True
 
-def _create_simple_run(idx):
+def _create_simple_run(idx=0):
     model = create_sklearn_model(max_depth=4)
     with mlflow.start_run(run_name=f"run_{idx}"):
-        mlflow.log_param("run_index",idx)
-        mlflow.log_metric("rmse",.789+idx)
-        mlflow.set_tag("my_uuid",mk_uuid())
-        mlflow.set_tag("run_index",idx)
+        mlflow.log_param("run_index", idx)
+        mlflow.log_metric("rmse", 0.789+idx)
+        mlflow.set_tag("my_uuid" ,mk_uuid())
+        mlflow.set_tag("run_index", idx)
         mlflow.sklearn.log_model(model, "model")
-        with open("info.txt", "w") as f:
+        with open("info.txt", "wt") as f:
             f.write("Hi artifact")
         mlflow.log_artifact("info.txt")
-        mlflow.log_artifact("info.txt","dir2")
+        mlflow.log_artifact("info.txt", "dir2")
         mlflow.log_metric("m1", idx)
 
 def create_test_experiment(client, num_runs, mk_test_object_name=mk_test_object_name_default):
