@@ -1,7 +1,7 @@
 # MLflow Export Import
 
 This package provides tools to export and import MLflow objects (runs, experiments or registered models) from one MLflow tracking server (Databricks workspace) to another.
-See the [Databricks MLflow Object Relationships](https://github.com/mlflow/mlflow-resources/blob/master/slides/Databricks_MLflow_Object_Relationships.pdf) slide deck.
+For more details the [Databricks MLflow Object Relationships](https://github.com/amesar/mlflow-resources/blob/master/slides/Databricks_MLflow_Object_Relationships.pdf) slide deck.
 
 ## Useful Links
   * [Point tools README](README_point.md)
@@ -46,7 +46,7 @@ See the [Databricks MLflow Object Relationships](https://github.com/mlflow/mlflo
 ### Two sets of migration tools
 
 * [Point tools](README_point.md). Low-level tools to copy individual MLflow objects and have fine-grained control over the target names.
-For example, if you wish to clone an experiment in the same tracking server (workspace), use these tools.
+For example, if you wish to clone an experiment in the same tracking server (Databricks workspace), use these tools.
 * [Bulk tools](README_bulk.md). High-level tools to copy an entire tracking server or the web of MLflow objects (runs and experiments) associated with registered models. 
 Full object referential integrity is maintained as well as the original MLflow object names.
   * For registered models it exports:
@@ -68,26 +68,26 @@ Full object referential integrity is maintained as well as the original MLflow o
 ### Databricks Limitations
 
 #### Exporting Notebook Revisions
-* The notebook revision associated with the run can be exported. It is stored as an artifact in the `notebooks` folder under the run's `artifacts` root.
+* The notebook revision associated with the run can be exported. It is stored as an an artifact in the `notebooks` directory.
 *  You can save the notebook in the suppported SOURCE, HTML, JUPYTER and DBC formats. 
+*  Examples: `notebooks/notebook.dbc` or `notebooks/notebook.source`.
 
 #### Importing Notebooks
 
 * Partial functionality due to Databricks REST API limitations.
 * The Databricks REST API does not support:
-  * Importing a notebook with its entire revision history.
-  * Linking an imported run with a given notebook revision.
-* When you import a run, the link to its source notebook revision ID will be a dead link and therefore the UI link is broken.
+  * Importing a notebook with its revision history.
+  * Linking an imported run with the imported notebook.
+* When you import a run, the link to its source notebook revision ID will be a dead link and you cannot access the notebook from the MLflow UI.
 * As a convenience, the import tools allows you to import the exported notebook into Databricks. For more details, see:
   *  [README_point - Import run](README_point.md#Import-run)
   *  [README_point - Import experiment](README_point.md#Import-Experiment)
-* The imported notebook cannot be attached to the new run that it is associated with.
 * You must export a notebook in the SOURCE format for the notebook to be imported.
 
 
 #### Used ID
 * When importing a run or experiment, for open source MLflow you can specify the user owner. 
-* OSS MLflow - the destination run `mlflow.user` tag will be the same as the source `mlflow.user` tag since OSS MLflow allows you to set this tag.
+* OSS MLflow - the destination run `mlflow.user` tag can be the same as the source `mlflow.user` tag since OSS MLflow allows you to set this tag.
 * Databricks MLflow - you cannot set the `mlflow.user` tag.  The `mlflow.user` will be based on the personal access token (PAT) of the importing user.
 
 ## Common options details 
