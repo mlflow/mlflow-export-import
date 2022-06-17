@@ -14,7 +14,7 @@ Notes:
 
 ## All MLflow objects
 
-### Export
+### Export all MLflow objects
 
 Exports all MLflow objects of the tracking server (Databricks workspace) - all models, experiments and runs.
 If you are exporting from Databricks the notebook is also exported.
@@ -44,7 +44,7 @@ Options:
 export-all --output-dir out
 ```
 
-### Import
+### Import all MLflow objects
 
 `import-all` is a console script that invokes [import-models](#Import-registered-models) to import all exported MLflow objects.
 The exported output directory is the same structure for both `export-all` and `export-models`.
@@ -98,8 +98,7 @@ For further directory structure see the `point` tool sections for experiments an
 
 ### Export registered models 
 
-
-Exports registered models and their versions' backing run along with the experiment that the run belongs to.
+Exports registered models and their versions' backing run along with the run's experiment.
 
 The `export-all-runs` option is of particular significance. 
 It controls whether all runs of an experiment are exported or only those associated with a registered model version.
@@ -309,7 +308,7 @@ In the example below we have two experiments - 1 and 7. Experiment 1 (sklearn) h
 |         +-model/
 ```
 
-Sample [experiments manifest.json](samples/oss_mlflow/experiment_list/manifest.json).
+Sample:
 ```
 {
   "info": {
@@ -330,7 +329,7 @@ Sample [experiments manifest.json](samples/oss_mlflow/experiment_list/manifest.j
 }
 ```
 
-Sample [experiment manifest.json](samples/oss_mlflow/experiment_list/1/manifest.json).
+Sample:
 
 ```
 {

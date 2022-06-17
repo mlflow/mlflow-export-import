@@ -1,18 +1,8 @@
 # MLflow Export Import
 
 This package provides tools to export and import MLflow objects (runs, experiments or registered models) from one MLflow tracking server (Databricks workspace) to another.
-For more details the [Databricks MLflow Object Relationships](https://github.com/amesar/mlflow-resources/blob/master/slides/Databricks_MLflow_Object_Relationships.pdf) slide deck.
 
-## Useful Links
-  * [Point tools README](README_point.md)
-    * `export_experiment` [API](mlflow_export_import/experiment/export_experiment.py#L25-L30)
-    * `export_model` [API](mlflow_export_import/model/export_model.py#L31-L35)
-    * `export_run` [API](mlflow_export_import/run/export_run.py#L47-L51)
-    * `import_experiment` [API](mlflow_export_import/experiment/import_experiment.py#L31-L35)
-    * `import_model` [API](mlflow_export_import/model/import_model.py#L83-L91)
-    * `import_run` [API](mlflow_export_import/run/import_run.py#L48-L54)
-  * [Bulk tools README](README_bulk.md)
-  * [Databricks notebooks for object export/import](databricks_notebooks/README.md).
+For more details on MLflow objects see the [Databricks MLflow Object Relationships](https://github.com/amesar/mlflow-resources/blob/master/slides/Databricks_MLflow_Object_Relationships.pdf) slide deck.
 
 ## Architecture
 
@@ -24,11 +14,11 @@ For more details the [Databricks MLflow Object Relationships](https://github.com
   * Share and collaborate with other data scientists in the same or another tracking server.
     * For example, clone a favorite experiment from another user in your own workspace.
   * Migrate experiments to another tracking server.
-    * For example, promote a registered model version (and its associated run) from the development to the production tracking server.
+    * For example, promote a registered model version (and its associated run) from the development to the test tracking server and then to the production tracking server.
   * Backup your MLflow objects.
   * Disaster recovery.
 
-### Migration modes
+### MLflow Export Import scenarios
 
 |Source tracking server | Destination tracking server | Note |
 |-------|------------|---|
@@ -37,22 +27,66 @@ For more details the [Databricks MLflow Object Relationships](https://github.com
 | Databricks | Databricks |common |
 | Databricks | Open source | rare |
 
-### Two migration tool contexts 
+### Two sets of tools
 
-* Open source MLflow Python CLI scripts - this page.
-* [Databricks notebooks](databricks_notebooks/README.md).
+* Open source MLflow Python scripts.
+* [Databricks notebooks](databricks_notebooks/README.md) that invoke the Python scripts.
 
+## Tools Overview
 
-### Two sets of migration tools
+###  Python Scripts
 
+There are two sets of Python scripts:
 * [Point tools](README_point.md). Low-level tools to copy individual MLflow objects and have fine-grained control over the target names.
-For example, if you wish to clone an experiment in the same tracking server (Databricks workspace), use these tools.
+For example, if you wish to clone an experiment to a different name in the same tracking server (Databricks workspace), use these tools.
 * [Bulk tools](README_bulk.md). High-level tools to copy an entire tracking server or the web of MLflow objects (runs and experiments) associated with registered models. 
 Full object referential integrity is maintained as well as the original MLflow object names.
   * For registered models it exports:
     * All the latest versions of a model.
     * The run associated with the version.
     * The experiment that the run belongs to.
+
+####  Point tools
+
+[README](README_point.md)
+    
+|Console Script | Code | 
+|-------|-------|
+| [export-model](README_point.md#Export-Registered-model) | [code](mlflow_export_import/model/export_model.py) |
+| [export-experiment](README_point.md#Export-Experiment) | [code](mlflow_export_import/experiment/export_experiment.py) |
+| [export-run](README_point.md#Export-run) | [code](mlflow_export_import/run/export_run.py) |
+| [import-model](README_point.md#Import-registered-model) | [code](mlflow_export_import/model/import_model.py) |
+| [import-experiment](README_point.md#Import-Experiment) | [code](mlflow_export_import/experiment/import_experiment.py) |
+| [import-run](README_point.md#Import-run) | [code](mlflow_export_import/run/import_run.py) |
+
+#### Bulk tools 
+
+[README](README_bulk.md)
+
+|Console Script | Code | Description |
+|-------|-------|----|
+| [export-all](README_bulk.md#Export-all-MLflow-objects) | [code](mlflow_export_import/bulk/export_all.py) | Exports all MLflow objects (registered models, experiments and runs). |
+| [export-models](README_bulk.md#Export-registered-models) | [code](mlflow_export_import/bulk/export_models.py) | Exports several (or all) registered models and their versions' backing run along with the run's experiment. |
+| [export-experiments](README_bulk.md#Export-experiments) | [code](mlflow_export_import/bulk/export_experiments.py) | Export several (or all) experiments to a directory. |
+| [import-all](README_bulk.md#Import-all-MLflow-objects) | Uses [import-models](mlflow_export_import/bulk/import_models.py) | Imports MLflow objects from a directory. |
+| [import-models](README_bulk.md#Import-registered-models) | [code](mlflow_export_import/bulk/import_models.py) | Imports registered models from a directory. |
+| [import-experiments](README_bulk.md#Import-experiments) | [code](mlflow_export_import/bulk/import_experiments.py) | Imports experiments from a directory. |
+
+### Databricks notebooks
+
+As mentioned before, Databricks notebooks simply invoke their corresponding Python scripts.
+Note that only Point notebooks are available now.
+
+[README](databricks_notebooks/README.md)
+
+| Notebook | Code | HTML |
+|-------|-------|----|
+| Export_Model | [code](databricks_notebooks/git/Export_Model.py) | [html](databricks_notebooks/html/Export_Model.html) | 
+| Export_Experiment | [code](databricks_notebooks/git/Export_Experiment.py) | [html](databricks_notebooks/html/Export_Experiment.html) | 
+| Export_Run | [code](databricks_notebooks/git/Export_Run.py) | [html](databricks_notebooks/html/Export_Run.html) | 
+| Import_Model | [code](databricks_notebooks/git/Import_Model.py) | [html](databricks_notebooks/html/Import_Model.html) | 
+| Import_Experiment | [code](databricks_notebooks/git/Import_Experiment.py) | [html](databricks_notebooks/html/Import_Experiment.html) | 
+| Import_Run | [code](databricks_notebooks/git/Import_Run.py) | [html](databricks_notebooks/html/Import_Run.html) | 
 
 ### Other
 * [Miscellanous tools](README_tools.md) 
@@ -68,7 +102,7 @@ Full object referential integrity is maintained as well as the original MLflow o
 ### Databricks Limitations
 
 #### Exporting Notebook Revisions
-* The notebook revision associated with the run can be exported. It is stored as an an artifact in the `notebooks` directory.
+* The notebook revision associated with the run can be exported. It is stored as an an artifact in the run's `notebooks` artifact directory.
 *  You can save the notebook in the suppported SOURCE, HTML, JUPYTER and DBC formats. 
 *  Examples: `notebooks/notebook.dbc` or `notebooks/notebook.source`.
 
@@ -81,7 +115,7 @@ Full object referential integrity is maintained as well as the original MLflow o
 * When you import a run, the link to its source notebook revision ID will be a dead link and you cannot access the notebook from the MLflow UI.
 * As a convenience, the import tools allows you to import the exported notebook into Databricks. For more details, see:
   *  [README_point - Import run](README_point.md#Import-run)
-  *  [README_point - Import experiment](README_point.md#Import-Experiment)
+  *  [README_point - Import experiment](README_point.md#Import-experiment)
 * You must export a notebook in the SOURCE format for the notebook to be imported.
 
 
@@ -118,13 +152,13 @@ If the `export-source-tags` option is set on an export tool, three sets of sourc
 
 #### Open Source Mlflow Export Import Tags
 
-See [sample run tags](samples/oss_mlflow/experiments/sklearn_wine/77a09d17edcf47e985403241c576debb/run.json)
+See [sample run tags](samples/oss_mlflow/experiments/sklearn_wine/eb66c160957d4a28b11d3f1b968df9cd/run.json).
 
 ##### MLflow system tags
 
 |Tag | Value |
 |----|-------|
-| mlflow_export_import.mlflow.log-model.history | [{\run_id\: \77a09d17edcf47e985403241c576debb\ | \artifact_path\: \model\, \utc_time_created\: \2022-06-12 03:34:39.289551\, \flavors\: {\python_function\: {\model_path\: \model.pkl\, \loader_module\: \mlflow.sklearn\, \python_version\: \3.7.6\, \env\: \conda.yaml\}, \sklearn\: {\pickled_model\: \model.pkl\, \sklearn_version\: \1.0.2\, \serialization_format\: \cloudpickle\, \code\: null}}, \model_uuid\: \38c43fc59c734b0a80704ac3214ea2c3\, \mlflow_version\: \1.26.1\}, {\run_id\: \77a09d17edcf47e985403241c576debb\, \artifact_path\: \onnx-model\, \utc_time_created\: \2022-06-12 03:34:42.110784\, \flavors\: {\python_function\: {\loader_module\: \mlflow.onnx\, \python_version\: \3.7.6\, \data\: \model.onnx\, \env\: \conda.yaml\}, \onnx\: {\onnx_version\: \1.10.2\, \data\: \model.onnx\, \providers\: [\CUDAExecutionProvider\, \CPUExecutionProvider\], \code\: null}}, \model_uuid\: \ddf79625e4d241b7813e601f31b1222f\, \mlflow_version\: \1.26.1\}],
+| mlflow_export_import.mlflow.log-model.history | [{\run_id\: \eb66c160957d4a28b11d3f1b968df9cd\ | \artifact_path\: \model\, \utc_time_created\: \2022-06-12 03:34:39.289551\, \flavors\: {\python_function\: {\model_path\: \model.pkl\, \loader_module\: \mlflow.sklearn\, \python_version\: \3.7.6\, \env\: \conda.yaml\}, \sklearn\: {\pickled_model\: \model.pkl\, \sklearn_version\: \1.0.2\, \serialization_format\: \cloudpickle\, \code\: null}}, \model_uuid\: \38c43fc59c734b0a80704ac3214ea2c3\, \mlflow_version\: \1.26.1\}, {\run_id\: \eb66c160957d4a28b11d3f1b968df9cd\, \artifact_path\: \onnx-model\, \utc_time_created\: \2022-06-12 03:34:42.110784\, \flavors\: {\python_function\: {\loader_module\: \mlflow.onnx\, \python_version\: \3.7.6\, \data\: \model.onnx\, \env\: \conda.yaml\}, \onnx\: {\onnx_version\: \1.10.2\, \data\: \model.onnx\, \providers\: [\CUDAExecutionProvider\, \CPUExecutionProvider\], \code\: null}}, \model_uuid\: \ddf79625e4d241b7813e601f31b1222f\, \mlflow_version\: \1.26.1\}],
 | mlflow_export_import.mlflow.runName | train.sh |
 | mlflow_export_import.mlflow.source.git.commit | 67fb8f823ec794902cdbb67be653a6155a0b5172 |
 | mlflow_export_import.mlflow.source.name | /Users/andre/git/mlflow-examples/python/sklearn/wine_quality/train.py |
@@ -135,11 +169,11 @@ See [sample run tags](samples/oss_mlflow/experiments/sklearn_wine/77a09d17edcf47
 
 |Tag | Value |
 |----|-------|
-| mlflow_export_import.run_info.artifact_uri | /opt/mlflow/server/mlruns/2/77a09d17edcf47e985403241c576debb/artifacts |
+| mlflow_export_import.run_info.artifact_uri | /opt/mlflow/server/mlruns/2/eb66c160957d4a28b11d3f1b968df9cd/artifacts |
 | mlflow_export_import.run_info.end_time | 1655004883611 |
 | mlflow_export_import.run_info.experiment_id | 2 |
 | mlflow_export_import.run_info.lifecycle_stage | active |
-| mlflow_export_import.run_info.run_id | 77a09d17edcf47e985403241c576debb |
+| mlflow_export_import.run_info.run_id | eb66c160957d4a28b11d3f1b968df9cd |
 | mlflow_export_import.run_info.start_time | 1655004878844 |
 | mlflow_export_import.run_info.status | FINISHED |
 | mlflow_export_import.run_info.user_id | andre |
@@ -156,9 +190,9 @@ See [sample run tags](samples/oss_mlflow/experiments/sklearn_wine/77a09d17edcf47
 
 ### Databricks MLflow source tags
 
-See [sample run tags](samples/databricks/experiments/sklearn_wine/f2e3f75c845d4365addbc9c0262a58a5/run.json).
+See [sample run tags](samples/databricks/experiments/sklearn_wine/eb66c160957d4a28b11d3f1b968df9cd/run.json).
 
-##### MLflow system tags
+##### MLflow system tags 
 
 |Tag | Value | 
 |----|-------|

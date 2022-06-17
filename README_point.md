@@ -176,8 +176,8 @@ artifacts
     model.pkl
 ```
 Sample run.json:
-[OSS](samples/oss_mlflow/experiments/sklearn_wine/1/6ccadf17812d43929b093d75cca1c33f/run.json)
- \- [Databricks](samples/databricks/experiments/sklearn_wine/16c36560c57a43fdb46e98f88a8d8819/run.json).
+[OSS](samples/oss_mlflow/experiments/sklearn_wine/eb66c160957d4a28b11d3f1b968df9cd/run.json)
+ \- [Databricks](samples/databricks/experiments/sklearn_wine/f2e3f75c845d4365addbc9c0262a58a5/run.json).
 ```
 {   
   "info": {
