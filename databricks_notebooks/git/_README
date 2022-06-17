@@ -8,8 +8,8 @@
 # MAGIC   * For example, we train model runs in the dev workspace, and then we wish to promote the best run to a production workspace.
 # MAGIC   * There is no official and easy way to do this.
 # MAGIC   * Customer experiment data is currently locked into a workspace and not portable.
-# MAGIC * These notebooks are an unofficial tool that address these problems.
-# MAGIC * You will need to set up a common cloud bucket mounted on DBFS in your source and destination workspaces.
+# MAGIC * These notebooks invoke the [mlflow-export-import](https://github.com/mlflow/mlflow-export-import) package to address these problems.
+# MAGIC * You will need to set up a shared cloud bucket mounted on DBFS in your source and destination workspaces.
 # MAGIC * For details see:
 # MAGIC   * [MLflow Export Import](https://databricks.atlassian.net/wiki/spaces/UN/pages/800754006/MLflow+Export+Import) - Databricks wiki page
 # MAGIC   * Github code:
@@ -64,4 +64,4 @@
 
 # COMMAND ----------
 
-# MAGIC %md Last updated: 2022-06-08
+# MAGIC %md Last updated: 2022-06-17
