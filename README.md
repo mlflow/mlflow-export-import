@@ -45,7 +45,7 @@ For example, if you want to clone the experiment `/Mary/Experiments/Iris` under 
 * [Collection tools](README_collection.md). High-level tools to copy an entire tracking server or a collection of MLflow objects (runs and experiments).
 Full object referential integrity is maintained as well as the original MLflow object names.
 
-### Databricks notebooks - TODO
+### Databricks notebooks
 
 Databricks notebooks simply invoke their corresponding Python scripts.
 Note that only `Individual` notebooks are currently available.
