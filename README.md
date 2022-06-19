@@ -2,7 +2,7 @@
 
 This package provides tools to export and import MLflow objects (runs, experiments or registered models) from one MLflow tracking server (Databricks workspace) to another.
 
-For more details on MLflow objects see the [Databricks MLflow Object Relationships](https://github.com/amesar/mlflow-resources/blob/master/slides/Databricks_MLflow_Object_Relationships.pdf) slide deck.
+For more details on MLflow objects (Databricks MLflow) see the [Databricks MLflow Object Relationships](https://github.com/amesar/mlflow-resources/blob/master/slides/Databricks_MLflow_Object_Relationships.pdf) slide deck.
 
 ## Architecture
 
@@ -37,56 +37,20 @@ For more details on MLflow objects see the [Databricks MLflow Object Relationshi
 ###  Python Scripts
 
 There are two sets of Python scripts:
-* [Point tools](README_point.md). Low-level tools to copy individual MLflow objects and have fine-grained control over the target names.
-For example, if you wish to clone an experiment to a different name in the same tracking server (Databricks workspace), use these tools.
-* [Bulk tools](README_bulk.md). High-level tools to copy an entire tracking server or the web of MLflow objects (runs and experiments) associated with registered models. 
+
+* [Individual tools](README_individual.md). Use these tools to export and import individual MLflow objects between tracking servers. 
+They allow you to specify a different destination object name.
+For example, if you want to clone the experiment `/Mary/Experiments/Iris` under a new name, you can specify the target experiment name as `/John/Experiments/Iris`.
+
+* [Collection tools](README_collection.md). High-level tools to copy an entire tracking server or a collection of MLflow objects (runs and experiments).
 Full object referential integrity is maintained as well as the original MLflow object names.
-  * For registered models it exports:
-    * All the latest versions of a model.
-    * The run associated with the version.
-    * The experiment that the run belongs to.
 
-####  Point tools
+### Databricks notebooks - TODO
 
-[README](README_point.md)
-    
-|Console Script | Code | 
-|-------|-------|
-| [export-model](README_point.md#Export-Registered-model) | [code](mlflow_export_import/model/export_model.py) |
-| [export-experiment](README_point.md#Export-Experiment) | [code](mlflow_export_import/experiment/export_experiment.py) |
-| [export-run](README_point.md#Export-run) | [code](mlflow_export_import/run/export_run.py) |
-| [import-model](README_point.md#Import-registered-model) | [code](mlflow_export_import/model/import_model.py) |
-| [import-experiment](README_point.md#Import-Experiment) | [code](mlflow_export_import/experiment/import_experiment.py) |
-| [import-run](README_point.md#Import-run) | [code](mlflow_export_import/run/import_run.py) |
+Databricks notebooks simply invoke their corresponding Python scripts.
+Note that only `Individual` notebooks are currently available.
 
-#### Bulk tools 
-
-[README](README_bulk.md)
-
-|Console Script | Code | Description |
-|-------|-------|----|
-| [export-all](README_bulk.md#Export-all-MLflow-objects) | [code](mlflow_export_import/bulk/export_all.py) | Exports all MLflow objects (registered models, experiments and runs). |
-| [export-models](README_bulk.md#Export-registered-models) | [code](mlflow_export_import/bulk/export_models.py) | Exports several (or all) registered models and their versions' backing run along with the run's experiment. |
-| [export-experiments](README_bulk.md#Export-experiments) | [code](mlflow_export_import/bulk/export_experiments.py) | Export several (or all) experiments to a directory. |
-| [import-all](README_bulk.md#Import-all-MLflow-objects) | Uses [import-models](mlflow_export_import/bulk/import_models.py) | Imports MLflow objects from a directory. |
-| [import-models](README_bulk.md#Import-registered-models) | [code](mlflow_export_import/bulk/import_models.py) | Imports registered models from a directory. |
-| [import-experiments](README_bulk.md#Import-experiments) | [code](mlflow_export_import/bulk/import_experiments.py) | Imports experiments from a directory. |
-
-### Databricks notebooks
-
-As mentioned before, Databricks notebooks simply invoke their corresponding Python scripts.
-Note that only Point notebooks are available now.
-
-[README](databricks_notebooks/README.md)
-
-| Notebook | Code | HTML |
-|-------|-------|----|
-| Export_Model | [code](databricks_notebooks/git/Export_Model.py) | [html](databricks_notebooks/html/Export_Model.html) | 
-| Export_Experiment | [code](databricks_notebooks/git/Export_Experiment.py) | [html](databricks_notebooks/html/Export_Experiment.html) | 
-| Export_Run | [code](databricks_notebooks/git/Export_Run.py) | [html](databricks_notebooks/html/Export_Run.html) | 
-| Import_Model | [code](databricks_notebooks/git/Import_Model.py) | [html](databricks_notebooks/html/Import_Model.html) | 
-| Import_Experiment | [code](databricks_notebooks/git/Import_Experiment.py) | [html](databricks_notebooks/html/Import_Experiment.html) | 
-| Import_Run | [code](databricks_notebooks/git/Import_Run.py) | [html](databricks_notebooks/html/Import_Run.html) | 
+See [README](databricks_notebooks/README.md).
 
 ### Other
 * [Miscellanous tools](README_tools.md) 
@@ -114,8 +78,8 @@ Note that only Point notebooks are available now.
   * Linking an imported run with the imported notebook.
 * When you import a run, the link to its source notebook revision ID will be a dead link and you cannot access the notebook from the MLflow UI.
 * As a convenience, the import tools allows you to import the exported notebook into Databricks. For more details, see:
-  *  [README_point - Import run](README_point.md#Import-run)
-  *  [README_point - Import experiment](README_point.md#Import-experiment)
+  *  [README_point - Import run](README_individual.md#Import-run)
+  *  [README_point - Import experiment](README_individual.md#Import-experiment)
 * You must export a notebook in the SOURCE format for the notebook to be imported.
 
 

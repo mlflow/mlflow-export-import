@@ -1,18 +1,33 @@
-# MLflow Export Import - Bulk Tools
+# MLflow Export Import - Collection Tools
 
 ## Overview
 
-Three sets of bulk tools:
+High-level tools to copy an entire tracking server or the collection of MLflow objects (runs, experiments and registered models).
+Full object referential integrity is maintained as well as the original MLflow object names.
+
+Three types of Collection tools:
 * All - all MLflow objects of the tracking server.
 * Registered models - models and their versions' run and the run's experiment.
 * Experiments.
 
 Notes:
 * Original source model and experiment names are preserved.
-* Leverages the [point tools](README_point.md) as basic building blocks.
+* Leverages the [Individual tools](README_individual.md) as basic building blocks.
 
+### Tools
 
-## All MLflow objects
+| MLflow Object | Documentation | Code | Description |
+|-------|-------|----|---|
+| **_All_**  | [export-all](#Export-all-MLflow-objects) | [code](mlflow_export_import/bulk/export_all.py) | Exports all MLflow objects (registered models, experiments and runs) to a directory. |
+| | [import-all](#Import-all-MLflow-objects) | Uses [import-models](mlflow_export_import/bulk/import_models.py) | Imports MLflow objects from a directory. |
+| **_Model_** | [export-models](#Export-registered-models) | [code](mlflow_export_import/bulk/export_models.py) | Exports several (or all) registered models and their versions' backing run along with the run's experiment to a directory. |
+| | [import-models](#Import-registered-models) | [code](mlflow_export_import/bulk/import_models.py) | Imports registered models from a directory. |
+| **_Experiment_** | [export-experiments](#Export-experiments) | [code](mlflow_export_import/bulk/export_experiments.py) | Export several (or all) experiments to a directory. |
+| | [import-experiments](#Import-experiments) | [code](mlflow_export_import/bulk/import_experiments.py) | Imports experiments from a directory. |
+
+## Overview - Old
+
+## All MLflow Objects Tools
 
 ### Export all MLflow objects
 
@@ -26,17 +41,18 @@ Source: [export_all.py](mlflow_export_import/bulk/export_all.py).
 export-all --help
 
 Options:
-  --output-dir TEXT               Output directory.  [required]
-  --export-source-tagss BOOLEAN  Export source run information (RunInfo,
-                                 MLflow system tags starting with 'mlflow' and
-                                 metadata) under the 'mlflow_export_import'
-                                 tag prefix. See README.md for more details.
-                                 [default: False]
-  --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
-                                  JUPYTER or DBC (comma seperated).  [default: ]
-                                  [default: False]
-  --use-threads BOOLEAN           Process the export/import in parallel using
-                                  threads.  [default: False]
+  --output-dir TEXT             Output directory.  [required]
+  --export-source-tags BOOLEAN  Export source run information (RunInfo, MLflow
+                                system tags starting with 'mlflow' and
+                                metadata) under the 'mlflow_export_import' tag
+                                prefix. See README.md for more details.
+                                [default: False]
+  --notebook-formats TEXT       Databricks notebook formats. Values are
+                                SOURCE, HTML, JUPYTER or DBC (comma
+                                seperated).
+  --use-threads BOOLEAN         Process export/import in parallel using
+                                threads.  [default: False]
+  --help                        Show this message and exit.
 ```
 #### Example
 
@@ -54,9 +70,14 @@ The exported output directory is the same structure for both `export-all` and `e
 import-all --input-dir out
 ```
 
-## Registered models
+## Registered Models Tools
 
 Tools that copy registered models and their versions' runs along with the runs' experiment.
+
+When exporting a registered models the associated following objects will be exported:
+* All the latest versions of a model.
+* The run associated with each version.
+* The experiment that the run belongs to.
 
 **Scripts**
 * `export-models` - exports registered models and their versions' backing run along with the experiment that the run belongs to.
@@ -112,24 +133,25 @@ Source: [export_models.py](mlflow_export_import/bulk/export_models.py).
 export-models --help
 
 Options:
-  --output-dir TEXT               Output directory.  [required]
-  --models TEXT                   Models to export. Values are 'all', comma
-                                  seperated list of models or model prefix
-                                  with * ('sklearn*'). Default is 'all'
-  --export-source-tagss BOOLEAN  Export source run information (RunInfo,
-                                 MLflow system tags starting with 'mlflow' and
-                                 metadata) under the 'mlflow_export_import'
-                                 tag prefix. See README.md for more details.
-                                 [default: False]
-  --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
-                                  JUPYTER or DBC (comma seperated).
-  --stages TEXT                   Stages to export (comma seperated). Default
-                                  is all stages. Values are Production,
-                                  Staging, Archived and None.
-  --export-all-runs BOOLEAN       Export all runs of experiment or just runs
-                                  associated with registered model versions.
-  --use-threads BOOLEAN           Process export/import in parallel using
-                                  threads.  [default: False]
+  --output-dir TEXT             Output directory.  [required]
+  --models TEXT                 Models to export. Values are 'all', comma
+                                seperated list of models or model prefix with
+                                * ('sklearn*'). Default is 'all'
+  --export-source-tags BOOLEAN  Export source run information (RunInfo, MLflow
+                                system tags starting with 'mlflow' and
+                                metadata) under the 'mlflow_export_import' tag
+                                prefix. See README.md for more details.
+                                [default: False]
+  --notebook-formats TEXT       Databricks notebook formats. Values are
+                                SOURCE, HTML, JUPYTER or DBC (comma
+                                seperated).
+  --stages TEXT                 Stages to export (comma seperated). Default is
+                                all stages. Values are Production, Staging,
+                                Archived and None.
+  --export-all-runs BOOLEAN     Export all runs of experiment or just runs
+                                associated with registered model versions.
+  --use-threads BOOLEAN         Process export/import in parallel using
+                                threads.  [default: False]
 ```
 
 #### Examples
@@ -203,7 +225,7 @@ Export/import experiments to a directory.
 | | +- . . .
 ```
 
-### Export experiments
+### Export Experiments Tools
 
 Export several (or all) experiments to a directory.
 
@@ -212,18 +234,20 @@ Export several (or all) experiments to a directory.
 export-experiments --help
 
 Options:
-  --experiments TEXT              Experiment names or IDs (comma delimited).
-                                  'all' will export all experiments.  [required]
-  --output-dir TEXT               Output directory.  [required]
-  --export-source-tagss BOOLEAN  Export source run information (RunInfo,
-                                 MLflow system tags starting with 'mlflow' and
-                                 metadata) under the 'mlflow_export_import'
-                                 tag prefix. See README.md for more details.
-                                 [default: False]
-  --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
-                                  JUPYTER or DBC (comma seperated).  [default: ]
-                                  [default: False]
-  --use-threads BOOLEAN           Process the export/import in parallel using
+  --experiments TEXT            Experiment names or IDs (comma delimited).
+                                'all' will export all experiments.
+                                [required]
+  --output-dir TEXT             Output directory.  [required]
+  --export-source-tags BOOLEAN  Export source run information (RunInfo, MLflow
+                                system tags starting with 'mlflow' and
+                                metadata) under the 'mlflow_export_import' tag
+                                prefix. See README.md for more details.
+                                [default: False]
+  --notebook-formats TEXT       Databricks notebook formats. Values are
+                                SOURCE, HTML, JUPYTER or DBC (comma
+                                seperated).
+  --use-threads BOOLEAN         Process export/import in parallel using
+                                threads.  [default: False]
 ```
 
 #### Examples

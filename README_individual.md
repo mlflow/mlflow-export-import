@@ -1,24 +1,24 @@
-# MLflow Export Import - Point tools
+# MLflow Export Import - Individual Tools
 
 ## Overview
 
-"Point" tools export and individual MLflow object. 
-They allow for more fine-grained low-level control such as object names.
+The `Individual` tools allow you to export and import individual MLflow objects between tracking servers.
+They allow you to specify a different destination object name.
 
-### Experiments
-  * Export experiment to a directory.
-  * Import experiment from a directory.
+For example, if you want to clone the experiment `/Mary/Experiment/Iris` under a new name, you can specify the target experiment name as `/John/Experiment/Iris`.
 
-### Runs
-  * Export run to  a directory.
-  * Import run from a directory.
+### Tools
 
-### Registered Models
-  * Export registered model to a directory.
-  * Import registered model from a directory.
-  * List all registered models.
+| MLflow Object | Documentation | Code |
+|-------|-------|---|
+| **_Model_** | [export-model](#Export-Registered-model) | [code](mlflow_export_import/model/export_model.py) |
+|    | [import-model](#Import-registered-model) | [code](mlflow_export_import/model/import_model.py) |
+| **_Experiment_** | [export-experiment](#Export-Experiment) | [code](mlflow_export_import/experiment/export_experiment.py) |
+|    | [import-experiment](#Import-Experiment) | [code](mlflow_export_import/experiment/import_experiment.py) |
+| **_Run_** | [export-run](#Export-run) | [code](mlflow_export_import/run/export_run.py) |
+|  | [import-run](#Import-run) | [code](mlflow_export_import/run/import_run.py) |
 
-## Experiments 
+## Experiment Tools
 
 ### Export Experiment
 
@@ -31,8 +31,8 @@ Accepts either an experiment ID or name.
 export-experiment --help
 
 Options:
-  --experiment TEXT               Experiment name or ID.  [required]
-  --output-dir TEXT               Output directory.  [required]
+  --experiment TEXT              Experiment name or ID.  [required]
+  --output-dir TEXT              Output directory.  [required]
   --export-source-tagss BOOLEAN  Export source run information (RunInfo,
                                  MLflow system tags starting with 'mlflow' and
                                  metadata) under the 'mlflow_export_import'
@@ -94,26 +94,27 @@ file containing run metadata and an artifact hierarchy.
 
 ### Import Experiment
 
-Import an experiment from a directory. Reads the manifest file to import the expirement and their runs.
+Import an experiment from a directory. Reads the manifest file to import the expirement and its runs.
 
 The experiment will be created if it does not exist in the destination tracking server. 
-If the experiment already exists, the source runs will be added to it.
+If the destination experiment already exists, the source runs will be added to it.
 
 #### Usage
 ```
-import-experiment --help \
+import-experiment --help 
 
 Options:
-  --input-dir TEXT                Input path - directory  [required]
-  --experiment-name TEXT          Destination experiment name  [required]
-  --just-peek BOOLEAN             Just display experiment metadata - do not import
-  --use-src-user-id BOOLEAN       Set the destination user ID to the source
-                                  user ID. Source user ID is ignored when
-                                  importing into Databricks since setting it
-                                  is not allowed.
-  --dst-notebook-dir TEXT         Databricks destination workpsace base
-                                  directory for notebook. A run ID will be
-                                  added to contain the run's notebook.
+  --input-dir TEXT           Input directory that contains the exported
+                             experiment.  [required]
+  --experiment-name TEXT     Destination experiment namethat contains the
+                             experiment.  [required]
+  --just-peek BOOLEAN        Just display experiment metadata - do not import.
+  --use-src-user-id BOOLEAN  Set the destination user ID to the source user
+                             ID. Source user ID is ignored when importing into
+                             Databricks since setting it is not allowed.
+  --dst-notebook-dir TEXT    Databricks destination workspace base directory
+                             for notebook. A run ID will be added to contain
+                             the run's notebook.
 ```
 
 #### Import examples
@@ -134,7 +135,7 @@ import-experiment \
 ```
 
 
-## Runs
+## Run Tools
 
 ### Export run
 
@@ -167,13 +168,16 @@ export-run \
 
 Produces a directory with the following structure:
 ```
-run.json
-artifacts
-  plot.png
-  sklearn-model
-    MLmodel
-    conda.yaml
-    model.pkl
++-run.json
++-artifacts/
+| +-model/
+|   +-requirements.txt
+|   +-python_env.yaml
+|   +-model.pkl
+|   +-conda.yaml
+|   +-MLmodel
+| +-plot.png
+
 ```
 Sample run.json:
 [OSS](samples/oss_mlflow/experiments/sklearn_wine/eb66c160957d4a28b11d3f1b968df9cd/run.json)
@@ -230,19 +234,16 @@ Imports a run from a directory.
 import-run --help
 
 Options:
-  --input-dir TEXT                Source input directory that contains the
-                                  exported run.  [required]
-
+  --input-dir TEXT                Input directory that contains the exported
+                                  run.  [required]
   --experiment-name TEXT          Destination experiment name.  [required]
   --mlmodel-fix BOOLEAN           Add correct run ID in destination MLmodel
                                   artifact. Can be expensive for deeply nested
-                                  artifacts.  [default: True]
-
+                                  artifacts  [default: True]
   --use-src-user-id BOOLEAN       Set the destination user ID to the source
                                   user ID. Source user ID is ignored when
                                   importing into Databricks since setting it
                                   is not allowed.  [default: False]
-
   --dst-notebook-dir TEXT         Databricks destination workpsace directory
                                   for notebook import.
   --dst-notebook-dir-add-run-id TEXT
@@ -269,15 +270,15 @@ export MLFLOW_TRACKING_URI=databricks
 run.import-run \
   --run-id 50fa90e751eb4b3f9ba9cef0efe8ea30 \
   --input out \
-  --experiment-name /Users/me@mycompany.com/imported/SklearnWine \
+  --experiment-name /Users/me@mycompany.com/imported/SklearnWine
 ```
 
-## Registered Models
+## Registered Model Tools
 
 ### Export Registered Model
 
 Export a registered model to a directory.
-The default is to export all versions of a model including all None and Archived stages.
+The default is to export all versions of a model including all `None` and `Archived` stages.
 You can specify a list of stages to export.
 
 Source: [export_model.py](mlflow_export_import/model/export_model.py).
@@ -362,17 +363,17 @@ Source: [import_model.py](mlflow_export_import/model/import_model.py).
 import-model --help
 
 Options:
-  --input-dir TEXT              Input directory produced by export_model.py.
-                                [required]
-
+  --input-dir TEXT              Input directory that contains the exported
+                                registered model.  [required]
   --model TEXT                  New registered model name.  [required]
   --experiment-name TEXT        Destination experiment name  - will be created
                                 if it does not exist.  [required]
-  --delete-model BOOLEAN        First delete the model if it exists and all
-                                its versions.  [default: False]
+  --delete-model BOOLEAN        If the model exists, first delete the model
+                                and all its versions.  [default: False]
   --await-creation-for INTEGER  Await creation for specified seconds.
+  --sleep-time INTEGER          Sleep time for polling until
+                                version.status==READY.
   --verbose BOOLEAN             Verbose.  [default: False]
-  --help                        Show this message and exit.
 ```
 
 
