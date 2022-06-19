@@ -78,8 +78,8 @@ See [README](databricks_notebooks/README.md).
   * Linking an imported run with the imported notebook.
 * When you import a run, the link to its source notebook revision ID will be a dead link and you cannot access the notebook from the MLflow UI.
 * As a convenience, the import tools allows you to import the exported notebook into Databricks. For more details, see:
-  *  [README_point - Import run](README_individual.md#Import-run)
-  *  [README_point - Import experiment](README_individual.md#Import-experiment)
+  *  [README_individual - Import run](README_individual.md#Import-run)
+  *  [README_individual - Import experiment](README_individual.md#Import-experiment)
 * You must export a notebook in the SOURCE format for the notebook to be imported.
 
 
