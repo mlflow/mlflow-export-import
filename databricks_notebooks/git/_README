@@ -34,8 +34,8 @@
 # MAGIC   
 # MAGIC #### Limitations
 # MAGIC 
-# MAGIC * [General limitations](https://github.com/amesar/mlflow-export-import#general-limitations)
-# MAGIC * [Databricks limitations](https://github.com/amesar/mlflow-export-import#databricks-limitations)
+# MAGIC * [General limitations](https://github.com/mlflow/mlflow-export-import#general-limitations)
+# MAGIC * [Databricks limitations](https://github.com/mlflow/mlflow-export-import#databricks-limitations)
 # MAGIC 
 # MAGIC #### Setup
 # MAGIC 
@@ -64,4 +64,4 @@
 
 # COMMAND ----------
 
-# MAGIC %md Last updated: 2022-06-17
+# MAGIC %md Last updated: 2022-06-19
