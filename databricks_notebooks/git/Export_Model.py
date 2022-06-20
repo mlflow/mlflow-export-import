@@ -40,9 +40,13 @@ dbutils.widgets.text("Destination base folder", "")
 output_dir = dbutils.widgets.get("Destination base folder")
 output_dir += f"/{model_name}"
 
+dbutils.widgets.dropdown("Export source tags","no",["yes","no"])
+export_source_tags = dbutils.widgets.get("Export source tags") == "yes"
+
 model_name, output_dir
 print("model_name:",model_name)
 print("output_dir:",output_dir)
+print("export_source_tags:",export_source_tags)
 
 # COMMAND ----------
 
@@ -81,7 +85,7 @@ dbutils.fs.mkdirs(output_dir)
 # COMMAND ----------
 
 from mlflow_export_import.model.export_model import ModelExporter
-exporter = ModelExporter(mlflow.tracking.MlflowClient())
+exporter = ModelExporter(mlflow.tracking.MlflowClient(), export_source_tags)
 exporter.export_model(model_name, output_dir)
 
 # COMMAND ----------
