@@ -22,7 +22,7 @@
 # MAGIC * Run ID 
 # MAGIC * Destination base folder- Base output folder to which the Run ID will be appended to.
 # MAGIC * Export metadata tags - Log source metadata such as:
-# MAGIC   * mlflow_export_import.metadata.experiment_id
+# MAGIC   * mlflow_export_import.info.experiment_id
 # MAGIC   * mlflow_export_import.metadata.experiment-name	
 # MAGIC * Notebook formats:
 # MAGIC   * Standard Databricks notebook formats such as SOURCE, HTML, JUPYTER, DBC. See [Databricks Export Format](https://docs.databricks.com/dev-tools/api/latest/workspace.html#notebookexportformat)  documentation.
@@ -47,8 +47,8 @@ dbutils.widgets.text("Destination base folder", "dbfs:/mnt/andre-work/exim/exper
 output_dir = dbutils.widgets.get("Destination base folder")
 output_dir += f"/{run_id}"
 
-dbutils.widgets.dropdown("Export metadata tags","no",["yes","no"])
-export_metadata_tags = dbutils.widgets.get("Export metadata tags") == "yes"
+dbutils.widgets.dropdown("Export source tags","no",["yes","no"])
+export_source_tags = dbutils.widgets.get("Export source tags") == "yes"
 
 all_formats = [ "SOURCE", "DBC", "HTML", "JUPYTER" ]
 dbutils.widgets.multiselect("Notebook formats",all_formats[0],all_formats)
@@ -58,7 +58,7 @@ if "" in formats: formats.remove("")
 
 print("run_id:",run_id)
 print("output_dir:",output_dir)
-print("export_metadata_tags:",export_metadata_tags)
+print("export_source_tags:",export_source_tags)
 print("formats:",formats)
 
 # COMMAND ----------
@@ -93,7 +93,7 @@ dbutils.fs.rm(output_dir, True)
 from mlflow_export_import.run.export_run import RunExporter
 exporter = RunExporter(mlflow.tracking.MlflowClient(),
                        notebook_formats=formats, 
-                       export_metadata_tags=export_metadata_tags)
+                       export_source_tags=export_source_tags)
 exporter.export_run(run_id, output_dir)
 
 # COMMAND ----------
