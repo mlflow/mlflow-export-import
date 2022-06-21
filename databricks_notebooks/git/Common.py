@@ -4,7 +4,6 @@
 # COMMAND ----------
 
 host_name = dbutils.notebook.entry_point.getDbutils().notebook().getContext().tags().get("browserHostName")
-host_name = None
 if host_name: host_name = host_name.get()
 import mlflow
 client = mlflow.tracking.MlflowClient()
