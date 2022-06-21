@@ -3,13 +3,16 @@
 
 # COMMAND ----------
 
-host_name = dbutils.notebook.entry_point.getDbutils().notebook().getContext().tags().get("browserHostName").get()
+host_name = dbutils.notebook.entry_point.getDbutils().notebook().getContext().tags().get("browserHostName")
+host_name = None
+if host_name: host_name = host_name.get()
 import mlflow
 client = mlflow.tracking.MlflowClient()
 
 # COMMAND ----------
 
 def display_run_uri(run_id):
+    if not host_name: return
     run = mlflow.get_run(run_id)
     uri = f"https://{host_name}/#mlflow/experiments/{run.info.experiment_id}/runs/{run.info.run_id}"
     displayHTML("""<b>Run URI:</b> <a href="{}">{}</a>""".format(uri,uri))
@@ -17,18 +20,21 @@ def display_run_uri(run_id):
 # COMMAND ----------
 
 def display_registered_model_uri(model_name):
+    if not host_name: return
     uri = f"https://{host_name}/#mlflow/models/{model_name}"
     displayHTML("""<b>Registered Model URI:</b> <a href="{}">{}</a>""".format(uri,uri))
 
 # COMMAND ----------
 
 def _display_experiment_uri(experiment_id):
+    if not host_name: return
     uri = "https://{}/#mlflow/experiments/{}".format(host_name, experiment_id)
     displayHTML("""<b>Experiment URI:</b> <a href="{}">{}</a>""".format(uri,uri))
 
 # COMMAND ----------
 
 def display_experiment_uri(experiment_name):
+    if not host_name: return
     experiment_id = client.get_experiment_by_name(experiment_name).experiment_id
     uri = "https://{}/#mlflow/experiments/{}".format(host_name, experiment_id)
     displayHTML("""<b>Experiment URI:</b> <a href="{}">{}</a>""".format(uri,uri))
