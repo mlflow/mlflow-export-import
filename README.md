@@ -259,6 +259,12 @@ export DATABRICKS_TOKEN=MY_TOKEN
 For full details see [Access the MLflow tracking server from outside Databricks](https://docs.databricks.com/applications/mlflow/access-hosted-tracking-server.html).
 
 
+## Workflow API
+
+* [README.md](mlflow_export_import/workflow_api/README.md)
+* The WorkflowApiClient is a Python wrapper around the Databricks REST API to execute job runs in a synchronous polling manner.
+* Although a generic tool, in terms of mlflow-export-import it used for testing Databricks notebook jobs.
+
 ## Running tools
 
 The main tool scripts can be executed either as a standard Python script or console script.
