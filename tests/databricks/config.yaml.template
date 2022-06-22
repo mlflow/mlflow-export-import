@@ -3,5 +3,12 @@
   dst_base_dir: dbfs:/tmp/me.lastname@mycomany.com/test-mlflow-exim
   model_name: test-mlflow-exim
   run_name_prefix: test-mlflow-exim
-  cluster: 0617-235336-61jzcmp1
+  #cluster: 0617-235336-61jzcmp1
+  cluster: { 
+    cluster_name: test-mlflow-exim,
+    spark_version: 11.0.x-cpu-ml-scala2.12,
+    node_type_id: i3.xlarge,
+    num_workers: 1,
+    autotermination_minutes: 20
+  }
 }

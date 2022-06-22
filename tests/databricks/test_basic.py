@@ -24,7 +24,7 @@ def _bounce_dbfs_dir(test_context, dir):
 
 
 def _check_dbfs_dir_after_export(test_context, dir):
-    """ Minimal check to see if we create the MLflow object's export directory. More check needed. """
+    """ Minimal check to see if we have created the MLflow object's export directory. More checks needed. """
     files = test_context.dbfs_api.list_files(DbfsPath(dir))
     assert len(files) > 0
     sub_dir = files[0]

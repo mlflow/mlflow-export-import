@@ -5,7 +5,7 @@
 There are two types of tests:
 * OSS tests - Launch a source and destination tracking server and run tests to ensure that the exported MLflow object is correctly imported.
 This page.
-* [Databricks tests](databricks/README.md) - Tests that check if the Databricks export-import notebooks execute properly.
+* [Databricks tests](databricks/README.md) - Tests that check if the [Databricks export-import notebooks](../databricks_notebooks/README.md) execute properly.
 ## Setup
 
 Virtual environment

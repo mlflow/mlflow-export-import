@@ -13,6 +13,8 @@ See [parent tests README](../README.md#Setup)
 
 ## Test Configuration
 
+Copy [config.yaml.template](config.yaml.template) to `config.json` and adjust the properties for your workspace.
+
 The tests read in environment-specific properties from `config.yaml` file.
 
 |Name | Required | Description|
@@ -21,19 +23,45 @@ The tests read in environment-specific properties from `config.yaml` file.
 | dst_base_dir | yes | DBFS path for exported MLflow objects |
 | model_name | yes | Name of test registered model |
 | run_name_prefix | yes | Prefix of the job run name |
-| cluster_id | yes | Existing cluster ID |
+| cluster | yes | Either an existing cluster ID or cluster spec for new cluster. See below. |
 | profile | no | Databricks profile. If not set the default DEFAULT from `~/.databrickscfg` will be used. |
 
-Copy [config.yaml.template](config.yaml.template) to `config.yaml` and adjust the properties for your workspace.
 
-Sample `config.yaml` file:
+### Cluster
+
+Since each test invokes a remote Databricks job, using a job cluster for each test would be very slow since you would
+need to spin up a cluster for each test.
+The `cluster` attribute is a polymorphic field that has two possible values.
+
+* **New cluster**. Launch a new all-purpose (interactive) cluster at test startup time and reuse this cluster for all tests. 
+At the end of the test suite, the cluster will be deleted.
+In the `cluster` attribute specify a new cluster spec per the standard Databricks JSON format for [new_cluster](https://docs.databricks.com/dev-tools/api/latest/clusters.html#create) attribute.
+* **Existing cluster**. Use an existing cluster. In the `cluster` attribute specify an existing cluster ID.
+
+### Sample `config.yaml` files
+
+**Use new cluster**
 
 ```
 ws_base_dir: /Users/me.lastname@mycomany.com/tmp/test-mlflow-exim
 dst_base_dir: dbfs:/tmp/me.lastname@mycomany.com/test-mlflow-exim
 model_name: test-mlflow-exim
 run_name_prefix: test-mlflow-exim
-cluster_id: 0318-151752-abed99
+cluster: { 
+  cluster_name: test-mlflow-exim,
+  spark_version: 11.0.x-cpu-ml-scala2.12,
+  node_type_id: i3.xlarge,
+  num_workers: 1,
+  autotermination_minutes: 20
+}
+```
+**Use existing cluster**
+```
+ws_base_dir: /Users/me.lastname@mycomany.com/tmp/test-mlflow-exim
+dst_base_dir: dbfs:/tmp/me.lastname@mycomany.com/test-mlflow-exim
+model_name: test-mlflow-exim
+run_name_prefix: test-mlflow-exim
+cluster: 318-151752-abed99
 ```
 
 ## Run tests

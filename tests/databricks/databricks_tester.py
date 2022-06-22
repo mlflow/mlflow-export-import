@@ -6,13 +6,13 @@ import utils
 
 from mlflow_export_import.workflow_api.workflow_api_client import WorkflowApiClient
 from mlflow_export_import.workflow_api import log_utils
-from mlflow_export_import.common import mlflow_utils
 workflow_client = WorkflowApiClient()
 
 mlflow_client = mlflow.tracking.MlflowClient()
 
 from databricks_cli.workspace.api import WorkspaceApi
 from databricks_cli.dbfs.api import DbfsApi, DbfsPath
+from databricks_cli.clusters.api import ClusterApi
     
 _formats = [ "SOURCE" ]
 _export_src_tags = True
@@ -27,19 +27,22 @@ print("_fs_experiment_nb_path:",_fs_experiment_nb_path)
 
 
 class DatabricksTester():
-    def __init__(self, ws_base_dir, dst_base_dir, cluster_id, model_name, run_name_prefix, profile=None, verbose=False):
+    def __init__(self, ws_base_dir, dst_base_dir, cluster_spec, model_name, run_name_prefix, profile=None, verbose=False):
         api_client = utils.get_api_client(profile)
         self.ws_api = WorkspaceApi(api_client)
         self.jobs_service = service.JobsService(api_client)
+        self.dbfs_api = DbfsApi(api_client)
+        self.cluster_api = ClusterApi(api_client)
 
         self.ws_base_dir = ws_base_dir
         self.dst_base_dir = dst_base_dir
         self.dst_exp_base_dir = os.path.join(dst_base_dir,"experiments")
         self.dst_model_base_dir = os.path.join(dst_base_dir,"models")
-        self.cluster_id = cluster_id
         self.model_name = model_name
         self.run_name_prefix = run_name_prefix
         self.verbose = verbose
+        self.cluster_spec = cluster_spec
+        self.cluster_id = self._get_cluster_id()
 
         self.ml_nb_path = os.path.join(self.ws_base_dir, _experiment_nb)
         self.ml_exp_path = os.path.join(self.ws_base_dir, _experiment_name)
@@ -49,8 +52,20 @@ class DatabricksTester():
         self._import_notebook(_fs_experiment_nb_name, "experiment", self.ws_base_dir) # import the model training notebook
         self._import_notebooks(_fs_nb_base_dir, ws_base_dir) # import all the export-import notebooks
 
-        self.dbfs_api = DbfsApi(api_client)
         self.dbfs_api.mkdirs(DbfsPath(dst_base_dir))
+
+    def _get_cluster_id(self):
+        if isinstance(self.cluster_spec, str):
+            return self.cluster_spec
+        elif isinstance(self.cluster_spec, dict):
+            res = self.cluster_api.create_cluster(self.cluster_spec)
+            return res["cluster_id"]
+        raise Exception("Unknown cluster type")
+
+
+    def delete_cluster(self):
+        if isinstance(self.cluster_spec, dict):
+            self.cluster_api.permanent_delete(self.cluster_id)
 
 
     def run_export_experiment_job(self):
