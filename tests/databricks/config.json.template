@@ -1,0 +1,7 @@
+{
+  "ws_base_dir": /Users/me.lastname@mycomany.com/tmp/test-mlflow-exim
+  "dst_base_dir": dbfs:/tmp/me.lastname@mycomany.com/test-mlflow-exim
+  "model_name": test-mlflow-exim
+  "run_name_prefix": test-mlflow-exim
+  "cluster_id": "0617-235336-61jzcmp1"
+}

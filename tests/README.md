@@ -1,5 +1,11 @@
-# mlflow-export-import tests
+# mlflow-export-import - OSS Tests
 
+## Overview
+
+There are two types of tests:
+* OSS tests - Launch a source and destination tracking server and run tests to ensure that the exported MLflow object is correctly imported.
+This page.
+* [Databricks tests](databricks/README.md) - Tests that check if the Databricks export-import notebooks execute properly.
 ## Setup
 
 Virtual environment
@@ -18,7 +24,9 @@ conda activate mlflow-export-import-tests
 
 ## Run tests
 
-To run the tests use the [run_tests.sh](run_tests.sh) script and specify the source and destination tracking server port number.
+Use the [run_tests.sh](run_tests.sh) script to run the tests and and specify the source and destination tracking server port number.
+Output can be found in the `run_tests.log` file.
+
 The script does the following:
 * Launches a source MLflow tracking server and destination MLflow tracking server in the background.
 * Runs tests against these servers with pytest.
@@ -29,8 +37,5 @@ The script does the following:
 run_tests.sh 5005 5006
 ```
 ```
-
-
-======================== 37 passed in 295.36s (0:04:55) ========================
-
+======================== 43 passed in 295.36s (0:04:55) ========================
 ```
