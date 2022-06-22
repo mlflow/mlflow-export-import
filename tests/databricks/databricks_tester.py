@@ -2,12 +2,13 @@ import os
 import json
 import mlflow
 from databricks_cli.sdk import service
-import utils
 
+from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.workflow_api.workflow_api_client import WorkflowApiClient
 from mlflow_export_import.workflow_api import log_utils
-workflow_client = WorkflowApiClient()
+import utils
 
+workflow_client = WorkflowApiClient()
 mlflow_client = mlflow.tracking.MlflowClient()
 
 from databricks_cli.workspace.api import WorkspaceApi
@@ -47,6 +48,7 @@ class DatabricksTester():
 
         self.ml_nb_path = os.path.join(self.ws_base_dir, _experiment_nb)
         self.ml_exp_path = os.path.join(self.ws_base_dir, _experiment_name)
+
         self._make_dirs()
 
 
@@ -78,6 +80,21 @@ class DatabricksTester():
         if self.verbose:
             self._dump_json(f"Run job {run_name} - notebook_task", notebook_task)
         return self.jobs_service.submit_run(run_name, existing_cluster_id=self.cluster_id, notebook_task=notebook_task)
+
+
+    def run_export_run_job(self):
+        run = mlflow_utils.get_first_run(mlflow_client, self.ml_exp_path)
+        nb_name = "Export_Run"
+        nb_path = os.path.join(self.ws_base_dir, nb_name)
+        notebook_task = {
+            "notebook_path": nb_path,
+            "base_parameters": {
+              " Run ID": run.info.run_id,
+              "Destination base folder": self.dst_run_base_dir,
+              "Export source tags": _export_src_tags
+            }
+        }
+        return self._run_job(nb_name, notebook_task)
 
 
     def run_export_experiment_job(self):

@@ -61,6 +61,12 @@ def set_experiment(mlflow_client, dbx_client, exp_name):
         return exp.experiment_id
 
 
+def get_first_run(mlflow_client, exp_id_or_name):
+    exp = get_experiment(mlflow_client, exp_id_or_name)
+    runs = mlflow_client.list_run_infos(exp.experiment_id)
+    return mlflow_client.get_run(runs[0].run_id)
+
+
 def delete_experiment(mlflow_client, exp_id_or_name):
     exp = get_experiment(mlflow_client, exp_id_or_name)
     print(f"Deleting experiment: name={exp.name} experiment_id={exp.experiment_id}")

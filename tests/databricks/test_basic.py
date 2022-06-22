@@ -2,6 +2,12 @@ from init_tests import test_context
 from databricks_cli.dbfs.api import DbfsPath
 
 
+def test_run(test_context):
+    _bounce_dbfs_dir(test_context, test_context.tester.dst_run_base_dir)
+    test_context.tester.run_job(test_context.tester.run_export_run_job, "Export Run")
+    _check_dbfs_dir_after_export(test_context, test_context.tester.dst_run_base_dir)
+
+
 def test_export_experiment_job(test_context):
     _bounce_dbfs_dir(test_context, test_context.tester.dst_exp_base_dir)
     test_context.tester.run_job(test_context.tester.run_export_experiment_job, "Export Experiment")
