@@ -4,20 +4,25 @@ from databricks_cli.dbfs.api import DbfsPath
 
 def test_run(test_context):
     _bounce_dbfs_dir(test_context, test_context.tester.dst_run_base_dir)
-    test_context.tester.run_job(test_context.tester.run_export_run_job, "Export Run")
+    _run_job(test_context, test_context.tester.run_export_run_job, "Export Run")
     _check_dbfs_dir_after_export(test_context, test_context.tester.dst_run_base_dir)
 
 
 def test_export_experiment_job(test_context):
     _bounce_dbfs_dir(test_context, test_context.tester.dst_exp_base_dir)
-    test_context.tester.run_job(test_context.tester.run_export_experiment_job, "Export Experiment")
+    _run_job(test_context, test_context.tester.run_export_experiment_job, "Export Experiment")
     _check_dbfs_dir_after_export(test_context, test_context.tester.dst_exp_base_dir)
 
 
 def test_export_model(test_context):
     _bounce_dbfs_dir(test_context, test_context.tester.dst_model_base_dir)
-    test_context.tester.run_job(test_context.tester.run_export_model_job, "Export Model")
+    _run_job(test_context, test_context.tester.run_export_model_job, "Export Model")
     _check_dbfs_dir_after_export(test_context, test_context.tester.dst_exp_base_dir)
+
+
+def _run_job(test_context, job, name):
+    run = test_context.tester.run_job(job, name)
+    assert run["state"]["result_state"] == "SUCCESS"
 
 
 def _bounce_dbfs_dir(test_context, dir):

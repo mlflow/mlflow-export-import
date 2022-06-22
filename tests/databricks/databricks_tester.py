@@ -40,6 +40,7 @@ class DatabricksTester():
         self.dst_run_base_dir = os.path.join(dst_base_dir,"runs")
         self.dst_exp_base_dir = os.path.join(dst_base_dir,"experiments")
         self.dst_model_base_dir = os.path.join(dst_base_dir,"models")
+
         self.model_name = model_name
         self.run_name_prefix = run_name_prefix
         self.verbose = verbose
@@ -148,6 +149,7 @@ class DatabricksTester():
         workflow_client.wait_until_run_is_done(run_id)
         run = workflow_client.get_run(run_id)
         self._dump_json("Run - final",run)
+        return run
     
 
     def _import_notebook(self, nb_name, src_dir, dst_dir):
