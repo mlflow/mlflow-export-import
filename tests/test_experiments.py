@@ -1,7 +1,7 @@
 from mlflow_export_import.experiment.export_experiment import ExperimentExporter
 from mlflow_export_import.experiment.import_experiment import ExperimentImporter
 from utils_test import create_simple_run, init_output_dirs, create_dst_experiment_name
-from compare_utils import compare_runs, compare_run_with_metadata_tags
+from compare_utils import compare_runs, compare_run_with_source_tags
 from compare_utils import dump_runs
 from init_tests import mlflow_context
 
@@ -31,8 +31,8 @@ def test_exp_basic(mlflow_context):
         True)
     compare_runs(mlflow_context.client_src, mlflow_context.client_dst, mlflow_context.output_dir, run1, run2)
 
-def test_exp_with_metadata_tags(mlflow_context):
+def test_exp_with_source_tags(mlflow_context):
     run1, run2 = init_exp_test(mlflow_context,
        ExperimentExporter(mlflow_context.client_src, export_source_tags=True), 
        ExperimentImporter(mlflow_context.client_dst), verbose=False)
-    compare_run_with_metadata_tags(mlflow_context.client_src, mlflow_context.client_dst, mlflow_context.output_dir, run1, run2)
+    compare_run_with_source_tags(mlflow_context.client_src, mlflow_context.client_dst, mlflow_context.output_dir, run1, run2)

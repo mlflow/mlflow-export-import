@@ -73,7 +73,7 @@ def test_basic(mlflow_context):
 def test_exp_basic_threads(mlflow_context):
     _run_test(mlflow_context, compare_runs, use_threads=True)
 
-def test_exp_with_metadata_tags(mlflow_context):
+def test_exp_with_source_tags(mlflow_context):
     _run_test(mlflow_context, compare_runs)
 
 

@@ -1,7 +1,7 @@
 from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import.run.import_run import RunImporter
 from utils_test import create_simple_run, create_dst_experiment_name, create_output_dir
-from compare_utils import compare_runs, compare_run_with_metadata_tags
+from compare_utils import compare_runs, compare_run_with_source_tags
 from init_tests import mlflow_context
 
 # == Setup
@@ -27,12 +27,12 @@ def test_run_basic(mlflow_context):
         "test_run_basic")
     compare_runs(mlflow_context.client_src, mlflow_context.client_dst, mlflow_context.output_dir, run1, run2)
 
-def test_run_with_metadata_tags(mlflow_context):
+def test_run_with_source_tags(mlflow_context):
     run1, run2 = init_run_test(mlflow_context, 
         RunExporter(mlflow_context.client_src, export_source_tags=True), 
         RunImporter(mlflow_context.client_dst, mlmodel_fix=mlmodel_fix), 
-        "test_run_with_metadata_tags")
-    compare_run_with_metadata_tags(mlflow_context.client_src, mlflow_context.client_dst, mlflow_context.output_dir, run1, run2)
+        "test_run_with_source_tags")
+    compare_run_with_source_tags(mlflow_context.client_src, mlflow_context.client_dst, mlflow_context.output_dir, run1, run2)
 
 def test_run_basic_use_metric_steps(mlflow_context): 
     run1, run2 = init_run_test(mlflow_context, 

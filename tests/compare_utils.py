@@ -8,14 +8,14 @@ from mlflow_export_import.utils import TAG_PREFIX_EXPORT_IMPORT_RUN_INFO
 from mlflow_export_import.utils import TAG_PREFIX_EXPORT_IMPORT_METADATA
 
 
-def compare_run_with_metadata_tags(client_src, client_dst, output_dir, run1, run2):
+def compare_run_with_source_tags(client_src, client_dst, output_dir, run1, run2):
     exp = client_src.get_experiment(run1.info.experiment_id)
 
-    metadata_tags2 = { k:v for k,v in run2.data.tags.items() if k.startswith("mlflow_export_import.") }
-    assert exp.name == metadata_tags2[f"{TAG_PREFIX_EXPORT_IMPORT_METADATA}.experiment_name"]
+    source_tags2 = { k:v for k,v in run2.data.tags.items() if k.startswith("mlflow_export_import.") }
+    assert exp.name == source_tags2[f"{TAG_PREFIX_EXPORT_IMPORT_METADATA}.experiment_name"]
 
     for k,v in strip_underscores(run1.info).items():
-        assert str(v) == metadata_tags2[f"{TAG_PREFIX_EXPORT_IMPORT_RUN_INFO}.{k}"],f"Assert failed for RunInfo field '{k}'" # NOTE: tag values must be strings
+        assert str(v) == source_tags2[f"{TAG_PREFIX_EXPORT_IMPORT_RUN_INFO}.{k}"],f"Assert failed for RunInfo field '{k}'" # NOTE: tag values must be strings
 
     compare_runs_no_tags(client_src, client_dst, output_dir, run1, run2)
 
