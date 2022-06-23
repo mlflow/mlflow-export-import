@@ -47,8 +47,8 @@ class DatabricksTester():
         self.cluster_spec = cluster_spec
         self.cluster_id = self._get_cluster_id()
 
-        self.ml_nb_path = os.path.join(self.ws_base_dir, _experiment_nb)
-        self.ml_exp_path = os.path.join(self.ws_base_dir, _experiment_name)
+        self.ml_nb_path = self._mk_ws_path(_experiment_nb)
+        self.ml_exp_path = self._mk_ws_path(_experiment_name)
 
         self._make_dirs()
 
@@ -86,7 +86,7 @@ class DatabricksTester():
     def run_export_run_job(self):
         run = mlflow_utils.get_first_run(mlflow_client, self.ml_exp_path)
         nb_name = "Export_Run"
-        nb_path = os.path.join(self.ws_base_dir, nb_name)
+        nb_path = self._mk_ws_path(nb_name)
         notebook_task = {
             "notebook_path": nb_path,
             "base_parameters": {
@@ -100,7 +100,7 @@ class DatabricksTester():
 
     def run_export_experiment_job(self):
         nb_name = "Export_Experiment"
-        nb_path = os.path.join(self.ws_base_dir, nb_name)
+        nb_path = self._mk_ws_path(nb_name)
         notebook_task = { 
             "notebook_path": nb_path,
             "base_parameters": {
@@ -115,7 +115,7 @@ class DatabricksTester():
 
     def run_export_model_job(self):
         nb_name = "Export_Model"
-        nb_path = os.path.join(self.ws_base_dir, nb_name)
+        nb_path = self._mk_ws_path(nb_name)
         notebook_task = { 
             "notebook_path": nb_path,
             "base_parameters": {
@@ -164,6 +164,10 @@ class DatabricksTester():
     
     def _ws_mkdir(self, ws_base_dir):
         self.ws_api.mkdirs(ws_base_dir)
+
+
+    def _mk_ws_path(self, ws_object_name):
+        return os.path.join(self.ws_base_dir, ws_object_name)
 
 
     def _mk_run_name(self, nb_name):
