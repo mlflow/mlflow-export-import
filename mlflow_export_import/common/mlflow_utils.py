@@ -72,7 +72,6 @@ def delete_experiments(mlflow_client, prefix):
     exps = mlflow_client.list_experiments()
     for exp in exps:
         if exp.name.startswith(prefix):
-            print(">> delete_experiments: exp:",exp.experiment_id,exp.name)
             mlflow_client.delete_experiment(exp.experiment_id)
 
 
