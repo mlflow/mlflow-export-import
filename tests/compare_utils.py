@@ -8,7 +8,7 @@ from mlflow_export_import.utils import TAG_PREFIX_EXPORT_IMPORT_RUN_INFO
 from mlflow_export_import.utils import TAG_PREFIX_EXPORT_IMPORT_METADATA
 
 
-def compare_run_with_source_tags(client_src, client_dst, output_dir, run1, run2):
+def compare_runs_with_source_tags(client_src, client_dst, run1, run2, output_dir):
     exp = client_src.get_experiment(run1.info.experiment_id)
 
     source_tags2 = { k:v for k,v in run2.data.tags.items() if k.startswith("mlflow_export_import.") }
@@ -17,10 +17,10 @@ def compare_run_with_source_tags(client_src, client_dst, output_dir, run1, run2)
     for k,v in strip_underscores(run1.info).items():
         assert str(v) == source_tags2[f"{TAG_PREFIX_EXPORT_IMPORT_RUN_INFO}.{k}"],f"Assert failed for RunInfo field '{k}'" # NOTE: tag values must be strings
 
-    compare_runs_no_tags(client_src, client_dst, output_dir, run1, run2)
+    compare_runs_no_tags(client_src, client_dst, run1, run2, output_dir)
 
 
-def compare_runs_no_tags(client_src, client_dst, output_dir, run1, run2):
+def compare_runs_no_tags(client_src, client_dst, run1, run2, output_dir):
     run_artifact_dir1, run_artifact_dir2 = create_run_artifact_dirs(output_dir)
     assert run1.info.lifecycle_stage == run2.info.lifecycle_stage
     assert run1.info.status == run2.info.status
@@ -28,8 +28,8 @@ def compare_runs_no_tags(client_src, client_dst, output_dir, run1, run2):
     _compare_artifacts(client_src, client_dst, run1, run2, run_artifact_dir1, run_artifact_dir2)
 
 
-def compare_runs(client_src, client_dst, output_dir, run1, run2):
-    compare_runs_no_tags(client_src, client_dst, output_dir, run1, run2) 
+def compare_runs(client_src, client_dst, run1, run2, output_dir):
+    compare_runs_no_tags(client_src, client_dst, run1, run2, output_dir)
 
 
 def _compare_data(run1, run2):

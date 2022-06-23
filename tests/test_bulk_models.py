@@ -33,7 +33,7 @@ def compare_models(mlflow_context, compare_func):
             tdir = os.path.join(test_dir,run2.info.run_id)
             os.makedirs(tdir)
             assert run1.info.run_id != run2.info.run_id
-            compare_func(mlflow_context.client_src, mlflow_context.client_dst, tdir, run1, run2)
+            compare_func(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, tdir)
 
 # == Export/import registered model tests
 

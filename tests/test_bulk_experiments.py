@@ -53,7 +53,7 @@ def compare_experiments(mlflow_context, compare_func):
         base_dir = os.path.join(mlflow_context.output_dir,"test_compare_runs")
         os.makedirs(base_dir, exist_ok=True)
         odir = os.path.join(base_dir,run1.info.experiment_id)
-        compare_func(mlflow_context.client_src, mlflow_context.client_dst, odir, run1, run2)
+        compare_func(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, odir)
 
 # == Export/import Experiments tests
 

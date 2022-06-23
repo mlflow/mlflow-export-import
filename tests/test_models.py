@@ -24,7 +24,7 @@ def test_export_import_model(mlflow_context):
     assert len(model_src.latest_versions) == len(model_dst.latest_versions)
 
     _compare_models(model_src, model_dst)
-    _compare_version_lists(mlflow_context, mlflow_context.output_dir, model_src.latest_versions, model_dst.latest_versions)
+    _compare_version_lists(mlflow_context, model_src.latest_versions, model_dst.latest_versions, mlflow_context.output_dir)
 
 def test_export_import_model_stages(mlflow_context):
     exporter = ModelExporter(mlflow_context.client_src, stages=["Production","Staging"])
@@ -53,9 +53,10 @@ def test_export_import_model_stages(mlflow_context):
 
     _compare_models(model_src, model_dst)
     _compare_version_lists(
-        mlflow_context, mlflow_context.output_dir,
+        mlflow_context, 
         [vr_prod_src, vr_staging_src],
-        [vr_prod_dst, vr_staging_dst])
+        [vr_prod_dst, vr_staging_dst],
+        mlflow_context.output_dir)
 
 
 def _create_version(client, model_name, stage=None):
@@ -74,11 +75,11 @@ def _compare_models(model_src, model_dst):
     assert model_src.description == model_dst.description
     assert model_src.tags == model_dst.tags
 
-def _compare_version_lists(mlflow_context, output_dir, versions_src, versions_dst):
+def _compare_version_lists(mlflow_context, versions_src, versions_dst, output_dir):
     for (vr_src, vr_dst) in zip(versions_src, versions_dst):
-        _compare_versions(mlflow_context, output_dir, vr_src, vr_dst)
+        _compare_versions(mlflow_context, vr_src, vr_dst, output_dir)
 
-def _compare_versions(mlflow_context, output_dir, vr_src, vr_dst):
+def _compare_versions(mlflow_context, vr_src, vr_dst, output_dir):
     assert vr_src.current_stage == vr_dst.current_stage
     assert vr_src.description == vr_dst.description
     assert vr_src.name == vr_dst.name
@@ -89,7 +90,7 @@ def _compare_versions(mlflow_context, output_dir, vr_src, vr_dst):
     assert vr_src.run_id != vr_dst.run_id
     run_src = mlflow_context.client_src.get_run(vr_src.run_id)
     run_dst = mlflow_context.client_dst.get_run(vr_dst.run_id)
-    compare_utils.compare_runs(mlflow_context.client_src, mlflow_context.client_dst, output_dir, run_src, run_dst)
+    compare_utils.compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run_src, run_dst, output_dir)
 
 
 from mlflow_export_import.model.import_model import _extract_model_path
