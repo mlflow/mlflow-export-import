@@ -23,6 +23,5 @@ TestContext = namedtuple(
 
 @pytest.fixture(scope="session")
 def test_context():
-    tester.run_job(tester.run_training_job, "Training run")
     yield TestContext(tester, dbfs_api)
     tester.delete_cluster()

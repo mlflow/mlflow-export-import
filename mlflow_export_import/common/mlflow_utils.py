@@ -67,6 +67,15 @@ def get_first_run(mlflow_client, exp_id_or_name):
     return mlflow_client.get_run(runs[0].run_id)
 
 
+def delete_experiments(mlflow_client, prefix):
+    """ Delete experiments starting with the prefix """
+    exps = mlflow_client.list_experiments()
+    for exp in exps:
+        if exp.name.startswith(prefix):
+            print(">> delete_experiments: exp:",exp.experiment_id,exp.name)
+            mlflow_client.delete_experiment(exp.experiment_id)
+
+
 def delete_experiment(mlflow_client, exp_id_or_name):
     exp = get_experiment(mlflow_client, exp_id_or_name)
     print(f"Deleting experiment: name={exp.name} experiment_id={exp.experiment_id}")
