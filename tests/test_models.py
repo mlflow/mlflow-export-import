@@ -1,7 +1,7 @@
 from mlflow_export_import.model.export_model import ModelExporter
 from mlflow_export_import.model.import_model import ModelImporter
 from mlflow_export_import import utils
-import utils_test 
+import utils_test
 import compare_utils
 from init_tests import mlflow_context
 
@@ -57,6 +57,34 @@ def test_export_import_model_stages(mlflow_context):
         [vr_prod_src, vr_staging_src],
         [vr_prod_dst, vr_staging_dst])
 
+def test_export_import_model_versions(mlflow_context):
+    model_name_src = utils_test.mk_test_object_name_default()
+    model_src = mlflow_context.client_src.create_registered_model(model_name_src)
+
+    vr_staging_src = _create_version(mlflow_context.client_src, model_name_src, "Staging")
+    vr_prod_src = _create_version(mlflow_context.client_src, model_name_src, "Production")
+
+    exporter = ModelExporter(mlflow_context.client_src, versions=[vr_staging_src.version, vr_prod_src.version])
+    exporter.export_model(model_name_src, mlflow_context.output_dir)
+
+    model_name_dst = utils_test.create_dst_model_name(model_name_src)
+    experiment_name = model_name_dst
+    importer = ModelImporter(mlflow_context.client_dst)
+    importer.import_model(model_name_dst, mlflow_context.output_dir, experiment_name, delete_model=True, verbose=False, sleep_time=10)
+
+    model_dst = mlflow_context.client_dst.get_registered_model(model_name_dst)
+    assert len(model_dst.latest_versions) == 2
+
+    versions = mlflow_context.client_dst.get_latest_versions(model_name_dst)
+    vr_prod_dst = [vr for vr in versions if vr.version == vr_prod_src.version][0]
+    vr_staging_dst = [vr for vr in versions if vr.version == vr_staging_src.version][0]
+
+    _compare_models(model_src, model_dst)
+    _compare_version_lists(
+        mlflow_context, mlflow_context.output_dir,
+        [vr_prod_src, vr_staging_src],
+        [vr_prod_dst, vr_staging_dst])
+
 
 def _create_version(client, model_name, stage=None):
     run = _create_run(client)
@@ -69,7 +97,7 @@ def _create_version(client, model_name, stage=None):
 def _create_run(client):
     _, run = utils_test.create_simple_run(client)
     return client.get_run(run.info.run_id)
-    
+
 def _compare_models(model_src, model_dst):
     assert model_src.description == model_dst.description
     assert model_src.tags == model_dst.tags
@@ -85,7 +113,7 @@ def _compare_versions(mlflow_context, output_dir, vr_src, vr_dst):
     assert vr_src.status == vr_dst.status
     assert vr_src.status_message == vr_dst.status_message
     if not utils.importing_into_databricks():
-        assert vr_src.user_id == vr_dst.user_id 
+        assert vr_src.user_id == vr_dst.user_id
     assert vr_src.run_id != vr_dst.run_id
     run_src = mlflow_context.client_src.get_run(vr_src.run_id)
     run_dst = mlflow_context.client_dst.get_run(vr_dst.run_id)

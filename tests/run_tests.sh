@@ -27,13 +27,13 @@ export MLFLOW_TRACKING_URI_SRC=http://localhost:${PORT_SRC}
 export MLFLOW_TRACKING_URI_DST=http://localhost:${PORT_DST}
 
 message() {
-  echo 
+  echo
   echo "******************************************************"
   echo "*"
   echo "* $*"
   echo "*"
   echo "******************************************************"
-  echo 
+  echo
 }
 
 run_tests() {
@@ -50,7 +50,7 @@ launch_server() {
   mlflow server \
     --host localhost --port ${port}  \
     --backend-store-uri sqlite:///mlflow_${port}.db \
-    --default-artifact-root $PWD/mlruns_${port}
+    --default-artifact-root "$(PWD)/mlruns_${port}"
 }
 
 kill_server() {

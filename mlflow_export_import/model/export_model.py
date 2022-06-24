@@ -11,18 +11,20 @@ from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils, click_doc
 
 class ModelExporter():
-    def __init__(self,  mlflow_client, export_source_tags=False, notebook_formats=None, stages=None, export_run=True):
+    def __init__(self,  mlflow_client, export_source_tags=False, notebook_formats=None, stages=None, versions=None, export_run=True):
         """
         :param mlflow_client: MLflow client or if None create default client.
         :param export_source_tags: Export source run metadata tags.
         :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
         :param stages: Stages to export. Default is all stages. Values are Production, Staging, Archived and None.
+        :param versions: Versions to export. Default is all versions. Values are valid integer numbers.
         :param export_run: Export the run that generated a registered model's version.
         """
         self.mlflow_client = mlflow_client
         self.http_client = MlflowHttpClient()
         self.run_exporter = RunExporter(self.mlflow_client, export_source_tags=export_source_tags, notebook_formats=notebook_formats)
         self.stages = self._normalize_stages(stages)
+        self.versions = self._normalize_versions(versions)
         self.export_run = export_run
 
     def export_model(self, model_name, output_dir):
@@ -49,6 +51,8 @@ class ModelExporter():
         exported_versions = 0
         for vr in versions:
             if len(self.stages) > 0 and not vr.current_stage.lower() in self.stages:
+                continue
+            if len(self.versions) > 0 and vr.version not in self.versions:
                 continue
             run_id = vr.run_id
             opath = os.path.join(output_dir,run_id)
@@ -89,14 +93,26 @@ class ModelExporter():
                 print(f"WARNING: stage '{stage}' must be one of: {model_version_stages.ALL_STAGES}")
         return stages
 
+    def _normalize_versions(self, versions):
+        if versions is None:
+            return []
+        if isinstance(versions, str):
+            versions = versions.split(",")
+        for version in versions:
+            try:
+                int(version)
+            except ValueError:
+                print(f"WARNING: version '{version}' must be a valid number")
+        return versions
+
 @click.command()
-@click.option("--model", 
-    help="Registered model name.", 
+@click.option("--model",
+    help="Registered model name.",
     type=str,
     required=True
 )
-@click.option("--output-dir", 
-    help="Output directory.", 
+@click.option("--output-dir",
+    help="Output directory.",
     type=str,
     required=True
 )
@@ -106,24 +122,29 @@ class ModelExporter():
     default=False,
     show_default=True
 )
-@click.option("--notebook-formats", 
-    help=click_doc.notebook_formats, 
+@click.option("--notebook-formats",
+    help=click_doc.notebook_formats,
     type=str,
-    default="", 
+    default="",
     show_default=True
 )
-@click.option("--stages", 
-    help=click_doc.model_stages, 
+@click.option("--stages",
+    help=click_doc.model_stages,
+    type=str,
+    required=False
+)
+@click.option("--versions",
+    help=click_doc.model_versions,
     type=str,
     required=False
 )
 
-def main(model, output_dir, export_source_tags, notebook_formats, stages):
+def main(model, output_dir, export_source_tags, notebook_formats, stages, versions):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
     client = mlflow.tracking.MlflowClient()
-    exporter = ModelExporter(client, export_source_tags=export_source_tags, notebook_formats=utils.string_to_list(notebook_formats), stages=stages)
+    exporter = ModelExporter(client, export_source_tags=export_source_tags, notebook_formats=utils.string_to_list(notebook_formats), stages=stages, versions=versions)
     exporter.export_model(model, output_dir)
 
 if __name__ == "__main__":
