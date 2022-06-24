@@ -51,34 +51,26 @@ class DatabricksTester():
         print("ML training notebook:", self.ml_nb_path)
         print("ML training experiment:", self.ml_exp_path)
 
-        self.delete_experiments(mlflow_client, self.ws_base_dir)
         self._init_dirs()
 
 
     def _init_dirs(self):
         """
-        Create/cleanup workspace and DBFS test directories.
+        Create/cleanup test Databricks workspace and DBFS directories.
         Copy notebooks to workspace test directory.
         """
-        self._ws_mkdir(self.ws_base_dir)
+
+        # Delete workspace and DBFS directorues
+        self._delete_dirs()
+
+        # Create and load workspace with notebooks
+        self.ws_api.mkdirs(self.ws_base_dir)
         self._ws_list(self.ws_base_dir)
         self._import_notebook(_fs_experiment_nb_name, "experiment", self.ws_base_dir) # import the model training notebook
         self._import_notebooks(_fs_nb_base_dir, self.ws_base_dir) # import all the export-import notebooks
+
+        # Create DBFS export directory
         self.dbfs_api.mkdirs(DbfsPath(self.dst_base_dir))
-
-
-    def _get_cluster_id(self):
-        if isinstance(self.cluster_spec, str):
-            return self.cluster_spec
-        elif isinstance(self.cluster_spec, dict):
-            res = self.cluster_api.create_cluster(self.cluster_spec)
-            return res["cluster_id"]
-        raise Exception("Unknown cluster type")
-
-
-    def delete_cluster(self):
-        if isinstance(self.cluster_spec, dict):
-            self.cluster_api.permanent_delete(self.cluster_id)
 
 
     def _run_job(self, nb_name, notebook_task):
@@ -183,10 +175,6 @@ class DatabricksTester():
         self.ws_api.import_workspace_dir(src_dir, dst_dir, True, True)
     
     
-    def _ws_mkdir(self, ws_base_dir):
-        self.ws_api.mkdirs(ws_base_dir)
-
-
     def _mk_ws_path(self, ws_object_name):
         return os.path.join(self.ws_base_dir, ws_object_name)
 
@@ -210,13 +198,32 @@ class DatabricksTester():
             print("  ",x.basename)
 
 
-    def delete_experiments(self, mlflow_client, prefix):
-        """ Delete experiments starting with the prefix """
-        exps = mlflow_client.list_experiments()
-        for exp in exps:
-            if exp.name.startswith(prefix) and (exp.name.endswith("_exp") or exp.name.endswith("_exp_imported")):
-                mlflow_client.delete_experiment(exp.experiment_id)
-    
+    def _ws_delete(self):
+        try:
+            self.ws_api.delete(self.ws_base_dir, is_recursive=True)
+        except Exception:
+            pass
+
+
+    def _delete_dirs(self):
+        """ Delete both test workspace and DBFS directories """
+        self._ws_delete()
+        self.dbfs_api.delete(DbfsPath(self.dst_base_dir), recursive=True)
+
+
+    def _get_cluster_id(self):
+        if isinstance(self.cluster_spec, str):
+            return self.cluster_spec
+        elif isinstance(self.cluster_spec, dict):
+            res = self.cluster_api.create_cluster(self.cluster_spec)
+            return res["cluster_id"]
+        raise Exception("Unknown cluster type")
+
+
+    def delete_cluster(self):
+        if isinstance(self.cluster_spec, dict):
+            self.cluster_api.permanent_delete(self.cluster_id)
+
 
     def _dump_json(self, msg, dct):
         print(f"{msg}:")

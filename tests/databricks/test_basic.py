@@ -53,15 +53,6 @@ def _run_job(test_context, job, name):
     return run
 
 
-def _bounce_dbfs_dir(test_context, dir):
-    """ Delete the export directory and recreate it """
-    dir = DbfsPath(dir)
-    test_context.dbfs_api.delete(dir, True)
-    test_context.dbfs_api.mkdirs(dir)
-    files = test_context.dbfs_api.list_files(dir)
-    assert len(files) == 0
-
-
 def _check_dbfs_dir_after_export(test_context, dir):
     """ Minimal check to see if we have created the MLflow object's export directory. More checks needed. """
     files = test_context.dbfs_api.list_files(DbfsPath(dir))
@@ -75,3 +66,6 @@ def _mk_artifact_output(test_context):
     dir = os.path.join(test_context.tester.dst_run_base_dir,"artifacts")
     utils_test.create_output_dir(dir)
     return dir
+
+def _bounce_dbfs_dir(test_context, dir):
+    pass
