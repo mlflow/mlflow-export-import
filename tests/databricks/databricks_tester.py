@@ -5,7 +5,6 @@ from databricks_cli.sdk import service
 
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.workflow_api.workflow_api_client import WorkflowApiClient
-from mlflow_export_import.workflow_api import log_utils
 import utils
 
 workflow_client = WorkflowApiClient()
@@ -16,7 +15,7 @@ from databricks_cli.dbfs.api import DbfsApi, DbfsPath
 from databricks_cli.clusters.api import ClusterApi
     
 _formats = [ "SOURCE" ]
-_export_src_tags = True
+_export_src_tags = "yes"
 
 _experiment_nb = "Iris_Train"
 _experiment_name = "Iris_Train_exp"
@@ -37,9 +36,9 @@ class DatabricksTester():
 
         self.ws_base_dir = ws_base_dir
         self.dst_base_dir = dst_base_dir
-        self.dst_run_base_dir = os.path.join(dst_base_dir,"runs")
-        self.dst_exp_base_dir = os.path.join(dst_base_dir,"experiments")
-        self.dst_model_base_dir = os.path.join(dst_base_dir,"models")
+        self.dst_run_base_dir = os.path.join(dst_base_dir, "runs")
+        self.dst_exp_base_dir = os.path.join(dst_base_dir, "experiments")
+        self.dst_model_base_dir = os.path.join(dst_base_dir, "models")
 
         self.model_name = model_name
         self.run_name_prefix = run_name_prefix
@@ -49,12 +48,18 @@ class DatabricksTester():
 
         self.ml_nb_path = self._mk_ws_path(_experiment_nb)
         self.ml_exp_path = self._mk_ws_path(_experiment_name)
+        print("ML training notebook:", self.ml_nb_path)
+        print("ML training experiment:", self.ml_exp_path)
 
-        mlflow_utils.delete_experiments(mlflow_client, self.ws_base_dir)
-        self._make_dirs()
+        self.delete_experiments(mlflow_client, self.ws_base_dir)
+        self._init_dirs()
 
 
-    def _make_dirs(self):
+    def _init_dirs(self):
+        """
+        Create/cleanup workspace and DBFS test directories.
+        Copy notebooks to workspace test directory.
+        """
         self._ws_mkdir(self.ws_base_dir)
         self._ws_list(self.ws_base_dir)
         self._import_notebook(_fs_experiment_nb_name, "experiment", self.ws_base_dir) # import the model training notebook
@@ -144,6 +149,7 @@ class DatabricksTester():
     def run_import_experiment_job(self):
         nb_name = "Import_Experiment"
         exp = mlflow_client.get_experiment_by_name(self.ml_exp_path)
+        assert exp
         dst_exp_name = self._mk_imported_exp_name()
         src_exp_dir = self._mk_dbfs_path(exp.experiment_id)
         notebook_task = {
@@ -203,7 +209,15 @@ class DatabricksTester():
         for x in lst:
             print("  ",x.basename)
 
+
+    def delete_experiments(self, mlflow_client, prefix):
+        """ Delete experiments starting with the prefix """
+        exps = mlflow_client.list_experiments()
+        for exp in exps:
+            if exp.name.startswith(prefix) and (exp.name.endswith("_exp") or exp.name.endswith("_exp_imported")):
+                mlflow_client.delete_experiment(exp.experiment_id)
     
+
     def _dump_json(self, msg, dct):
         print(f"{msg}:")
         print(json.dumps(dct,indent=2)+"\n")

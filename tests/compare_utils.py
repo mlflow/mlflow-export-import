@@ -36,6 +36,7 @@ def _compare_data(run1, run2):
     assert run1.data.params == run2.data.params
     assert run1.data.metrics == run2.data.metrics
 
+
 def _compare_artifacts(client_src, client_dst, run1, run2, run_artifact_dir1, run_artifact_dir2):
     path1 = client_src.download_artifacts(run1.info.run_id, ".", dst_path=run_artifact_dir1)
     path2 = client_dst.download_artifacts(run2.info.run_id, ".", dst_path=run_artifact_dir2)

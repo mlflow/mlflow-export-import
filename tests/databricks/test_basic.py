@@ -1,14 +1,22 @@
+"""
+Databricks notebook tests for MLflow export import notebooks.
+"""
+
+import os
 import mlflow
 from init_tests import test_context
 from databricks_cli.dbfs.api import DbfsPath
+from compare_utils import compare_runs_with_source_tags
+import utils_test
 
 mlflow_client = mlflow.tracking.MlflowClient()
+
 
 def test_train_model(test_context):
     _run_job(test_context, test_context.tester.run_training_job, "Train model")
 
 
-def test_run(test_context):
+def test_export_run(test_context):
     _bounce_dbfs_dir(test_context, test_context.tester.dst_run_base_dir)
     _run_job(test_context, test_context.tester.run_export_run_job, "Export Run")
     _check_dbfs_dir_after_export(test_context, test_context.tester.dst_run_base_dir)
@@ -26,11 +34,11 @@ def test_import_experiment_job(test_context):
     exp_name_2 = test_context.tester._mk_imported_exp_name()
     exp1 = mlflow_client.get_experiment_by_name(exp_name_1)
     exp2 = mlflow_client.get_experiment_by_name(exp_name_2)
-
-    runs1 = mlflow_client.list_run_infos(exp1.experiment_id)
-    runs2 = mlflow_client.list_run_infos(exp2.experiment_id)
+    runs1 = mlflow_client.search_runs(exp1.experiment_id, "")
+    runs2 = mlflow_client.search_runs(exp2.experiment_id, "")
     assert len(runs1) == len(runs2)
     assert len(runs1) == 1
+    compare_runs_with_source_tags(mlflow_client, mlflow_client, runs1[0], runs2[0], _mk_artifact_output(test_context))
 
 
 def test_export_model(test_context):
@@ -61,3 +69,9 @@ def _check_dbfs_dir_after_export(test_context, dir):
     sub_dir = files[0]
     files = test_context.dbfs_api.list_files(sub_dir.dbfs_path)
     assert len(files) > 0
+
+
+def _mk_artifact_output(test_context):
+    dir = os.path.join(test_context.tester.dst_run_base_dir,"artifacts")
+    utils_test.create_output_dir(dir)
+    return dir
