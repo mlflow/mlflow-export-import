@@ -132,6 +132,38 @@ class DatabricksTester():
         return self._run_job(nb_name, notebook_task)
 
 
+    def run_import_experiment_job(self):
+        nb_name = "Import_Experiment"
+        exp = mlflow_client.get_experiment_by_name(self.ml_exp_path)
+        assert exp
+        dst_exp_name = self.mk_imported_name(self.ml_exp_path)
+        src_exp_dir = self._mk_dbfs_path(self.dst_exp_base_dir, exp.experiment_id)
+        notebook_task = {
+            "notebook_path": self._mk_ws_path(nb_name),
+            "base_parameters": {
+              "Destination experiment name": dst_exp_name,
+              "DBFS input folder": src_exp_dir
+            }
+        }
+        return self._run_job(nb_name, notebook_task)
+
+
+    def run_import_model_job(self):
+        nb_name = "Import_Model"
+        export_model_dir = self._mk_dbfs_path(self.dst_model_base_dir, self.model_name)
+        dst_model_name = self.mk_imported_name(self.model_name)
+        dst_exp_name = self.mk_imported_name(self.ml_exp_path)
+        notebook_task = {
+            "notebook_path": self._mk_ws_path(nb_name),
+            "base_parameters": {
+              " Model": dst_model_name,
+              "Experiment name": dst_exp_name,
+              "Input folder": export_model_dir
+            }
+        }
+        return self._run_job(nb_name, notebook_task)
+
+
     def run_training_job(self):
         run_name = self._mk_run_name("training_job")
         notebook_task = { 
@@ -144,24 +176,8 @@ class DatabricksTester():
         if self.verbose:
             self._dump_json("run_training_job - notebook_task",notebook_task)
         return self.jobs_service.submit_run(run_name, existing_cluster_id=self.cluster_id, notebook_task=notebook_task)
-
-
-    def run_import_experiment_job(self):
-        nb_name = "Import_Experiment"
-        exp = mlflow_client.get_experiment_by_name(self.ml_exp_path)
-        assert exp
-        dst_exp_name = self._mk_imported_exp_name()
-        src_exp_dir = self._mk_dbfs_path(exp.experiment_id)
-        notebook_task = {
-            "notebook_path": self._mk_ws_path(nb_name),
-            "base_parameters": {
-              "Destination experiment name": dst_exp_name,
-              "DBFS input folder": src_exp_dir
-            }
-        }
-        return self._run_job(nb_name, notebook_task)
-
     
+
     def run_job(self, job_func, name):
         print(f"====== run_job: {name}")
         res = job_func()
@@ -187,16 +203,18 @@ class DatabricksTester():
         return os.path.join(self.ws_base_dir, ws_object_name)
 
 
-    def _mk_dbfs_path(self, file):
-        return os.path.join(self.dst_exp_base_dir, file)
+    def _mk_dbfs_path(self, dir, file):
+        return os.path.join(dir, file)
+    #def _mk_dbfs_path(self, file):
+        #return os.path.join(self.dst_exp_base_dir, file)
 
 
     def _mk_run_name(self, nb_name):
         return f"{self.run_name_prefix}_{nb_name}"
 
 
-    def _mk_imported_exp_name(self):
-        return f"{self.ml_exp_path}_imported"
+    def mk_imported_name(self, name):
+        return f"{name}_imported"
     
 
     def _ws_list(self, path):

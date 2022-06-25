@@ -31,21 +31,24 @@ def test_export_experiment_job(test_context):
 def test_import_experiment_job(test_context):
     _run_job(test_context, test_context.tester.run_import_experiment_job, "Import Experiment")
     exp_name_1 = test_context.tester.ml_exp_path
-    exp_name_2 = test_context.tester._mk_imported_exp_name()
+    exp_name_2 = test_context.tester.mk_imported_name(test_context.tester.ml_exp_path)
     exp1 = mlflow_client.get_experiment_by_name(exp_name_1)
     exp2 = mlflow_client.get_experiment_by_name(exp_name_2)
-    runs1 = mlflow_client.search_runs(exp1.experiment_id, "")
-    runs2 = mlflow_client.search_runs(exp2.experiment_id, "")
+    runs1 = mlflow_client.search_runs(exp1.experiment_id)
+    runs2 = mlflow_client.search_runs(exp2.experiment_id)
     assert len(runs1) == len(runs2)
     assert len(runs1) == 1
     compare_runs_with_source_tags(mlflow_client, mlflow_client, runs1[0], runs2[0], _mk_artifact_output(test_context))
-    #compare_runs_with_source_tags(mlflow_client, mlflow_client, runs1[0], runs2[0], _mk_artifact_output(test_context))
 
 
 def test_export_model(test_context):
     _bounce_dbfs_dir(test_context, test_context.tester.dst_model_base_dir)
     _run_job(test_context, test_context.tester.run_export_model_job, "Export Model")
     _check_dbfs_dir_after_export(test_context, test_context.tester.dst_exp_base_dir)
+
+
+def test_import_model_job(test_context):
+    _run_job(test_context, test_context.tester.run_import_model_job, "Import Experiment")
 
 
 def _run_job(test_context, job, name):
