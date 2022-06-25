@@ -4,6 +4,8 @@ from mlflow_export_import import utils
 import utils_test 
 import compare_utils
 from init_tests import mlflow_context
+from mlflow_export_import.model.import_model import _extract_model_path
+
 
 def test_export_import_model(mlflow_context):
     run_src = _create_run(mlflow_context.client_src)
@@ -16,15 +18,15 @@ def test_export_import_model(mlflow_context):
 
     model_name_dst = utils_test.create_dst_model_name(model_name_src)
     experiment_name =  model_name_dst
-    importer = ModelImporter( mlflow_context.client_dst)
+    importer = ModelImporter(mlflow_context.client_dst)
     importer.import_model(model_name_dst, mlflow_context.output_dir, experiment_name, delete_model=True, verbose=False, sleep_time=10)
     model_dst = mlflow_context.client_dst.get_registered_model(model_name_dst)
 
     model_src = mlflow_context.client_src.get_registered_model(model_name_src)
     assert len(model_src.latest_versions) == len(model_dst.latest_versions)
 
-    _compare_models(model_src, model_dst)
-    _compare_version_lists(mlflow_context, model_src.latest_versions, model_dst.latest_versions, mlflow_context.output_dir)
+    _compare_models(mlflow_context, model_src, model_dst, mlflow_context.output_dir)
+
 
 def test_export_import_model_stages(mlflow_context):
     exporter = ModelExporter(mlflow_context.client_src, stages=["Production","Staging"])
@@ -32,31 +34,21 @@ def test_export_import_model_stages(mlflow_context):
     model_src = mlflow_context.client_src.create_registered_model(model_name_src)
 
     _create_version(mlflow_context.client_src, model_name_src, "Production")
-    _create_version(mlflow_context.client_src, model_name_src)
-    vr_staging_src = _create_version(mlflow_context.client_src, model_name_src, "Staging")
-    vr_prod_src = _create_version(mlflow_context.client_src, model_name_src, "Production")
+    _create_version(mlflow_context.client_src, model_name_src, "Staging")
     _create_version(mlflow_context.client_src, model_name_src, "Archived")
     exporter.export_model(model_name_src, mlflow_context.output_dir)
 
     model_name_dst = utils_test.create_dst_model_name(model_name_src)
     experiment_name =  model_name_dst
     importer = ModelImporter(mlflow_context.client_dst)
-    importer.import_model(model_name_dst, mlflow_context.output_dir, experiment_name, delete_model=True, verbose=False, sleep_time=10)
-    model_dst = mlflow_context.client_dst.get_registered_model(model_name_dst)
-
+    importer.import_model(model_name_dst, 
+        mlflow_context.output_dir, 
+        experiment_name, delete_model=True, 
+        verbose=False, 
+        sleep_time=10)
     model_dst = mlflow_context.client_dst.get_registered_model(model_name_dst)
     assert len(model_dst.latest_versions) == 2
-
-    versions = mlflow_context.client_dst.get_latest_versions(model_name_dst)
-    vr_prod_dst = [vr for vr in versions if vr.current_stage == "Production"][0]
-    vr_staging_dst = [vr for vr in versions if vr.current_stage == "Staging"][0]
-
-    _compare_models(model_src, model_dst)
-    _compare_version_lists(
-        mlflow_context, 
-        [vr_prod_src, vr_staging_src],
-        [vr_prod_dst, vr_staging_dst],
-        mlflow_context.output_dir)
+    _compare_models(mlflow_context,  model_src, model_dst, mlflow_context.output_dir)
 
 
 def _create_version(client, model_name, stage=None):
@@ -67,17 +59,18 @@ def _create_version(client, model_name, stage=None):
         vr = client.transition_model_version_stage(model_name, vr.version, stage)
     return vr
 
+
 def _create_run(client):
     _, run = utils_test.create_simple_run(client)
     return client.get_run(run.info.run_id)
     
-def _compare_models(model_src, model_dst):
+
+def _compare_models(mlflow_context, model_src, model_dst, output_dir):
     assert model_src.description == model_dst.description
     assert model_src.tags == model_dst.tags
-
-def _compare_version_lists(mlflow_context, versions_src, versions_dst, output_dir):
-    for (vr_src, vr_dst) in zip(versions_src, versions_dst):
+    for (vr_src, vr_dst) in zip(model_src.latest_versions, model_dst.latest_versions):
         _compare_versions(mlflow_context, vr_src, vr_dst, output_dir)
+
 
 def _compare_versions(mlflow_context, vr_src, vr_dst, output_dir):
     assert vr_src.current_stage == vr_dst.current_stage
@@ -93,19 +86,22 @@ def _compare_versions(mlflow_context, vr_src, vr_dst, output_dir):
     compare_utils.compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run_src, run_dst, output_dir)
 
 
-from mlflow_export_import.model.import_model import _extract_model_path
+# Simple tests for parsing
 
-run_id = "48cf29167ddb4e098da780f0959fb4cf"
-model_path = "models:/my_model"
+_run_id = "48cf29167ddb4e098da780f0959fb4cf"
+_model_path = "models:/my_model"
+
 
 def test_extract_model_path_databricks(mlflow_context):
-    source = f"dbfs:/databricks/mlflow-tracking/4072937019901104/{run_id}/artifacts/{model_path}"
+    source = f"dbfs:/databricks/mlflow-tracking/4072937019901104/{_run_id}/artifacts/{_model_path}"
     _run_test_extract_model_path(source)
+
 
 def test_extract_model_path_oss(mlflow_context):
-    source = f"/opt/mlflow_context/local_mlrun/mlruns/3/{run_id}/artifacts/{model_path}"
+    source = f"/opt/mlflow_context/local_mlrun/mlruns/3/{_run_id}/artifacts/{_model_path}"
     _run_test_extract_model_path(source)
 
+
 def _run_test_extract_model_path(source):
-    model_path2 = _extract_model_path(source, run_id)
-    assert model_path == model_path2
+    model_path2 = _extract_model_path(source, _run_id)
+    assert _model_path == model_path2

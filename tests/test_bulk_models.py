@@ -23,9 +23,8 @@ def compare_models(mlflow_context, compare_func):
     models2 = mlflow_context.client_dst.list_registered_models()
     assert len(models2) > 0
     for model2 in models2:
-        model2 = mlflow_context.client_dst.get_registered_model(model2.name)
-        versions = mlflow_context.client_dst.get_latest_versions(model2.name)
-        for vr in versions:
+        versions2 = mlflow_context.client_dst.get_latest_versions(model2.name)
+        for vr in versions2:
             run2 = mlflow_context.client_dst.get_run(vr.run_id)
             tag = run2.data.tags["my_uuid"]
             filter = f"tags.my_uuid = '{tag}'"
