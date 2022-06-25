@@ -20,7 +20,8 @@ The tests read in environment-specific properties from `config.yaml` file.
 |Name | Required | Description|
 |-----|----------|---------|
 | ws_base_dir | yes | Workspace directory for the test notebooks and experiment |
-| dst_base_dir | yes | DBFS path for exported MLflow objects |
+| dbfs_base_export_dir | yes | DBFS base directory for exported MLflow objects |
+| local_artifacts_compare_dir | no | Local scratch directory for comparing two run's downloaded artifacts. Defaults to a tmp directory. Set it for debugging. |
 | model_name | yes | Name of test registered model |
 | run_name_prefix | yes | Prefix of the job run name |
 | cluster | yes | Either an existing cluster ID or cluster spec for new cluster. See below. |

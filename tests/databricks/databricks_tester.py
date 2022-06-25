@@ -27,7 +27,14 @@ print("_fs_experiment_nb_path:",_fs_experiment_nb_path)
 
 
 class DatabricksTester():
-    def __init__(self, ws_base_dir, dst_base_dir, cluster_spec, model_name, run_name_prefix, profile=None, verbose=False):
+    def __init__(self, ws_base_dir, 
+            dbfs_base_export_dir, 
+            local_artifacts_compare_dir, 
+            cluster_spec, 
+            model_name, 
+            run_name_prefix, 
+            profile=None, 
+            verbose=False):
         api_client = utils.get_api_client(profile)
         self.ws_api = WorkspaceApi(api_client)
         self.dbfs_api = DbfsApi(api_client)
@@ -35,10 +42,11 @@ class DatabricksTester():
         self.jobs_service = service.JobsService(api_client)
 
         self.ws_base_dir = ws_base_dir
-        self.dst_base_dir = dst_base_dir
-        self.dst_run_base_dir = os.path.join(dst_base_dir, "runs")
-        self.dst_exp_base_dir = os.path.join(dst_base_dir, "experiments")
-        self.dst_model_base_dir = os.path.join(dst_base_dir, "models")
+        self.dbfs_base_export_dir = dbfs_base_export_dir
+        self.local_artifacts_compare_dir = local_artifacts_compare_dir
+        self.dst_run_base_dir = os.path.join(dbfs_base_export_dir, "runs")
+        self.dst_exp_base_dir = os.path.join(dbfs_base_export_dir, "experiments")
+        self.dst_model_base_dir = os.path.join(dbfs_base_export_dir, "models")
 
         self.model_name = model_name
         self.run_name_prefix = run_name_prefix
@@ -70,7 +78,7 @@ class DatabricksTester():
         self._import_notebooks(_fs_nb_base_dir, self.ws_base_dir) # import all the export-import notebooks
 
         # Create DBFS export directory
-        self.dbfs_api.mkdirs(DbfsPath(self.dst_base_dir))
+        self.dbfs_api.mkdirs(DbfsPath(self.dbfs_base_export_dir))
 
 
     def _run_job(self, nb_name, notebook_task):
@@ -208,16 +216,20 @@ class DatabricksTester():
     def _delete_dirs(self):
         """ Delete both test workspace and DBFS directories """
         self._ws_delete()
-        self.dbfs_api.delete(DbfsPath(self.dst_base_dir), recursive=True)
+        self.dbfs_api.delete(DbfsPath(self.dbfs_base_export_dir), recursive=True)
 
 
     def _get_cluster_id(self):
         if isinstance(self.cluster_spec, str):
-            return self.cluster_spec
+            cluster_id = self.cluster_spec
+            cluster = self.cluster_api.get_cluster(cluster_id)
         elif isinstance(self.cluster_spec, dict):
-            res = self.cluster_api.create_cluster(self.cluster_spec)
-            return res["cluster_id"]
-        raise Exception("Unknown cluster type")
+            cluster = self.cluster_api.create_cluster(self.cluster_spec)
+            cluster_id = cluster["cluster_id"]
+        else:
+            raise Exception(f"Unknown cluster type: {type(self.cluster_spec)}. Muar be a string or dict.")
+        print(f"Using cluster: id={cluster_id} name={cluster['cluster_name']}")
+        return cluster_id
 
 
     def delete_cluster(self):

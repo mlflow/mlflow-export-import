@@ -39,6 +39,7 @@ def test_import_experiment_job(test_context):
     assert len(runs1) == len(runs2)
     assert len(runs1) == 1
     compare_runs_with_source_tags(mlflow_client, mlflow_client, runs1[0], runs2[0], _mk_artifact_output(test_context))
+    #compare_runs_with_source_tags(mlflow_client, mlflow_client, runs1[0], runs2[0], _mk_artifact_output(test_context))
 
 
 def test_export_model(test_context):
@@ -63,9 +64,9 @@ def _check_dbfs_dir_after_export(test_context, dir):
 
 
 def _mk_artifact_output(test_context):
-    dir = os.path.join(test_context.tester.dst_run_base_dir,"artifacts")
+    dir = os.path.join(test_context.tester.local_artifacts_compare_dir, "artifacts")
     utils_test.create_output_dir(dir)
     return dir
 
 def _bounce_dbfs_dir(test_context, dir):
-    pass
+    pass # TODO
