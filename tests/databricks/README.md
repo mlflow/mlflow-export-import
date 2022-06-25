@@ -13,7 +13,8 @@ See [parent tests README](../README.md#Setup)
 
 ## Test Configuration
 
-Copy [config.yaml.template](config.yaml.template) to `config.json` and adjust the properties for your workspace.
+The tests use `config.yaml` for environment configuration.
+Copy [config.yaml.template](config.yaml.template) to `config.yaml` and adjust the properties for your workspace.
 
 The tests read in environment-specific properties from `config.yaml` file.
 
@@ -32,7 +33,9 @@ The tests read in environment-specific properties from `config.yaml` file.
 
 Since each test invokes a remote Databricks job, using a job cluster for each test would be very slow since you would
 need to spin up a cluster for each test.
-The `cluster` attribute is a polymorphic field that has two possible values.
+Therefore an interactive cluster is used for the test session. 
+
+The `cluster` attribute is a polymorphic attribute that has two possible values:
 
 * **New cluster**. Launch a new all-purpose (interactive) cluster at test startup time and reuse this cluster for all tests. 
 At the end of the test suite, the cluster will be deleted.
