@@ -63,8 +63,6 @@ def compare_models(mlflow_client_src, mlflow_client_dst, model_src, model_dst, o
 def compare_versions(mlflow_client_src, mlflow_client_dst, vr_src, vr_dst, output_dir):
     assert vr_src.current_stage == vr_dst.current_stage
     assert vr_src.description == vr_dst.description
-    print(">> vr_src.name:",vr_src.name)
-    print(">> vr_dst.name:",vr_dst.name)
     if mlflow_client_src != mlflow_client_src:
         assert vr_src.name == vr_dst.name
     assert vr_src.status == vr_dst.status

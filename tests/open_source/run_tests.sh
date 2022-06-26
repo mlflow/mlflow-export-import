@@ -38,7 +38,7 @@ message() {
 
 run_tests() {
   message "STAGE 2: RUN TESTS"
-  export PYTHONPATH=..:.
+  export PYTHONPATH=../..:.
   py.test -s test_*.py
 }
 
