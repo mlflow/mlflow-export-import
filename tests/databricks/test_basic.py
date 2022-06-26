@@ -49,6 +49,12 @@ def test_export_model(test_context):
 
 def test_import_model_job(test_context):
     _run_job(test_context, test_context.tester.run_import_model_job, "Import Experiment")
+    model_name_1 = test_context.tester.model_name
+    model_name_2 = test_context.tester.mk_imported_name(model_name_1)
+    model1 = mlflow_client.get_registered_model(model_name_1)
+    model2 = mlflow_client.get_registered_model(model_name_2)
+    from compare_utils import compare_models
+    compare_models(mlflow_client, mlflow_client, model1, model2, test_context.tester.local_artifacts_compare_dir)
 
 
 def _run_job(test_context, job, name):
