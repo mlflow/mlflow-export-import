@@ -6,6 +6,7 @@ import os
 import mlflow
 from init_tests import test_context
 from databricks_cli.dbfs.api import DbfsPath
+from mlflow_export_import.common import mlflow_utils
 from compare_utils import compare_runs_with_source_tags
 import utils_test
 
@@ -20,6 +21,13 @@ def test_export_run(test_context):
     _bounce_dbfs_dir(test_context, test_context.tester.dst_run_base_dir)
     _run_job(test_context, test_context.tester.run_export_run_job, "Export Run")
     _check_dbfs_dir_after_export(test_context, test_context.tester.dst_run_base_dir)
+
+
+def test_import_run(test_context):
+    _run_job(test_context, test_context.tester.run_import_run_job, "Import Run")
+    src_run = mlflow_utils.get_last_run(mlflow_client, test_context.tester.ml_exp_path)
+    dst_run = mlflow_utils.get_last_run(mlflow_client, test_context.tester.mk_imported_name(test_context.tester.ml_exp_path+"_run"))
+    compare_runs_with_source_tags(mlflow_client, mlflow_client, src_run, dst_run, test_context.tester.local_artifacts_compare_dir)
 
 
 def test_export_experiment_job(test_context):

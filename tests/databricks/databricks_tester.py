@@ -132,6 +132,22 @@ class DatabricksTester():
         return self._run_job(nb_name, notebook_task)
 
 
+    def run_import_run_job(self):
+        nb_name = "Import_Run"
+        files = self.dbfs_api.list_files(DbfsPath(self.dst_run_base_dir))
+        run_id = files[0].dbfs_path.basename
+        src_run_dir = os.path.join(self.dst_run_base_dir, run_id)
+        dst_exp_name = self.mk_imported_name(self.ml_exp_path+"_run")
+        notebook_task = {
+            "notebook_path": self._mk_ws_path(nb_name),
+            "base_parameters": {
+              "Destination experiment name": dst_exp_name,
+              "Input folder": src_run_dir
+            }
+        }
+        return self._run_job(nb_name, notebook_task)
+
+
     def run_import_experiment_job(self):
         nb_name = "Import_Experiment"
         exp = mlflow_client.get_experiment_by_name(self.ml_exp_path)

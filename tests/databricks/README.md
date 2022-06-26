@@ -4,8 +4,8 @@
 
 * Databricks tests check if the Databricks export-import notebooks execute properly.
 * They launch a Databricks job that invokes a Databricks notebook.
-* Currently these tests are minimal smoke tests that simply check to see if the notebooks can succesfully execute.
-More complete test logic like the OSS tests will be added at a later date.
+* Currently these tests are a subset of the OSS tests. More complete test logic should be forthcoming.
+* Unlike the OSS tests which two source and destination tracking servers, the Databricks tests use one tracking cluster (workspace). Imported object have `_imported` added to the end of their name.
 
 ## Setup
 
@@ -77,6 +77,6 @@ Use the [run_tests.sh](run_tests.sh) script to run the tests. Output can be foun
 run_tests.sh 
 ```
 ```
-================== 2 passed, 6 warnings in 114.62s (0:01:54) ===================
+================== 7 passed, 6 warnings in 114.62s (0:01:54) ===================
 
 ```
