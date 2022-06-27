@@ -1,13 +1,13 @@
 # Databricks notebook source
 # MAGIC %md ### Export Experiment
 # MAGIC 
-# MAGIC ##### Overview
+# MAGIC #### Overview
 # MAGIC * Exports an experiment and its runs (artifacts too) to a DBFS directory.
 # MAGIC * Output file `manifest.json` contains top-level experiment metadata.
 # MAGIC * Each run and its artifacts are stored as a sub-directory whose name is that of the run_id.
 # MAGIC * Notebooks also can be exported in several formats.
 # MAGIC 
-# MAGIC #### Output folder
+# MAGIC ##### Output folder
 # MAGIC ```
 # MAGIC 
 # MAGIC +-model.json
@@ -35,7 +35,11 @@
 
 # COMMAND ----------
 
-# MAGIC %md ### Create and process widgets 
+# MAGIC %md ### Setup
+
+# COMMAND ----------
+
+# MAGIC %run ./Common
 
 # COMMAND ----------
 
@@ -48,36 +52,24 @@ output_dir = dbutils.widgets.get("Destination base folder")
 dbutils.widgets.dropdown("Export source tags","no",["yes","no"])
 export_source_tags = dbutils.widgets.get("Export source tags") == "yes"
 
-all_formats = [ "SOURCE", "DBC", "HTML", "JUPYTER" ]
-dbutils.widgets.multiselect("Notebook formats",all_formats[0],all_formats)
-formats = dbutils.widgets.get("Notebook formats")
-formats = formats.split(",")
-if "" in formats: formats.remove("")
+notebook_formats = get_notebook_formats()
 
-experiment_id_or_name, output_dir, export_source_tags, formats
-print("experiment_id_or_name:",experiment_id_or_name)
-print("output_dir:",output_dir)
-print("export_source_tags:",export_source_tags)
-print("formats:",formats)
-
-# COMMAND ----------
-
-# MAGIC %run ./Common
+print("experiment_id_or_name:", experiment_id_or_name)
+print("output_dir:", output_dir)
+print("export_source_tags:", export_source_tags)
+print("notebook_formats:", notebook_formats)
 
 # COMMAND ----------
 
 if len(experiment_id_or_name)==0: raise Exception("ERROR: Experiment ID or Name is required")
-if len(output_dir)==0: raise Exception("ERROR: DBFS destination is required")
+if len(output_dir)==0: raise Exception("ERROR: DBFS destination base folder is required")
   
 import mlflow
 from mlflow_export_import.common import mlflow_utils 
 
 client = mlflow.tracking.MlflowClient()
-
 experiment = mlflow_utils.get_experiment(client, experiment_id_or_name)
-
 output_dir = f"{output_dir}/{experiment.experiment_id}"
-
 experiment.experiment_id, experiment.name, output_dir
 
 # COMMAND ----------
@@ -107,9 +99,7 @@ dbutils.fs.rm(output_dir, False)
 
 from mlflow_export_import.experiment.export_experiment import ExperimentExporter
 
-exporter = ExperimentExporter(client,
-                              notebook_formats=formats, 
-                              export_source_tags=export_source_tags)
+exporter = ExperimentExporter(client, export_source_tags, notebook_formats)
 exporter.export_experiment(experiment.experiment_id, output_dir)
 
 # COMMAND ----------
