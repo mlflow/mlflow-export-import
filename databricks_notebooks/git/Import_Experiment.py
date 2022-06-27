@@ -7,7 +7,7 @@
 # MAGIC * Just peek - Just display manifest.json and do not import the experiment.
 # MAGIC 
 # MAGIC #### Setup
-# MAGIC * See the Setup section in [README]($00_README_Export_Import).
+# MAGIC * See the Setup section in [README]($./_README).
 
 # COMMAND ----------
 
