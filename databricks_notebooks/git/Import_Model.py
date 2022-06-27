@@ -15,7 +15,7 @@
 # MAGIC * There is a bug where you cannot create a model with the same name as a deleted model.
 # MAGIC 
 # MAGIC #### Setup
-# MAGIC * See Setup in [README]($00_README_Export_Import).
+# MAGIC * See Setup in [README]($./_README).
 
 # COMMAND ----------
 
