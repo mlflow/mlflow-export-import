@@ -18,7 +18,6 @@ def test_train_model(test_context):
 
 
 def test_export_run(test_context):
-    _bounce_dbfs_dir(test_context, test_context.tester.dst_run_base_dir)
     _run_job(test_context, test_context.tester.run_export_run_job, "Export Run")
     _check_dbfs_dir_after_export(test_context, test_context.tester.dst_run_base_dir)
 
@@ -31,7 +30,6 @@ def test_import_run(test_context):
 
 
 def test_export_experiment_job(test_context):
-    _bounce_dbfs_dir(test_context, test_context.tester.dst_exp_base_dir)
     _run_job(test_context, test_context.tester.run_export_experiment_job, "Export Experiment")
     _check_dbfs_dir_after_export(test_context, test_context.tester.dst_exp_base_dir)
 
@@ -50,7 +48,6 @@ def test_import_experiment_job(test_context):
 
 
 def test_export_model(test_context):
-    _bounce_dbfs_dir(test_context, test_context.tester.dst_model_base_dir)
     _run_job(test_context, test_context.tester.run_export_model_job, "Export Model")
     _check_dbfs_dir_after_export(test_context, test_context.tester.dst_exp_base_dir)
 
@@ -83,6 +80,3 @@ def _mk_artifact_output(test_context):
     dir = os.path.join(test_context.tester.local_artifacts_compare_dir, "artifacts")
     utils_test.create_output_dir(dir)
     return dir
-
-def _bounce_dbfs_dir(test_context, dir):
-    pass # TODO

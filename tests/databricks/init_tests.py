@@ -36,4 +36,4 @@ def test_context():
         with tempfile.TemporaryDirectory() as tmpdir:
             tester.local_artifacts_compare_dir = tmpdir
     yield TestContext(tester, dbfs_api)
-    tester.delete_cluster()
+    tester.teardown()

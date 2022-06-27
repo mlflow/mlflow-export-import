@@ -62,30 +62,6 @@ class DatabricksTester():
         self._init_dirs()
 
 
-    def _init_dirs(self):
-        """
-        Create/cleanup test Databricks workspace and DBFS directories.
-        Copy notebooks to workspace test directory.
-        """
-
-        # Delete workspace and DBFS directorues
-        self._delete_dirs()
-
-        # Create and load workspace with notebooks
-        self.ws_api.mkdirs(self.ws_base_dir)
-        self._ws_list(self.ws_base_dir)
-        self._import_notebook(_fs_experiment_nb_name, "experiment", self.ws_base_dir) # import the model training notebook
-        self._import_notebooks(_fs_nb_base_dir, self.ws_base_dir) # import all the export-import notebooks
-
-        # Create DBFS export directory
-        self.dbfs_api.mkdirs(DbfsPath(self.dbfs_base_export_dir))
-
-
-    def _run_job(self, nb_name, notebook_task):
-        run_name = self._mk_run_name(nb_name)
-        if self.verbose:
-            self._dump_json(f"Run job {run_name} - notebook_task", notebook_task)
-        return self.jobs_service.submit_run(run_name, existing_cluster_id=self.cluster_id, notebook_task=notebook_task)
 
 
     def run_export_run_job(self):
@@ -192,7 +168,7 @@ class DatabricksTester():
         if self.verbose:
             self._dump_json("run_training_job - notebook_task",notebook_task)
         return self.jobs_service.submit_run(run_name, existing_cluster_id=self.cluster_id, notebook_task=notebook_task)
-    
+
 
     def run_job(self, job_func, name):
         print(f"====== run_job: {name}")
@@ -203,7 +179,33 @@ class DatabricksTester():
         run = workflow_client.get_run(run_id)
         self._dump_json("Run - final",run)
         return run
+
+
+    def _run_job(self, nb_name, notebook_task):
+        run_name = self._mk_run_name(nb_name)
+        if self.verbose:
+            self._dump_json(f"Run job {run_name} - notebook_task", notebook_task)
+        return self.jobs_service.submit_run(run_name, existing_cluster_id=self.cluster_id, notebook_task=notebook_task)
     
+
+    def _init_dirs(self):
+        """
+        Create/cleanup test Databricks workspace and DBFS directories.
+        Copy notebooks to workspace test directory.
+        """
+
+        # Delete workspace and DBFS directorues
+        self._delete_dirs()
+
+        # Create and load workspace with notebooks
+        self.ws_api.mkdirs(self.ws_base_dir)
+        self._ws_list(self.ws_base_dir)
+        self._import_notebook(_fs_experiment_nb_name, "experiment", self.ws_base_dir) # import the model training notebook
+        self._import_notebooks(_fs_nb_base_dir, self.ws_base_dir) # import all the export-import notebooks
+
+        # Create DBFS export directory
+        self.dbfs_api.mkdirs(DbfsPath(self.dbfs_base_export_dir))
+
 
     def _import_notebook(self, nb_name, src_dir, dst_dir):
         src = os.path.join(src_dir, nb_name)
@@ -221,8 +223,6 @@ class DatabricksTester():
 
     def _mk_dbfs_path(self, dir, file):
         return os.path.join(dir, file)
-    #def _mk_dbfs_path(self, file):
-        #return os.path.join(self.dst_exp_base_dir, file)
 
 
     def _mk_run_name(self, nb_name):
@@ -253,6 +253,17 @@ class DatabricksTester():
         self.dbfs_api.delete(DbfsPath(self.dbfs_base_export_dir), recursive=True)
 
 
+    def _delete_cluster(self):
+        if isinstance(self.cluster_spec, dict):
+            print(f"Deleting cluster self.cluster_id")
+            self.cluster_api.permanent_delete(self.cluster_id)
+
+
+    def teardown(self):
+        self._delete_dirs()
+        self._delete_cluster()
+
+
     def _get_cluster_id(self):
         if isinstance(self.cluster_spec, str):
             cluster_id = self.cluster_spec
@@ -264,11 +275,6 @@ class DatabricksTester():
         cluster = self.cluster_api.get_cluster(cluster_id)
         print(f"Using cluster: id={cluster_id} name={cluster['cluster_name']}")
         return cluster_id
-
-
-    def delete_cluster(self):
-        if isinstance(self.cluster_spec, dict):
-            self.cluster_api.permanent_delete(self.cluster_id)
 
 
     def _dump_json(self, msg, dct):
