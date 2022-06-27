@@ -8,11 +8,15 @@
 # MAGIC * Input folder - Input directory containing an exported run.
 # MAGIC 
 # MAGIC #### Setup
-# MAGIC * See Setup in [README]($00_README_Export_Import).
+# MAGIC * See Setup in [README]($./_README).
 
 # COMMAND ----------
 
 # MAGIC %md ### Setup
+
+# COMMAND ----------
+
+# MAGIC %run ./Common
 
 # COMMAND ----------
 
@@ -43,10 +47,6 @@ run.info.run_id
 # COMMAND ----------
 
 # MAGIC %md ### Display MLflow UI URIs
-
-# COMMAND ----------
-
-# MAGIC %run ./Common
 
 # COMMAND ----------
 
