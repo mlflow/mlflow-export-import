@@ -1,13 +1,11 @@
 from mlflow_export_import.experiment.export_experiment import ExperimentExporter
 from mlflow_export_import.experiment.import_experiment import ExperimentImporter
-from utils_test import create_simple_run, init_output_dirs, create_dst_experiment_name
+from oss_utils_test import create_simple_run, init_output_dirs, create_dst_experiment_name
 from compare_utils import compare_runs, compare_runs_with_source_tags
 from compare_utils import dump_runs
 from init_tests import mlflow_context
 
 # == Setup
-
-mlmodel_fix = True
 
 def init_exp_test(mlflow_context, exporter, importer, verbose=False):
     init_output_dirs(mlflow_context.output_dir)

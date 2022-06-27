@@ -1,7 +1,7 @@
 import os
 import mlflow
 from mlflow_export_import.bulk import bulk_utils
-from utils_test import create_experiment, mk_uuid, delete_experiments, mk_test_object_name_default
+from oss_utils_test import create_experiment, mk_uuid, delete_experiments, mk_test_object_name_default
 from sklearn_utils import create_sklearn_model
 from compare_utils import compare_runs
 from mlflow_export_import.bulk.export_experiments import export_experiments

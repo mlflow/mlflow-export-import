@@ -1,26 +1,25 @@
-import os
-import shutil
 import shortuuid
 import mlflow
 import mlflow.sklearn
 from sklearn_utils import create_sklearn_model
 from mlflow_export_import.common import model_utils
+import utils_test
 
 print("MLflow version:", mlflow.__version__)
 
 def init_output_dirs(output_dir):
-    create_output_dir(output_dir)
-    return create_run_artifact_dirs(output_dir)
+    utils_test.create_output_dir(output_dir)
+    return utils_test.create_run_artifact_dirs(output_dir)
 
-def create_run_artifact_dirs(output_dir):
-    dir1 = create_run_artifact_dir(output_dir, "run1")
-    dir2 = create_run_artifact_dir(output_dir, "run2")
-    return dir1, dir2
+#def OLD_create_run_artifact_dirs(output_dir):
+    #dir1 = create_run_artifact_dir(output_dir, "run1")
+    #dir2 = create_run_artifact_dir(output_dir, "run2")
+    #return dir1, dir2
 
-def create_run_artifact_dir(output_dir, run_name):
-    dir = os.path.join(output_dir, "artifacts", run_name)
-    create_output_dir(dir)
-    return dir
+#def OLD_create_run_artifact_dir(output_dir, run_name):
+    #dir = os.path.join(output_dir, "artifacts", run_name)
+    #utils_test.create_output_dir(dir)
+    #return dir
 
 def mk_uuid():
     return shortuuid.uuid()
@@ -87,26 +86,8 @@ def delete_experiments_and_models(mlflow_context):
     delete_experiments(mlflow_context.client_dst)
     delete_models(mlflow_context.client_src)
     delete_models(mlflow_context.client_dst)
-    create_output_dir(mlflow_context.output_dir)
+    utils_test.create_output_dir(mlflow_context.output_dir)
 
-def create_output_dir(output_dir):
-    if os.path.exists(output_dir):
-        shutil.rmtree(output_dir)
-    os.makedirs(output_dir)
-
-def compare_dirs(d1, d2):
-    from filecmp import dircmp
-    def _compare_dirs(dcmp):
-        if len(dcmp.diff_files) > 0 or len(dcmp.left_only) > 0 or len(dcmp.right_only) > 0:
-            if len(dcmp.diff_files) == 1:
-                if dcmp.diff_files[0] == "MLmodel": # run_id differs because we changed it to the imported run_id
-                    return True
-            return False
-        for sub_dcmp in dcmp.subdirs.values():
-            if not _compare_dirs(sub_dcmp):
-                return False
-        return True
-    return _compare_dirs(dircmp(d1, d2))
 
 def dump_tags(tags, msg=""):
     print(f"==== {len(tags)} Tags:",msg)

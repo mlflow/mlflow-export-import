@@ -1,6 +1,7 @@
 from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import.run.import_run import RunImporter
-from utils_test import create_simple_run, create_dst_experiment_name, create_output_dir
+from oss_utils_test import create_simple_run, create_dst_experiment_name
+from utils_test import create_output_dir
 from compare_utils import compare_runs, compare_runs_with_source_tags
 from init_tests import mlflow_context
 

@@ -1,6 +1,6 @@
 from mlflow_export_import.model.export_model import ModelExporter
 from mlflow_export_import.model.import_model import ModelImporter
-import utils_test 
+import oss_utils_test 
 from compare_utils import compare_models
 from init_tests import mlflow_context
 from mlflow_export_import.model.import_model import _extract_model_path
@@ -9,13 +9,13 @@ from mlflow_export_import.model.import_model import _extract_model_path
 def test_export_import_model(mlflow_context):
     run_src = _create_run(mlflow_context.client_src)
     exporter = ModelExporter(mlflow_context.client_src)
-    model_name_src = utils_test.mk_test_object_name_default()
+    model_name_src = oss_utils_test.mk_test_object_name_default()
     model_src = mlflow_context.client_src.create_registered_model(model_name_src)
     source = f"{run_src.info.artifact_uri}/model"
     mlflow_context.client_src.create_model_version(model_name_src, source, run_src.info.run_id)
     exporter.export_model(model_name_src, mlflow_context.output_dir)
 
-    model_name_dst = utils_test.create_dst_model_name(model_name_src)
+    model_name_dst = oss_utils_test.create_dst_model_name(model_name_src)
     experiment_name =  model_name_dst
     importer = ModelImporter(mlflow_context.client_dst)
     importer.import_model(model_name_dst, mlflow_context.output_dir, experiment_name, delete_model=True, verbose=False, sleep_time=10)
@@ -29,7 +29,7 @@ def test_export_import_model(mlflow_context):
 
 def test_export_import_model_stages(mlflow_context):
     exporter = ModelExporter(mlflow_context.client_src, stages=["Production","Staging"])
-    model_name_src = utils_test.mk_test_object_name_default()
+    model_name_src = oss_utils_test.mk_test_object_name_default()
     model_src = mlflow_context.client_src.create_registered_model(model_name_src)
 
     _create_version(mlflow_context.client_src, model_name_src, "Production")
@@ -37,7 +37,7 @@ def test_export_import_model_stages(mlflow_context):
     _create_version(mlflow_context.client_src, model_name_src, "Archived")
     exporter.export_model(model_name_src, mlflow_context.output_dir)
 
-    model_name_dst = utils_test.create_dst_model_name(model_name_src)
+    model_name_dst = oss_utils_test.create_dst_model_name(model_name_src)
     experiment_name =  model_name_dst
     importer = ModelImporter(mlflow_context.client_dst)
     importer.import_model(model_name_dst, 
@@ -60,7 +60,7 @@ def _create_version(client, model_name, stage=None):
 
 
 def _create_run(client):
-    _, run = utils_test.create_simple_run(client)
+    _, run = oss_utils_test.create_simple_run(client)
     return client.get_run(run.info.run_id)
 
 

@@ -1,5 +1,5 @@
 import os
-from utils_test import mk_test_object_name_default, list_experiments, delete_experiments_and_models
+from oss_utils_test import mk_test_object_name_default, list_experiments, delete_experiments_and_models
 from compare_utils import compare_runs
 
 from mlflow_export_import.bulk.export_models import export_models
