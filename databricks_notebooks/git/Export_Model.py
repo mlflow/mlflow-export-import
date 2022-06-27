@@ -33,6 +33,10 @@
 
 # COMMAND ----------
 
+# MAGIC %run ./Common
+
+# COMMAND ----------
+
 dbutils.widgets.text(" Model", "") 
 model_name = dbutils.widgets.get(" Model")
 
@@ -43,10 +47,12 @@ output_dir += f"/{model_name}"
 dbutils.widgets.dropdown("Export source tags","no",["yes","no"])
 export_source_tags = dbutils.widgets.get("Export source tags") == "yes"
 
-model_name, output_dir
+notebook_formats = get_notebook_formats()
+
 print("model_name:",model_name)
 print("output_dir:",output_dir)
 print("export_source_tags:",export_source_tags)
+print("notebook_formats:",notebook_formats)
 
 # COMMAND ----------
 
@@ -54,10 +60,6 @@ if len(model_name)==0: raise Exception("ERROR: Model is required")
 if len(output_dir)==0: raise Exception("ERROR: DBFS destination is required")
   
 import mlflow
-
-# COMMAND ----------
-
-# MAGIC %run ./Common
 
 # COMMAND ----------
 
@@ -85,7 +87,7 @@ dbutils.fs.mkdirs(output_dir)
 # COMMAND ----------
 
 from mlflow_export_import.model.export_model import ModelExporter
-exporter = ModelExporter(mlflow.tracking.MlflowClient(), export_source_tags)
+exporter = ModelExporter(mlflow.tracking.MlflowClient(), export_source_tags, notebook_formats)
 exporter.export_model(model_name, output_dir)
 
 # COMMAND ----------
