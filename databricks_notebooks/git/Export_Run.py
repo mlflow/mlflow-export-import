@@ -49,17 +49,12 @@ output_dir += f"/{run_id}"
 
 dbutils.widgets.dropdown("Export source tags","no",["yes","no"])
 export_source_tags = dbutils.widgets.get("Export source tags") == "yes"
+notebook_formats = get_notebook_formats()
 
-all_formats = [ "SOURCE", "DBC", "HTML", "JUPYTER" ]
-dbutils.widgets.multiselect("Notebook formats",all_formats[0],all_formats)
-formats = dbutils.widgets.get("Notebook formats")
-formats = formats.split(",")
-if "" in formats: formats.remove("")
-
-print("run_id:",run_id)
-print("output_dir:",output_dir)
-print("export_source_tags:",export_source_tags)
-print("formats:",formats)
+print("run_id:", run_id)
+print("output_dir:", output_dir)
+print("export_source_tags:", export_source_tags)
+print("notebook_formats:", notebook_formats)
 
 # COMMAND ----------
 
@@ -91,9 +86,7 @@ dbutils.fs.rm(output_dir, True)
 # COMMAND ----------
 
 from mlflow_export_import.run.export_run import RunExporter
-exporter = RunExporter(mlflow.tracking.MlflowClient(),
-                       notebook_formats=formats, 
-                       export_source_tags=export_source_tags)
+exporter = RunExporter(mlflow.tracking.MlflowClient(), export_source_tags, notebook_formats)
 exporter.export_run(run_id, output_dir)
 
 # COMMAND ----------
