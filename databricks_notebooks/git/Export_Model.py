@@ -25,7 +25,7 @@
 # MAGIC * Destination base folder - Base output directory to which the model name will be appended to.
 # MAGIC 
 # MAGIC #### Setup
-# MAGIC * See Setup in [README]($00_README_Export_Import).
+# MAGIC * See Setup in [README]($./_README).
 
 # COMMAND ----------
 
