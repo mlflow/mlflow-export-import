@@ -19,22 +19,32 @@
 
 # COMMAND ----------
 
-dbutils.widgets.text(" Model", "") 
-model_name = dbutils.widgets.get(" Model")
+dbutils.widgets.removeAll()
 
-dbutils.widgets.text("Experiment name", "") 
-experiment_name = dbutils.widgets.get("Experiment name")
 
-dbutils.widgets.text("Input folder", "") 
-input_dir = dbutils.widgets.get("Input folder")
+# COMMAND ----------
 
-if len(input_dir)==0: raise Exception("ERROR: Input folder is required")
+dbutils.widgets.text("1. Model name", "") 
+model_name = dbutils.widgets.get("1. Model name")
+
+dbutils.widgets.text("2. Destination experiment name", "") 
+experiment_name = dbutils.widgets.get("2. Destination experiment name")
+
+dbutils.widgets.text("3. Input directory", "") 
+input_dir = dbutils.widgets.get("3. Input directory")
+
 import os
 os.environ["INPUT_DIR"] = input_dir.replace("dbfs:","/dbfs")
 
 print("model_name:",model_name)
 print("input_dir:",input_dir)
 print("experiment_name:",experiment_name)
+
+# COMMAND ----------
+
+if len(input_dir)==0: raise Exception("ERROR: Input directory is required")
+if len(input_dir)==0: raise Exception("ERROR: model name is required")
+if len(experiment_name)==0: raise Exception("ERROR: Destination experiment name is required")
 
 # COMMAND ----------
 
