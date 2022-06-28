@@ -114,8 +114,8 @@ class DatabricksTester():
         notebook_task = {
             "notebook_path": self._mk_ws_path(nb_name),
             "base_parameters": {
-              "Destination experiment name": dst_exp_name,
-              "Input folder": src_run_dir
+              "1. Destination experiment name": dst_exp_name,
+              "2. Input directory": src_run_dir
             }
         }
         return self._run_job(nb_name, notebook_task)
@@ -130,8 +130,8 @@ class DatabricksTester():
         notebook_task = {
             "notebook_path": self._mk_ws_path(nb_name),
             "base_parameters": {
-              "Destination experiment name": dst_exp_name,
-              "DBFS input folder": src_exp_dir
+              "1. Destination experiment name": dst_exp_name,
+              "2. Input directory": src_exp_dir
             }
         }
         return self._run_job(nb_name, notebook_task)
@@ -145,9 +145,9 @@ class DatabricksTester():
         notebook_task = {
             "notebook_path": self._mk_ws_path(nb_name),
             "base_parameters": {
-              " Model": dst_model_name,
-              "Experiment name": dst_exp_name,
-              "Input folder": export_model_dir
+              "1. Model name": dst_model_name,
+              "2. Destination experiment name": dst_exp_name,
+              "3. Input directory": export_model_dir
             }
         }
         return self._run_job(nb_name, notebook_task)
