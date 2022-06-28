@@ -19,7 +19,7 @@ def test_train_model(test_context):
 
 def test_export_run(test_context):
     _run_job(test_context, test_context.tester.run_export_run_job, "Export Run")
-    _check_dbfs_dir_after_export(test_context, test_context.tester.dst_run_base_dir)
+    _check_dbfs_dir_after_export(test_context, test_context.tester.output_run_base_dir)
 
 
 def test_import_run(test_context):
@@ -31,7 +31,7 @@ def test_import_run(test_context):
 
 def test_export_experiment_job(test_context):
     _run_job(test_context, test_context.tester.run_export_experiment_job, "Export Experiment")
-    _check_dbfs_dir_after_export(test_context, test_context.tester.dst_exp_base_dir)
+    _check_dbfs_dir_after_export(test_context, test_context.tester.output_exp_base_dir)
 
 
 def test_import_experiment_job(test_context):
@@ -49,11 +49,11 @@ def test_import_experiment_job(test_context):
 
 def test_export_model(test_context):
     _run_job(test_context, test_context.tester.run_export_model_job, "Export Model")
-    _check_dbfs_dir_after_export(test_context, test_context.tester.dst_exp_base_dir)
+    _check_dbfs_dir_after_export(test_context, test_context.tester.output_exp_base_dir)
 
 
 def test_import_model_job(test_context):
-    _run_job(test_context, test_context.tester.run_import_model_job, "Import Experiment")
+    _run_job(test_context, test_context.tester.run_import_model_job, "Import Model")
     model_name_1 = test_context.tester.model_name
     model_name_2 = test_context.tester.mk_imported_name(model_name_1)
     model1 = mlflow_client.get_registered_model(model_name_1)

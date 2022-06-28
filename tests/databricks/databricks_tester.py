@@ -44,9 +44,9 @@ class DatabricksTester():
         self.ws_base_dir = ws_base_dir
         self.dbfs_base_export_dir = dbfs_base_export_dir
         self.local_artifacts_compare_dir = local_artifacts_compare_dir
-        self.dst_run_base_dir = os.path.join(dbfs_base_export_dir, "runs")
-        self.dst_exp_base_dir = os.path.join(dbfs_base_export_dir, "experiments")
-        self.dst_model_base_dir = os.path.join(dbfs_base_export_dir, "models")
+        self.output_run_base_dir = os.path.join(dbfs_base_export_dir, "runs")
+        self.output_exp_base_dir = os.path.join(dbfs_base_export_dir, "experiments")
+        self.output_model_base_dir = os.path.join(dbfs_base_export_dir, "models")
 
         self.model_name = model_name
         self.run_name_prefix = run_name_prefix
@@ -62,8 +62,6 @@ class DatabricksTester():
         self._init_dirs()
 
 
-
-
     def run_export_run_job(self):
         run = mlflow_utils.get_first_run(mlflow_client, self.ml_exp_path)
         nb_name = "Export_Run"
@@ -71,9 +69,9 @@ class DatabricksTester():
         notebook_task = {
             "notebook_path": nb_path,
             "base_parameters": {
-              " Run ID": run.info.run_id,
-              "Destination base folder": self.dst_run_base_dir,
-              "Export source tags": _export_src_tags
+              "1. Run ID": run.info.run_id,
+              "2. Output base directory": self.output_run_base_dir,
+              "3. Export source tags": _export_src_tags
             }
         }
         return self._run_job(nb_name, notebook_task)
@@ -85,10 +83,9 @@ class DatabricksTester():
         notebook_task = { 
             "notebook_path": nb_path,
             "base_parameters": {
-              " Experiment ID or Name": self.ml_exp_path,
-              "Destination base folder": self.dst_exp_base_dir,
-              "Export source tags": _export_src_tags,
-              "Registered model": self.model_name
+              "1. Experiment ID or Name": self.ml_exp_path,
+              "2. Output base directory": self.output_exp_base_dir,
+              "3. Export source tags": _export_src_tags
             }
         }
         return self._run_job(nb_name, notebook_task)
@@ -100,9 +97,9 @@ class DatabricksTester():
         notebook_task = { 
             "notebook_path": nb_path,
             "base_parameters": {
-              " Model": self.model_name,
-              "Destination base folder": self.dst_model_base_dir,
-              "Export source tags": _export_src_tags,
+              "1. Model": self.model_name,
+              "2. Output base directory": self.output_model_base_dir,
+              "3. Export source tags": _export_src_tags,
             }
         }
         return self._run_job(nb_name, notebook_task)
@@ -110,9 +107,9 @@ class DatabricksTester():
 
     def run_import_run_job(self):
         nb_name = "Import_Run"
-        files = self.dbfs_api.list_files(DbfsPath(self.dst_run_base_dir))
+        files = self.dbfs_api.list_files(DbfsPath(self.output_run_base_dir))
         run_id = files[0].dbfs_path.basename
-        src_run_dir = os.path.join(self.dst_run_base_dir, run_id)
+        src_run_dir = os.path.join(self.output_run_base_dir, run_id)
         dst_exp_name = self.mk_imported_name(self.ml_exp_path+"_run")
         notebook_task = {
             "notebook_path": self._mk_ws_path(nb_name),
@@ -129,7 +126,7 @@ class DatabricksTester():
         exp = mlflow_client.get_experiment_by_name(self.ml_exp_path)
         assert exp
         dst_exp_name = self.mk_imported_name(self.ml_exp_path)
-        src_exp_dir = self._mk_dbfs_path(self.dst_exp_base_dir, exp.experiment_id)
+        src_exp_dir = self._mk_dbfs_path(self.output_exp_base_dir, exp.experiment_id)
         notebook_task = {
             "notebook_path": self._mk_ws_path(nb_name),
             "base_parameters": {
@@ -142,7 +139,7 @@ class DatabricksTester():
 
     def run_import_model_job(self):
         nb_name = "Import_Model"
-        export_model_dir = self._mk_dbfs_path(self.dst_model_base_dir, self.model_name)
+        export_model_dir = self._mk_dbfs_path(self.output_model_base_dir, self.model_name)
         dst_model_name = self.mk_imported_name(self.model_name)
         dst_exp_name = self.mk_imported_name(self.ml_exp_path)
         notebook_task = {
