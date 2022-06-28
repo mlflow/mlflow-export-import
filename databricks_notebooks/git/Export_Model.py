@@ -37,27 +37,34 @@
 
 # COMMAND ----------
 
-dbutils.widgets.text(" Model", "") 
-model_name = dbutils.widgets.get(" Model")
+dbutils.widgets.text("1. Model", "") 
+model_name = dbutils.widgets.get("1. Model")
 
-dbutils.widgets.text("Destination base folder", "") 
-output_dir = dbutils.widgets.get("Destination base folder")
+dbutils.widgets.text("2. Output base directory", "") 
+output_dir = dbutils.widgets.get("2. Output base directory")
 output_dir += f"/{model_name}"
 
-dbutils.widgets.dropdown("Export source tags","no",["yes","no"])
-export_source_tags = dbutils.widgets.get("Export source tags") == "yes"
+dbutils.widgets.dropdown("3. Export source tags","no",["yes","no"])
+export_source_tags = dbutils.widgets.get("3. Export source tags") == "yes"
 
-notebook_formats = get_notebook_formats()
+notebook_formats = get_notebook_formats(4)
 
-print("model_name:",model_name)
-print("output_dir:",output_dir)
-print("export_source_tags:",export_source_tags)
-print("notebook_formats:",notebook_formats)
+all_stages = [ "All", "Production", "Staging", "Archived", "None" ]
+dbutils.widgets.multiselect("5. Stages", all_stages[0], all_stages)
+stages = dbutils.widgets.get("5. Stages")
+stages = stages.split(",")
+if "" in stages: stages.remove("")
+
+print("model_name:", model_name)
+print("output_dir:", output_dir)
+print("export_source_tags:", export_source_tags)
+print("notebook_formats:", notebook_formats)
+print("stages:", stages)
 
 # COMMAND ----------
 
-if len(model_name)==0: raise Exception("ERROR: Model is required")
-if len(output_dir)==0: raise Exception("ERROR: DBFS destination is required")
+if len(model_name)==0: raise Exception("ERROR: 'Model' widget is required")
+if len(output_dir)==0: raise Exception("ERROR: 'Destination base folder' widget is required")
   
 import mlflow
 
@@ -87,7 +94,7 @@ dbutils.fs.mkdirs(output_dir)
 # COMMAND ----------
 
 from mlflow_export_import.model.export_model import ModelExporter
-exporter = ModelExporter(mlflow.tracking.MlflowClient(), export_source_tags, notebook_formats)
+exporter = ModelExporter(mlflow.tracking.MlflowClient(), export_source_tags, notebook_formats, stages)
 exporter.export_model(model_name, output_dir)
 
 # COMMAND ----------
