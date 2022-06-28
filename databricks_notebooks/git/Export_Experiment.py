@@ -22,8 +22,8 @@
 # MAGIC ```
 # MAGIC 
 # MAGIC ##### Widgets
-# MAGIC * Experiment ID or Name - Either the experiment ID or experiment name.
-# MAGIC * Destination base folder - Base output directory to which the experiment ID will be appended to. All experiment data will be saved here.
+# MAGIC * Experiment ID or name - Either the experiment ID or experiment name.
+# MAGIC * Output base directory - Base output folder of the exported experiment. All the experiment data will be saved here under the experiment ID folder.
 # MAGIC * Export source tags - Export source tags such as:
 # MAGIC   * mlflow_export_import.info.experiment_id
 # MAGIC   * mlflow_export_import.metadata.experiment-name	
@@ -43,16 +43,16 @@
 
 # COMMAND ----------
 
-dbutils.widgets.text(" Experiment ID or Name", "") 
-experiment_id_or_name = dbutils.widgets.get(" Experiment ID or Name")
+dbutils.widgets.text("1. Experiment ID or Name", "") 
+experiment_id_or_name = dbutils.widgets.get("1. Experiment ID or Name")
  
-dbutils.widgets.text("Destination base folder", "dbfs:/mnt/andre-work/exim/experiments") 
-output_dir = dbutils.widgets.get("Destination base folder")
+dbutils.widgets.text("2. Output base directory", "") 
+output_dir = dbutils.widgets.get("2. Output base directory")
 
-dbutils.widgets.dropdown("Export source tags","no",["yes","no"])
-export_source_tags = dbutils.widgets.get("Export source tags") == "yes"
+dbutils.widgets.dropdown("3. Export source tags","no",["yes","no"])
+export_source_tags = dbutils.widgets.get("3. Export source tags") == "yes"
 
-notebook_formats = get_notebook_formats()
+notebook_formats = get_notebook_formats(4)
 
 print("experiment_id_or_name:", experiment_id_or_name)
 print("output_dir:", output_dir)
