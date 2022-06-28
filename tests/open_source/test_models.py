@@ -6,29 +6,26 @@ from init_tests import mlflow_context
 from mlflow_export_import.model.import_model import _extract_model_path
 
 
-def test_export_import_model(mlflow_context):
-    run_src = _create_run(mlflow_context.client_src)
-    exporter = ModelExporter(mlflow_context.client_src)
-    model_name_src = oss_utils_test.mk_test_object_name_default()
-    model_src = mlflow_context.client_src.create_registered_model(model_name_src)
-    source = f"{run_src.info.artifact_uri}/model"
-    mlflow_context.client_src.create_model_version(model_name_src, source, run_src.info.run_id)
-    exporter.export_model(model_name_src, mlflow_context.output_dir)
-
-    model_name_dst = oss_utils_test.create_dst_model_name(model_name_src)
-    experiment_name =  model_name_dst
-    importer = ModelImporter(mlflow_context.client_dst)
-    importer.import_model(model_name_dst, mlflow_context.output_dir, experiment_name, delete_model=True, verbose=False, sleep_time=10)
-    model_dst = mlflow_context.client_dst.get_registered_model(model_name_dst)
-
-    model_src = mlflow_context.client_src.get_registered_model(model_name_src)
-    assert len(model_src.latest_versions) == len(model_dst.latest_versions)
-
-    compare_models(mlflow_context.client_src, mlflow_context.client_dst, model_src, model_dst, mlflow_context.output_dir)
+def test_export_import_model_1_stage(mlflow_context):
+    model_src, model_dst = _run_test_export_import_model_stages(mlflow_context, ["Production"] )
+    assert len(model_dst.latest_versions) == 1
+    compare_models(mlflow_context.client_src, mlflow_context.client_dst,  model_src, model_dst, mlflow_context.output_dir)
 
 
-def test_export_import_model_stages(mlflow_context):
-    exporter = ModelExporter(mlflow_context.client_src, stages=["Production","Staging"])
+def test_export_import_model_2_stages(mlflow_context):
+    model_src, model_dst = _run_test_export_import_model_stages(mlflow_context, ["Production","Staging"])
+    assert len(model_dst.latest_versions) == 2
+    compare_models(mlflow_context.client_src, mlflow_context.client_dst,  model_src, model_dst, mlflow_context.output_dir)
+
+
+def test_export_import_model_all_stages(mlflow_context):
+    model_src, model_dst = _run_test_export_import_model_stages(mlflow_context, None)
+    assert len(model_dst.latest_versions) == 3
+    compare_models(mlflow_context.client_src, mlflow_context.client_dst,  model_src, model_dst, mlflow_context.output_dir)
+
+
+def _run_test_export_import_model_stages(mlflow_context, stages):
+    exporter = ModelExporter(mlflow_context.client_src, stages=stages)
     model_name_src = oss_utils_test.mk_test_object_name_default()
     model_src = mlflow_context.client_src.create_registered_model(model_name_src)
 
@@ -39,15 +36,16 @@ def test_export_import_model_stages(mlflow_context):
 
     model_name_dst = oss_utils_test.create_dst_model_name(model_name_src)
     experiment_name =  model_name_dst
+
     importer = ModelImporter(mlflow_context.client_dst)
     importer.import_model(model_name_dst, 
         mlflow_context.output_dir, 
         experiment_name, delete_model=True, 
         verbose=False, 
         sleep_time=10)
+
     model_dst = mlflow_context.client_dst.get_registered_model(model_name_dst)
-    assert len(model_dst.latest_versions) == 2
-    compare_models(mlflow_context.client_src, mlflow_context.client_dst,  model_src, model_dst, mlflow_context.output_dir)
+    return model_src, model_dst
 
 
 def _create_version(client, model_name, stage=None):
