@@ -5,7 +5,7 @@ See: https://www.mlflow.org/docs/latest/rest-api.html#request-limits.
 
 import mlflow
 from mlflow.utils.validation import MAX_PARAMS_TAGS_PER_BATCH, MAX_METRICS_PER_BATCH
-from utils_test import create_experiment, create_dst_experiment_name
+from oss_utils_test import create_experiment, create_dst_experiment_name
 from compare_utils import compare_runs
 from mlflow.entities import Metric, Param, RunTag
 from mlflow_export_import.run.export_run import RunExporter
@@ -22,7 +22,7 @@ def test_params(mlflow_context):
         RunImporter(mlflow_context.client_dst, mlmodel_fix=True), 
         num_params=_num_params)
     assert len(run1.data.params) == MAX_PARAMS_TAGS_PER_BATCH + _num_params
-    compare_runs(mlflow_context.client_src, mlflow_context.client_dst, mlflow_context.output_dir, run1, run2)
+    compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, mlflow_context.output_dir)
 
 def test_metrics(mlflow_context):
     run1, run2 = _init_test_runs(mlflow_context, 
@@ -30,7 +30,7 @@ def test_metrics(mlflow_context):
         RunImporter(mlflow_context.client_dst, mlmodel_fix=True), 
         num_metrics=_num_metrics)
     assert len(run1.data.metrics) == MAX_METRICS_PER_BATCH + _num_metrics
-    compare_runs(mlflow_context.client_src, mlflow_context.client_dst, mlflow_context.output_dir, run1, run2)
+    compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, mlflow_context.output_dir)
 
 def test_tags(mlflow_context):
     run1, run2 = _init_test_runs(mlflow_context, 
@@ -38,7 +38,7 @@ def test_tags(mlflow_context):
         RunImporter(mlflow_context.client_dst, 
         mlmodel_fix=True), num_tags=_num_tags)
     assert len(run1.data.tags) >= MAX_PARAMS_TAGS_PER_BATCH + _num_tags
-    compare_runs(mlflow_context.client_src, mlflow_context.client_dst, mlflow_context.output_dir, run1, run2)
+    compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, mlflow_context.output_dir)
 
 def test_params_and_metrics(mlflow_context):
     run1, run2 = _init_test_runs(mlflow_context, 
@@ -47,7 +47,7 @@ def test_params_and_metrics(mlflow_context):
         num_params=_num_params, num_metrics=_num_metrics)
     assert len(run1.data.params) == MAX_PARAMS_TAGS_PER_BATCH + _num_params
     assert len(run1.data.metrics) == MAX_METRICS_PER_BATCH + _num_metrics
-    compare_runs(mlflow_context.client_src, mlflow_context.client_dst, mlflow_context.output_dir, run1, run2)
+    compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, mlflow_context.output_dir)
 
 def _init_test_runs(mlflow_context, exporter, importer, num_params=None, num_metrics=None, num_tags=None):
     exp, run = _create_run(mlflow_context.client_src, num_params, num_metrics, num_tags)

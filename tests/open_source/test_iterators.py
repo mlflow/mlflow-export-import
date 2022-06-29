@@ -6,7 +6,7 @@ from mlflow_export_import.common.iterators import SearchRunsIterator
 from mlflow_export_import.common.iterators import SearchRegisteredModelsIterator
 from mlflow_export_import.common.iterators import ListExperimentsIterator
 from mlflow_export_import.common.iterators import ListRegisteredModelsIterator
-from utils_test import create_experiment, delete_experiments, delete_models, mk_test_object_name_default, list_experiments, TEST_OBJECT_PREFIX
+from oss_utils_test import create_experiment, delete_experiments, delete_models, mk_test_object_name_default, list_experiments, TEST_OBJECT_PREFIX
 from init_tests import mlflow_context
 
 # ==== List experiments

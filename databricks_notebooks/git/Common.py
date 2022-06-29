@@ -44,3 +44,17 @@ def find_run_dir(output_dir, env_var_name, file_name):
     files = [f for f in glob.glob(f"{output_dir}/*") if not f.endswith(file_name)]
     os.environ[env_var_name] = files[0]
     return files[0]
+
+# COMMAND ----------
+
+def get_notebook_formats(num):
+    widget_name = f"{num}. Notebook formats"
+    all_notebook_formats = [ "SOURCE", "DBC", "HTML", "JUPYTER" ]
+    dbutils.widgets.multiselect(widget_name, all_notebook_formats[0], all_notebook_formats)
+    notebook_formats = dbutils.widgets.get(widget_name)
+    notebook_formats = notebook_formats.split(",")
+    if "" in notebook_formats: notebook_formats.remove("")
+    return notebook_formats
+
+# COMMAND ----------
+

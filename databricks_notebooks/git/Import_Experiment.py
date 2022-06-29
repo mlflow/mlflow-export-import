@@ -2,12 +2,12 @@
 # MAGIC %md ### Import Experiment
 # MAGIC 
 # MAGIC **Widgets**
-# MAGIC * DBFS input folder - Input directory containing an exported experiment.
+# MAGIC * Input directory - DBFS input directory containing an exported experiment.
 # MAGIC * Destination experiment name - Will create if it doesn't exist.
 # MAGIC * Just peek - Just display manifest.json and do not import the experiment.
 # MAGIC 
 # MAGIC #### Setup
-# MAGIC * See the Setup section in [README]($00_README_Export_Import).
+# MAGIC * See the Setup section in [README]($./_README).
 
 # COMMAND ----------
 
@@ -15,20 +15,23 @@
 
 # COMMAND ----------
 
-dbutils.widgets.text("Destination experiment name", "") 
-experiment_name = dbutils.widgets.get("Destination experiment name")
+dbutils.widgets.text("1. Destination experiment name", "") 
+experiment_name = dbutils.widgets.get("1. Destination experiment name")
 
-dbutils.widgets.text("DBFS input folder", "") 
-input_dir = dbutils.widgets.get("DBFS input folder")
+dbutils.widgets.text("2. Input directory", "") 
+input_dir = dbutils.widgets.get("2. Input directory")
 
-dbutils.widgets.dropdown("Just peek","no",["yes","no"])
-just_peek = dbutils.widgets.get("Just peek") == "yes"
-
-if len(input_dir)==0: raise Exception("ERROR: Input is required")
+dbutils.widgets.dropdown("3. Just peek","no",["yes","no"])
+just_peek = dbutils.widgets.get("3. Just peek") == "yes"
 
 print("input_dir:",input_dir)
 print("experiment_name:",experiment_name)
 print("just_peek:",just_peek)
+
+# COMMAND ----------
+
+if len(input_dir)==0: raise Exception("ERROR: Input directory is required")
+if len(experiment_name)==0: raise Exception("ERROR: Destination experiment name is required")
 
 # COMMAND ----------
 

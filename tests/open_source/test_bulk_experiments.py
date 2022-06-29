@@ -1,7 +1,7 @@
 import os
 import mlflow
 from mlflow_export_import.bulk import bulk_utils
-from utils_test import create_experiment, mk_uuid, delete_experiments, mk_test_object_name_default
+from oss_utils_test import create_experiment, mk_uuid, delete_experiments, mk_test_object_name_default
 from sklearn_utils import create_sklearn_model
 from compare_utils import compare_runs
 from mlflow_export_import.bulk.export_experiments import export_experiments
@@ -53,7 +53,7 @@ def compare_experiments(mlflow_context, compare_func):
         base_dir = os.path.join(mlflow_context.output_dir,"test_compare_runs")
         os.makedirs(base_dir, exist_ok=True)
         odir = os.path.join(base_dir,run1.info.experiment_id)
-        compare_func(mlflow_context.client_src, mlflow_context.client_dst, odir, run1, run2)
+        compare_func(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, odir)
 
 # == Export/import Experiments tests
 
@@ -77,7 +77,7 @@ def test_exp_basic(mlflow_context):
 def test_exp_basic_threads(mlflow_context):
     _run_test(mlflow_context, compare_runs, use_threads=True)
 
-def test_exp_with_metadata_tags(mlflow_context): 
+def test_exp_with_source_tags(mlflow_context): 
     _run_test(mlflow_context, compare_runs, export_source_tags=True)
 
 def test_get_experiment_ids_from_comma_delimited_string(mlflow_context):

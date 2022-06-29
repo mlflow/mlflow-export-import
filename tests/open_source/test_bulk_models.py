@@ -1,5 +1,5 @@
 import os
-from utils_test import mk_test_object_name_default, list_experiments, delete_experiments_and_models
+from oss_utils_test import mk_test_object_name_default, list_experiments, delete_experiments_and_models
 from compare_utils import compare_runs
 
 from mlflow_export_import.bulk.export_models import export_models
@@ -23,9 +23,8 @@ def compare_models(mlflow_context, compare_func):
     models2 = mlflow_context.client_dst.list_registered_models()
     assert len(models2) > 0
     for model2 in models2:
-        model2 = mlflow_context.client_dst.get_registered_model(model2.name)
-        versions = mlflow_context.client_dst.get_latest_versions(model2.name)
-        for vr in versions:
+        versions2 = mlflow_context.client_dst.get_latest_versions(model2.name)
+        for vr in versions2:
             run2 = mlflow_context.client_dst.get_run(vr.run_id)
             tag = run2.data.tags["my_uuid"]
             filter = f"tags.my_uuid = '{tag}'"
@@ -33,7 +32,7 @@ def compare_models(mlflow_context, compare_func):
             tdir = os.path.join(test_dir,run2.info.run_id)
             os.makedirs(tdir)
             assert run1.info.run_id != run2.info.run_id
-            compare_func(mlflow_context.client_src, mlflow_context.client_dst, tdir, run1, run2)
+            compare_func(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, tdir)
 
 # == Export/import registered model tests
 
@@ -73,7 +72,7 @@ def test_basic(mlflow_context):
 def test_exp_basic_threads(mlflow_context):
     _run_test(mlflow_context, compare_runs, use_threads=True)
 
-def test_exp_with_metadata_tags(mlflow_context):
+def test_exp_with_source_tags(mlflow_context):
     _run_test(mlflow_context, compare_runs)
 
 

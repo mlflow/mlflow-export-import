@@ -5,10 +5,10 @@
 # MAGIC 
 # MAGIC #### Widgets
 # MAGIC * Destination experiment name - Import run into this experiment. Will create if it doesn't exist.
-# MAGIC * Input folder - Input directory containing an exported run.
+# MAGIC * Input directory - DBFS nput directory containing an exported run.
 # MAGIC 
 # MAGIC #### Setup
-# MAGIC * See Setup in [README]($00_README_Export_Import).
+# MAGIC * See Setup in [README]($./_README).
 
 # COMMAND ----------
 
@@ -16,17 +16,23 @@
 
 # COMMAND ----------
 
-dbutils.widgets.text("Destination experiment name", "") 
-experiment_name = dbutils.widgets.get("Destination experiment name")
+# MAGIC %run ./Common
 
-dbutils.widgets.text("Input folder", "") 
-input_dir = dbutils.widgets.get("Input folder")
+# COMMAND ----------
 
-if len(input_dir)==0: raise Exception("ERROR: Input is required")
-input_dir, experiment_name
+dbutils.widgets.text("1. Destination experiment name", "") 
+experiment_name = dbutils.widgets.get("1. Destination experiment name")
+
+dbutils.widgets.text("2. Input directory", "") 
+input_dir = dbutils.widgets.get("2. Input directory")
 
 print("input_dir:",input_dir)
 print("experiment_name:",experiment_name)
+
+# COMMAND ----------
+
+if len(input_dir)==0: raise Exception("ERROR: Input directory is required")
+if len(experiment_name)==0: raise Exception("ERROR: Destination experiment name is required")
 
 # COMMAND ----------
 
@@ -43,10 +49,6 @@ run.info.run_id
 # COMMAND ----------
 
 # MAGIC %md ### Display MLflow UI URIs
-
-# COMMAND ----------
-
-# MAGIC %run ./Common
 
 # COMMAND ----------
 
