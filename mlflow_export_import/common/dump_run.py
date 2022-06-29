@@ -9,8 +9,6 @@ import mlflow
 INDENT = "  "
 MAX_LEVEL = 1
 TS_FORMAT = "%Y-%m-%d_%H:%M:%S"
-client = mlflow.tracking.MlflowClient()
-print("MLflow Tracking URI:", mlflow.get_tracking_uri())
 
 def dump_run(run, max_level=1, indent=""):
     dump_run_info(run.info,indent)
@@ -27,17 +25,19 @@ def dump_run(run, max_level=1, indent=""):
     num_bytes, num_artifacts = dump_artifacts(run.info.run_id, "", 0, max_level, indent+INDENT)
     print(f"{indent}Total: bytes: {num_bytes} artifacts: {num_artifacts}")
     return run, num_bytes, num_artifacts
-        
+
 def dump_run_id(run_id, max_level=1, indent=""):
+    client = mlflow.tracking.MlflowClient()
     run = client.get_run(run_id)
     return dump_run(run,max_level,indent)
 
 def dump_run_info(info, indent=""):
     print("{}RunInfo:".format(indent))
+    client = mlflow.tracking.MlflowClient()
     exp = client.get_experiment(info.experiment_id)
     if exp is None:
         print(f"ERROR: Cannot find experiment ID '{info.experiment_id}'")
-        return 
+        return
     print("{}  name: {}".format(indent,exp.name))
     for k,v in sorted(info.__dict__.items()):
         if not k.endswith("_time"):
@@ -58,8 +58,9 @@ def _dump_time(info, k, indent=""):
     return v
 
 def dump_artifacts(run_id, path, level, max_level, indent):
-    if level+1 > max_level: 
+    if level+1 > max_level:
         return 0,0
+    client = mlflow.tracking.MlflowClient()
     artifacts = client.list_artifacts(run_id,path)
     num_bytes, num_artifacts = (0,0)
     for j,art in enumerate(artifacts):

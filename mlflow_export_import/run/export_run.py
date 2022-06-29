@@ -1,4 +1,4 @@
-""" 
+"""
 Exports a run to a directory.
 """
 
@@ -14,20 +14,19 @@ from mlflow_export_import.common.http_client import DatabricksHttpClient
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import import utils, click_doc
 
-print("MLflow Version:", mlflow.version.VERSION)
-print("MLflow Tracking URI:", mlflow.get_tracking_uri())
 
 class RunExporter:
-    def __init__(self, mlflow_client, export_source_tags=False, notebook_formats=None):
+    def __init__(self, mlflow_client, export_source_tags=False, notebook_formats=None, host=None):
         """
         :param mlflow_client: MLflow client.
         :param export_source_tags: Export source run metadata tags.
         :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
+        :param host: Pass host to the DatabricksHttpClient.
         """
         if notebook_formats is None:
             notebook_formats = []
         self.mlflow_client = mlflow_client
-        self.dbx_client = DatabricksHttpClient()
+        self.dbx_client = DatabricksHttpClient(host=host)
         print("Databricks REST client:", self.dbx_client)
         self.export_source_tags = export_source_tags
         self.notebook_formats = notebook_formats
@@ -38,7 +37,7 @@ class RunExporter:
             metric_history = self.mlflow_client.get_metric_history(run.info.run_id,metric)
             lst = [utils.strip_underscores(m) for m in metric_history]
             for x in lst:
-                del x["key"] 
+                del x["key"]
             metrics_with_steps[metric] = lst
         return metrics_with_steps
 
@@ -91,8 +90,8 @@ class RunExporter:
         revision_id = tags["mlflow.databricks.notebookRevisionID"]
         notebook_path = tags["mlflow.databricks.notebookPath"]
         notebook_name = os.path.basename(notebook_path)
-        manifest = { 
-           "mlflow.databricks.notebookRevisionID": revision_id, 
+        manifest = {
+           "mlflow.databricks.notebookRevisionID": revision_id,
            "mlflow.databricks.notebookPath": notebook_path,
            "mlflow.databricks.export-notebook-revision": revision_id }
         path = os.path.join(notebook_dir, "manifest.json")
@@ -101,11 +100,11 @@ class RunExporter:
             self._export_notebook_format(notebook_dir, notebook, format, format.lower(), notebook_name, revision_id)
 
     def _export_notebook_format(self, notebook_dir, notebook, format, extension, notebook_name, revision_id):
-        params = { 
-            "path": notebook, 
+        params = {
+            "path": notebook,
             "direct_download": True,
             "format": format,
-            "revision_timestamp": revision_id 
+            "revision_timestamp": revision_id
         }
         try:
             rsp = self.dbx_client._get("workspace/export", params)
@@ -115,26 +114,26 @@ class RunExporter:
             print(f"WARNING: Cannot save notebook '{notebook}'. {e}")
 
 @click.command()
-@click.option("--run-id", 
-    help="Run ID.", 
+@click.option("--run-id",
+    help="Run ID.",
     type=str,
     required=True
 )
-@click.option("--output-dir", 
-    help="Output directory.", 
+@click.option("--output-dir",
+    help="Output directory.",
     type=str,
     required=True
 )
-@click.option("--export-source-tags", 
-    help=click_doc.export_source_tags, 
-    type=bool, 
-    default=False, 
+@click.option("--export-source-tags",
+    help=click_doc.export_source_tags,
+    type=bool,
+    default=False,
     show_default=True
 )
-@click.option("--notebook-formats", 
-    help=click_doc.notebook_formats, 
+@click.option("--notebook-formats",
+    help=click_doc.notebook_formats,
     type=str,
-    default="", 
+    default="",
     show_default=True
 )
 
@@ -145,7 +144,7 @@ def main(run_id, output_dir, export_source_tags, notebook_formats):
     client = mlflow.tracking.MlflowClient()
     exporter = RunExporter(
       client,
-      export_source_tags=export_source_tags, 
+      export_source_tags=export_source_tags,
       notebook_formats=utils.string_to_list(notebook_formats))
     exporter.export_run(run_id, output_dir)
 

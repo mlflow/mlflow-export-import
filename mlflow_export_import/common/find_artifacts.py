@@ -7,16 +7,15 @@ import os
 import click
 import mlflow
 
-client = mlflow.tracking.MlflowClient()
-print("MLflow Tracking URI:", mlflow.get_tracking_uri())
 
 def find_artifacts(run_id, path, target, max_level=sys.maxsize):
     return _find_artifacts(run_id, path, target, max_level, 0, [])
 
 def _find_artifacts(run_id, path, target, max_level, level, matches):
-    if level+1 > max_level: 
+    if level+1 > max_level:
         return matches
-    artifacts = client.list_artifacts(run_id,path)
+    client = mlflow.tracking.MlflowClient()
+    artifacts = client.list_artifacts(run_id, path)
     for art in artifacts:
         #print(f"art_path: {art.path}")
         filename = os.path.basename(art.path)
@@ -40,5 +39,5 @@ def main(run_id, path, target, max_level): # pragma: no cover
     for x in matches:
         print(" ",x)
 
-if __name__ == "__main__": 
+if __name__ == "__main__":
     main()

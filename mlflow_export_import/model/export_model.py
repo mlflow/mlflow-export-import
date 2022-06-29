@@ -11,7 +11,7 @@ from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils, click_doc
 
 class ModelExporter():
-    def __init__(self,  mlflow_client, export_source_tags=False, notebook_formats=None, stages=None, versions=None, export_run=True):
+    def __init__(self,  mlflow_client, export_source_tags=False, notebook_formats=None, stages=None, versions=None, export_run=True, host=None):
         """
         :param mlflow_client: MLflow client or if None create default client.
         :param export_source_tags: Export source run metadata tags.
@@ -19,10 +19,11 @@ class ModelExporter():
         :param stages: Stages to export. Default is all stages. Values are Production, Staging, Archived and None.
         :param versions: Versions to export. Default is all versions. Values are valid integer numbers.
         :param export_run: Export the run that generated a registered model's version.
+        :param host: Pass host to the MlflowHttpClient and RunExporter.
         """
         self.mlflow_client = mlflow_client
-        self.http_client = MlflowHttpClient()
-        self.run_exporter = RunExporter(self.mlflow_client, export_source_tags=export_source_tags, notebook_formats=notebook_formats)
+        self.http_client = MlflowHttpClient(host=host)
+        self.run_exporter = RunExporter(self.mlflow_client, export_source_tags=export_source_tags, notebook_formats=notebook_formats, host=host)
         self.stages = self._normalize_stages(stages)
         self.versions = self._normalize_versions(versions)
         self.export_run = export_run
@@ -66,7 +67,7 @@ class ModelExporter():
                 run = self.mlflow_client.get_run(run_id)
                 dct = dict(vr)
                 dct["_run_artifact_uri"] = run.info.artifact_uri
-                experiment = mlflow.get_experiment(run.info.experiment_id)
+                experiment = self.mlflow_client.get_experiment(run.info.experiment_id)
                 dct["_experiment_name"] = experiment.name
                 model["registered_model"]["latest_versions"].append(dct)
                 exported_versions += 1

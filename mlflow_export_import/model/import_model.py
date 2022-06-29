@@ -13,14 +13,15 @@ from mlflow_export_import.common import model_utils
 
 class BaseModelImporter():
     """ Base class of ModelImporter subclasses. """
-    def __init__(self, mlflow_client, run_importer=None, await_creation_for=None):
+    def __init__(self, mlflow_client, run_importer=None, await_creation_for=None, host=None):
         """
         :param mlflow_client: MLflow client or if None create default client.
         :param run_importer: RunImporter instance.
         :param await_creation_for: Seconds to wait for model version crreation.
+        :param host: Pass host to the RunImporter.
         """
         self.mlflow_client = mlflow_client
-        self.run_importer = run_importer if run_importer else RunImporter(self.mlflow_client, mlmodel_fix=True)
+        self.run_importer = run_importer if run_importer else RunImporter(self.mlflow_client, mlmodel_fix=True, host=host)
         self.await_creation_for = await_creation_for
 
     def _import_version(self, model_name, src_vr, dst_run_id, dst_source, sleep_time):
@@ -77,27 +78,29 @@ class BaseModelImporter():
 
 class ModelImporter(BaseModelImporter):
     """ Low-level 'point' model importer  """
-    def __init__(self, mlflow_client, run_importer=None, await_creation_for=None):
-        super().__init__(mlflow_client, run_importer, await_creation_for=await_creation_for)
+    def __init__(self, mlflow_client, run_importer=None, await_creation_for=None, host=None):
+        super().__init__(mlflow_client, run_importer, await_creation_for=await_creation_for, host=host)
 
     def import_model(self, model_name, input_dir, experiment_name, delete_model=False, verbose=False, sleep_time=30):
         """
         :param model_name: Model name.
         :param input_dir: Input directory.
-        :param experiment_name: The name of the experiment
+        :param experiment_name: The name of the experiment.
         :param delete_model: Delete current model before importing versions.
         :param verbose: Verbose.
         :param sleep_time: Seconds to wait for model version crreation.
         :return: Model import manifest.
         """
         model_dct = self._import_model(model_name, input_dir, delete_model, verbose, sleep_time)
-        mlflow.set_experiment(experiment_name)
         print("Importing versions:")
+        imported_run_ids = []
         for vr in model_dct["latest_versions"]:
             run_id = self._import_run(input_dir, experiment_name, vr)
+            imported_run_ids.append(run_id)
             self.import_version(model_name, vr, run_id, sleep_time)
         if verbose:
             model_utils.dump_model_versions(self.mlflow_client, model_name)
+        return imported_run_ids
 
     def _import_run(self, input_dir, experiment_name, vr):
         run_id = vr["run_id"]
@@ -149,7 +152,6 @@ class AllModelImporter(BaseModelImporter):
         for vr in model_dct["latest_versions"]:
             src_run_id = vr["run_id"]
             dst_run_id = self.run_info_map[src_run_id].run_id
-            mlflow.set_experiment(vr["_experiment_name"])
             self.import_version(model_name, vr, dst_run_id, sleep_time)
         if verbose:
             model_utils.dump_model_versions(self.mlflow_client, model_name)
