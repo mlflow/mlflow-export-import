@@ -12,11 +12,6 @@
 
 # COMMAND ----------
 
-dbutils.widgets.removeAll()
-
-
-# COMMAND ----------
-
 # MAGIC %md ### Setup
 
 # COMMAND ----------
