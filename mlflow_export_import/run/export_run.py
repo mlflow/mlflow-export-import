@@ -51,7 +51,7 @@ class RunExporter:
         fs = _filesystem.get_filesystem(output_dir)
         run = self.mlflow_client.get_run(run_id)
         fs.mkdirs(output_dir)
-        tags = utils.create_tags_for_metadata(self.mlflow_client, run, self.export_source_tags)
+        tags = utils.create_source_tags(self.mlflow_client, run, self.export_source_tags)
         dct = {
             "export_info": {
                 "mlflow_version": mlflow.__version__,
