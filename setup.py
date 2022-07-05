@@ -12,7 +12,7 @@ setup(
         "Documentation": "https://github.com/mlflow/mlflow-export-import/",
         "Source Code": "https://github.com/mlflow/mlflow-export-import/"
     },
-    python_requires = ">=3.7.6",
+    python_requires = ">=3.7",
     packages = find_packages(),
     zip_safe = False,
     install_requires = [
@@ -23,7 +23,7 @@ setup(
     keywords = "mlflow ml ai",
     classifiers = [
         "Intended Audience :: Developers",
-        "Programming Language :: Python :: 3.7.6",
+        "Programming Language :: Python :: 3.7",
         "Operating System :: OS Independent"
     ],
     entry_points = {
