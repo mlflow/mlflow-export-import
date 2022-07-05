@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %sh pip install git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
+# MAGIC %sh pip install mlflow-export-import
 
 # COMMAND ----------
 
@@ -55,6 +55,3 @@ def get_notebook_formats(num):
     notebook_formats = notebook_formats.split(",")
     if "" in notebook_formats: notebook_formats.remove("")
     return notebook_formats
-
-# COMMAND ----------
-
