@@ -1,15 +1,16 @@
-
 from setuptools import setup, find_packages
   
 setup(
     name="mlflow_export_import",
-    version = "1.0.0",
+    version = "1.0.1",
     author = "Andre Mesarovic",
     description = "Copy MLflow objects (experiments, runs or registered models) to another tracking server",
+    long_description=open("README.md").read(),
+    long_description_content_type='text/markdown',
     url = "https://github.com/mlflow/mlflow-export-import",
     project_urls={
         "Bug Tracker": "https://github.com/mlflow/mlflow-export-import/issues",
-        "Documentation": "https://github.com/mlflow/mlflow-export-import/",
+        "Documentation": "https://github.com/mlflow/mlflow-export-import/blob/master/README.md", 
         "Source Code": "https://github.com/mlflow/mlflow-export-import/"
     },
     python_requires = ">=3.7",
