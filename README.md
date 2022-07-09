@@ -87,9 +87,9 @@ See [README](databricks_notebooks/README.md).
 
 
 #### Used ID
-* When importing a run or experiment, for open source MLflow you can specify the user owner. 
+* When importing a run or experiment, for open source (OSS) MLflow you can specify a different user owner. 
 * OSS MLflow - the destination run `mlflow.user` tag can be the same as the source `mlflow.user` tag since OSS MLflow allows you to set this tag.
-* Databricks MLflow - you cannot set the `mlflow.user` tag.  The `mlflow.user` will be based on the personal access token (PAT) of the importing user.
+* Databricks MLflow - you cannot set the `mlflow.user` tag.  The `mlflow.user` will be based upon the personal access token (PAT) of the importing user.
 
 ## Common options details 
 
@@ -198,6 +198,6 @@ See [tests/README](tests/README.md).
 ### Workflow API
 
 * [README.md](mlflow_export_import/workflow_api/README.md)
-* The WorkflowApiClient is a Python wrapper around the Databricks REST API to execute job runs in a synchronous polling manner.
-* Although a generic tool, in terms of mlflow-export-import it used for testing Databricks notebook jobs.
+* The `WorkflowApiClient` is a Python wrapper around the Databricks REST API to execute job runs in a synchronous polling manner.
+* Although a generic tool, in terms of mlflow-export-import, its main use is for testing Databricks notebook jobs.
 
