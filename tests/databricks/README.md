@@ -2,38 +2,38 @@
 
 ## Overview
 
-* Databricks tests check if the Databricks export-import notebooks execute properly.
-* They launch a Databricks job that invokes a Databricks notebook.
-* Currently these tests are a subset of the OSS tests. More complete test logic should be forthcoming.
-* Unlike the OSS tests which two source and destination tracking servers, the Databricks tests use one tracking cluster (workspace). Imported object have `_imported` added to the end of their name.
+* Databricks tests check that [Databricks export-import notebooks](../../databricks_notebooks/README.md) execute properly.
+* Launches Databricks jobs that invoke a Databricks notebook.
+* Currently these tests are a subset of the OSS tests. The main purpose is to ensure that the notebooks run correctly.
+* Unlike the OSS tests which uses two source and destination tracking servers, the Databricks tests use one tracking cluster (workspace). Imported object have `_imported` added to the end of their name. Using a source and destination workspaces is a TODO.
 
 ## Setup
 
-See [parent tests README](../README.md#Setup)
+See [common test setup](../README.md#Setup) section.
 
 ## Test Configuration
 
 The tests use `config.yaml` for environment configuration.
 Copy [config.yaml.template](config.yaml.template) to `config.yaml` and adjust the properties for your workspace.
 
-The tests read in environment-specific properties from `config.yaml` file.
+**`config.yaml` properties**
 
 |Name | Required | Description|
 |-----|----------|---------|
-| ws_base_dir | yes | Workspace directory for the test notebooks and experiment |
-| dbfs_base_export_dir | yes | DBFS base directory for exported MLflow objects |
-| local_artifacts_compare_dir | no | Local scratch directory for comparing two run's downloaded artifacts. Defaults to a tmp directory. Set it for debugging. |
-| model_name | yes | Name of test registered model |
-| run_name_prefix | yes | Prefix of the job run name |
+| ws_base_dir | yes | Workspace directory for the test notebooks and experiment. |
+| dbfs_base_export_dir | yes | DBFS base directory for exported MLflow objects. |
+| local_artifacts_compare_dir | no | Local scratch directory for comparing a source and destination run's downloaded artifacts. Defaults to a `/tmp` directory. For debugging, you can set to a fixed directory. |
+| model_name | yes | Name of test registered model. |
+| run_name_prefix | yes | Prefix of the job run name. |
 | cluster | yes | Either an existing cluster ID or cluster spec for new cluster. See below. |
-| profile | no | Databricks profile. If not set the default DEFAULT from `~/.databrickscfg` will be used. |
+| profile | no | Databricks profile. If not set the DEFAULT profile from `~/.databrickscfg` will be used. |
 
 
 ### Cluster
 
 Since each test invokes a remote Databricks job, using a job cluster for each test would be very slow since you would
 need to spin up a cluster for each test.
-Therefore an interactive cluster is used for the test session. 
+Therefore, an interactive cluster is used for the test session. 
 
 The `cluster` attribute is a polymorphic attribute that has two possible values:
 

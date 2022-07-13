@@ -6,7 +6,7 @@ from databricks_tester import DatabricksTester
 import utils
 import utils_test
 
-cfg = utils.read_config_file()
+cfg = utils_test.read_config_file()
 profile = cfg.get("profile", None)
 tester = DatabricksTester(
     cfg["ws_base_dir"], 

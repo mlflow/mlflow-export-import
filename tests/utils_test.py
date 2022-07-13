@@ -1,5 +1,6 @@
 import os
 import shutil
+import yaml
 import mlflow
 import mlflow.sklearn
 
@@ -35,3 +36,12 @@ def create_run_artifact_dir(output_dir, run_name):
     dir = os.path.join(output_dir, "artifacts", run_name)
     create_output_dir(dir)
     return dir
+
+
+def read_config_file(path="config.yaml"):
+    with open(path,  encoding="utf-8") as f:
+        dct = yaml.safe_load(f)
+        print(f"Config for '{path}':")
+        for k,v in dct.items():
+            print(f"  {k}: {v}")
+    return dct
