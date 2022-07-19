@@ -1,7 +1,7 @@
 import os
 import mlflow
 from mlflow_export_import.bulk import bulk_utils
-from oss_utils_test import create_experiment, mk_uuid, delete_experiments, mk_test_object_name_default
+from oss_utils_test import create_experiment, mk_uuid, delete_experiments_and_models, mk_test_object_name_default
 from sklearn_utils import create_sklearn_model
 from compare_utils import compare_runs
 from mlflow_export_import.bulk.export_experiments import export_experiments
@@ -22,7 +22,7 @@ def _create_simple_run(idx=0):
         mlflow.set_tag("my_uuid" ,mk_uuid())
         mlflow.set_tag("run_index", idx)
         mlflow.sklearn.log_model(model, "model")
-        with open("info.txt", "wt") as f:
+        with open("info.txt", "wt", encoding="utf-8") as f:
             f.write("Hi artifact")
         mlflow.log_artifact("info.txt")
         mlflow.log_artifact("info.txt", "dir2")
@@ -58,6 +58,7 @@ def compare_experiments(mlflow_context, compare_func):
 # == Export/import Experiments tests
 
 def _run_test(mlflow_context, compare_func, export_source_tags=False, use_threads=False):
+    delete_experiments_and_models(mlflow_context)
     exps = [ create_test_experiment(mlflow_context.client_src, 3), create_test_experiment(mlflow_context.client_src, 4) ]
     exp_names = [ exp.name for exp in exps ]
     export_experiments(mlflow_context.client_src,
@@ -85,7 +86,7 @@ def test_get_experiment_ids_from_comma_delimited_string(mlflow_context):
     assert len(exp_ids) == 3
 
 def test_get_experiment_ids_from_all_string(mlflow_context):
-    delete_experiments(mlflow_context.client_src)
+    delete_experiments_and_models(mlflow_context)
     exps = [ create_test_experiment(mlflow_context.client_src, 3), create_test_experiment(mlflow_context.client_src, 4) ]
     exp_ids = bulk_utils.get_experiment_ids(mlflow_context.client_src, "all")
     assert exp_ids == [ exp.experiment_id for exp in exps ]

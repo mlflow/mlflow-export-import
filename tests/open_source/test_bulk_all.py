@@ -6,13 +6,10 @@ from mlflow_export_import.bulk.import_models import import_all
 from oss_utils_test import delete_experiments_and_models
 from compare_utils import compare_runs
 
-# == Setup
-
 notebook_formats = "SOURCE,DBC"
 num_models = 2
 num_runs = 3
 
-# == Export/import registered model tests
 
 def _run_test(mlflow_context, compare_func, export_source_tags=False, use_threads=False):
     delete_experiments_and_models(mlflow_context)
