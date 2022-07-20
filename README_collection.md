@@ -114,7 +114,7 @@ When exporting a registered models the associated following objects will be expo
 | +-4273c31c45744ec385f3654c63c31360/
 | | +-run.json
 
-For further directory structure see the `point` tool sections for experiments and models further below.
+For further directory structure see the `individual` tool sections for experiments and models further below.
 
 
 ### Export registered models 

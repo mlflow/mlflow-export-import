@@ -8,7 +8,7 @@
 
 For governance purposes, original source run information is saved under the `mlflow_export_import` tag prefix. When you import a run, the values of `RunInfo` are auto-generated for you as well as some other tags. 
 
-This is useful for governance, provenance and auditing purposes for regulated industries such as finance and HLS (health case and life science).
+This is useful for governance, provenance and auditing purposes for regulated industries such as finance and HLS (health care and life science).
 
 If the `export-source-tags` option is set on an export tool, three sets of source run tags will be saved under the `mlflow_export_import` prefix.
 

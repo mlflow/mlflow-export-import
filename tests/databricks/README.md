@@ -5,7 +5,7 @@
 * Databricks tests check that [Databricks export-import notebooks](../../databricks_notebooks/README.md) execute properly.
 * Launches Databricks jobs that invoke a Databricks notebook.
 * Currently these tests are a subset of the OSS tests. The main purpose is to ensure that the notebooks run correctly.
-* Unlike the OSS tests which uses two source and destination tracking servers, the Databricks tests use one tracking cluster (workspace). Imported object have `_imported` added to the end of their name. Using a source and destination workspaces is a TODO.
+* Unlike the OSS tests which uses two source and destination tracking servers, the Databricks tests use one tracking server (workspace). Imported object have `_imported` added to the end of their name. Using a source and destination workspaces is a TODO.
 
 ## Setup
 
@@ -20,13 +20,13 @@ Copy [config.yaml.template](config.yaml.template) to `config.yaml` and adjust th
 
 |Name | Required | Description|
 |-----|----------|---------|
-| ws_base_dir | yes | Workspace directory for the test notebooks and experiment. |
+| ws_base_dir | yes | Workspace directory for the test notebooks and experiments. |
 | dbfs_base_export_dir | yes | DBFS base directory for exported MLflow objects. |
-| local_artifacts_compare_dir | no | Local scratch directory for comparing a source and destination run's downloaded artifacts. Defaults to a `/tmp` directory. For debugging, you can set to a fixed directory. |
+| local_artifacts_compare_dir | no | Local scratch directory to compare the downloaded artifacts of the source and destination runs. Defaults to a `/tmp` directory. For debugging, you can set to a fixed directory. |
 | model_name | yes | Name of test registered model. |
 | run_name_prefix | yes | Prefix of the job run name. |
 | cluster | yes | Either an existing cluster ID or cluster spec for new cluster. See below. |
-| profile | no | Databricks profile. If not set the DEFAULT profile from `~/.databrickscfg` will be used. |
+| profile | no | Databricks profile. If not set, the DEFAULT profile from `~/.databrickscfg` will be used. |
 
 
 ### Cluster

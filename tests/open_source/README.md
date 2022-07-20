@@ -18,7 +18,7 @@ Test environment variables.
 |-----|----------|---------|
 | MLFLOW_TRACKING_URI_SRC | yes | URI of source tracking server |
 | MLFLOW_TRACKING_URI_DST | yes | URI of destination tracking server |
-| MLFLOW_EXPORT_IMPORT_OUTPUT_DIR | no | If set will use this as the export output directory instead of `tempfile.TemporaryDirectory()` |
+| MLFLOW_EXPORT_IMPORT_OUTPUT_DIR | no | If set, will use this as the export output directory instead of `tempfile.TemporaryDirectory()` |
 
 
 
@@ -30,7 +30,7 @@ Output will be in the `run_tests.log` file.
 The script does the following:
 * Launches a source MLflow tracking server and destination MLflow tracking server in the background.
 * Runs tests against these servers with pytest.
-* Tear down the two MLflow tracking servers.
+* Tears down the two MLflow tracking servers.
 
 **Example**
 ```
