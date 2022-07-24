@@ -18,14 +18,13 @@ Notes:
 
 | MLflow Object | Documentation | Code | Description |
 |-------|-------|----|---|
-| **_All_**  | [export-all](#Export-all-MLflow-objects) | [code](mlflow_export_import/bulk/export_all.py) | Exports all MLflow objects (registered models, experiments and runs) to a directory. |
+| All  | [export-all](#Export-all-MLflow-objects) | [code](mlflow_export_import/bulk/export_all.py) | Exports all MLflow objects (registered models, experiments and runs) to a directory. |
 | | [import-all](#Import-all-MLflow-objects) | Uses [import-models](mlflow_export_import/bulk/import_models.py) | Imports MLflow objects from a directory. |
-| **_Model_** | [export-models](#Export-registered-models) | [code](mlflow_export_import/bulk/export_models.py) | Exports several (or all) registered models and their versions' backing run along with the run's experiment to a directory. |
+| Model | [export-models](#Export-registered-models) | [code](mlflow_export_import/bulk/export_models.py) | Exports several (or all) registered models and their versions' backing run along with the run's experiment to a directory. |
 | | [import-models](#Import-registered-models) | [code](mlflow_export_import/bulk/import_models.py) | Imports registered models from a directory. |
-| **_Experiment_** | [export-experiments](#Export-experiments) | [code](mlflow_export_import/bulk/export_experiments.py) | Export several (or all) experiments to a directory. |
+| Experiment | [export-experiments](#Export-experiments) | [code](mlflow_export_import/bulk/export_experiments.py) | Export several (or all) experiments to a directory. |
 | | [import-experiments](#Import-experiments) | [code](mlflow_export_import/bulk/import_experiments.py) | Imports experiments from a directory. |
 
-## Overview - Old
 
 ## All MLflow Objects Tools
 
@@ -62,8 +61,8 @@ export-all --output-dir out
 
 ### Import all MLflow objects
 
-`import-all` is a console script that invokes [import-models](#Import-registered-models) to import all exported MLflow objects.
-The exported output directory is the same structure for both `export-all` and `export-models`.
+`import-all` imports all exported MLflow objects.
+Since the exported output directory is the same structure for both `export-all` and `export-models`, this script calls [import-models](#Import-registered-models).
 
 #### Examples
 ```
@@ -74,7 +73,7 @@ import-all --input-dir out
 
 Tools that copy registered models and their versions' runs along with the runs' experiment.
 
-When exporting a registered models the associated following objects will be exported:
+When exporting a registered models the following model's associated objects will be exported:
 * All the latest versions of a model.
 * The run associated with each version.
 * The experiment that the run belongs to.
@@ -134,14 +133,14 @@ export-models --help
 
 Options:
   --output-dir TEXT             Output directory.  [required]
-  --models TEXT                 Models to export. Values are 'all', comma
-                                seperated list of models or model prefix with
-                                * ('sklearn*'). Default is 'all'
+  --models TEXT                 Registered model names (comma delimited).
+                                For example, 'model1,model2'. 'all' will
+                                export all models.  [required]
   --export-source-tags BOOLEAN  Export source run information (RunInfo, MLflow
                                 system tags starting with 'mlflow' and
                                 metadata) under the 'mlflow_export_import' tag
-                                prefix. See README.md for more details.
-                                [default: False]
+                                prefix. See README_individual.md for more
+                                details.  [default: False]
   --notebook-formats TEXT       Databricks notebook formats. Values are
                                 SOURCE, HTML, JUPYTER or DBC (comma
                                 seperated).
@@ -234,15 +233,16 @@ Export several (or all) experiments to a directory.
 export-experiments --help
 
 Options:
-  --experiments TEXT            Experiment names or IDs (comma delimited).
-                                'all' will export all experiments.
-                                [required]
   --output-dir TEXT             Output directory.  [required]
+  --experiments TEXT            Experiment names or IDs (comma delimited).
+                                For example, 'sklearn_wine,sklearn_iris' or
+                                '1,2'. 'all' will export all experiments.
+                                [required]
   --export-source-tags BOOLEAN  Export source run information (RunInfo, MLflow
                                 system tags starting with 'mlflow' and
                                 metadata) under the 'mlflow_export_import' tag
-                                prefix. See README.md for more details.
-                                [default: False]
+                                prefix. See README_individual.md for more
+                                details.  [default: False]
   --notebook-formats TEXT       Databricks notebook formats. Values are
                                 SOURCE, HTML, JUPYTER or DBC (comma
                                 seperated).

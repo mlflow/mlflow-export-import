@@ -11,11 +11,11 @@ For example, if you want to clone the experiment `/Mary/Experiment/Iris` under a
 
 | MLflow Object | Documentation | Code |
 |-------|-------|---|
-| **_Model_** | [export-model](#Export-Registered-model) | [code](mlflow_export_import/model/export_model.py) |
+| Model | [export-model](#Export-Registered-model) | [code](mlflow_export_import/model/export_model.py) |
 |    | [import-model](#Import-registered-model) | [code](mlflow_export_import/model/import_model.py) |
-| **_Experiment_** | [export-experiment](#Export-Experiment) | [code](mlflow_export_import/experiment/export_experiment.py) |
+| Experiment | [export-experiment](#Export-Experiment) | [code](mlflow_export_import/experiment/export_experiment.py) |
 |    | [import-experiment](#Import-Experiment) | [code](mlflow_export_import/experiment/import_experiment.py) |
-| **_Run_** | [export-run](#Export-run) | [code](mlflow_export_import/run/export_run.py) |
+| Run | [export-run](#Export-run) | [code](mlflow_export_import/run/export_run.py) |
 |  | [import-run](#Import-run) | [code](mlflow_export_import/run/import_run.py) |
 
 ## Experiment Tools

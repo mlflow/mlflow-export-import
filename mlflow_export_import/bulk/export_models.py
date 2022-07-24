@@ -59,7 +59,7 @@ def _export_models(client, model_names, output_dir, export_source_tags, notebook
 
     fs = _filesystem.get_filesystem(output_dir)
     fs.mkdirs(output_dir)
-    with open(os.path.join(output_dir, "manifest.json"), "w") as f:
+    with open(os.path.join(output_dir, "manifest.json"), "w", encoding="utf-8") as f:
         f.write(json.dumps(manifest, indent=2)+"\n")
 
     print(f"{len(model_names)} models exported")
@@ -81,12 +81,13 @@ def export_models(client, model_names, output_dir, export_source_tags=False, not
 @click.option("--output-dir",
      help="Output directory.", 
      type=str,
-    required=True
+     required=True
 )
 @click.option("--models", 
-    help="Models to export. Values are 'all', comma seperated list of models or model prefix with * ('sklearn*'). Default is 'all'", 
+    help="Registered model names (comma delimited).  \
+        For example, 'model1,model2'. 'all' will export all models.",
     type=str,
-    default="all"
+    required=True
 )
 @click.option("--export-source-tags",
     help=click_doc.export_source_tags,
@@ -119,6 +120,7 @@ def export_models(client, model_names, output_dir, export_source_tags=False, not
 )
 
 def main(models, output_dir, stages, export_source_tags, notebook_formats, export_all_runs, use_threads):
+    print(">> models:",models)
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")

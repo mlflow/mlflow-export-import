@@ -41,22 +41,23 @@ def export_experiments(client, experiments, output_dir, export_source_tags=False
     :param: experiments: Can be either:
       - List of experiment names 
       - List of experiment IDs
-      - Dictionary with experiment ID key and list of run IDs 
-      - String with comma-delimited experiment names or IDs.
+      - Dictionary whose key is an experiment and the value is a list of run IDs 
+      - String with comma-delimited experiment names or IDs such as 'sklearn_wine,sklearn_iris' or '1,2'
     """
     start_time = time.time()
     max_workers = os.cpu_count() or 4 if use_threads else 1
 
-    export_all_runs = not isinstance(experiments,dict) 
+    export_all_runs = not isinstance(experiments, dict) 
+    experiments = bulk_utils.get_experiment_ids(client, experiments)
+    print(">> experiments:",experiments)
+    print(">> experiments.len:",len(experiments))
     if export_all_runs:
-        experiments = bulk_utils.get_experiment_ids(client, experiments)
         table_data = experiments
         columns = ["Experiment Name or ID"]
         experiments_dct = {}
     else:
-        experiments_dct = experiments
+        experiments_dct = experiments # we passed in a dict
         experiments = experiments.keys()
-        experiments = bulk_utils.get_experiment_ids(client, experiments)
         table_data = [ [exp_id,len(runs)] for exp_id,runs in experiments_dct.items() ]
         num_runs = sum(x[1] for x in table_data)
         table_data.append(["Total",num_runs])
@@ -71,7 +72,7 @@ def export_experiments(client, experiments, output_dir, export_source_tags=False
     exporter = ExperimentExporter(client, export_source_tags, utils.string_to_list(notebook_formats))
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for exp_id_or_name in experiments:
-            run_ids = experiments_dct.get(exp_id_or_name,None)
+            run_ids = experiments_dct.get(exp_id_or_name, None)
             future = executor.submit(_export_experiment, client, exp_id_or_name, output_dir, exporter, export_results, run_ids)
             futures.append(future)
     duration = round(time.time() - start_time, 1)
@@ -99,7 +100,7 @@ def export_experiments(client, experiments, output_dir, export_source_tags=False
     }
     fs = _filesystem.get_filesystem(output_dir)
     fs.mkdirs(output_dir)
-    with open(os.path.join(output_dir, "manifest.json"), "w") as f:
+    with open(os.path.join(output_dir, "manifest.json"), "w", encoding="utf-8") as f:
         f.write(json.dumps(dct,indent=2)+"\n")
 
     print(f"{len(experiments)} experiments exported")
@@ -110,13 +111,14 @@ def export_experiments(client, experiments, output_dir, export_source_tags=False
 
 
 @click.command()
-@click.option("--experiments", 
-    help="Experiment names or IDs (comma delimited). 'all' will export all experiments. ", 
-    required=True, 
-    type=str
-)
 @click.option("--output-dir", 
     help="Output directory.", 
+    required=True
+)
+@click.option("--experiments", 
+    help="Experiment names or IDs (comma delimited).  \
+        For example, 'sklearn_wine,sklearn_iris' or '1,2'. 'all' will export all experiments.",
+    type=str,
     required=True
 )
 @click.option("--export-source-tags", 
