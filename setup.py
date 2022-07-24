@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
   
 setup(
     name="mlflow_export_import",
-    version = "1.0.2",
+    version = "1.0.3",
     author = "Andre Mesarovic",
     description = "Copy MLflow objects (experiments, runs or registered models) to another tracking server",
     long_description=open("README.md").read(),
