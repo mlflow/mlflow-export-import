@@ -120,7 +120,6 @@ def export_models(client, model_names, output_dir, export_source_tags=False, not
 )
 
 def main(models, output_dir, stages, export_source_tags, notebook_formats, export_all_runs, use_threads):
-    print(">> models:",models)
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")

@@ -49,8 +49,6 @@ def export_experiments(client, experiments, output_dir, export_source_tags=False
 
     export_all_runs = not isinstance(experiments, dict) 
     experiments = bulk_utils.get_experiment_ids(client, experiments)
-    print(">> experiments:",experiments)
-    print(">> experiments.len:",len(experiments))
     if export_all_runs:
         table_data = experiments
         columns = ["Experiment Name or ID"]

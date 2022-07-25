@@ -73,8 +73,6 @@ def import_all(client, input_dir, delete_model, use_src_user_id=False, verbose=F
     duration = round(time.time() - start_time, 1)
     dct = { "duration": duration, "experiment_import": exp_res[1], "model_import": model_res }
     fs = _filesystem.get_filesystem(".")
-    print(">> import_models.py: dct:",dct)
-    print(">> import_models.py: dct.type:",type(dct))
     utils.write_json_file(fs, "import_report.json", dct)
     print("\nImport report:")
     print(json.dumps(dct,indent=2)+"\n")
