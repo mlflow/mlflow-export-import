@@ -9,6 +9,8 @@ notebook_formats = "Databricks notebook formats. Values are SOURCE, HTML, JUPYTE
 
 model_stages = "Stages to export (comma seperated). Default is all stages. Values are Production, Staging, Archived and None."
 
+model_versions = "Versions to export (comma seperated). Default is all versions. Values are valid integer numbers."
+
 delete_model = "If the model exists, first delete the model and all its versions."
 
 use_threads = "Process export/import in parallel using threads."

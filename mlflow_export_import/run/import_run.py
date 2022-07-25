@@ -21,32 +21,33 @@ from mlflow_export_import.run import run_data_importer
 from mlflow_export_import.common import MlflowExportImportException
 
 class RunImporter():
-    def __init__(self, 
-            mlflow_client, 
-            mlmodel_fix=True, 
+    def __init__(self,
+            mlflow_client,
+            mlmodel_fix=True,
             use_src_user_id=False, \
-            dst_notebook_dir_add_run_id=False):
-        """ 
+            dst_notebook_dir_add_run_id=False,
+            host=None):
+        """
         :param mlflow_client: MLflow client.
-        :param mlmodel_fix: Add correct run ID in destination MLmodel artifact. 
+        :param mlmodel_fix: Add correct run ID in destination MLmodel artifact.
                             Can be expensive for deeply nested artifacts.
-        :param use_src_user_id: Set the destination user ID to the source user ID. 
-                                Source user ID is ignored when importing into 
+        :param use_src_user_id: Set the destination user ID to the source user ID.
+                                Source user ID is ignored when importing into
                                 Databricks since setting it is not allowed.
-        :param dst_notebook_dir: Databricks destination workpsace directory for notebook import.
         :param dst_notebook_dir_add_run_id: Add the run ID to the destination notebook directory.
+        :param host: Pass host to the DatabricksHttpClient.
         """
         self.mlflow_client = mlflow_client
         self.mlmodel_fix = mlmodel_fix
         self.use_src_user_id = use_src_user_id
         self.in_databricks = "DATABRICKS_RUNTIME_VERSION" in os.environ
         self.dst_notebook_dir_add_run_id = dst_notebook_dir_add_run_id
-        self.dbx_client = DatabricksHttpClient()
+        self.dbx_client = DatabricksHttpClient(host=host)
         print(f"in_databricks: {self.in_databricks}")
         print(f"importing_into_databricks: {utils.importing_into_databricks()}")
 
     def import_run(self, exp_name, input_dir, dst_notebook_dir=None):
-        """ 
+        """
         Imports a run into the specified experiment.
         :param exp_name: Experiment name.
         :param input_dir: Source input directory that contains the exported run.
@@ -104,12 +105,12 @@ class RunImporter():
         run_data_importer.log_params(self.mlflow_client, run_dct, run_id, MAX_PARAMS_TAGS_PER_BATCH)
         run_data_importer.log_metrics(self.mlflow_client, run_dct, run_id, MAX_METRICS_PER_BATCH)
         run_data_importer.log_tags(
-            self.mlflow_client, 
-            run_dct, 
-            run_id, 
-            MAX_PARAMS_TAGS_PER_BATCH, 
-            self.in_databricks, 
-            src_user_id, 
+            self.mlflow_client,
+            run_dct,
+            run_id,
+            MAX_PARAMS_TAGS_PER_BATCH,
+            self.in_databricks,
+            src_user_id,
             self.use_src_user_id)
 
     def _upload_databricks_notebook(self, input_dir, src_run_dct, dst_notebook_dir):
@@ -121,9 +122,9 @@ class RunImporter():
             return
         notebook_name = os.path.basename(src_notebook_path)
 
-        format = "source" 
+        format = "source"
         notebook_path = os.path.join(input_dir,"artifacts","notebooks",f"{notebook_name}.{format}")
-        if not os.path.exists(notebook_path): 
+        if not os.path.exists(notebook_path):
             print(f"WARNING: Source '{notebook_path}' does not exist for run_id '{run_id}'")
             return
 
@@ -148,38 +149,38 @@ class RunImporter():
 
 @click.command()
 @click.option("--input-dir",
-    help="Source input directory that contains the exported run.", 
-    required=True, 
+    help="Source input directory that contains the exported run.",
+    required=True,
     type=str
 )
 @click.option("--experiment-name",
-    help="Destination experiment name.", 
+    help="Destination experiment name.",
     type=str,
     required=True
 )
 @click.option("--mlmodel-fix",
-    help="Add correct run ID in destination MLmodel artifact. Can be expensive for deeply nested artifacts.", 
-    type=bool, 
-    default=True, 
+    help="Add correct run ID in destination MLmodel artifact. Can be expensive for deeply nested artifacts.",
+    type=bool,
+    default=True,
     show_default=True
 )
 @click.option("--use-src-user-id",
-    help=click_doc.use_src_user_id, 
-    type=bool, 
-    default=False, 
+    help=click_doc.use_src_user_id,
+    type=bool,
+    default=False,
     show_default=True
 )
 
 @click.option("--dst-notebook-dir",
     help="Databricks destination workpsace directory for notebook import.",
-    type=str, 
-    required=False, 
+    type=str,
+    required=False,
     show_default=True
 )
 @click.option("--dst-notebook-dir-add-run-id",
     help="Add the run ID to the destination notebook directory.",
-    type=str, 
-    required=False, 
+    type=str,
+    required=False,
     show_default=True
 )
 def main(input_dir, experiment_name, mlmodel_fix, use_src_user_id, \
@@ -190,8 +191,8 @@ def main(input_dir, experiment_name, mlmodel_fix, use_src_user_id, \
     client = mlflow.tracking.MlflowClient()
     importer = RunImporter(
         client,
-        mlmodel_fix=mlmodel_fix, 
-        use_src_user_id=use_src_user_id, 
+        mlmodel_fix=mlmodel_fix,
+        use_src_user_id=use_src_user_id,
         dst_notebook_dir_add_run_id=dst_notebook_dir_add_run_id)
     importer.import_run(experiment_name, input_dir, dst_notebook_dir)
 
