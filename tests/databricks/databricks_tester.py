@@ -20,7 +20,7 @@ _export_src_tags = "yes"
 _experiment_nb = "Iris_Train"
 _experiment_name = "Iris_Train_exp"
 
-_fs_nb_base_dir = "../../databricks_notebooks/git"
+_fs_nb_base_dir = "../../databricks_notebooks/individual/git"
 _fs_experiment_nb_name = "Iris_Train.py" 
 _fs_experiment_nb_path = os.path.join("experiment", _fs_experiment_nb_name)
 print("_fs_experiment_nb_path:",_fs_experiment_nb_path)
