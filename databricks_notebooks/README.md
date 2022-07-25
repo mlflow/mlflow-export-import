@@ -19,16 +19,16 @@
 
 **Notebooks**
 
-| Notebook | git import | HTML | 
+| Notebook | git code | HTML | 
 |----------|----------|---------|
-| Export_Run | [link](git/Export_Run.py) | [link](html/Export_Run.html) |
-| Import_Run | [link](git/Import_Run.py) | [link](html/Import_Run.html) | 
-| Export_Experiment | [link](git/Export_Experiment.py) | [link](html/Export_Experiment.html) 
-| Import_Experiment | [link](git/Import_Experiment.py) | [link](html/Import_Experiment.html) |
-| Export_Model | [link](git/Export_Model.py) | [link](html/Export_Model.html) | 
-| Import_Model | [link](git/Import_Model.py) | [link](html/Import_Model.html) |
-| Common | [link](git/Common.py) | [link](html/Common.html) | 
-| _README | [link](git/_README) | [link](html/_README.html) |
+| Export_Run | [link](individual/git/Export_Run.py) | [link](individual/html/Export_Run.html) |
+| Import_Run | [link](individual/git/Import_Run.py) | [link](individual/html/Import_Run.html) | 
+| Export_Experiment | [link](individual/git/Export_Experiment.py) | [link](individual/html/Export_Experiment.html) 
+| Import_Experiment | [link](individual/git/Import_Experiment.py) | [link](individual/html/Import_Experiment.html) |
+| Export_Model | [link](individual/git/Export_Model.py) | [link](individual/html/Export_Model.html) | 
+| Import_Model | [link](individual/git/Import_Model.py) | [link](individual/html/Import_Model.html) |
+| Common | [link](individual/git/Common.py) | [link](html/Common.individual/html) | 
+| _README | [link](individual/git/_README) | [link](individual/html/_README.html) |
 
 
 ## Import Notebooks 
