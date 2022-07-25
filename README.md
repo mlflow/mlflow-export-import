@@ -53,7 +53,7 @@ Full object referential integrity is maintained as well as the original MLflow o
 Databricks notebooks simply invoke their corresponding Python scripts.
 Note that only `Individual` notebooks are currently available.
 
-See [README](databricks_notebooks/README.md).
+See [README](databricks_notebooks/individual/README.md).
 
 ### Other
 * [Miscellanous tools](README_tools.md) 
