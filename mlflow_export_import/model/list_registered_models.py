@@ -7,9 +7,13 @@ import json
 import click
 from mlflow_export_import.common.http_client import MlflowHttpClient
 
-@click.command()
+
+@click.command("list-models")
 @click.option("--output-dir", help="Output directory.", default=".", type=str)
 def main(output_dir):  # pragma: no cover
+    """
+    Lists all registered models.
+    """
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
@@ -21,6 +25,7 @@ def main(output_dir):  # pragma: no cover
     dct = json.loads(rsp.text)
     with open(path, "w") as f:
         f.write(json.dumps(dct,indent=2)+"\n")
+
 
 if __name__ == "__main__":
     main()

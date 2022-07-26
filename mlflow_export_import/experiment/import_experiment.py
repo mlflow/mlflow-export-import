@@ -1,5 +1,5 @@
 """ 
-Exports an experiment to a directory.
+Imports an experiment from a directory.
 """
 
 import os
@@ -52,7 +52,7 @@ class ExperimentImporter():
         return run_info_map
 
 
-@click.command()
+@click.command("import-experiment")
 @click.option("--input-dir", 
     help="Input path - directory", 
     type=str,
@@ -79,8 +79,10 @@ class ExperimentImporter():
     required=False,
     show_default=True
 )
-
 def main(input_dir, experiment_name, just_peek, use_src_user_id, dst_notebook_dir):
+    """
+    Imports an experiment from a directory.
+    """
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
@@ -92,6 +94,7 @@ def main(input_dir, experiment_name, just_peek, use_src_user_id, dst_notebook_di
             client,
             use_src_user_id=use_src_user_id)
         importer.import_experiment(experiment_name, input_dir, dst_notebook_dir)
+
 
 if __name__ == "__main__":
     main()
