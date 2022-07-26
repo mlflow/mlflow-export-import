@@ -17,7 +17,7 @@ def _import_experiment(importer, exp_name, exp_input_dir):
         import traceback
         traceback.print_exc()
 
-def import_experiments(client, input_dir, use_src_user_id, use_threads): 
+def import_experiments(client, input_dir, use_src_user_id=False, use_threads=False): 
     path = os.path.join(input_dir,"manifest.json")
     with open(path, "r") as f:
         dct = json.loads(f.read())
@@ -34,13 +34,15 @@ def import_experiments(client, input_dir, use_src_user_id, use_threads):
 
 @click.command()
 @click.option("--input-dir", 
-    help="Input directory.", required=True, type=str
+    help="Input directory.", 
+    type=strm
+    required=True
 )
 @click.option("--use-src-user-id", 
     help=click_doc.use_src_user_id, 
     type=bool, 
     default=False, 
-   show_default=True
+    show_default=True
 )
 @click.option("--use-threads",
     help=click_doc.use_threads,
