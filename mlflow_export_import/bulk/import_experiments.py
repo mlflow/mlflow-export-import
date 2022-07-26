@@ -35,7 +35,7 @@ def import_experiments(client, input_dir, use_src_user_id=False, use_threads=Fal
 @click.command()
 @click.option("--input-dir", 
     help="Input directory.", 
-    type=strm
+    type=str,
     required=True
 )
 @click.option("--use-src-user-id", 
