@@ -19,7 +19,7 @@
 dbutils.widgets.text("1. Experiments", "") 
 experiments = dbutils.widgets.get("1. Experiments")
 
-dbutils.widgets.text("2. Output base directory", "dbfs:/mnt/andre-work/exim/experiments") 
+dbutils.widgets.text("2. Output base directory", "") 
 output_dir = dbutils.widgets.get("2. Output base directory")
 output_dir = output_dir.replace("dbfs:","/dbfs")
 
