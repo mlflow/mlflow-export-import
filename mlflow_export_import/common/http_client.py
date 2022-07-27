@@ -74,7 +74,7 @@ class MlflowHttpClient(HttpClient):
         super().__init__("api/2.0/mlflow", host, token)
 
 
-@click.command()
+@click.command("http-client")
 @click.option("--api", help="API: mlflow|databricks.", default="mlflow", type=str)
 @click.option("--resource", help="API resource such as 'experiments/list'.", required=True, type=str)
 @click.option("--method", help="HTTP method: GET|POST.", default="GET", type=str)
@@ -82,8 +82,10 @@ class MlflowHttpClient(HttpClient):
 @click.option("--data", help="HTTP POST data as JSON.", required=False, type=str)
 @click.option("--output-file", help="Output file.", required=False, type=str)
 @click.option("--verbose", help="Verbose.", type=bool, default=False, show_default=True)
-
 def main(api, resource, method, params, data, output_file, verbose):
+    """
+    Interact with the MLflow / Databricks HTTP Client.
+    """
     def write_output(rsp, output_file):
         if output_file:
             print(f"Output file: {output_file}")
@@ -109,6 +111,7 @@ def main(api, resource, method, params, data, output_file, verbose):
         write_output(rsp, output_file)
     else:
         print(f"ERROR: Unsupported HTTP method '{method}'")
+
 
 if __name__ == "__main__":
     main()

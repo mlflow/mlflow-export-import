@@ -8,7 +8,6 @@ import click
 import mlflow
 
 client = mlflow.tracking.MlflowClient()
-print("MLflow Tracking URI:", mlflow.get_tracking_uri())
 
 def find_artifacts(run_id, path, target, max_level=sys.maxsize):
     return _find_artifacts(run_id, path, target, max_level, 0, [])
@@ -26,12 +25,17 @@ def _find_artifacts(run_id, path, target, max_level, level, matches):
             _find_artifacts(run_id, art.path, target, max_level, level+1, matches)
     return matches
 
-@click.command()
+
+@click.command("find-artifacts")
 @click.option("--run-id", help="Run ID.", required=True, type=str)
 @click.option("--path", help="Relative artifact path.", default="", type=str, show_default=True)
 @click.option("--target", help="Target filename to search for.", required=True, type=str)
 @click.option("--max-level", help="Number of artifact levels to recurse.", default=sys.maxsize, type=int, show_default=True)
 def main(run_id, path, target, max_level): # pragma: no cover
+    """
+    Find artifacts that match a filename.
+    """
+    print("MLflow Tracking URI:", mlflow.get_tracking_uri())
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
@@ -40,5 +44,6 @@ def main(run_id, path, target, max_level): # pragma: no cover
     for x in matches:
         print(" ",x)
 
-if __name__ == "__main__": 
+
+if __name__ == "__main__":
     main()

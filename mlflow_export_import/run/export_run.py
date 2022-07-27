@@ -14,8 +14,6 @@ from mlflow_export_import.common.http_client import DatabricksHttpClient
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import import utils, click_doc
 
-print("MLflow Version:", mlflow.version.VERSION)
-print("MLflow Tracking URI:", mlflow.get_tracking_uri())
 
 class RunExporter:
     def __init__(self, mlflow_client, export_source_tags=False, notebook_formats=None):
@@ -114,7 +112,8 @@ class RunExporter:
         except MlflowExportImportException as e:
             print(f"WARNING: Cannot save notebook '{notebook}'. {e}")
 
-@click.command()
+
+@click.command("export-run")
 @click.option("--run-id", 
     help="Run ID.", 
     type=str,
@@ -137,8 +136,12 @@ class RunExporter:
     default="", 
     show_default=True
 )
-
 def main(run_id, output_dir, export_source_tags, notebook_formats):
+    """
+    Exports a run to a directory.
+    """
+    print("MLflow Version:", mlflow.version.VERSION)
+    print("MLflow Tracking URI:", mlflow.get_tracking_uri())
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
@@ -148,6 +151,7 @@ def main(run_id, output_dir, export_source_tags, notebook_formats):
       export_source_tags=export_source_tags, 
       notebook_formats=utils.string_to_list(notebook_formats))
     exporter.export_run(run_id, output_dir)
+
 
 if __name__ == "__main__":
     main()

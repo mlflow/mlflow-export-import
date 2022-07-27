@@ -10,7 +10,6 @@ INDENT = "  "
 MAX_LEVEL = 1
 TS_FORMAT = "%Y-%m-%d_%H:%M:%S"
 client = mlflow.tracking.MlflowClient()
-print("MLflow Tracking URI:", mlflow.get_tracking_uri())
 
 def dump_run(run, max_level=1, indent=""):
     dump_run_info(run.info,indent)
@@ -78,8 +77,8 @@ def dump_artifacts(run_id, path, level, max_level, indent):
 @click.command()
 @click.option("--run-id", help="Run ID.", required=True)
 @click.option("--artifact-max-level", help="Number of artifact levels to recurse.", default=1, type=int)
-
 def main(run_id, artifact_max_level):
+    print("MLflow Tracking URI:", mlflow.get_tracking_uri())
     print("Options:")
     for k,v in locals().items(): print(f"  {k}: {v}")
     dump_run_id(run_id, artifact_max_level)

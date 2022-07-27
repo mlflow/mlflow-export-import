@@ -89,7 +89,8 @@ class ModelExporter():
                 print(f"WARNING: stage '{stage}' must be one of: {model_version_stages.ALL_STAGES}")
         return stages
 
-@click.command()
+
+@click.command("export-model")
 @click.option("--model", 
     help="Registered model name.", 
     type=str,
@@ -117,14 +118,19 @@ class ModelExporter():
     type=str,
     required=False
 )
-
 def main(model, output_dir, export_source_tags, notebook_formats, stages):
+    """
+    Export a registered model.
+
+    This also exports all experiment runs associated with each version.
+    """
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
     client = mlflow.tracking.MlflowClient()
     exporter = ModelExporter(client, export_source_tags=export_source_tags, notebook_formats=utils.string_to_list(notebook_formats), stages=stages)
     exporter.export_model(model, output_dir)
+
 
 if __name__ == "__main__":
     main()

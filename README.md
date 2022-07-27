@@ -177,17 +177,39 @@ For full details see [Access the MLflow tracking server from outside Databricks]
 
 ## Running tools
 
-The main tool scripts can be executed either as a standard Python script or console script.
+The main tool scripts can be executed either as a standard Python script or Command Line Utility.
 
-Python [console scripts](https://python-packaging.readthedocs.io/en/latest/command-line-scripts.html#the-console-scripts-entry-point)  (such as export-run, import-run, etc.) are provided as a convenience. For a list of scripts see [setup.py](setup.py).
+To see the various subcommands and their documentation, try the following command:
 
-This allows you to use:
 ```
-export-experiment --help
+mlflow-export-import --help
 ```
-instead of:
-```
-python -u -m mlflow_export_import.experiment.export_experiment --help
+
+```console
+❯ mlflow-export-import --help
+Usage: mlflow-export-import [OPTIONS] COMMAND [ARGS]...
+
+  MLflow Export / Import CLI: Command Line Interface
+
+Options:
+  --version  Show the version and exit.
+  --help     Show this message and exit.
+
+Commands:
+  export-all          Export the entire tracking server.
+  export-experiment   Exports an experiment to a directory.
+  export-experiments  Exports experiments to a directory.
+  export-model        Export a registered model.
+  export-models       Exports models and their versions' backing.
+  export-run          Exports a run to a directory.
+  find-artifacts      Find artifacts that match a filename.
+  http-client         Interact with the MLflow / Databricks HTTP Client.
+  import-all          Imports models and their experiments and runs.
+  import-experiment   Imports an experiment from a directory.
+  import-experiments  Import a list of experiments from a directory.
+  import-model        Import a registered model.
+  import-run          Imports a run from a directory.
+  list-models         Lists all registered models.
 ```
 
 ## Testing

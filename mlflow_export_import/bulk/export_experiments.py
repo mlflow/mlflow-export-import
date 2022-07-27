@@ -41,13 +41,13 @@ def export_experiments(client, experiments, output_dir, export_source_tags=False
     :param: experiments: Can be either:
       - List of experiment names 
       - List of experiment IDs
-      - Dictionary whose key is an experiment and the value is a list of run IDs 
+      - Dictionary whose key is an experiment and the value is a list of run IDs
       - String with comma-delimited experiment names or IDs such as 'sklearn_wine,sklearn_iris' or '1,2'
     """
     start_time = time.time()
     max_workers = os.cpu_count() or 4 if use_threads else 1
 
-    export_all_runs = not isinstance(experiments, dict) 
+    export_all_runs = not isinstance(experiments, dict)
     experiments = bulk_utils.get_experiment_ids(client, experiments)
     if export_all_runs:
         table_data = experiments
@@ -108,19 +108,19 @@ def export_experiments(client, experiments, output_dir, export_source_tags=False
     print(f"Duration for experiments export: {duration} seconds")
 
 
-@click.command()
+@click.command("export-experiments")
 @click.option("--output-dir", 
     help="Output directory.", 
     required=True
 )
-@click.option("--experiments", 
+@click.option("--experiments",
     help="Experiment names or IDs (comma delimited).  \
         For example, 'sklearn_wine,sklearn_iris' or '1,2'. 'all' will export all experiments.",
     type=str,
     required=True
 )
-@click.option("--export-source-tags", 
-    help=click_doc.export_source_tags, 
+@click.option("--export-source-tags",
+    help=click_doc.export_source_tags,
     type=bool, 
     default=False, 
     show_default=True
@@ -137,18 +137,21 @@ def export_experiments(client, experiments, output_dir, export_source_tags=False
     default=False,
     show_default=True
 )
-
-def main(experiments, output_dir, export_source_tags, notebook_formats, use_threads): 
+def main(experiments, output_dir, export_source_tags, notebook_formats, use_threads):
+    """
+    Exports experiments to a directory.
+    """
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
     client = mlflow.tracking.MlflowClient()
-    export_experiments(client, 
+    export_experiments(client,
         experiments=experiments,
         output_dir=output_dir,
         export_source_tags=export_source_tags,
         notebook_formats=notebook_formats,
         use_threads=use_threads)
+
 
 if __name__ == "__main__":
     main()

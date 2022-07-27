@@ -75,7 +75,8 @@ class ExperimentExporter():
         else:
             failed_run_ids.append(run.info.run_id)
 
-@click.command()
+
+@click.command("export-experiment")
 @click.option("--experiment",
     help="Experiment name or ID.", 
     type=str,
@@ -98,8 +99,10 @@ class ExperimentExporter():
     default="", 
     show_default=True
 )
-
 def main(experiment, output_dir, export_source_tags, notebook_formats):
+    """
+    Exports an experiment to a directory.
+    """
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
