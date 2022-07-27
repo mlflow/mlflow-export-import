@@ -56,6 +56,6 @@ A separate _README import is needed since there is apparently a glitch in that w
 
 | Export | Import |
 | ---- | ---- |
-| [Export_Experiments](collection/Export_Experiments.py) | [Import_Experiments](collection/Import_Experiments) |
+| [Export_Experiments](collection/Export_Experiments.py) | [Import_Experiments](collection/Import_Experiments.py) |
 | Export Model | Import Model |
 | Export All | Import All |
