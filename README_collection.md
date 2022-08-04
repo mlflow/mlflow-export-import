@@ -2,7 +2,7 @@
 
 ## Overview
 
-High-level tools to copy an entire tracking server or the collection of MLflow objects (runs, experiments and registered models).
+High-level tools to copy an entire tracking server or a collection of MLflow objects (runs, experiments and registered models).
 Full object referential integrity is maintained as well as the original MLflow object names.
 
 Three types of Collection tools:
@@ -31,7 +31,7 @@ Notes:
 ### Export all MLflow objects
 
 Exports all MLflow objects of the tracking server (Databricks workspace) - all models, experiments and runs.
-If you are exporting from Databricks the notebook is also exported.
+If you are exporting from Databricks, the notebook can be exported in several different formats.
 
 Source: [export_all.py](mlflow_export_import/bulk/export_all.py).
 
@@ -51,7 +51,6 @@ Options:
                                 seperated).
   --use-threads BOOLEAN         Process export/import in parallel using
                                 threads.  [default: False]
-  --help                        Show this message and exit.
 ```
 #### Example
 
@@ -73,14 +72,14 @@ import-all --input-dir out
 
 Tools that copy registered models and their versions' runs along with the runs' experiment.
 
-When exporting a registered models the following model's associated objects will be exported:
+When exporting a registered models the following model's associated objects are exported:
 * All the latest versions of a model.
 * The run associated with each version.
 * The experiment that the run belongs to.
 
 **Scripts**
 * `export-models` - exports registered models and their versions' backing run along with the experiment that the run belongs to.
-* `import-models` - imports models and their runs and experiments from the above exported directory.
+* `import-models` - imports models and their versions' runs and experiments from the above exported directory.
 
 **Output directory structure of models export**
 
@@ -149,6 +148,7 @@ Options:
                                 Archived and None.
   --export-all-runs BOOLEAN     Export all runs of experiment or just runs
                                 associated with registered model versions.
+                                [default: False]
   --use-threads BOOLEAN         Process export/import in parallel using
                                 threads.  [default: False]
 ```
