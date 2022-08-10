@@ -68,7 +68,7 @@ Since the exported output directory is the same structure for both `export-all` 
 import-all --input-dir out
 ```
 
-## Registered Models Tools
+## Registered Models
 
 Tools that copy registered models and their versions' runs along with the runs' experiment.
 
@@ -224,7 +224,7 @@ Export/import experiments to a directory.
 | | +- . . .
 ```
 
-### Export Experiments Tools
+### Export Experiments
 
 Export several (or all) experiments to a directory.
 
