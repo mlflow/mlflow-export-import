@@ -11,10 +11,10 @@
 # MAGIC * These notebooks are an unofficial tool that address this problem.
 # MAGIC * You will need to set up a common cloud bucket mounted on DBFS in your source and destination workspaces.
 # MAGIC * For details see:
-# MAGIC   * [MLflow Export Import](https://databricks.atlassian.net/wiki/spaces/UN/pages/800754006/MLflow+Export+Import) - wiki page
+# MAGIC   * [MLflow Export Import](https://databricks.atlassian.net/wiki/spaces/UN/pages/800754006/MLflow+Export+Import) - Internal Databricks wiki page.
 # MAGIC   * Github code:
-# MAGIC     * Source code: https://github.com/amesar/mlflow-export-import
-# MAGIC     * Databricks notebooks: https://github.com/amesar/mlflow-export-import/tree/master/databricks_notebooks
+# MAGIC     * Source code: https://github.com/amesar/mlflow-export-import - source of truth with extensive documentation.
+# MAGIC     * Databricks notebooks: https://github.com/amesar/mlflow-export-import/tree/master/databricks_notebooks.
 # MAGIC   
 # MAGIC #### Architecture
 # MAGIC 
