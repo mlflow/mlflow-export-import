@@ -20,24 +20,29 @@
 # MAGIC 
 # MAGIC <img src="https://github.com/amesar/mlflow-export-import/blob/master/architecture.png?raw=true"  width="700" />
 # MAGIC 
-# MAGIC #### Notebooks
+# MAGIC #### Notebooks 
 # MAGIC 
 # MAGIC ##### Collection Notebooks
-# MAGIC * [Export_Experiments]($./bulk/Export_Experiments) - export experiments to folder
-# MAGIC * [Export_Models]($./bulk/Export_Models) - export experiments to folder
+# MAGIC 
+# MAGIC | MLflow Object | Notebook | 
+# MAGIC |-------|-------|
+# MAGIC | Models | [Export_Models]($./collection/Export_Models) |
+# MAGIC |    | [Import_Models]($./collection/Import_Models) | 
+# MAGIC | Experiments | [Export_Experiments]($./collection/Export_Experiments) |
+# MAGIC |    | [Export_Experiments]($./collection/Export_Experiments) | 
 # MAGIC 
 # MAGIC ##### Individual Notebooks
-# MAGIC * Run
-# MAGIC   * [Export_Run]($./Export_Run) - export run to folder
-# MAGIC   * [Import_Run]($./Import_Run) - import run from folder
-# MAGIC * Experiment
-# MAGIC   * [Export_Experiment]($./Export_Experiment) - export an experiment (and all its runs) to folder
-# MAGIC     * [Export_Experiment_List]($./Export_Experiment_List) - export a list of experiments (or all) to folder - WIP
-# MAGIC   * [Import_Experiment]($./Import_Experiment) - import experiment from folder
-# MAGIC * Registered Model
-# MAGIC   * [Export_Model]($./Export_Model) - export model (and runs of all its versions) to folder
-# MAGIC   * [Import_Model]($./Import_Model) - import model from folder
-# MAGIC * [Common]($./Common)
+# MAGIC 
+# MAGIC | MLflow Object | Notebook | 
+# MAGIC |-------|-------|
+# MAGIC | Model | [Export_Model]($./individual/Export_Model) |
+# MAGIC |    | [Import_Model]($./individual/Import_Model) | 
+# MAGIC | Experiment | [Export_Experiment]($./individual/Export_Experiment) |
+# MAGIC |    | [Import_Experiment]($./individual/Import_Experiment) | 
+# MAGIC | Run | [Export_Run]($./individual/Export_Run) |
+# MAGIC |    | [Import_Run]($./individual/Import_Run) |
+# MAGIC | | [Common]($./individual/Common) |
+# MAGIC 
 # MAGIC   
 # MAGIC #### Limitations
 # MAGIC 
