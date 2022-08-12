@@ -22,11 +22,11 @@
 # MAGIC 
 # MAGIC #### Notebooks
 # MAGIC 
-# MAGIC ##### Bulk Notebooks
+# MAGIC ##### Collection Notebooks
 # MAGIC * [Export_Experiments]($./bulk/Export_Experiments) - export experiments to folder
 # MAGIC * [Export_Models]($./bulk/Export_Models) - export experiments to folder
 # MAGIC 
-# MAGIC ##### Point Notebooks
+# MAGIC ##### Individual Notebooks
 # MAGIC * Run
 # MAGIC   * [Export_Run]($./Export_Run) - export run to folder
 # MAGIC   * [Import_Run]($./Import_Run) - import run from folder
@@ -74,4 +74,4 @@
 
 # COMMAND ----------
 
-# MAGIC %md Last updated: 2022-08-11
+# MAGIC %md Last updated: 2022-08-12
