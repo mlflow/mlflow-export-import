@@ -52,8 +52,11 @@ notebook_formats = get_notebook_formats(4)
 all_stages = [ "All", "Production", "Staging", "Archived", "None" ]
 dbutils.widgets.multiselect("5. Stages", all_stages[0], all_stages)
 stages = dbutils.widgets.get("5. Stages")
-stages = stages.split(",")
-if "" in stages: stages.remove("")
+if stages == "All": 
+    stages = None
+else:
+    stages = stages.split(",")
+    if "" in stages: stages.remove("")
 
 print("model_name:", model_name)
 print("output_dir:", output_dir)
@@ -118,23 +121,3 @@ os.environ['OUTPUT_DIR'] = output_dir
 # COMMAND ----------
 
 # MAGIC %sh cat $OUTPUT_DIR/model.json
-
-# COMMAND ----------
-
-# MAGIC %md #### Display exported run information
-
-# COMMAND ----------
-
-find_run_dir(output_dir, "RUN_DIR", "manifest.json")
-
-# COMMAND ----------
-
-# MAGIC %sh echo $RUN_DIR
-
-# COMMAND ----------
-
-# MAGIC %sh ls -l $RUN_DIR
-
-# COMMAND ----------
-
-# MAGIC %sh  cat $RUN_DIR/run.json
