@@ -13,12 +13,14 @@ from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.experiment.import_experiment import ExperimentImporter
 from mlflow_export_import.model.import_model import AllModelImporter
 
+
 def _remap(run_info_map):
     res = {}
     for dct in run_info_map.values():
         for src_run_id,run_info in dct.items():
             res[src_run_id] = run_info
     return res
+
 
 def _import_experiments(client, input_dir, use_src_user_id):
     start_time = time.time()
@@ -37,7 +39,7 @@ def _import_experiments(client, input_dir, use_src_user_id):
             _run_info_map = importer.import_experiment( exp["name"], exp_input_dir)
             run_info_map[exp["id"]] = _run_info_map
         except Exception as e:
-            exceptions.append(e)
+            exceptions.append(str(e))
             import traceback
             traceback.print_exc()
 
@@ -47,6 +49,7 @@ def _import_experiments(client, input_dir, use_src_user_id):
     print(f"Duration: {duration} seconds")
 
     return run_info_map, { "experiments": len(exps), "exceptions": exceptions, "duration": duration }
+
 
 def _import_models(client, input_dir, run_info_map, delete_model, verbose, use_threads):
     max_workers = os.cpu_count() or 4 if use_threads else 1
@@ -64,6 +67,7 @@ def _import_models(client, input_dir, run_info_map, delete_model, verbose, use_t
 
     duration = round(time.time() - start_time, 1)
     return { "models": len(models), "duration": duration }
+
 
 def import_all(client, input_dir, delete_model, use_src_user_id=False, verbose=False, use_threads=False):
     start_time = time.time()
@@ -109,6 +113,7 @@ def import_all(client, input_dir, delete_model, use_src_user_id=False, verbose=F
     show_default=True
 )
 
+
 def main(input_dir, delete_model, use_src_user_id, verbose, use_threads):
     print("Options:")
     for k,v in locals().items():
@@ -121,6 +126,7 @@ def main(input_dir, delete_model, use_src_user_id, verbose, use_threads):
         use_src_user_id=use_src_user_id, 
         verbose=verbose, 
         use_threads=use_threads)
+
 
 if __name__ == "__main__":
     main()
