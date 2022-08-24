@@ -146,7 +146,7 @@ class RunImporter():
             print(f"WARNING: Cannot save notebook '{dst_notebook_path}'. {e}")
 
 
-@click.command()
+@click.command("import-run")
 @click.option("--input-dir",
     help="Source input directory that contains the exported run.", 
     required=True, 
@@ -184,6 +184,9 @@ class RunImporter():
 )
 def main(input_dir, experiment_name, mlmodel_fix, use_src_user_id, \
         dst_notebook_dir, dst_notebook_dir_add_run_id):
+    """
+    Imports a run from a directory.
+    """
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
@@ -194,6 +197,7 @@ def main(input_dir, experiment_name, mlmodel_fix, use_src_user_id, \
         use_src_user_id=use_src_user_id, 
         dst_notebook_dir_add_run_id=dst_notebook_dir_add_run_id)
     importer.import_run(experiment_name, input_dir, dst_notebook_dir)
+
 
 if __name__ == "__main__":
     main()

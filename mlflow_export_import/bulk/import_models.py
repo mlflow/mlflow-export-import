@@ -82,7 +82,7 @@ def import_all(client, input_dir, delete_model, use_src_user_id=False, verbose=F
     print(json.dumps(dct,indent=2)+"\n")
 
 
-@click.command()
+@click.command("import-all")
 @click.option("--input-dir", 
     help="Input directory.", 
     required=True, 
@@ -112,9 +112,10 @@ def import_all(client, input_dir, delete_model, use_src_user_id=False, verbose=F
     default=False,
     show_default=True
 )
-
-
 def main(input_dir, delete_model, use_src_user_id, verbose, use_threads):
+    """
+    Imports models and their experiments and runs.
+    """
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")

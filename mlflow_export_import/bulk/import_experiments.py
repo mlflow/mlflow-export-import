@@ -1,5 +1,5 @@
 """ 
-Import a list of experiment from a directory.
+Import a list of experiments from a directory.
 """
 
 import os
@@ -32,7 +32,8 @@ def import_experiments(client, input_dir, use_src_user_id=False, use_threads=Fal
             exp_name = exp["name"]
             executor.submit(_import_experiment, importer, exp_name, exp_input_dir)
 
-@click.command()
+
+@click.command("import-experiments")
 @click.option("--input-dir", 
     help="Input directory.", 
     type=str,
@@ -50,13 +51,16 @@ def import_experiments(client, input_dir, use_src_user_id=False, use_threads=Fal
     default=False,
     show_default=True
 )
-
-def main(input_dir, use_src_user_id, use_threads): 
+def main(input_dir, use_src_user_id, use_threads):
+    """
+    Import a list of experiments from a directory.
+    """
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
     client = mlflow.tracking.MlflowClient()
     import_experiments(client, input_dir, use_src_user_id, use_threads)
+
 
 if __name__ == "__main__":
     main()

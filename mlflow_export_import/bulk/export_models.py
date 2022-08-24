@@ -24,9 +24,9 @@ def _export_models(client, model_names, output_dir, export_source_tags, notebook
     for model_name in model_names:
         print(f"  {model_name}")
 
-    exporter = ModelExporter(client, 
+    exporter = ModelExporter(client,
         export_source_tags=export_source_tags,
-        notebook_formats=utils.string_to_list(notebook_formats), 
+        notebook_formats=utils.string_to_list(notebook_formats),
         stages=stages, export_run=export_run)
     futures = []
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
@@ -77,13 +77,14 @@ def export_models(client, model_names, output_dir, export_source_tags=False, not
     write_export_manifest_file(output_dir, duration, stages, notebook_formats)
     print(f"Duration for total registered models and versions' runs export: {duration} seconds")
 
-@click.command()
+
+@click.command("export-models")
 @click.option("--output-dir",
-     help="Output directory.", 
+     help="Output directory.",
      type=str,
      required=True
 )
-@click.option("--models", 
+@click.option("--models",
     help="Registered model names (comma delimited).  \
         For example, 'model1,model2'. 'all' will export all models.",
     type=str,
@@ -95,17 +96,18 @@ def export_models(client, model_names, output_dir, export_source_tags=False, not
     default=False,
     show_default=True
 )
-@click.option("--notebook-formats", 
-    help=click_doc.notebook_formats, 
+@click.option("--notebook-formats",
+    help=click_doc.notebook_formats,
     type=str,
-    default="", 
+    default="",
     show_default=True
 )
-@click.option("--stages", 
-    help=click_doc.model_stages, 
+@click.option("--stages",
+    help=click_doc.model_stages,
     type=str,
     required=False
 )
+
 @click.option("--export-all-runs", 
     help="Export all runs of experiment or just runs associated with registered model versions.", 
     type=bool, 
@@ -118,20 +120,25 @@ def export_models(client, model_names, output_dir, export_source_tags=False, not
     default=False,
     show_default=True
 )
-
 def main(models, output_dir, stages, export_source_tags, notebook_formats, export_all_runs, use_threads):
+    """
+    Exports models and their versions' backing.
+
+    Run along with the experiment that the run belongs to.
+    """
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
     client = mlflow.tracking.MlflowClient()
     export_models(client,
-        models, 
-        output_dir=output_dir, 
+        models,
+        output_dir=output_dir,
         export_source_tags=export_source_tags,
-        notebook_formats=notebook_formats, 
-        stages=stages, 
-        export_all_runs=export_all_runs, 
+        notebook_formats=notebook_formats,
+        stages=stages,
+        export_all_runs=export_all_runs,
         use_threads=use_threads)
+
 
 if __name__ == "__main__":
     main()

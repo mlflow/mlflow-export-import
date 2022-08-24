@@ -178,7 +178,8 @@ def _path_join(x,y):
         path = path.replace("\\","/") 
     return path
 
-@click.command()
+
+@click.command("import-model")
 @click.option("--input-dir", 
     help="Input directory produced by export_model.py.", 
     type=str,
@@ -217,14 +218,19 @@ def _path_join(x,y):
     default=False, 
     show_default=True
 )
-
 def main(input_dir, model, experiment_name, delete_model, await_creation_for, verbose, sleep_time): # pragma: no cover
+    """
+    Import a registered model.
+
+    This also imports all the experiment runs associated with its latest versions.
+    """
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
     client = mlflow.tracking.MlflowClient()
     importer = ModelImporter(client, await_creation_for=await_creation_for)
     importer.import_model(model, input_dir, experiment_name, delete_model, verbose, sleep_time)
+
 
 if __name__ == "__main__":
     main()
