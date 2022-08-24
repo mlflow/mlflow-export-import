@@ -107,11 +107,12 @@ def export_models(client, model_names, output_dir, export_source_tags=False, not
     type=str,
     required=False
 )
-@click.option("--export-all-runs",
-    help="Export all runs of experiment or just runs associated with registered model versions.",
-    type=bool,
-    default=False,
-    show_default=False
+
+@click.option("--export-all-runs", 
+    help="Export all runs of experiment or just runs associated with registered model versions.", 
+    type=bool, 
+    default=False, 
+    show_default=True
 )
 @click.option("--use-threads",
     help=click_doc.use_threads,

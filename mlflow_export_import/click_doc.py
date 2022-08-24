@@ -7,7 +7,7 @@ export_source_tags = "Export source run information (RunInfo, MLflow system tags
 
 notebook_formats = "Databricks notebook formats. Values are SOURCE, HTML, JUPYTER or DBC (comma seperated)."
 
-model_stages = "Stages to export (comma seperated). Default is all stages. Values are Production, Staging, Archived and None."
+model_stages = "Stages to export (comma seperated). Default is all stages and all versions. Stages are Production, Staging, Archived and None."
 
 delete_model = "If the model exists, first delete the model and all its versions."
 

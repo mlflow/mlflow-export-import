@@ -5,13 +5,16 @@ Filesystem utilities - local or Databricks
 import os
 import shutil
 
+
 def mk_dbfs_path(path):
     return path.replace("/dbfs","dbfs:")
+
 
 def mk_local_path(path):
     return path.replace("dbfs:","/dbfs")
 
-class DatabricksFileSystem(object):
+
+class DatabricksFileSystem():
     def __init__(self):
         import IPython
         self.dbutils = IPython.get_ipython().user_ns["dbutils"]
@@ -32,7 +35,7 @@ class DatabricksFileSystem(object):
         self.dbutils.fs.put(mk_dbfs_path(path), content, True)
             
 
-class LocalFileSystem(object):
+class LocalFileSystem():
     def __init__(self):
         pass
 
@@ -49,5 +52,7 @@ class LocalFileSystem(object):
         with open(mk_local_path(path), 'w') as f:
             f.write(content)
 
+
 def get_filesystem(dir):
+    """ Return the filesystem object matching the directory path. """
     return DatabricksFileSystem() if dir.startswith("dbfs:") else LocalFileSystem()

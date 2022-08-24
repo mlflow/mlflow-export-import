@@ -39,7 +39,9 @@ class BaseModelImporter():
         version = self.mlflow_client.create_model_version(model_name, dst_source, dst_run_id, **kwargs)
         model_utils.wait_until_version_is_ready(self.mlflow_client, model_name, version, sleep_time=sleep_time)
         if src_current_stage != "None":
-            self.mlflow_client.transition_model_version_stage(model_name, version.version, src_current_stage)
+            active_stages = [ "Production", "Staging" ]
+            archive_existing_versions = src_current_stage in active_stages
+            self.mlflow_client.transition_model_version_stage(model_name, version.version, src_current_stage, archive_existing_versions)
 
     def _import_model(self, model_name, input_dir, delete_model=False, verbose=False, sleep_time=30):
         """
