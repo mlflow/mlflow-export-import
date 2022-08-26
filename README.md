@@ -1,3 +1,6 @@
+This repository is folked from [mlflow/mlflow-export-import](https://github.com/mlflow/mlflow-export-import).
+You need to restore backend DB before using this script.
+
 # MLflow Export Import
 
 This package provides tools to copy MLflow objects (runs, experiments or registered models) from one MLflow tracking server (Databricks workspace) to another.

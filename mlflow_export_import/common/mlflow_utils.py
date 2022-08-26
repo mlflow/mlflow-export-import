@@ -45,7 +45,7 @@ def get_experiment(mlflow_client, exp_id_or_name):
     return exp
 
 
-def set_experiment(mlflow_client, dbx_client, exp_name):
+def set_experiment(mlflow_client, dbx_client, exp_name, is_create_new_exp=False):
     """
     Set experiment name. 
     For Databricks, create the workspace directory if it doesn't exist.
@@ -54,9 +54,9 @@ def set_experiment(mlflow_client, dbx_client, exp_name):
     from mlflow_export_import import utils
     if utils.importing_into_databricks():
         create_workspace_dir(dbx_client, os.path.dirname(exp_name))
-    try:
+    if is_create_new_exp:
         return mlflow_client.create_experiment(exp_name)
-    except Exception:
+    else:
         exp = mlflow_client.get_experiment_by_name(exp_name)
         return exp.experiment_id
 
