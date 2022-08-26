@@ -67,7 +67,6 @@ class RunImporter():
         run_id = src_run_dct["info"].get("run_id", None)
         try:
             run = self.mlflow_client.get_run(run_id)
-            self._import_run_data(src_run_dct, run_id, src_run_dct["info"]["user_id"])
             path = os.path.join(input_dir, "artifacts")
             if os.path.exists(_filesystem.mk_local_path(path)):
                 self.mlflow_client.log_artifacts(run_id, mk_local_path(path))
@@ -99,18 +98,6 @@ class RunImporter():
                 with open(output_path, "w") as f:
                     yaml.dump(mlmodel, f)
                 self.mlflow_client.log_artifact(run_id, output_path,  f"{model_path}")
-
-    def _import_run_data(self, run_dct, run_id, src_user_id):
-        run_data_importer.log_params(self.mlflow_client, run_dct, run_id, MAX_PARAMS_TAGS_PER_BATCH)
-        run_data_importer.log_metrics(self.mlflow_client, run_dct, run_id, MAX_METRICS_PER_BATCH)
-        run_data_importer.log_tags(
-            self.mlflow_client, 
-            run_dct, 
-            run_id, 
-            MAX_PARAMS_TAGS_PER_BATCH, 
-            self.in_databricks, 
-            src_user_id, 
-            self.use_src_user_id)
 
     def _upload_databricks_notebook(self, input_dir, src_run_dct, dst_notebook_dir):
         run_id = src_run_dct["info"]["run_id"]
