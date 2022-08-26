@@ -64,9 +64,9 @@ class RunImporter():
         src_run_path = os.path.join(input_dir,"run.json")
         src_run_dct = utils.read_json_file(src_run_path)
 
-        run = self.mlflow_client.create_run(exp.experiment_id)
-        run_id = run.info.run_id
+        run_id = src_run_dct["info"].get("run_id", None)
         try:
+            run = self.mlflow_client.get_run(run_id)
             self._import_run_data(src_run_dct, run_id, src_run_dct["info"]["user_id"])
             path = os.path.join(input_dir, "artifacts")
             if os.path.exists(_filesystem.mk_local_path(path)):
