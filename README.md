@@ -65,6 +65,7 @@ See [README](databricks_notebooks/individual/README.md).
 * Nested runs are only supported when you import an experiment. For a run, it is still a TODO.
 * If the run linked to a registered model version does not exist (has been deleted) the version is not exported 
   since when importing [MLflowClient.create_model_version](https://mlflow.org/docs/latest/python_api/mlflow.client.html#mlflow.client.MlflowClient.create_model_version) requires a run ID.
+* If you need to preserve registered model version nummbers do not use the `use-threads` option since version numbers will not be exported or imported sequentially.
 
 ### Databricks Limitations
 
