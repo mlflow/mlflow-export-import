@@ -10,6 +10,7 @@ from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils, click_doc
 
+
 class ModelExporter():
     def __init__(self,  mlflow_client, export_source_tags=False, notebook_formats=None, stages=None, export_run=True):
         """
@@ -25,6 +26,7 @@ class ModelExporter():
         self.stages = self._normalize_stages(stages)
         self.export_run = export_run
 
+
     def export_model(self, model_name, output_dir):
         """
         :param model_name: Registered model name.
@@ -38,11 +40,12 @@ class ModelExporter():
             print("ERROR:", e)
             return False, model_name
 
+
     def _export_model(self, model_name, output_dir):
         fs = _filesystem.get_filesystem(output_dir)
         model = self.http_client.get(f"registered-models/get", {"name": model_name})
         fs.mkdirs(output_dir)
-        model["registered_model"]["latest_versions"] = []
+        output_versions = []
         versions = self.mlflow_client.search_model_versions(f"name='{model_name}'")
         print(f"Found {len(versions)} versions for model {model_name}")
         manifest = []
@@ -64,7 +67,7 @@ class ModelExporter():
                 dct["_run_artifact_uri"] = run.info.artifact_uri
                 experiment = mlflow.get_experiment(run.info.experiment_id)
                 dct["_experiment_name"] = experiment.name
-                model["registered_model"]["latest_versions"].append(dct)
+                output_versions.append(dct)
                 exported_versions += 1
             except mlflow.exceptions.RestException as e:
                 if "RESOURCE_DOES_NOT_EXIST: Run" in str(e):
@@ -72,10 +75,14 @@ class ModelExporter():
                 else:
                     import traceback
                     traceback.print_exc()
-        print(f"Exported {exported_versions}/{len(versions)} versions for model {model_name}")
+        output_versions.sort(key=lambda x: x["version"], reverse=False)
+        model["registered_model"]["latest_versions"] = output_versions
+
+        print(f"Exported {exported_versions}/{len(output_versions)} versions for model {model_name}")
         path = os.path.join(output_dir, "model.json")
         utils.write_json_file(fs, path, model)
         return manifest
+
 
     def _normalize_stages(self, stages):
         from mlflow.entities.model_registry import model_version_stages
@@ -88,6 +95,7 @@ class ModelExporter():
             if stage not in model_version_stages._CANONICAL_MAPPING:
                 print(f"WARNING: stage '{stage}' must be one of: {model_version_stages.ALL_STAGES}")
         return stages
+
 
 @click.command()
 @click.option("--model", 
@@ -117,7 +125,6 @@ class ModelExporter():
     type=str,
     required=False
 )
-
 def main(model, output_dir, export_source_tags, notebook_formats, stages):
     print("Options:")
     for k,v in locals().items():
@@ -125,6 +132,7 @@ def main(model, output_dir, export_source_tags, notebook_formats, stages):
     client = mlflow.tracking.MlflowClient()
     exporter = ModelExporter(client, export_source_tags=export_source_tags, notebook_formats=utils.string_to_list(notebook_formats), stages=stages)
     exporter.export_model(model, output_dir)
+
 
 if __name__ == "__main__":
     main()
