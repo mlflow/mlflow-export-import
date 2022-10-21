@@ -53,12 +53,12 @@ class ModelExporter():
                 vr_version_int = int(vr.version)
             except ValueError:
                 # Handle the exception
-                logger.error(f"{vr.version} no valid integer number")
+                print(f"ERROR: {vr.version} no valid integer number")
 
             if len(self.stages) > 0 and not vr.current_stage.lower() in self.stages:
                 continue
             if filter_version is not None and (filter_version != vr_version_int):
-                logger.info(f"skipping model {vr.name} in version {vr.version}")
+                print(f"skipping model {vr.name} in version {vr.version}")
                 continue
             run_id = vr.run_id
             opath = os.path.join(output_dir, run_id)
