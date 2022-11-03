@@ -48,10 +48,10 @@ class ListExperimentsIterator(BaseIterator):
     """
 
     def _call_iter(self):
-        return self.client.list_experiments(max_results=self.max_results)
+        return self.client.search_experiments(max_results=self.max_results)
 
     def _call_next(self):
-        return self.client.list_experiments(max_results=self.max_results, page_token=self.paged_list.token)
+        return self.client.search_experiments(max_results=self.max_results, page_token=self.paged_list.token)
 
 class ListRegisteredModelsIterator(BaseIterator):
     """
@@ -62,10 +62,10 @@ class ListRegisteredModelsIterator(BaseIterator):
     """
 
     def _call_iter(self):
-        return self.client.list_registered_models(max_results=self.max_results)
+        return self.client.search_registered_models(max_results=self.max_results)
 
     def _call_next(self):
-        return self.client.list_registered_models(max_results=self.max_results, page_token=self.paged_list.token)
+        return self.client.search_registered_models(max_results=self.max_results, page_token=self.paged_list.token)
 
 
 class SearchRunsIterator(BaseIterator):

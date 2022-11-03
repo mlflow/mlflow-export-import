@@ -37,14 +37,14 @@ def create_test_experiment(client, num_runs, mk_test_object_name=mk_test_object_
 # == Compare
 
 def compare_experiments(mlflow_context, compare_func):
-    exps1 = sorted(mlflow_context.client_src.list_experiments(), key=lambda x: x.name)
-    exps2 = sorted(mlflow_context.client_dst.list_experiments(), key=lambda x: x.name)
+    exps1 = sorted(mlflow_context.client_src.search_experiments(), key=lambda x: x.name)
+    exps2 = sorted(mlflow_context.client_dst.search_experiments(), key=lambda x: x.name)
     assert len(exps1) == len(exps2)
     for x in zip(exps1, exps2):
         exp1, exp2 = x[0], x[1]
         assert exp1.name == exp2.name
-        runs1 = mlflow_context.client_src.list_run_infos(exp1.experiment_id)
-        runs2 = mlflow_context.client_dst.list_run_infos(exp2.experiment_id)
+        runs1 = mlflow_context.client_src.search_runs(exp1.experiment_id)
+        runs2 = mlflow_context.client_dst.search_runs(exp2.experiment_id)
         assert len(runs1) == len(runs2)
     for run1 in mlflow_context.client_src.search_runs(exp1.experiment_id, ""):
         tag = run1.data.tags["run_index"]

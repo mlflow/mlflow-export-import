@@ -76,7 +76,7 @@ class MlflowHttpClient(HttpClient):
 
 @click.command()
 @click.option("--api", help="API: mlflow|databricks.", default="mlflow", type=str)
-@click.option("--resource", help="API resource such as 'experiments/list'.", required=True, type=str)
+@click.option("--resource", help="API resource such as 'experiments/search'.", required=True, type=str)
 @click.option("--method", help="HTTP method: GET|POST.", default="GET", type=str)
 @click.option("--params", help="HTTP GET query parameters as JSON.", required=False, type=str)
 @click.option("--data", help="HTTP POST data as JSON.", required=False, type=str)

@@ -63,7 +63,7 @@ def set_experiment(mlflow_client, dbx_client, exp_name):
 
 def get_first_run(mlflow_client, exp_id_or_name):
     exp = get_experiment(mlflow_client, exp_id_or_name)
-    runs = mlflow_client.list_run_infos(exp.experiment_id)
+    runs = mlflow_client.search_runs(exp.experiment_id)
     return mlflow_client.get_run(runs[0].run_id)
 
 
