@@ -4,7 +4,7 @@ MAX_RESULTS = 500
 
 class BaseIterator(metaclass=ABCMeta):
     """
-    Base clase to iterate for list methods that return PageList.
+    Base class to iterate for list methods that return PageList.
     """
 
     @abstractmethod
@@ -39,10 +39,11 @@ class BaseIterator(metaclass=ABCMeta):
             self.idx = 1
             return self.paged_list[0]
 
+
 class ListExperimentsIterator(BaseIterator):
     """
     Usage:
-        experiments = ListExperimentssIterator(client, max_results)
+        experiments = ListExperimentsIterator(client, max_results)
         for experiment in experiments:
             print(experiment)
     """
@@ -52,6 +53,7 @@ class ListExperimentsIterator(BaseIterator):
 
     def _call_next(self):
         return self.client.list_experiments(max_results=self.max_results, page_token=self.paged_list.token)
+
 
 class ListRegisteredModelsIterator(BaseIterator):
     """
@@ -79,6 +81,9 @@ class SearchRunsIterator(BaseIterator):
 
     def _call_next(self):
         return self.client.search_runs(self.experiment_id, self.query, max_results=self.max_results, page_token=self.paged_list.token)
+
+
+# Though MlflowClient.search_registered_models exists, we wrap it for BaseIterator consistency.
 
 class SearchRegisteredModelsIterator(BaseIterator):
     def __init__(self, client, max_results=MAX_RESULTS, query=""):
