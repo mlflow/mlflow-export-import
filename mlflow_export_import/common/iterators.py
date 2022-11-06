@@ -83,8 +83,6 @@ class SearchRunsIterator(BaseIterator):
         return self.client.search_runs(self.experiment_id, self.query, max_results=self.max_results, page_token=self.paged_list.token)
 
 
-# Though MlflowClient.search_registered_models exists, we wrap it for BaseIterator consistency.
-
 class SearchRegisteredModelsIterator(BaseIterator):
     def __init__(self, client, max_results=MAX_RESULTS, query=""):
         super().__init__(client, max_results)
