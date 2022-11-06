@@ -82,7 +82,6 @@ def delete_model(mlflow_client, model_name):
     mlflow_client.delete_registered_model(model_name)
 
 
-# XX
 def get_last_run(mlflow_client, exp_id_or_name):
     exp = get_experiment(mlflow_client, exp_id_or_name)
     runs = mlflow_client.search_runs(exp.experiment_id, order_by=["attributes.start_time desc"], max_results=1)
