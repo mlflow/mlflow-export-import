@@ -4,7 +4,7 @@ channels:
 dependencies:
 - python>=3.8
 - pip:
-    - mlflow==1.30.0
+    - mlflow>=1.28.0
     - pytest>=7.1.2
     - shortuuid
     - scikit-learn>=1.0.2

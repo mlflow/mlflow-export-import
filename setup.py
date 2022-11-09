@@ -17,7 +17,7 @@ setup(
     packages = find_packages(),
     zip_safe = False,
     install_requires = [
-          "mlflow==1.30.0",
+          "mlflow>=1.28.0"
           "wheel"
     ],
     license = "Apache License 2.0",
