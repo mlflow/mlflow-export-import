@@ -6,7 +6,18 @@ import utils_test
 from  mlflow_export_import import utils 
 
 
-def compare_runs_with_source_tags(client_src, client_dst, run1, run2, output_dir):
+def compare_runs(client_src, client_dst, run1, run2, output_dir, export_source_tags=False):
+    if export_source_tags:
+        _compare_runs_with_source_tags(client_src, client_dst, run1, run2, output_dir)
+    else:
+        _compare_runs_without_source_tags(client_src, client_dst, run1, run2, output_dir)
+
+def _compare_runs_without_source_tags(client_src, client_dst, run1, run2, output_dir):
+    _compare_common_tags(run1, run2)
+    _compare_runs_without_tags(client_src, client_dst, run1, run2, output_dir)
+
+
+def _compare_runs_with_source_tags(client_src, client_dst, run1, run2, output_dir):
     exp = client_src.get_experiment(run1.info.experiment_id)
 
     source_tags2 = { k:v for k,v in run2.data.tags.items() if k.startswith("mlflow_export_import.") }
@@ -16,11 +27,6 @@ def compare_runs_with_source_tags(client_src, client_dst, run1, run2, output_dir
         assert str(v) == source_tags2[f"{utils.TAG_PREFIX_EXPORT_IMPORT_RUN_INFO}.{k}"],f"Assert failed for RunInfo field '{k}'" # NOTE: tag values must be strings
 
     compare_runs(client_src, client_dst, run1, run2, output_dir)
-
-
-def compare_runs(client_src, client_dst, run1, run2, output_dir):
-    _compare_common_tags(run1, run2)
-    _compare_runs_without_tags(client_src, client_dst, run1, run2, output_dir)
 
 
 def _compare_common_tags(run1, run2):

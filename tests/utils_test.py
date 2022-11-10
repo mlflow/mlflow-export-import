@@ -11,6 +11,7 @@ def create_output_dir(output_dir):
         shutil.rmtree(output_dir)
     os.makedirs(output_dir)
 
+
 def compare_dirs(d1, d2):
     from filecmp import dircmp
     def _compare_dirs(dcmp):

@@ -2,12 +2,15 @@ from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import.run.import_run import RunImporter
 from oss_utils_test import create_simple_run, create_dst_experiment_name
 from utils_test import create_output_dir
-from compare_utils import compare_runs, compare_runs_with_source_tags
+from compare_utils import compare_runs
 from init_tests import mlflow_context
+
+_use_source_tags = True
 
 # == Setup
 
-mlmodel_fix = True
+_mlmodel_fix = True
+
 
 def init_run_test(mlflow_context, exporter, importer, run_name=None, use_metric_steps=False):
     exp, run1 = create_simple_run(mlflow_context.client_src, run_name=run_name, use_metric_steps=use_metric_steps)
@@ -24,21 +27,23 @@ def init_run_test(mlflow_context, exporter, importer, run_name=None, use_metric_
 def test_run_basic(mlflow_context):
     run1, run2 = init_run_test(mlflow_context, 
         RunExporter(mlflow_context.client_src), 
-        RunImporter(mlflow_context.client_dst, mlmodel_fix=mlmodel_fix),
+        RunImporter(mlflow_context.client_dst, mlmodel_fix=_mlmodel_fix),
         "test_run_basic")
     compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, mlflow_context.output_dir)
+
 
 def test_run_with_source_tags(mlflow_context):
     run1, run2 = init_run_test(mlflow_context, 
         RunExporter(mlflow_context.client_src, export_source_tags=True), 
-        RunImporter(mlflow_context.client_dst, mlmodel_fix=mlmodel_fix), 
+        RunImporter(mlflow_context.client_dst, mlmodel_fix=_mlmodel_fix), 
         "test_run_with_source_tags")
-    compare_runs_with_source_tags(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, mlflow_context.output_dir)
+    compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, mlflow_context.output_dir, _use_source_tags)
+
 
 def test_run_basic_use_metric_steps(mlflow_context): 
     run1, run2 = init_run_test(mlflow_context, 
         RunExporter(mlflow_context.client_src), 
-        RunImporter(mlflow_context.client_dst, mlmodel_fix=mlmodel_fix), 
+        RunImporter(mlflow_context.client_dst, mlmodel_fix=_mlmodel_fix), 
         run_name="_test_run_basic_use_metric_steps",
         use_metric_steps=True)
     compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, mlflow_context.output_dir)
@@ -49,6 +54,7 @@ from sklearn.model_selection import train_test_split
 from sklearn import datasets
 import cloudpickle as pickle
 import numpy as np
+
 
 def test_model_predictions(mlflow_context):
     exp1, run1 = create_simple_run(mlflow_context.client_src)
