@@ -9,10 +9,13 @@ from databricks_cli.dbfs.api import DbfsPath
 from mlflow_export_import.common import mlflow_utils
 from compare_utils import compare_runs, compare_models
 import utils_test
+import init_tests
 
 mlflow_client = mlflow.tracking.MlflowClient()
 
-_use_source_tags = False
+_use_source_tags = init_tests.cfg.get("use_source_tags",False)
+print("use_source_tags:",_use_source_tags)
+
 
 def test_train_model(test_context):
     _run_job(test_context, test_context.tester.run_training_job, "Train model")
