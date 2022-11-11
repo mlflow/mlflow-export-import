@@ -39,7 +39,7 @@ message() {
 run_tests() {
   message "STAGE 2: RUN TESTS"
   export PYTHONPATH=../..:.
-  py.test -s test_*.py
+  py.test -s --junitxml=test_junit.xml test_*.py
 }
 
 launch_server() {
@@ -76,6 +76,6 @@ run() {
   kill_server $PORT_DST
 }
 
-run 2>&1 | tee run_tests.log
+time -p run 2>&1 | tee run_tests.log
 
 exit 0
