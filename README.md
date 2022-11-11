@@ -80,9 +80,12 @@ See [README](databricks_notebooks/individual/README.md).
 * Partial functionality due to Databricks REST API limitations.
 * The Databricks REST API does not support:
   * Importing a notebook with its revision history.
-  * Linking an imported run with the imported notebook.
-* When you import a run, the link to its source notebook revision ID will be a dead link and you cannot access the notebook from the MLflow UI.
-* As a convenience, the import tools allows you to import the exported notebook into Databricks. For more details, see:
+  * Linking an imported run with its associated imported notebook revision.
+* The API does allow you to export a notebook revision, but it is simply a notebook with one revision. 
+* The notebook is saved as a run artifact for convenience.
+* When you import a run, the link to its source `notebookRevisionID` tag will be a dead link and you cannot access the notebook from the MLflow UI.
+* As a convenience, the import tools allows you to import the exported notebook into a Databricks workspace directory. 
+For more details, see:
   *  [README_individual - Import run](README_individual.md#Import-run)
   *  [README_individual - Import experiment](README_individual.md#Import-experiment)
 * You must export a notebook in the SOURCE format for the notebook to be imported.

@@ -244,11 +244,11 @@ Options:
                                   user ID. Source user ID is ignored when
                                   importing into Databricks since setting it
                                   is not allowed.  [default: False]
-  --dst-notebook-dir TEXT         Databricks destination workpsace directory
+  --dst-notebook-dir TEXT         Databricks destination workspace directory
                                   for notebook import.
   --dst-notebook-dir-add-run-id TEXT
                                   Add the run ID to the destination notebook
-                                  directory.
+                                  workspace directory.
 ```
 
 #### Import examples

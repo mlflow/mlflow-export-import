@@ -33,7 +33,7 @@ class RunImporter():
         :param use_src_user_id: Set the destination user ID to the source user ID. 
                                 Source user ID is ignored when importing into 
                                 Databricks since setting it is not allowed.
-        :param dst_notebook_dir: Databricks destination workpsace directory for notebook import.
+        :param dst_notebook_dir: Databricks destination workspace directory for notebook import.
         :param dst_notebook_dir_add_run_id: Add the run ID to the destination notebook directory.
         """
         self.mlflow_client = mlflow_client
@@ -177,7 +177,7 @@ class RunImporter():
     show_default=True
 )
 @click.option("--dst-notebook-dir-add-run-id",
-    help="Add the run ID to the destination notebook directory.",
+    help="Add the run ID to the destination notebook workspace directory.",
     type=str, 
     required=False, 
     show_default=True

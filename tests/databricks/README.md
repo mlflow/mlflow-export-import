@@ -22,8 +22,8 @@ Copy [config.yaml.template](config.yaml.template) to `config.yaml` and adjust th
 |-----|----------|---------|
 | ws_base_dir | yes | Workspace directory for the test notebooks and experiments. |
 | dbfs_base_export_dir | yes | DBFS base directory for exported MLflow objects. |
-| local_artifacts_compare_dir | no | Local scratch directory to compare the downloaded artifacts of the source and destination runs. Defaults to a `/tmp` directory. For debugging, you can set to a fixed directory. |
 | model_name | yes | Name of test registered model. |
+| use_source_tags | no | Whether to test using source tags or not. Default is False. |
 | run_name_prefix | yes | Prefix of the job run name. |
 | cluster | yes | Either an existing cluster ID or cluster spec for new cluster. See below. |
 | profile | no | Databricks profile. If not set, the DEFAULT profile from `~/.databrickscfg` will be used. |
@@ -51,6 +51,7 @@ ws_base_dir: /Users/me.lastname@mycomany.com/tmp/test-mlflow-exim
 dst_base_dir: dbfs:/tmp/me.lastname@mycomany.com/test-mlflow-exim
 model_name: test-mlflow-exim
 run_name_prefix: test-mlflow-exim
+use_source_tags: False
 cluster: { 
   cluster_name: test-mlflow-exim,
   spark_version: 11.0.x-cpu-ml-scala2.12,
