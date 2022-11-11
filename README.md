@@ -71,7 +71,7 @@ See [README](databricks_notebooks/individual/README.md).
 ### Databricks Limitations
 
 #### Exporting Notebook Revisions
-* The notebook revision associated with the run can be exported. It is stored as an an artifact in the run's `notebooks` artifact directory.
+* The notebook revision associated with a run can be exported. It is stored as an artifact in the run's `notebooks` artifact directory.
 *  You can save the notebook in the suppported SOURCE, HTML, JUPYTER and DBC formats. 
 *  Examples: `notebooks/notebook.dbc` or `notebooks/notebook.source`.
 
@@ -82,9 +82,10 @@ See [README](databricks_notebooks/individual/README.md).
   * Importing a notebook with its revision history.
   * Linking an imported run with its associated imported notebook revision.
 * The API does allow you to export a notebook revision, but it is simply a notebook with one revision. 
-* The notebook is saved as a run artifact for convenience.
+* The notebook is exported as a run artifact for convenience.
 * When you import a run, the link to its source `notebookRevisionID` tag will be a dead link and you cannot access the notebook from the MLflow UI.
-* As a convenience, the import tools allows you to import the exported notebook into a Databricks workspace directory. 
+See the `dst-notebook-dir` option for `Import Run`.
+* As another convenience, the import tools allows you to import the exported notebook into a Databricks workspace directory. 
 For more details, see:
   *  [README_individual - Import run](README_individual.md#Import-run)
   *  [README_individual - Import experiment](README_individual.md#Import-experiment)
