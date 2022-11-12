@@ -2,10 +2,10 @@
 
 ## Overview
 
-* Databricks tests check that [Databricks export-import notebooks](../../databricks_notebooks/README.md) execute properly.
-* Launches Databricks jobs that invoke a Databricks notebook.
-* Currently these tests are a subset of the OSS tests. The main purpose is to ensure that the notebooks run correctly.
-* Unlike the OSS tests which uses two source and destination tracking servers, the Databricks tests use one tracking server (workspace). Imported object have `_imported` added to the end of their name. Using a source and destination workspaces is a TODO.
+* Databricks tests that check that [Databricks export-import notebooks](../../databricks_notebooks/README.md) execute properly.
+* For each test launches a Databricks job that invoke a Databricks notebook.
+* Currently these tests are a subset of the fine-grained OSS tests. The main purpose is to ensure that the notebooks run without errors. i
+* Unlike the OSS tests which use two source and destination tracking servers, the Databricks tests use one tracking server (workspace). Imported object have `_imported` added to the end of their name. Using a source and destination workspaces is a TODO.
 
 ## Setup
 
@@ -31,9 +31,9 @@ Copy [config.yaml.template](config.yaml.template) to `config.yaml` and adjust th
 
 ### Cluster
 
-Since each test invokes a remote Databricks job, using a job cluster for each test would be very slow since you would
+Since each test laynches a remote Databricks job, using a job cluster for each test would be very slow since you would
 need to spin up a cluster for each test.
-Therefore, an interactive cluster is used for the test session. 
+Therefore, the test session uses one cluster for the entire session. It can be a new cluster or an existing cluster - see below.
 
 The `cluster` attribute is a polymorphic attribute that has two possible values:
 
@@ -79,5 +79,9 @@ run_tests.sh
 ```
 ```
 ================== 7 passed, 6 warnings in 114.62s (0:01:54) ===================
+
+LOG_FILE    : run_tests.log
+JUNIT REPORT: run_tests_junit.xml
+HTML REPORT : run_tests_report.html
 
 ```

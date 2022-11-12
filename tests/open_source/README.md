@@ -38,4 +38,9 @@ run_tests.sh 5005 5006
 ```
 ```
 ======================== 43 passed in 295.36s (0:04:55) ========================
+
+LOG_FILE    : run_tests.log
+JUNIT REPORT: run_tests_junit.xml
+HTML REPORT : run_tests_report.html
 ```
+
