@@ -67,6 +67,9 @@ See [README](databricks_notebooks/individual/README.md).
   since when importing [MLflowClient.create_model_version](https://mlflow.org/docs/latest/python_api/mlflow.client.html#mlflow.client.MlflowClient.create_model_version) requires a run ID.
 * If you need to preserve registered model version nummbers do not use the `use-threads` option since version numbers will not be exported or imported sequentially.
 * Run tags are always exported as a `string` even if they are an `int` since the [MlflowClienti.get_run()](https://mlflow.org/docs/latest/python_api/mlflow.client.html#mlflow.client.MlflowClient.get_run)  does not return tag type information.
+* Importing from a file-based `--backend-store-uri` implementation is not supported since it does not have the same semantics as a database-based implementation (e.g. primary key constraints are not respected, model registry is not implemented, etc.).
+This is is not a limitation of mlflow-export-import but rather of the MLflow file-based implementation which is not meant for production.
+`
 
 ### Databricks Limitations
 
