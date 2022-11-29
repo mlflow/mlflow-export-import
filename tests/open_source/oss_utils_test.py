@@ -26,7 +26,7 @@ def create_experiment(client, mk_test_object_name=mk_test_object_name_default):
     exp_name = f"{mk_test_object_name()}"
     mlflow.set_experiment(exp_name)
     exp = client.get_experiment_by_name(exp_name)
-    for info in client.list_run_infos(exp.experiment_id):
+    for info in client.search_runs(exp.experiment_id):
         client.delete_run(info.run_id)
     return exp
 
@@ -64,7 +64,7 @@ def create_runs(client):
 
 
 def list_experiments(client):
-    return [ exp for exp in client.list_experiments() if exp.name.startswith(TEST_OBJECT_PREFIX) ]
+    return [ exp for exp in client.search_experiments() if exp.name.startswith(TEST_OBJECT_PREFIX) ]
 
 
 def delete_experiment(client, exp):
@@ -72,12 +72,12 @@ def delete_experiment(client, exp):
 
 
 def delete_experiments(client):
-    for exp in client.list_experiments():
+    for exp in client.search_experiments():
         client.delete_experiment(exp.experiment_id)
 
 
 def delete_models(client):
-    for model in client.list_registered_models(max_results=1000):
+    for model in client.search_registered_models(max_results=1000):
         model_utils.delete_model(client, model.name)
 
 

@@ -53,7 +53,7 @@ def test_list_experiments_max_results_custom(mlflow_context):
 
 def _create_models(client, num_models):
     delete_models(client)
-    models = client.list_registered_models()
+    models = client.search_registered_models()
     assert len(models) == 0
     for _ in range(0,num_models):
         model_name = mk_test_object_name_default()
@@ -61,7 +61,7 @@ def _create_models(client, num_models):
 
 def _run_test_list_models(client, num_models, max_results):
     _create_models(client, num_models)
-    models1 = client.list_registered_models()
+    models1 = client.search_registered_models()
     assert len(models1) == num_models
     models2 = ListRegisteredModelsIterator(client, max_results)
     assert len(models1) == len(list(models2))
@@ -79,7 +79,7 @@ def test_list_models_max_results_custom(mlflow_context):
     num_models = 101
     max_results = 20
     _create_models(mlflow_context.client_src, num_models)
-    models1 = mlflow_context.client_src.list_registered_models(max_results=num_models)
+    models1 = mlflow_context.client_src.search_registered_models(max_results=num_models)
     assert len(models1) == num_models
     models2 = ListRegisteredModelsIterator(mlflow_context.client_src, max_results)
     assert len(models1) == len(list(models2))
@@ -89,7 +89,7 @@ def test_list_models_max_results_non_default(mlflow_context):
     num_models = 101
     max_results = 20
     _create_models(mlflow_context.client_src, num_models)
-    models1 = mlflow_context.client_src.list_registered_models()
+    models1 = mlflow_context.client_src.search_registered_models()
     assert len(models1) == MAX_RESULTS_DEFAULT
     models2 = ListRegisteredModelsIterator(mlflow_context.client_src, max_results)
     assert len(list(models2)) == num_models
@@ -107,7 +107,7 @@ def test_SearchRunsIterator(mlflow_context):
     num_runs = 120
     max_results = 22
     exp = _create_runs(mlflow_context.client_src, num_runs)
-    infos = mlflow_context.client_src.list_run_infos(exp.experiment_id)
+    infos = mlflow_context.client_src.search_runs(exp.experiment_id)
     assert num_runs == len(infos)
     iterator = SearchRunsIterator(mlflow_context.client_src, exp.experiment_id, max_results)
     runs = list(iterator)
@@ -117,7 +117,7 @@ def test_SearchRunsIterator_empty(mlflow_context):
     num_runs = 0
     max_results = 22
     exp = _create_runs(mlflow_context.client_src, num_runs)
-    infos = mlflow_context.client_src.list_run_infos(exp.experiment_id)
+    infos = mlflow_context.client_src.search_runs(exp.experiment_id)
     assert num_runs == len(infos)
     iterator = SearchRunsIterator(mlflow_context.client_src, exp.experiment_id, max_results)
     runs = list(iterator)
@@ -128,7 +128,7 @@ def test_SearchRunsIterator_many(mlflow_context):
     num_runs = 1200
     max_results = 500
     exp = _create_runs(mlflow_context.client_src, num_runs)
-    infos = mlflow_context.client_src.list_run_infos(exp.experiment_id)
+    infos = mlflow_context.client_src.search_runs(exp.experiment_id)
     assert len(infos) == 1000
     iterator = SearchRunsIterator(mlflow_context.client_src, exp.experiment_id, max_results)
     runs = list(iterator)

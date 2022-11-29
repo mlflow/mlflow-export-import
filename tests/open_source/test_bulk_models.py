@@ -20,7 +20,7 @@ def compare_models(mlflow_context, compare_func):
     test_dir = os.path.join(mlflow_context.output_dir, "test_compare_runs")
     exps = list_experiments(mlflow_context.client_src)
     exp_ids = [ exp.experiment_id for exp in exps ]
-    models2 = mlflow_context.client_dst.list_registered_models()
+    models2 = mlflow_context.client_dst.search_registered_models()
     assert len(models2) > 0
     for model2 in models2:
         versions2 = mlflow_context.client_dst.get_latest_versions(model2.name)

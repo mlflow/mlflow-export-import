@@ -15,7 +15,7 @@ def main(output_dir):  # pragma: no cover
         print(f"  {k}: {v}")
     client = MlflowHttpClient()
     print("HTTP client:",client)
-    rsp = client._get("registered-models/list")
+    rsp = client._get("registered-models/search")
     path = os.path.join(output_dir,"registered_models.json")
     print("Output file:",path)
     dct = json.loads(rsp.text)
