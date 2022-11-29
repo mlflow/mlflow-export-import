@@ -89,7 +89,7 @@ def test_get_experiment_ids_from_all_string(mlflow_context):
     delete_experiments_and_models(mlflow_context)
     exps = [ create_test_experiment(mlflow_context.client_src, 3), create_test_experiment(mlflow_context.client_src, 4) ]
     exp_ids = bulk_utils.get_experiment_ids(mlflow_context.client_src, "all")
-    assert exp_ids == [ exp.experiment_id for exp in exps ]
+    assert sorted(exp_ids) == sorted([exp.experiment_id for exp in exps]) # XX
 
 def test_get_experiment_ids_from_list(mlflow_context):
     exp_ids1 = ["exp1","exp2","exp3"]
