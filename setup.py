@@ -13,11 +13,11 @@ setup(
         "Documentation": "https://github.com/mlflow/mlflow-export-import/blob/master/README.md", 
         "Source Code": "https://github.com/mlflow/mlflow-export-import/"
     },
-    python_requires = ">=3.8",
+    python_requires = ">=3.7",
     packages = find_packages(),
     zip_safe = False,
     install_requires = [
-          "mlflow>=1.28.0"
+          "mlflow>=1.28.0",
           "wheel"
     ],
     license = "Apache License 2.0",
