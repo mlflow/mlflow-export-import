@@ -33,7 +33,7 @@ class BaseModelImporter():
         """
         src_current_stage = src_vr["current_stage"]
         dst_source = dst_source.replace("file://","") # OSS MLflow
-        if not dst_source.startswith("dbfs:") and not os.path.exists(dst_source):
+        if not dst_source.startswith(("dbfs:","mlflow-artifacts:")) and not os.path.exists(dst_source):
             raise MlflowExportImportException(f"'source' argument for MLflowClient.create_model_version does not exist: {dst_source}")
         kwargs = {"await_creation_for": self.await_creation_for } if self.await_creation_for else {}
         version = self.mlflow_client.create_model_version(model_name, dst_source, dst_run_id, **kwargs)
