@@ -9,7 +9,7 @@
 
 ## Setup
 
-See [common test setup](../README.md#Setup) section.
+See [Setup](../../README.md#Setup) section.
 
 ## Test Configuration
 

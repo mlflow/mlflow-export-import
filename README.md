@@ -117,7 +117,7 @@ For details see [README_source_tags](README_source_tags.md).
 
 ## Setup
 
-Supports python 3.7 or above.
+Supports python 3.8 or above.
 
 
 ### Local setup
@@ -149,17 +149,17 @@ cd mlflow-export-import
 pip install -e .
 ```
 
-### Databricks setup
+### Databricks notebook setup
 
-There are two different ways to install the package.
+There are two different ways to install the package in a Databricks notebook.
 
 #### 1. Install package in notebook
 
-[Install notebook-scoped libraries with %pip](https://docs.databricks.com/libraries/notebooks-python-libraries.html#install-notebook-scoped-libraries-with-pip).
+See documentation: [Install notebook-scoped libraries with %pip](https://docs.databricks.com/libraries/notebooks-python-libraries.html#install-notebook-scoped-libraries-with-pip).
 
 
 ```
-pip install mlflow-export-import
+%pip install mlflow-export-import
 ```
 
 #### 2. Install package as a wheel on cluster
@@ -173,9 +173,9 @@ python setup.py bdist_wheel
 databricks fs cp dist/mlflow_export_import-1.0.0-py3-none-any.whl {MY_DBFS_PATH}
 ```
 
-### Databricks MLflow usage
+### Laptop to Databricks usage
 
-To run the tools externally (from your laptop) against a Databricks tracking server (workspace) set the following environment variables.
+To run the tools externally (from your laptop) against a Databricks tracking server (workspace) set the following environment variables:
 ```
 export MLFLOW_TRACKING_URI=databricks
 export DATABRICKS_HOST=https://mycompany.cloud.databricks.com

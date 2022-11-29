@@ -8,7 +8,7 @@ Open source MLflow Export Import tests use two MLflow tracking servers:
 
 ## Setup
 
-See the [common test setup](../README.md#Setup) section.
+See the [Setup](../../README.md#Setup) section.
 
 ## Test Configuration
 

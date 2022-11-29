@@ -29,8 +29,4 @@ Failed Databricks Tests:
 
 ## Setup
 
-Create a virtual environment with dependencies.
-```
-conda env create conda.yaml
-conda activate mlflow-export-import-tests
-```
+See [Setup](../README.md#Setup) section.

@@ -1,4 +1,15 @@
 from setuptools import setup, find_packages
+
+CORE_REQUIREMENTS = [
+    "mlflow>=1.28.0",
+    "wheel"
+]
+
+TEST_REQUIREMENTS = [
+    "pytest>=7.2.0",
+    "pytest-html",
+    "shortuuid"
+]
   
 setup(
     name="mlflow_export_import",
@@ -16,10 +27,7 @@ setup(
     python_requires = ">=3.8",
     packages = find_packages(),
     zip_safe = False,
-    install_requires = [
-          "mlflow>=1.28.0",
-          "wheel"
-    ],
+    install_requires = CORE_REQUIREMENTS + TEST_REQUIREMENTS,
     license = "Apache License 2.0",
     keywords = "mlflow ml ai",
     classifiers = [
