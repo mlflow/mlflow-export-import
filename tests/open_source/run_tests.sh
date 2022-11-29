@@ -47,8 +47,7 @@ run_tests() {
     --junitxml=$JUNIT_FILE \
     --html=$HTML_FILE \
     --self-contained-html \
-  test_runs.py
-  #test_*.py
+  test_*.py
 }
 
 launch_server() {
