@@ -63,7 +63,7 @@ def _init_test_runs(mlflow_context, exporter, importer, num_params=None, num_met
 def _create_run(client, num_params=None, num_metrics=None, num_tags=None):
     exp = create_experiment(client)
     with mlflow.start_run() as run:
-        with open("info.txt", "w") as f: f.write("Hi artifact")
+        with open("info.txt", "w", encoding="utf-8") as f: f.write("Hi artifact")
         mlflow.log_artifact("info.txt","dir")
     if num_params:
         params0 = [Param(f"p0_{j:>04d}", "pval") for j in range(0,MAX_PARAMS_TAGS_PER_BATCH) ]
