@@ -1,7 +1,7 @@
 from mlflow_export_import.model.export_model import ModelExporter
 from mlflow_export_import.model.import_model import ModelImporter
 import oss_utils_test 
-from compare_utils import compare_models
+from compare_utils import compare_models, compare_models_with_versions
 from init_tests import mlflow_context
 from mlflow_export_import.model.import_model import _extract_model_path
 
@@ -9,25 +9,27 @@ from mlflow_export_import.model.import_model import _extract_model_path
 def test_export_import_model_1_stage(mlflow_context):
     model_src, model_dst = _run_test_export_import_model_stages(mlflow_context, ["Production"] )
     assert len(model_dst.latest_versions) == 1
-    compare_models(mlflow_context.client_src, mlflow_context.client_dst,  model_src, model_dst, mlflow_context.output_dir)
+    compare_models_with_versions(mlflow_context.client_src, mlflow_context.client_dst,  model_src, model_dst, mlflow_context.output_dir)
 
 
 def test_export_import_model_2_stages(mlflow_context):
     model_src, model_dst = _run_test_export_import_model_stages(mlflow_context, ["Production","Staging"])
     assert len(model_dst.latest_versions) == 2
-    compare_models(mlflow_context.client_src, mlflow_context.client_dst,  model_src, model_dst, mlflow_context.output_dir)
+    compare_models_with_versions(mlflow_context.client_src, mlflow_context.client_dst,  model_src, model_dst, mlflow_context.output_dir)
 
 
 def test_export_import_model_all_stages(mlflow_context):
     model_src, model_dst = _run_test_export_import_model_stages(mlflow_context, None)
     assert len(model_dst.latest_versions) == 3
-    compare_models(mlflow_context.client_src, mlflow_context.client_dst,  model_src, model_dst, mlflow_context.output_dir)
+    compare_models_with_versions(mlflow_context.client_src, mlflow_context.client_dst,  model_src, model_dst, mlflow_context.output_dir)
 
 
 def _run_test_export_import_model_stages(mlflow_context, stages):
     exporter = ModelExporter(mlflow_context.client_src, stages=stages)
     model_name_src = oss_utils_test.mk_test_object_name_default()
-    model_src = mlflow_context.client_src.create_registered_model(model_name_src)
+    desc = "Hello decription"
+    tags = { "city": "franconia" }
+    model_src = mlflow_context.client_src.create_registered_model(model_name_src, tags, desc)
 
     _create_version(mlflow_context.client_src, model_name_src, "Production")
     _create_version(mlflow_context.client_src, model_name_src, "Staging")
@@ -51,7 +53,9 @@ def _run_test_export_import_model_stages(mlflow_context, stages):
 def _create_version(client, model_name, stage=None):
     run = _create_run(client)
     source = f"{run.info.artifact_uri}/model"
-    vr = client.create_model_version(model_name, source, run.info.run_id)
+    desc = "My version desc"
+    tags = { "city": "versionville" }
+    vr = client.create_model_version(model_name, source, run.info.run_id, description=desc, tags=tags)
     if stage:
         vr = client.transition_model_version_stage(model_name, vr.version, stage)
     return vr
@@ -63,6 +67,7 @@ def _create_run(client):
 
 
 # Simple tests for parsing
+
 
 _run_id = "48cf29167ddb4e098da780f0959fb4cf"
 _model_path = "models:/my_model"

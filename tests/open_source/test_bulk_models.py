@@ -16,7 +16,7 @@ num_runs = 2
 
 # == Compare
 
-def compare_models(mlflow_context, compare_func):
+def compare_models_with_versions(mlflow_context, compare_func):
     test_dir = os.path.join(mlflow_context.output_dir, "test_compare_runs")
     exps = list_experiments(mlflow_context.client_src)
     exp_ids = [ exp.experiment_id for exp in exps ]
@@ -63,7 +63,7 @@ def _run_test(mlflow_context, compare_func, use_threads=False):
         verbose=False,
         use_threads=use_threads)
 
-    compare_models(mlflow_context, compare_func)
+    compare_models_with_versions(mlflow_context, compare_func)
 
 
 def test_basic(mlflow_context):

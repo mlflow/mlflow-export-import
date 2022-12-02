@@ -11,7 +11,7 @@ run() {
     --junitxml=$JUNIT_FILE \
     --html=$HTML_FILE \
     --self-contained-html \
-    `ls tes*.py` 
+    `ls test_*.py`
 
   echo 
   echo "******************************************************"

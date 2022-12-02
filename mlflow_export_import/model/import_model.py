@@ -4,6 +4,7 @@ Import a registered model and all the experiment runs associated with its latest
 
 import os
 import click
+
 import mlflow
 from mlflow.exceptions import RestException
 from mlflow_export_import.common import MlflowExportImportException
@@ -11,8 +12,10 @@ from mlflow_export_import.run.import_run import RunImporter
 from mlflow_export_import import utils, click_doc
 from mlflow_export_import.common import model_utils
 
+
 class BaseModelImporter():
     """ Base class of ModelImporter subclasses. """
+
     def __init__(self, mlflow_client, run_importer=None, await_creation_for=None):
         """
         :param mlflow_client: MLflow client or if None create default client.
@@ -22,6 +25,7 @@ class BaseModelImporter():
         self.mlflow_client = mlflow_client 
         self.run_importer = run_importer if run_importer else RunImporter(self.mlflow_client, mlmodel_fix=True)
         self.await_creation_for = await_creation_for 
+
 
     def _import_version(self, model_name, src_vr, dst_run_id, dst_source, sleep_time):
         """
@@ -36,12 +40,14 @@ class BaseModelImporter():
         if not dst_source.startswith("dbfs:") and not os.path.exists(dst_source):
             raise MlflowExportImportException(f"'source' argument for MLflowClient.create_model_version does not exist: {dst_source}")
         kwargs = {"await_creation_for": self.await_creation_for } if self.await_creation_for else {}
-        version = self.mlflow_client.create_model_version(model_name, dst_source, dst_run_id, **kwargs)
+        version = self.mlflow_client.create_model_version(model_name, dst_source, dst_run_id, \
+            description=src_vr["description"], tags=src_vr["tags"], **kwargs)
         model_utils.wait_until_version_is_ready(self.mlflow_client, model_name, version, sleep_time=sleep_time)
         if src_current_stage != "None":
             active_stages = [ "Production", "Staging" ]
             archive_existing_versions = src_current_stage in active_stages
             self.mlflow_client.transition_model_version_stage(model_name, version.version, src_current_stage, archive_existing_versions)
+
 
     def _import_model(self, model_name, input_dir, delete_model=False, verbose=False, sleep_time=30):
         """
@@ -52,7 +58,7 @@ class BaseModelImporter():
         :param sleep_time: Seconds to wait for model version crreation.
         :return: Model import manifest.
         """
-        path = os.path.join(input_dir,"model.json")
+        path = os.path.join(input_dir, "model.json")
         model_dct = utils.read_json_file(path)["registered_model"]
 
         print("Model to import:")
@@ -77,10 +83,13 @@ class BaseModelImporter():
             print(f"Registered model '{model_name}' already exists")
         return model_dct
 
+
 class ModelImporter(BaseModelImporter):
-    """ Low-level 'point' model importer  """
+    """ Low-level 'point' model importer.  """
+
     def __init__(self, mlflow_client, run_importer=None, await_creation_for=None):
         super().__init__(mlflow_client, run_importer, await_creation_for=await_creation_for)
+
 
     def import_model(self, model_name, input_dir, experiment_name, delete_model=False, verbose=False, sleep_time=30):
         """
@@ -100,6 +109,7 @@ class ModelImporter(BaseModelImporter):
             self.import_version(model_name, vr, run_id, sleep_time)
         if verbose:
             model_utils.dump_model_versions(self.mlflow_client, model_name)
+
 
     def _import_run(self, input_dir, experiment_name, vr):
         run_id = vr["run_id"]
@@ -125,17 +135,21 @@ class ModelImporter(BaseModelImporter):
         print(f"      source:           {source}")
         return dst_run_id
 
+
     def import_version(self, model_name, src_vr, dst_run_id, sleep_time):
         dst_run = self.mlflow_client.get_run(dst_run_id)
         model_path = _extract_model_path(src_vr["source"], src_vr["run_id"])
         dst_source = f"{dst_run.info.artifact_uri}/{model_path}"
         self._import_version(model_name, src_vr, dst_run_id, dst_source, sleep_time)
 
+
 class AllModelImporter(BaseModelImporter):
-    """ High-level 'bulk' model importer  """
+    """ High-level 'bulk' model importer.  """
+
     def __init__(self, mlflow_client, run_info_map, run_importer=None, await_creation_for=None):
         super().__init__(mlflow_client, run_importer, await_creation_for=await_creation_for)
         self.run_info_map = run_info_map
+
 
     def import_model(self, model_name, input_dir, delete_model=False, verbose=False, sleep_time=30):
         """
@@ -171,12 +185,14 @@ def _extract_model_path(source, run_id):
         model_path = model_path.replace("artifacts/","")
     return model_path
 
+
 def _path_join(x,y):
     """ Account for DOS backslash """
     path = os.path.join(x,y)
     if path.startswith("dbfs:"):
         path = path.replace("\\","/") 
     return path
+
 
 @click.command()
 @click.option("--input-dir", 
@@ -217,14 +233,14 @@ def _path_join(x,y):
     default=False, 
     show_default=True
 )
-
 def main(input_dir, model, experiment_name, delete_model, await_creation_for, verbose, sleep_time): # pragma: no cover
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    client = mlflow.tracking.MlflowClient()
+    client = mlflow.client.MlflowClient()
     importer = ModelImporter(client, await_creation_for=await_creation_for)
     importer.import_model(model, input_dir, experiment_name, delete_model, verbose, sleep_time)
+
 
 if __name__ == "__main__":
     main()
