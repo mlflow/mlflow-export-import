@@ -1,7 +1,7 @@
 from mlflow_export_import.model.export_model import ModelExporter
 from mlflow_export_import.model.import_model import ModelImporter
 import oss_utils_test 
-from compare_utils import compare_models, compare_models_with_versions
+from compare_utils import compare_models_with_versions
 from init_tests import mlflow_context
 from mlflow_export_import.model.import_model import _extract_model_path
 

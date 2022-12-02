@@ -19,7 +19,7 @@ def main(output_dir):  # pragma: no cover
     path = os.path.join(output_dir,"registered_models.json")
     print("Output file:",path)
     dct = json.loads(rsp.text)
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write(json.dumps(dct,indent=2)+"\n")
 
 if __name__ == "__main__":
