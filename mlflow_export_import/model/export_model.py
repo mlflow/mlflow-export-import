@@ -5,6 +5,7 @@ Export a registered model and all the experiment runs associated with each versi
 import os
 import click
 import mlflow
+from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common.http_client import MlflowHttpClient
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.run.export_run import RunExporter
@@ -56,7 +57,7 @@ class ModelExporter():
             run_id = vr.run_id
             opath = os.path.join(output_dir,run_id)
             opath = opath.replace("dbfs:", "/dbfs")
-            dct = { "version": vr.version, "stage": vr.current_stage, "run_id": run_id }
+            dct = { "version": vr.version, "stage": vr.current_stage, "run_id": run_id, "description": vr.description, "tags": vr.tags }
             print(f"Exporting: {dct}")
             manifest.append(dct)
             try:
@@ -129,8 +130,8 @@ def main(model, output_dir, export_source_tags, notebook_formats, stages):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    client = mlflow.tracking.MlflowClient()
-    exporter = ModelExporter(client, export_source_tags=export_source_tags, notebook_formats=utils.string_to_list(notebook_formats), stages=stages)
+    mlflow_client = mlflow.client.MlflowClient()
+    exporter = ModelExporter(mlflow_client, export_source_tags=export_source_tags, notebook_formats=utils.string_to_list(notebook_formats), stages=stages)
     exporter.export_model(model, output_dir)
 
 

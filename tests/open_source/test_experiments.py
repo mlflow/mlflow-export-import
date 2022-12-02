@@ -19,7 +19,7 @@ def init_exp_test(mlflow_context, exporter, importer, verbose=False):
     importer.import_experiment(experiment_name, mlflow_context.output_dir)
     exp2 = mlflow_context.client_dst.get_experiment_by_name(experiment_name)
     runs = mlflow_context.client_dst.search_runs(exp2.experiment_id)
-    run2 = mlflow_context.client_dst.get_run(runs[0].info.run_id) # XX
+    run2 = mlflow_context.client_dst.get_run(runs[0].info.run_id)
 
     if verbose: dump_runs(run1, run2)
     return run1, run2

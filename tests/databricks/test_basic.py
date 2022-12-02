@@ -7,7 +7,7 @@ import mlflow
 from init_tests import test_context
 from databricks_cli.dbfs.api import DbfsPath
 from mlflow_export_import.common import mlflow_utils
-from compare_utils import compare_runs, compare_models
+from compare_utils import compare_runs, compare_models_with_versions
 import utils_test
 import init_tests
 
@@ -62,7 +62,7 @@ def test_import_model_job(test_context):
     model_name_2 = test_context.tester.mk_imported_name(model_name_1)
     model1 = mlflow_client.get_registered_model(model_name_1)
     model2 = mlflow_client.get_registered_model(model_name_2)
-    compare_models(mlflow_client, mlflow_client, model1, model2, test_context.tester.local_artifacts_compare_dir)
+    compare_models_with_versions(mlflow_client, mlflow_client, model1, model2, test_context.tester.local_artifacts_compare_dir)
 
 
 def _run_job(test_context, job, name):

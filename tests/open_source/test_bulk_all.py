@@ -1,5 +1,5 @@
 from test_bulk_experiments import compare_experiments
-from test_bulk_models import create_model, compare_models
+from test_bulk_models import create_model, compare_models_with_versions
 from init_tests import mlflow_context
 from mlflow_export_import.bulk.export_all import export_all
 from mlflow_export_import.bulk.import_models import import_all
@@ -18,7 +18,7 @@ def _run_test(mlflow_context, compare_func, export_source_tags=False, use_thread
     export_all(mlflow_context.output_dir, export_source_tags=export_source_tags, notebook_formats=notebook_formats, use_threads=use_threads)
     import_all(mlflow_context.client_dst, mlflow_context.output_dir, delete_model=True)
     compare_experiments(mlflow_context, compare_func)
-    compare_models(mlflow_context, compare_func)
+    compare_models_with_versions(mlflow_context, compare_func)
 
 def test_basic(mlflow_context):
     _run_test(mlflow_context, compare_runs)
