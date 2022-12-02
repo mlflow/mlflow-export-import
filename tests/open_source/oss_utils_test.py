@@ -3,6 +3,7 @@ import mlflow
 import mlflow.sklearn
 from sklearn_utils import create_sklearn_model
 from mlflow_export_import.common import model_utils
+from mlflow.utils.mlflow_tags import MLFLOW_RUN_NOTE # NOTE: ""mlflow.note.content" - used for Experiment Description too!
 from init_tests import mlflow_context
 import utils_test
 
@@ -26,6 +27,9 @@ def create_experiment(client, mk_test_object_name=mk_test_object_name_default):
     exp_name = f"{mk_test_object_name()}"
     mlflow.set_experiment(exp_name)
     exp = client.get_experiment_by_name(exp_name)
+    client.set_experiment_tag(exp.experiment_id, "version_mlflow", mlflow.__version__)
+    client.set_experiment_tag(exp.experiment_id, MLFLOW_RUN_NOTE, f"Description_{mk_uuid()}")
+    exp = client.get_experiment(exp.experiment_id)
     for info in client.search_runs(exp.experiment_id):
         client.delete_run(info.run_id)
     return exp

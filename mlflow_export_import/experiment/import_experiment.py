@@ -13,6 +13,7 @@ from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common.http_client import DatabricksHttpClient
 
 class ExperimentImporter():
+
     def __init__(self, mlflow_client, mlmodel_fix=True, use_src_user_id=False):
         """
         :param mlflow_client: MLflow client.
@@ -26,22 +27,24 @@ class ExperimentImporter():
         print("MLflowClient:",self.mlflow_client)
         self.dbx_client = DatabricksHttpClient()
 
+
     def import_experiment(self, exp_name, input_dir, dst_notebook_dir=None):
         """
         :param: exp_name: Destination experiment name.
         :param: input_dir: Source experiment directory.
         :return: A map of source run IDs and destination run.info.
         """
-        mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, exp_name)
-        manifest_path = os.path.join(input_dir,"manifest.json")
-        dct = utils.read_json_file(manifest_path)
-        run_ids = dct["export_info"]["ok_runs"]
-        failed_run_ids = dct["export_info"]["failed_runs"]
+        manifest_path = os.path.join(input_dir, "manifest.json")
+        exp_dct = utils.read_json_file(manifest_path)
+        tags = exp_dct["experiment"]["tags"] 
+        mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, exp_name, tags)
+        run_ids = exp_dct["export_info"]["ok_runs"]
+        failed_run_ids = exp_dct["export_info"]["failed_runs"]
         print(f"Importing {len(run_ids)} runs into experiment '{exp_name}' from {input_dir}")
         run_ids_map = {}
         run_info_map = {}
         for src_run_id in run_ids:
-            dst_run, src_parent_run_id = self.run_importer.import_run(exp_name, os.path.join(input_dir,src_run_id), dst_notebook_dir)
+            dst_run, src_parent_run_id = self.run_importer.import_run(exp_name, os.path.join(input_dir, src_run_id), dst_notebook_dir)
             dst_run_id = dst_run.info.run_id
             run_ids_map[src_run_id] = { "dst_run_id": dst_run_id, "src_parent_run_id": src_parent_run_id }
             run_info_map[src_run_id] = dst_run.info
@@ -53,24 +56,24 @@ class ExperimentImporter():
 
 
 @click.command()
-@click.option("--input-dir", 
-    help="Input path - directory", 
+@click.option("--input-dir",
+    help="Input path - directory",
     type=str,
     required=True
 )
-@click.option("--experiment-name", 
-    help="Destination experiment name", 
+@click.option("--experiment-name",
+    help="Destination experiment name",
     type=str,
     required=True
 )
-@click.option("--just-peek", 
-    help="Just display experiment metadata - do not import", 
-    type=bool, 
+@click.option("--just-peek",
+    help="Just display experiment metadata - do not import",
+    type=bool,
     default=False
 )
-@click.option("--use-src-user-id", 
-    help=click_doc.use_src_user_id, 
-    type=bool, 
+@click.option("--use-src-user-id",
+    help=click_doc.use_src_user_id,
+    type=bool,
     default=False
 )
 @click.option("--dst-notebook-dir",
