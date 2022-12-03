@@ -12,11 +12,30 @@ from mlflow_export_import.run.import_run import RunImporter
 from mlflow_export_import import utils, click_doc
 from mlflow_export_import.common import model_utils
 
+TAG_SRC_PREFIX = "mlflow_export_import.src"
+
+def _fmt_timestamp_millis(millis, as_utc=False):
+    import time
+    ts_format = "%Y-%m-%d %H:%M:%S"
+    seconds = time.gmtime(round(millis/1000))
+    seconds = round(millis/1000)
+    if as_utc:
+        return time.strftime(ts_format, time.gmtime(seconds))
+    else:
+        return time.strftime(ts_format, time.localtime(seconds))
+
+
+def _fmt_timestamps(tag, dct, tags):
+    ts = dct[tag]
+    tags[f"{TAG_SRC_PREFIX}.{tag}"] = ts
+    tags[f"{TAG_SRC_PREFIX}._{tag}_local"] = _fmt_timestamp_millis(ts)
+    tags[f"{TAG_SRC_PREFIX}._{tag}_utc"] = _fmt_timestamp_millis(ts, True)
+
 
 class BaseModelImporter():
     """ Base class of ModelImporter subclasses. """
 
-    def __init__(self, mlflow_client, run_importer=None, await_creation_for=None):
+    def __init__(self, mlflow_client, run_importer=None, import_source_tags=False, await_creation_for=None):
         """
         :param mlflow_client: MLflow client or if None create default client.
         :param run_importer: RunImporter instance.
@@ -24,6 +43,7 @@ class BaseModelImporter():
         """
         self.mlflow_client = mlflow_client 
         self.run_importer = run_importer if run_importer else RunImporter(self.mlflow_client, mlmodel_fix=True)
+        self.import_source_tags = import_source_tags 
         self.await_creation_for = await_creation_for 
 
 
@@ -40,8 +60,16 @@ class BaseModelImporter():
         if not dst_source.startswith("dbfs:") and not os.path.exists(dst_source):
             raise MlflowExportImportException(f"'source' argument for MLflowClient.create_model_version does not exist: {dst_source}")
         kwargs = {"await_creation_for": self.await_creation_for } if self.await_creation_for else {}
+        tags = src_vr["tags"]
+        if self.import_source_tags:
+            for k,v in src_vr.items():
+                if k != "tags":
+                    tags[f"{TAG_SRC_PREFIX}.{k}"] = v
+            _fmt_timestamps("creation_timestamp", src_vr, tags)
+            _fmt_timestamps("last_updated_timestamp", src_vr, tags)
+
         version = self.mlflow_client.create_model_version(model_name, dst_source, dst_run_id, \
-            description=src_vr["description"], tags=src_vr["tags"], **kwargs)
+            description=src_vr["description"], tags=tags, **kwargs)
         model_utils.wait_until_version_is_ready(self.mlflow_client, model_name, version, sleep_time=sleep_time)
         if src_current_stage != "None":
             active_stages = [ "Production", "Staging" ]
@@ -49,7 +77,7 @@ class BaseModelImporter():
             self.mlflow_client.transition_model_version_stage(model_name, version.version, src_current_stage, archive_existing_versions)
 
 
-    def _import_model(self, model_name, input_dir, delete_model=False, verbose=False, sleep_time=30):
+    def _import_model(self, model_name, input_dir, delete_model=False):
         """
         :param model_name: Model name.
         :param input_dir: Input directory.
@@ -75,6 +103,12 @@ class BaseModelImporter():
 
         try:
             tags = { e["key"]:e["value"] for e in model_dct.get("tags", {}) }
+            if self.import_source_tags:
+                _fmt_timestamps("creation_timestamp", model_dct, tags)
+                _fmt_timestamps("last_updated_timestamp", model_dct, tags)
+                for k,_ in model_dct.items():
+                    if k != "tags":
+                        tags[f"{TAG_SRC_PREFIX}.{k}"] = model_dct[k]
             self.mlflow_client.create_registered_model(model_name, tags, model_dct.get("description"))
             print(f"Created new registered model '{model_name}'")
         except RestException as e:
@@ -87,21 +121,22 @@ class BaseModelImporter():
 class ModelImporter(BaseModelImporter):
     """ Low-level 'point' model importer.  """
 
-    def __init__(self, mlflow_client, run_importer=None, await_creation_for=None):
-        super().__init__(mlflow_client, run_importer, await_creation_for=await_creation_for)
+    def __init__(self, mlflow_client, run_importer=None, import_source_tags=False, await_creation_for=None):
+        super().__init__(mlflow_client, run_importer, import_source_tags=import_source_tags, await_creation_for=await_creation_for)
 
 
     def import_model(self, model_name, input_dir, experiment_name, delete_model=False, verbose=False, sleep_time=30):
         """
         :param model_name: Model name.
         :param input_dir: Input directory.
-        :param experiment_name: The name of the experiment
+        :param experiment_name: The name of the experiment.
         :param delete_model: Delete current model before importing versions.
+        :param import_source_tags: Import source information for registered model and its versions ad tags in destination object.
         :param verbose: Verbose.
         :param sleep_time: Seconds to wait for model version crreation.
         :return: Model import manifest.
         """
-        model_dct = self._import_model(model_name, input_dir, delete_model, verbose, sleep_time)
+        model_dct = self._import_model(model_name, input_dir, delete_model)
         mlflow.set_experiment(experiment_name)
         print("Importing versions:")
         for vr in model_dct["latest_versions"]:
@@ -146,8 +181,8 @@ class ModelImporter(BaseModelImporter):
 class AllModelImporter(BaseModelImporter):
     """ High-level 'bulk' model importer.  """
 
-    def __init__(self, mlflow_client, run_info_map, run_importer=None, await_creation_for=None):
-        super().__init__(mlflow_client, run_importer, await_creation_for=await_creation_for)
+    def __init__(self, mlflow_client, run_info_map, run_importer=None, import_source_tags=False, await_creation_for=None):
+        super().__init__(mlflow_client, run_importer, import_source_tags=import_source_tags, await_creation_for=await_creation_for)
         self.run_info_map = run_info_map
 
 
@@ -160,7 +195,7 @@ class AllModelImporter(BaseModelImporter):
         :param sleep_time: Seconds to wait for model version crreation.
         :return: Model import manifest.
         """
-        model_dct = self._import_model(model_name, input_dir, delete_model, verbose, sleep_time)
+        model_dct = self._import_model(model_name, input_dir, delete_model)
         print("Importing latest versions:")
         for vr in model_dct["latest_versions"]:
             src_run_id = vr["run_id"]
@@ -195,50 +230,56 @@ def _path_join(x,y):
 
 
 @click.command()
-@click.option("--input-dir", 
-    help="Input directory produced by export_model.py.", 
+@click.option("--input-dir",
+    help="Input directory produced by export_model.py.",
     type=str,
     required=True
 )
-@click.option("--model", 
-    help="New registered model name.", 
+@click.option("--model",
+    help="New registered model name.",
     type=str,
-    required=True, 
+    required=True,
 )
-@click.option("--experiment-name", 
-    help="Destination experiment name  - will be created if it does not exist.", 
+@click.option("--experiment-name",
+    help="Destination experiment name  - will be created if it does not exist.",
     type=str,
     required=True
 )
-@click.option("--delete-model", 
-    help=click_doc.delete_model, 
+@click.option("--delete-model",
+    help=click_doc.delete_model,
     type=bool,
-    default=False, 
+    default=False,
     show_default=True
 )
-@click.option("--await-creation-for", 
-    help="Await creation for specified seconds.", 
-    type=int, 
-    default=None, 
+@click.option("--await-creation-for",
+    help="Await creation for specified seconds.",
+    type=int,
+    default=None,
     show_default=True
 )
-@click.option("--sleep-time", 
-    help="Sleep time for polling until version.status==READY.", 
+@click.option("--sleep-time",
+    help="Sleep time for polling until version.status==READY.",
     type=int,
     default=5,
 )
-@click.option("--verbose", 
-    help="Verbose.", 
-    type=bool, 
-    default=False, 
+@click.option("--import-source-tags",
+    help=click_doc.import_source_tags,
+    type=bool,
+    default=False,
     show_default=True
 )
-def main(input_dir, model, experiment_name, delete_model, await_creation_for, verbose, sleep_time): # pragma: no cover
+@click.option("--verbose",
+    help="Verbose.",
+    type=bool,
+    default=False,
+    show_default=True
+)
+def main(input_dir, model, experiment_name, delete_model, await_creation_for, import_source_tags, verbose, sleep_time):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
     client = mlflow.client.MlflowClient()
-    importer = ModelImporter(client, await_creation_for=await_creation_for)
+    importer = ModelImporter(client, import_source_tags=import_source_tags, await_creation_for=await_creation_for)
     importer.import_model(model, input_dir, experiment_name, delete_model, verbose, sleep_time)
 
 

@@ -5,7 +5,6 @@ Export a registered model and all the experiment runs associated with each versi
 import os
 import click
 import mlflow
-from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common.http_client import MlflowHttpClient
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.run.export_run import RunExporter
@@ -48,7 +47,7 @@ class ModelExporter():
         fs.mkdirs(output_dir)
         output_versions = []
         versions = self.mlflow_client.search_model_versions(f"name='{model_name}'")
-        print(f"Found {len(versions)} versions for model {model_name}")
+        print(f"Found {len(versions)} versions for model '{model_name}'")
         manifest = []
         exported_versions = 0
         for vr in versions:
@@ -79,7 +78,7 @@ class ModelExporter():
         output_versions.sort(key=lambda x: x["version"], reverse=False)
         model["registered_model"]["latest_versions"] = output_versions
 
-        print(f"Exported {exported_versions}/{len(output_versions)} versions for model {model_name}")
+        print(f"Exported {exported_versions}/{len(output_versions)} versions for model '{model_name}'")
         path = os.path.join(output_dir, "model.json")
         utils.write_json_file(fs, path, model)
         return manifest
@@ -99,13 +98,13 @@ class ModelExporter():
 
 
 @click.command()
-@click.option("--model", 
-    help="Registered model name.", 
+@click.option("--model",
+    help="Registered model name.",
     type=str,
     required=True
 )
-@click.option("--output-dir", 
-    help="Output directory.", 
+@click.option("--output-dir",
+    help="Output directory.",
     type=str,
     required=True
 )
@@ -115,14 +114,14 @@ class ModelExporter():
     default=False,
     show_default=True
 )
-@click.option("--notebook-formats", 
-    help=click_doc.notebook_formats, 
+@click.option("--notebook-formats",
+    help=click_doc.notebook_formats,
     type=str,
-    default="", 
+    default="",
     show_default=True
 )
-@click.option("--stages", 
-    help=click_doc.model_stages, 
+@click.option("--stages",
+    help=click_doc.model_stages,
     type=str,
     required=False
 )
