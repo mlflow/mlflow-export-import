@@ -7,6 +7,7 @@ import time
 import json
 import click
 from concurrent.futures import ThreadPoolExecutor
+
 import mlflow
 from mlflow_export_import import utils, click_doc
 from mlflow_export_import.common import filesystem as _filesystem
@@ -51,14 +52,14 @@ def _import_experiments(client, input_dir, use_src_user_id):
     return run_info_map, { "experiments": len(exps), "exceptions": exceptions, "duration": duration }
 
 
-def _import_models(client, input_dir, run_info_map, delete_model, verbose, use_threads):
+def _import_models(client, input_dir, run_info_map, delete_model, import_source_tags, verbose, use_threads):
     max_workers = os.cpu_count() or 4 if use_threads else 1
     start_time = time.time()
     models_dir = os.path.join(input_dir, "models")
     manifest_path = os.path.join(models_dir,"manifest.json")
     manifest = utils.read_json_file(manifest_path)
     models = manifest["ok_models"]
-    importer = AllModelImporter(client, run_info_map)
+    importer = AllModelImporter(client, run_info_map, import_source_tags=import_source_tags)
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for model in models:
@@ -69,11 +70,11 @@ def _import_models(client, input_dir, run_info_map, delete_model, verbose, use_t
     return { "models": len(models), "duration": duration }
 
 
-def import_all(client, input_dir, delete_model, use_src_user_id=False, verbose=False, use_threads=False):
+def import_all(client, input_dir, delete_model, use_src_user_id=False, import_source_tags=False, verbose=False, use_threads=False):
     start_time = time.time()
     exp_res = _import_experiments(client, input_dir, use_src_user_id)
     run_info_map = _remap(exp_res[0])
-    model_res = _import_models(client, input_dir, run_info_map, delete_model, verbose, use_threads)
+    model_res = _import_models(client, input_dir, run_info_map, delete_model, import_source_tags, verbose, use_threads)
     duration = round(time.time() - start_time, 1)
     dct = { "duration": duration, "experiment_import": exp_res[1], "model_import": model_res }
     fs = _filesystem.get_filesystem(".")
@@ -106,6 +107,12 @@ def import_all(client, input_dir, delete_model, use_src_user_id=False, verbose=F
     default=False, 
     show_default=True
 )
+@click.option("--import-source-tags",
+    help=click_doc.import_source_tags,
+    type=bool,
+    default=False,
+    show_default=True
+)
 @click.option("--use-threads",
     help=click_doc.use_threads,
     type=bool,
@@ -114,7 +121,7 @@ def import_all(client, input_dir, delete_model, use_src_user_id=False, verbose=F
 )
 
 
-def main(input_dir, delete_model, use_src_user_id, verbose, use_threads):
+def main(input_dir, delete_model, use_src_user_id, import_source_tags, verbose, use_threads):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
@@ -124,6 +131,7 @@ def main(input_dir, delete_model, use_src_user_id, verbose, use_threads):
         input_dir, 
         delete_model=delete_model, 
         use_src_user_id=use_src_user_id, 
+        import_source_tags=import_source_tags,
         verbose=verbose, 
         use_threads=use_threads)
 

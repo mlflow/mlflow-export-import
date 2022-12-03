@@ -57,17 +57,17 @@ def _compare_artifacts(client_src, client_dst, run1, run2, run_artifact_dir1, ru
     assert utils_test.compare_dirs(path1, path2)
 
 
-def compare_models(model_src, model_dst, compare_name):
+def _compare_models(model_src, model_dst, compare_name):
     if compare_name: 
         assert model_src.name == model_dst.name
     else:
         assert model_src.name != model_dst.name # When testing against Databricks, for now we use one tracking server and thus the model names are different
     assert model_src.description == model_dst.description
-    assert model_src.tags == model_dst.tags
+    assert model_src.tags.items() <= model_dst.tags.items()
 
 
 def compare_models_with_versions(mlflow_client_src, mlflow_client_dst, model_src, model_dst, output_dir):
-    compare_models(model_src, model_dst, mlflow_client_src!=mlflow_client_dst)
+    _compare_models(model_src, model_dst, mlflow_client_src!=mlflow_client_dst)
     for (vr_src, vr_dst) in zip(model_src.latest_versions, model_dst.latest_versions):
         compare_versions(mlflow_client_src, mlflow_client_dst, vr_src, vr_dst, output_dir)
 
