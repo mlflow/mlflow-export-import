@@ -49,7 +49,7 @@ class ExperimentExporter():
         dct["export_info"] = { 
             "mlflow_version": mlflow.__version__,
             "mlflow_tracking_uri": mlflow.get_tracking_uri(),
-            "export_time": utils.get_now_nice(), 
+            utils.TAG_EXPORT_TIME: utils.create_export_times(),
             "num_total_runs": (j+1),
             "num_ok_runs": len(ok_run_ids),
             "ok_runs": ok_run_ids,

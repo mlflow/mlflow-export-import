@@ -34,10 +34,9 @@ def _create_source_tags(src_client, tags, run):
     dbx_host = os.environ.get("DATABRICKS_HOST",None)
     if dbx_host is not None:
         tags[f"{TAG_PREFIX_EXPORT_IMPORT_METADATA}.DATABRICKS_HOST"] = dbx_host
-    now = round(time.time())
-    snow = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(now))
-    tags[f"{TAG_PREFIX_EXPORT_IMPORT_METADATA}.timestamp"] = str(now)
-    tags[f"{TAG_PREFIX_EXPORT_IMPORT_METADATA}.timestamp_nice"] = snow
+    tags[f"{TAG_PREFIX_EXPORT_IMPORT_METADATA}.timestamp"] = str(ts_now_seconds)
+    tags[f"{TAG_PREFIX_EXPORT_IMPORT_METADATA}.timestamp_nice_local"] = ts_now_fmt_local
+    tags[f"{TAG_PREFIX_EXPORT_IMPORT_METADATA}.timestamp_nice_utc"] = ts_now_fmt_utc
     exp = src_client.get_experiment(run.info.experiment_id)
     tags[f"{TAG_PREFIX_EXPORT_IMPORT_METADATA}.experiment_name"] = exp.name
 
@@ -65,9 +64,33 @@ def set_dst_user_id(tags, user_id, use_src_user_id):
     tags.append(RunTag(MLFLOW_USER,user_id ))
 
 
-def get_now_nice():
-    now = int(time.time()+.5)
-    return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(now))
+TS_FORMAT = "%Y-%m-%d %H:%M:%S"
+ts_now_seconds = round(time.time())
+ts_now_fmt_utc = time.strftime(TS_FORMAT, time.gmtime(ts_now_seconds))
+ts_now_fmt_local = time.strftime(TS_FORMAT, time.localtime(ts_now_seconds))
+
+def get_now_nice(as_utc=False):
+    return fmt_ts_seconds(round(time.time()), as_utc)
+
+def fmt_ts_millis(millis, as_utc=False):
+    return fmt_ts_seconds(round(millis/1000), as_utc)
+
+def fmt_ts_seconds(seconds, as_utc=False):
+    ts_format = "%Y-%m-%d %H:%M:%S"
+    if as_utc:
+        ts = time.gmtime(seconds)
+    else:
+        ts = time.localtime(seconds)
+    return time.strftime(ts_format, ts)
+
+TAG_EXPORT_TIME = "export_time"
+
+def create_export_times():
+    return {
+        "seconds": ts_now_seconds,
+        "local_time": ts_now_fmt_local,
+        "utc_time": ts_now_fmt_local
+    }
 
 
 def strip_underscores(obj):
@@ -79,12 +102,12 @@ def write_json_file(fs, path, dct):
 
 
 def write_file(path, content):
-    with open(mk_local_path(path), 'wb') as f:
+    with open(mk_local_path(path), "wb" ) as f:
         f.write(content)
 
 
 def read_json_file(path):
-    with open(mk_local_path(path), "r") as f:
+    with open(mk_local_path(path), "r", encoding="utf-8") as f:
         return json.loads(f.read())
 
 
