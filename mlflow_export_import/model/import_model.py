@@ -14,22 +14,12 @@ from mlflow_export_import.common import model_utils
 
 TAG_SRC_PREFIX = "mlflow_export_import.src"
 
-def _fmt_timestamp_millis(millis, as_utc=False):
-    import time
-    ts_format = "%Y-%m-%d %H:%M:%S"
-    seconds = time.gmtime(round(millis/1000))
-    seconds = round(millis/1000)
-    if as_utc:
-        return time.strftime(ts_format, time.gmtime(seconds))
-    else:
-        return time.strftime(ts_format, time.localtime(seconds))
-
 
 def _fmt_timestamps(tag, dct, tags):
     ts = dct[tag]
     tags[f"{TAG_SRC_PREFIX}.{tag}"] = ts
-    tags[f"{TAG_SRC_PREFIX}._{tag}_local"] = _fmt_timestamp_millis(ts)
-    tags[f"{TAG_SRC_PREFIX}._{tag}_utc"] = _fmt_timestamp_millis(ts, True)
+    tags[f"{TAG_SRC_PREFIX}._{tag}_local"] = utils.fmt_ts_millis(ts)
+    tags[f"{TAG_SRC_PREFIX}._{tag}_utc"] = utils.fmt_ts_millis(ts, True)
 
 
 class BaseModelImporter():
