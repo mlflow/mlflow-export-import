@@ -5,8 +5,8 @@ Exports a run to a directory.
 import os
 import json
 import traceback
-import mlflow
 import click
+import mlflow
 
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common.filesystem import mk_local_path
@@ -18,6 +18,7 @@ print("MLflow Version:", mlflow.version.VERSION)
 print("MLflow Tracking URI:", mlflow.get_tracking_uri())
 
 class RunExporter:
+
     def __init__(self, mlflow_client, export_source_tags=False, notebook_formats=None):
         """
         :param mlflow_client: MLflow client.
@@ -32,6 +33,7 @@ class RunExporter:
         self.export_source_tags = export_source_tags
         self.notebook_formats = notebook_formats
 
+
     def _get_metrics_with_steps(self, run):
         metrics_with_steps = {}
         for metric in run.data.metrics.keys():
@@ -41,6 +43,7 @@ class RunExporter:
                 del x["key"] 
             metrics_with_steps[metric] = lst
         return metrics_with_steps
+
 
     def export_run(self, run_id, output_dir):
         """
@@ -52,17 +55,16 @@ class RunExporter:
         run = self.mlflow_client.get_run(run_id)
         fs.mkdirs(output_dir)
         tags = utils.create_source_tags(self.mlflow_client, run, self.export_source_tags)
-        dct = {
-            "export_info": {
-                "mlflow_version": mlflow.__version__,
-                "mlflow_tracking_uri": mlflow.get_tracking_uri(),
-                utils.TAG_EXPORT_TIME: utils.create_export_times() 
-            },
-            "info": utils.strip_underscores(run.info),
-            "params": run.data.params,
-            "metrics": self._get_metrics_with_steps(run),
-            "tags": tags,
+        
+        dct = { **{"export_info": utils.create_export_info() },
+                **{
+                    "info": utils.strip_underscores(run.info),
+                    "params": run.data.params,
+                    "metrics": self._get_metrics_with_steps(run),
+                    "tags": tags
+                }
         }
+
         path = os.path.join(output_dir, "run.json")
         utils.write_json_file(fs, path, dct)
 
@@ -86,6 +88,7 @@ class RunExporter:
             traceback.print_exc()
             return False
 
+
     def _export_notebook(self, output_dir, notebook, tags, fs):
         notebook_dir = os.path.join(output_dir, "artifacts", "notebooks")
         fs.mkdirs(notebook_dir)
@@ -101,6 +104,7 @@ class RunExporter:
         for format in self.notebook_formats:
             self._export_notebook_format(notebook_dir, notebook, format, format.lower(), notebook_name, revision_id)
 
+
     def _export_notebook_format(self, notebook_dir, notebook, format, extension, notebook_name, revision_id):
         params = { 
             "path": notebook, 
@@ -114,6 +118,7 @@ class RunExporter:
             utils.write_file(notebook_path, rsp.content)
         except MlflowExportImportException as e:
             print(f"WARNING: Cannot save notebook '{notebook}'. {e}")
+
 
 @click.command()
 @click.option("--run-id", 
@@ -138,7 +143,6 @@ class RunExporter:
     default="", 
     show_default=True
 )
-
 def main(run_id, output_dir, export_source_tags, notebook_formats):
     print("Options:")
     for k,v in locals().items():
@@ -149,6 +153,7 @@ def main(run_id, output_dir, export_source_tags, notebook_formats):
       export_source_tags=export_source_tags, 
       notebook_formats=utils.string_to_list(notebook_formats))
     exporter.export_run(run_id, output_dir)
+
 
 if __name__ == "__main__":
     main()

@@ -3,18 +3,14 @@ import json
 import time
 from tabulate import tabulate
 import pandas as pd
+
 import mlflow
 from . import mk_local_path
-
-TAG_PREFIX_EXPORT_IMPORT_RUN_INFO = "mlflow_export_import.run_info"
-TAG_PREFIX_EXPORT_IMPORT_METADATA = "mlflow_export_import.metadata"
-TAG_PREFIX_EXPORT_IMPORT_MLFLOW = "mlflow_export_import.mlflow"
-TAG_PREFIX_MLFLOW = "mlflow."
-TAG_PARENT_ID = "mlflow.parentRunId"
+from mlflow_export_import.source_tags import ExportTags, MlflowTags
 
 
 # Databricks tags that cannot be set
-_databricks_skip_tags = set([
+_DATABRICKS_SKIP_TAGS = set([
   "mlflow.user",
   "mlflow.log-model.history",
   "mlflow.rootRunId"
@@ -23,34 +19,34 @@ _databricks_skip_tags = set([
 
 def create_mlflow_tags_for_databricks_import(tags):
     if importing_into_databricks(): 
-        tags = { k:v for k,v in tags.items() if not k in _databricks_skip_tags }
+        tags = { k:v for k,v in tags.items() if not k in _DATABRICKS_SKIP_TAGS }
     return tags
 
 
 def _create_source_tags(src_client, tags, run):
-    tags[f"{TAG_PREFIX_EXPORT_IMPORT_METADATA}.mlflow_version"] = mlflow.__version__
+    tags[f"{ExportTags.TAG_PREFIX_METADATA}.mlflow_version"] = mlflow.__version__
     uri = mlflow.tracking.get_tracking_uri()
-    tags[f"{TAG_PREFIX_EXPORT_IMPORT_METADATA}.tracking_uri"] = uri
+    tags[f"{ExportTags.TAG_PREFIX_METADATA}.tracking_uri"] = uri
     dbx_host = os.environ.get("DATABRICKS_HOST",None)
     if dbx_host is not None:
-        tags[f"{TAG_PREFIX_EXPORT_IMPORT_METADATA}.DATABRICKS_HOST"] = dbx_host
-    tags[f"{TAG_PREFIX_EXPORT_IMPORT_METADATA}.timestamp"] = str(ts_now_seconds)
-    tags[f"{TAG_PREFIX_EXPORT_IMPORT_METADATA}.timestamp_nice_local"] = ts_now_fmt_local
-    tags[f"{TAG_PREFIX_EXPORT_IMPORT_METADATA}.timestamp_nice_utc"] = ts_now_fmt_utc
+        tags[f"{ExportTags.TAG_PREFIX_METADATA}.DATABRICKS_HOST"] = dbx_host
+    tags[f"{ExportTags.TAG_PREFIX_METADATA}.timestamp"] = str(ts_now_seconds)
+    tags[f"{ExportTags.TAG_PREFIX_METADATA}.timestamp_nice_local"] = ts_now_fmt_local
+    tags[f"{ExportTags.TAG_PREFIX_METADATA}.timestamp_nice_utc"] = ts_now_fmt_utc
     exp = src_client.get_experiment(run.info.experiment_id)
-    tags[f"{TAG_PREFIX_EXPORT_IMPORT_METADATA}.experiment_name"] = exp.name
+    tags[f"{ExportTags.TAG_PREFIX_METADATA}.experiment_name"] = exp.name
 
 
 def create_source_tags(src_client, run, export_source_tags):
     """ Create destination tags from source run """
-    mlflow_system_tags = { k:v for k,v in run.data.tags.items() if k.startswith(TAG_PREFIX_MLFLOW) }
+    mlflow_system_tags = { k:v for k,v in run.data.tags.items() if k.startswith(MlflowTags.TAG_PREFIX) }
     tags = run.data.tags.copy()
     if export_source_tags:
         _create_source_tags(src_client, tags, run)
         for k,v in strip_underscores(run.info).items():
-            tags[f"{TAG_PREFIX_EXPORT_IMPORT_RUN_INFO}.{k}"] = str(v) # NOTE: tag values must be strings
+            tags[f"{ExportTags.TAG_PREFIX_RUN_INFO}.{k}"] = str(v) # NOTE: tag values must be strings
         for k,v in mlflow_system_tags.items():
-            tags[k.replace(TAG_PREFIX_MLFLOW,TAG_PREFIX_EXPORT_IMPORT_MLFLOW+".")] = v
+            tags[k.replace(MlflowTags.TAG_PREFIX,ExportTags.TAG_PREFIX_MLFLOW+".")] = v
     tags = { k:v for k,v in sorted(tags.items()) }
     return tags
 
@@ -63,6 +59,8 @@ def set_dst_user_id(tags, user_id, use_src_user_id):
     user_id = user_id if use_src_user_id else get_user_id()
     tags.append(RunTag(MLFLOW_USER,user_id ))
 
+
+# Timestamp format methods
 
 TS_FORMAT = "%Y-%m-%d %H:%M:%S"
 ts_now_seconds = round(time.time())
@@ -83,7 +81,6 @@ def fmt_ts_seconds(seconds, as_utc=False):
         ts = time.localtime(seconds)
     return time.strftime(ts_format, ts)
 
-TAG_EXPORT_TIME = "export_time"
 
 def create_export_times():
     return {
@@ -92,6 +89,19 @@ def create_export_times():
         "utc_time": ts_now_fmt_local
     }
 
+def create_export_info():
+    return {
+        "mlflow_version": mlflow.__version__,
+        "mlflow_tracking_uri": mlflow.get_tracking_uri(),
+        ExportTags.TAG_EXPORT_TIME: {
+            "seconds": ts_now_seconds,
+            "local_time": ts_now_fmt_local,
+            "utc_time": ts_now_fmt_local
+        }
+    }
+
+
+# Miscellaneous 
 
 def strip_underscores(obj):
     return { k[1:]:v for (k,v) in obj.__dict__.items() }

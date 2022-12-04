@@ -7,19 +7,18 @@ import click
 
 import mlflow
 from mlflow.exceptions import RestException
+
+from mlflow_export_import.source_tags import ImportTags
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.run.import_run import RunImporter
 from mlflow_export_import import utils, click_doc
 from mlflow_export_import.common import model_utils
 
-TAG_SRC_PREFIX = "mlflow_export_import.src"
-
-
 def _fmt_timestamps(tag, dct, tags):
     ts = dct[tag]
-    tags[f"{TAG_SRC_PREFIX}.{tag}"] = ts
-    tags[f"{TAG_SRC_PREFIX}._{tag}_local"] = utils.fmt_ts_millis(ts)
-    tags[f"{TAG_SRC_PREFIX}._{tag}_utc"] = utils.fmt_ts_millis(ts, True)
+    tags[f"{ImportTags.TAG_PREFIX}.{tag}"] = ts
+    tags[f"{ImportTags.TAG_PREFIX}._{tag}_local"] = utils.fmt_ts_millis(ts)
+    tags[f"{ImportTags.TAG_PREFIX}._{tag}_utc"] = utils.fmt_ts_millis(ts, True)
 
 
 class BaseModelImporter():
@@ -54,7 +53,7 @@ class BaseModelImporter():
         if self.import_source_tags:
             for k,v in src_vr.items():
                 if k != "tags":
-                    tags[f"{TAG_SRC_PREFIX}.{k}"] = v
+                    tags[f"{ImportTags.TAG_PREFIX}.{k}"] = v
             _fmt_timestamps("creation_timestamp", src_vr, tags)
             _fmt_timestamps("last_updated_timestamp", src_vr, tags)
 
@@ -98,7 +97,7 @@ class BaseModelImporter():
                 _fmt_timestamps("last_updated_timestamp", model_dct, tags)
                 for k,_ in model_dct.items():
                     if k != "tags":
-                        tags[f"{TAG_SRC_PREFIX}.{k}"] = model_dct[k]
+                        tags[f"{ImportTags.TAG_PREFIX}.{k}"] = model_dct[k]
             self.mlflow_client.create_registered_model(model_name, tags, model_dct.get("description"))
             print(f"Created new registered model '{model_name}'")
         except RestException as e:

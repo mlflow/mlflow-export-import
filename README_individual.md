@@ -288,19 +288,22 @@ Source: [export_model.py](mlflow_export_import/model/export_model.py).
 export-model --help
 
 Options:
-  --model TEXT       Registered model name.  [required]
-  --output-dir TEXT  Output directory.  [required]
-  --export-source-tagss BOOLEAN  Export source run information (RunInfo,
-                                 MLflow system tags starting with 'mlflow' and
-                                 metadata) under the 'mlflow_export_import'
-                                 tag prefix. See README.md for more details.
-                                 [default: False]
-  --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
-                                  JUPYTER or DBC (comma seperated).  [default: ]
-                                  True]
-  --stages TEXT                   Stages to export (comma seperated). Default
-                                  is all stages. Values are Production,
-                                  Staging, Archived and None
+  --model TEXT                  Registered model name.  [required]
+  --output-dir TEXT             Output directory.  [required]
+  --export-source-tags BOOLEAN  Export source run information (RunInfo, MLflow
+                                system tags starting with 'mlflow' and
+                                metadata) under the 'mlflow_export_import' tag
+                                prefix. See README_individual.md for more
+                                details.  [default: False]
+  --notebook-formats TEXT       Databricks notebook formats. Values are
+                                SOURCE, HTML, JUPYTER or DBC (comma
+                                seperated).
+  --stages TEXT                 Stages to export (comma seperated). Default is
+                                all stages and all versions. Stages are
+                                Production, Staging, Archived and None.
+                                Mututally exclusive with option --versions.
+  --versions TEXT               Export specified versions (comma separated).
+                                Mututally exclusive with option --stages.
 ```
 
 #### Example
