@@ -5,13 +5,16 @@ Exports an experiment to a directory.
 import os
 import click
 import mlflow
+
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common.iterators import SearchRunsIterator
 from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils, click_doc
 
+
 class ExperimentExporter():
+
     def __init__(self, mlflow_client, export_source_tags=False, notebook_formats=None):
         """
         :param mlflow_client: MLflow client.
@@ -20,6 +23,7 @@ class ExperimentExporter():
         """
         self.mlflow_client = mlflow_client
         self.run_exporter = RunExporter(self.mlflow_client, export_source_tags, notebook_formats)
+
 
     def export_experiment(self, exp_id_or_name, output_dir, run_ids=None):
         """
@@ -35,7 +39,6 @@ class ExperimentExporter():
         print("Filesystem:",type(fs).__name__)
         fs.mkdirs(output_dir)
         exp = self.mlflow_client.get_experiment(exp_id)
-        dct = {"experiment": utils.strip_underscores(exp)}
         ok_run_ids = []
         failed_run_ids = []
         j = -1
@@ -46,15 +49,20 @@ class ExperimentExporter():
         else:
             for j,run in enumerate(SearchRunsIterator(self.mlflow_client, exp_id)):
                 self._export_run(j, run, output_dir, ok_run_ids, failed_run_ids)
-        dct["export_info"] = { 
-            "mlflow_version": mlflow.__version__,
-            "mlflow_tracking_uri": mlflow.get_tracking_uri(),
-            utils.TAG_EXPORT_TIME: utils.create_export_times(),
-            "num_total_runs": (j+1),
-            "num_ok_runs": len(ok_run_ids),
-            "ok_runs": ok_run_ids,
-            "num_failed_runs": len(failed_run_ids),
-            "failed_runs": failed_run_ids }
+
+        export_info = {  "export_info": 
+            { **utils.create_export_info(),
+              **{ "num_total_runs": (j+1),
+                  "num_ok_runs": len(ok_run_ids),
+                  "ok_runs": ok_run_ids,
+                  "num_failed_runs": len(failed_run_ids),
+                  "failed_runs": failed_run_ids 
+                } 
+            }
+        }
+        dct = { ** export_info,
+                **{ "experiment": utils.strip_underscores(exp)}
+        }
 
         path = os.path.join(output_dir,"manifest.json")
         utils.write_json_file(fs, path, dct)
@@ -66,6 +74,7 @@ class ExperimentExporter():
             print(f"{len(failed_run_ids)/j} runs failed {msg}")
         return len(ok_run_ids), len(failed_run_ids) 
 
+
     def _export_run(self, idx, run, output_dir, ok_run_ids, failed_run_ids):
         run_dir = os.path.join(output_dir, run.info.run_id)
         print(f"Exporting run {idx+1}: {run.info.run_id}")
@@ -74,6 +83,7 @@ class ExperimentExporter():
             ok_run_ids.append(run.info.run_id)
         else:
             failed_run_ids.append(run.info.run_id)
+
 
 @click.command()
 @click.option("--experiment",
@@ -98,7 +108,6 @@ class ExperimentExporter():
     default="", 
     show_default=True
 )
-
 def main(experiment, output_dir, export_source_tags, notebook_formats):
     print("Options:")
     for k,v in locals().items():

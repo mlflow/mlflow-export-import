@@ -5,14 +5,16 @@ Export a registered model and all the experiment runs associated with each versi
 import os
 import click
 import mlflow
+
+from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common.http_client import MlflowHttpClient
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils, click_doc
 
-
 class ModelExporter():
-    def __init__(self,  mlflow_client, export_source_tags=False, notebook_formats=None, stages=None, export_run=True):
+
+    def __init__(self,  mlflow_client, export_source_tags=False, notebook_formats=None, stages=None, versions=None, export_run=True):
         """
         :param mlflow_client: MLflow client or if None create default client.
         :param export_source_tags: Export source run metadata tags.
@@ -24,6 +26,10 @@ class ModelExporter():
         self.http_client = MlflowHttpClient()
         self.run_exporter = RunExporter(self.mlflow_client, export_source_tags=export_source_tags, notebook_formats=notebook_formats)
         self.stages = self._normalize_stages(stages)
+        self.export_run = export_run
+        self.versions = versions if versions else []
+        if len(self.stages) > 0 and len(self.versions) > 0:
+            raise MlflowExportImportException(f"Both stages {self.stages} and versions {self.versions} cannot be set")
         self.export_run = export_run
 
 
@@ -44,6 +50,7 @@ class ModelExporter():
     def _export_model(self, model_name, output_dir):
         fs = _filesystem.get_filesystem(output_dir)
         model = self.http_client.get(f"registered-models/get", {"name": model_name})
+        model["_mlflow.version"] = mlflow.__version__
         fs.mkdirs(output_dir)
         output_versions = []
         versions = self.mlflow_client.search_model_versions(f"name='{model_name}'")
@@ -52,6 +59,8 @@ class ModelExporter():
         exported_versions = 0
         for vr in versions:
             if len(self.stages) > 0 and not vr.current_stage.lower() in self.stages:
+                continue
+            if len(self.versions) > 0 and not vr.version in self.versions:
                 continue
             run_id = vr.run_id
             opath = os.path.join(output_dir,run_id)
@@ -121,16 +130,22 @@ class ModelExporter():
     show_default=True
 )
 @click.option("--stages",
-    help=click_doc.model_stages,
+    help=f"{click_doc.model_stages} Mututally exclusive with option --versions." ,
     type=str,
     required=False
 )
-def main(model, output_dir, export_source_tags, notebook_formats, stages):
+@click.option("--versions",
+    help="Export specified versions (comma separated). Mututally exclusive with option --stages.",
+    type=str,
+    required=False
+)
+def main(model, output_dir, export_source_tags, notebook_formats, stages, versions):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
     mlflow_client = mlflow.client.MlflowClient()
-    exporter = ModelExporter(mlflow_client, export_source_tags=export_source_tags, notebook_formats=utils.string_to_list(notebook_formats), stages=stages)
+    versions = versions.split(",")
+    exporter = ModelExporter(mlflow_client, export_source_tags=export_source_tags, notebook_formats=utils.string_to_list(notebook_formats), stages=stages, versions=versions)
     exporter.export_model(model, output_dir)
 
 
