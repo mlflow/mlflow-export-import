@@ -64,7 +64,7 @@ class ExperimentExporter():
                 **{ "experiment": utils.strip_underscores(exp)}
         }
 
-        path = os.path.join(output_dir,"manifest.json")
+        path = os.path.join(output_dir,"experiment.json")
         utils.write_json_file(fs, path, dct)
         msg = f"for experiment '{exp.name}' (ID: {exp.experiment_id})"
         if len(failed_run_ids) == 0:
