@@ -336,7 +336,7 @@ Output export directory example.
 ```
 
 Sample model.json:
-[OSS](samples/oss_mlflow/models/model.json)
+[OSS](samples/oss_mlflow/models/sklearn_wine/model.json)
 \- [Databricks](samples/databricks/models/model.json).
 ```
 {

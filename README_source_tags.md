@@ -4,11 +4,12 @@
 
 `export-source-tags` - Exports source information under the `mlflow_export_import` tag prefix. See section below for details.
 
-## MLflow Export Import Source Run Tags - `mlflow_export_import`
+## MLflow Export Import Source Run Tags
 
-For governance purposes, original source run information is saved under the `mlflow_export_import` tag prefix. When you import a run, the values of `RunInfo` are auto-generated for you as well as some other tags. 
+For governance purposes, original source run information is saved under the `mlflow_export_import` tag prefix. 
+When you import a run, the values of `RunInfo` are auto-generated for you as well as some other tags. 
 
-This is useful for governance, provenance and auditing purposes for regulated industries such as finance and HLS (health care and life science).
+This is useful for model governance, provenance and auditing purposes for regulated industries such as finance and HLS (health care and life science).
 
 If the `export-source-tags` option is set on an export tool, three sets of source run tags will be saved under the `mlflow_export_import` prefix.
 
@@ -22,7 +23,7 @@ If the `export-source-tags` option is set on an export tool, three sets of sourc
 * **Metadata tags.** Prefix: `mlflow_export_import.metadata`.  Tags indicating source export metadata information 
   * Example: `mlflow_export_import.metadata.tracking_uri`.
 
-### Open Source Mlflow Export Import Tags
+## Open Source Mlflow Export Import Tags
 
 See [sample run tags](samples/oss_mlflow/experiments/sklearn_wine/eb66c160957d4a28b11d3f1b968df9cd/run.json).
 
@@ -30,7 +31,7 @@ See [sample run tags](samples/oss_mlflow/experiments/sklearn_wine/eb66c160957d4a
 
 |Tag | Value |
 |----|-------|
-| mlflow_export_import.mlflow.log-model.history | [{\run_id\: \eb66c160957d4a28b11d3f1b968df9cd\ | \artifact_path\: \model\, \utc_time_created\: \2022-06-12 03:34:39.289551\, \flavors\: {\python_function\: {\model_path\: \model.pkl\, \loader_module\: \mlflow.sklearn\, \python_version\: \3.7.6\, \env\: \conda.yaml\}, \sklearn\: {\pickled_model\: \model.pkl\, \sklearn_version\: \1.0.2\, \serialization_format\: \cloudpickle\, \code\: null}}, \model_uuid\: \38c43fc59c734b0a80704ac3214ea2c3\, \mlflow_version\: \1.26.1\}, {\run_id\: \eb66c160957d4a28b11d3f1b968df9cd\, \artifact_path\: \onnx-model\, \utc_time_created\: \2022-06-12 03:34:42.110784\, \flavors\: {\python_function\: {\loader_module\: \mlflow.onnx\, \python_version\: \3.7.6\, \data\: \model.onnx\, \env\: \conda.yaml\}, \onnx\: {\onnx_version\: \1.10.2\, \data\: \model.onnx\, \providers\: [\CUDAExecutionProvider\, \CPUExecutionProvider\], \code\: null}}, \model_uuid\: \ddf79625e4d241b7813e601f31b1222f\, \mlflow_version\: \1.26.1\}],
+| mlflow_export_import.mlflow.log-model.history | [{\run_id\: \f2e3f75c845d4365addbc9c0262a58a5\ | \artifact_path\: \model\, \utc_time_created\: \2022-06-12 03:34:39.289551\, \flavors\: {\python_function\: {\model_path\: \model.pkl\, \loader_module\: \mlflow.sklearn\, \python_version\: \3.7.6\, \env\: \conda.yaml\}, \sklearn\: {\pickled_model\: \model.pkl\, \sklearn_version\: \1.0.2\, \serialization_format\: \cloudpickle\, \code\: null}}, \model_uuid\: \38c43fc59c734b0a80704ac3214ea2c3\, \mlflow_version\: \1.26.1\}, {\run_id\: \f2e3f75c845d4365addbc9c0262a58a5\, \artifact_path\: \onnx-model\, \utc_time_created\: \2022-06-12 03:34:42.110784\, \flavors\: {\python_function\: {\loader_module\: \mlflow.onnx\, \python_version\: \3.7.6\, \data\: \model.onnx\, \env\: \conda.yaml\}, \onnx\: {\onnx_version\: \1.10.2\, \data\: \model.onnx\, \providers\: [\CUDAExecutionProvider\, \CPUExecutionProvider\], \code\: null}}, \model_uuid\: \ddf79625e4d241b7813e601f31b1222f\, \mlflow_version\: \1.26.1\}],
 | mlflow_export_import.mlflow.runName | train.sh |
 | mlflow_export_import.mlflow.source.git.commit | 67fb8f823ec794902cdbb67be653a6155a0b5172 |
 | mlflow_export_import.mlflow.source.name | /Users/andre/git/mlflow-examples/python/sklearn/wine_quality/train.py |
@@ -41,11 +42,11 @@ See [sample run tags](samples/oss_mlflow/experiments/sklearn_wine/eb66c160957d4a
 
 |Tag | Value |
 |----|-------|
-| mlflow_export_import.run_info.artifact_uri | /opt/mlflow/server/mlruns/2/eb66c160957d4a28b11d3f1b968df9cd/artifacts |
+| mlflow_export_import.run_info.artifact_uri | /opt/mlflow/server/mlruns/2/f2e3f75c845d4365addbc9c0262a58a5/artifacts |
 | mlflow_export_import.run_info.end_time | 1655004883611 |
 | mlflow_export_import.run_info.experiment_id | 2 |
 | mlflow_export_import.run_info.lifecycle_stage | active |
-| mlflow_export_import.run_info.run_id | eb66c160957d4a28b11d3f1b968df9cd |
+| mlflow_export_import.run_info.run_id | f2e3f75c845d4365addbc9c0262a58a5 |
 | mlflow_export_import.run_info.start_time | 1655004878844 |
 | mlflow_export_import.run_info.status | FINISHED |
 | mlflow_export_import.run_info.user_id | andre |
@@ -62,7 +63,7 @@ See [sample run tags](samples/oss_mlflow/experiments/sklearn_wine/eb66c160957d4a
 
 ## Databricks MLflow source tags
 
-See [sample run tags](samples/databricks/experiments/sklearn_wine/eb66c160957d4a28b11d3f1b968df9cd/run.json).
+See [sample run tags](samples/databricks/experiments/sklearn_wine/f2e3f75c845d4365addbc9c0262a58a5/run.json).
 
 #### MLflow system tags 
 
