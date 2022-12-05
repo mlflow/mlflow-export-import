@@ -56,7 +56,7 @@ class RunExporter:
         fs.mkdirs(output_dir)
         tags = utils.create_source_tags(self.mlflow_client, run, self.export_source_tags)
         
-        dct = { **{"export_info": utils.create_export_info() },
+        dct = { **{ "export_info": utils.create_export_info() },
                 **{
                     "info": utils.strip_underscores(run.info),
                     "params": run.data.params,

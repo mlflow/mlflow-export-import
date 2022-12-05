@@ -49,8 +49,7 @@ class ModelExporter():
 
     def _export_model(self, model_name, output_dir):
         fs = _filesystem.get_filesystem(output_dir)
-        model = self.http_client.get(f"registered-models/get", {"name": model_name})
-        model["_mlflow.version"] = mlflow.__version__
+
         fs.mkdirs(output_dir)
         output_versions = []
         versions = self.mlflow_client.search_model_versions(f"name='{model_name}'")
@@ -85,6 +84,18 @@ class ModelExporter():
                     import traceback
                     traceback.print_exc()
         output_versions.sort(key=lambda x: x["version"], reverse=False)
+
+        model = self.http_client.get(f"registered-models/get", {"name": model_name})
+        export_info = { "export_info":
+            { **utils.create_export_info(),
+              **{ "num_target_stages": len(self.stages),
+                  "num_target_versions": len(self.versions),
+                  "num_src_versions": len(versions),
+                  "num_dst_versions": len(output_versions)
+                }
+            }
+        }
+        model = { **export_info, **model }
         model["registered_model"]["latest_versions"] = output_versions
 
         print(f"Exported {exported_versions}/{len(output_versions)} versions for model '{model_name}'")
