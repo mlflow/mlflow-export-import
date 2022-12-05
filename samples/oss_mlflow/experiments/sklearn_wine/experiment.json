@@ -1,0 +1,30 @@
+{
+  "export_info": {
+    "mlflow_version": "2.0.1",
+    "mlflow_tracking_uri": "http://127.0.0.1:5020",
+    "export_time": {
+      "seconds": 1670203523,
+      "local_time": "2022-12-04 20:25:23",
+      "utc_time": "2022-12-04 20:25:23"
+    },
+    "num_total_runs": 1,
+    "num_ok_runs": 1,
+    "ok_runs": [
+      "eb66c160957d4a28b11d3f1b968df9cd"
+    ],
+    "num_failed_runs": 0,
+    "failed_runs": []
+  },
+  "experiment": {
+    "experiment_id": "1",
+    "name": "sklearn_wine",
+    "artifact_location": "/opt/mlflow/server/mlruns/1",
+    "lifecycle_stage": "active",
+    "tags": {
+      "version_mlflow": "2.0.1",
+      "experiment_created": "2022-12-05 01:25:00"
+    },
+    "creation_time": 1670203501203,
+    "last_update_time": 1670203501203
+  }
+}
