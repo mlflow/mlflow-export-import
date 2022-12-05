@@ -155,7 +155,7 @@ def main(model, output_dir, export_source_tags, notebook_formats, stages, versio
     for k,v in locals().items():
         print(f"  {k}: {v}")
     mlflow_client = mlflow.client.MlflowClient()
-    versions = versions.split(",")
+    versions = versions.split(",") if versions else []
     exporter = ModelExporter(mlflow_client, export_source_tags=export_source_tags, notebook_formats=utils.string_to_list(notebook_formats), stages=stages, versions=versions)
     exporter.export_model(model, output_dir)
 
