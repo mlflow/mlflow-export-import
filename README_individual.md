@@ -76,8 +76,8 @@ export-experiment \
 
 The output directory contains a manifest file and a subdirectory for each run (by run ID).
 The run directory contains a run.json
-([OSS](samples/oss_mlflow/experiments/1/6ccadf17812d43929b093d75cca1c33f/run.json),
-[Databricks](samples/databricks/experiments/sklearn_wine/16c36560c57a43fdb46e98f88a8d8819/run.json)),
+([OSS](samples/oss_mlflow/individual/experiments/1/6ccadf17812d43929b093d75cca1c33f/run.json),
+[Databricks](samples/databricks/individual/experiments/sklearn_wine/16c36560c57a43fdb46e98f88a8d8819/run.json)),
 file containing run metadata and an artifact hierarchy.
 
 ```
@@ -180,8 +180,8 @@ Produces a directory with the following structure:
 
 ```
 Sample run.json:
-[OSS](samples/oss_mlflow/experiments/sklearn_wine/eb66c160957d4a28b11d3f1b968df9cd/run.json)
- \- [Databricks](samples/databricks/experiments/sklearn_wine/f2e3f75c845d4365addbc9c0262a58a5/run.json).
+[OSS](samples/oss_mlflow/individual/experiments/sklearn_wine/eb66c160957d4a28b11d3f1b968df9cd/run.json)
+ \- [Databricks](samples/databricks/individual/experiments/sklearn_wine/f2e3f75c845d4365addbc9c0262a58a5/run.json).
 ```
 {   
   "info": {
@@ -336,8 +336,8 @@ Output export directory example.
 ```
 
 Sample model.json:
-[OSS](samples/oss_mlflow/models/sklearn_wine/model.json)
-\- [Databricks](samples/databricks/models/model.json).
+[OSS](samples/oss_mlflow/individual/models/sklearn_wine/model.json)
+\- [Databricks](samples/databricks/individual/models/model.json).
 ```
 {
   "registered_model": {
