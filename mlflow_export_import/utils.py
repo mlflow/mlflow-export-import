@@ -82,13 +82,6 @@ def fmt_ts_seconds(seconds, as_utc=False):
     return time.strftime(ts_format, ts)
 
 
-def create_export_times():
-    return {
-        "seconds": ts_now_seconds,
-        "local_time": ts_now_fmt_local,
-        "utc_time": ts_now_fmt_local
-    }
-
 def create_export_info():
     return {
         "mlflow_version": mlflow.__version__,
