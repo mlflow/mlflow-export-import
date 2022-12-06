@@ -96,7 +96,7 @@ def create_export_info():
         ExportTags.TAG_EXPORT_TIME: {
             "seconds": ts_now_seconds,
             "local_time": ts_now_fmt_local,
-            "utc_time": ts_now_fmt_local
+            "utc_time": ts_now_fmt_utc
         }
     }
 
