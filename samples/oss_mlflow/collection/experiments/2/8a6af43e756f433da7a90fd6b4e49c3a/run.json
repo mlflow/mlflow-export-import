@@ -1,0 +1,75 @@
+{
+  "export_info": {
+    "mlflow_version": "2.0.1",
+    "mlflow_tracking_uri": "http://127.0.0.1:5020",
+    "export_time": {
+      "seconds": 1670303442,
+      "local_time": "2022-12-06 00:10:42",
+      "utc_time": "2022-12-06 05:10:42"
+    }
+  },
+  "info": {
+    "run_uuid": "8a6af43e756f433da7a90fd6b4e49c3a",
+    "run_id": "8a6af43e756f433da7a90fd6b4e49c3a",
+    "experiment_id": "2",
+    "user_id": "andre.mesarovic",
+    "status": "FINISHED",
+    "start_time": 1670301595769,
+    "end_time": 1670301598938,
+    "lifecycle_stage": "active",
+    "artifact_uri": "/Users/andre.mesarovic/work/mlflow_server/local_mlrun/mlruns/2/8a6af43e756f433da7a90fd6b4e49c3a/artifacts",
+    "run_name": "silent-dog-788"
+  },
+  "params": {
+    "max_depth": "5"
+  },
+  "metrics": {
+    "accuracy_score": [
+      {
+        "value": 0.9333333333333333,
+        "timestamp": 1670301595838,
+        "step": 0
+      }
+    ],
+    "zero_one_loss": [
+      {
+        "value": 0.06666666666666665,
+        "timestamp": 1670301595847,
+        "step": 0
+      }
+    ]
+  },
+  "tags": {
+    "algorithm": "sklearn-iris",
+    "int": "123",
+    "mlflow.log-model.history": "[{\"run_id\": \"8a6af43e756f433da7a90fd6b4e49c3a\", \"artifact_path\": \"sklearn-model\", \"utc_time_created\": \"2022-12-06 04:39:55.856989\", \"flavors\": {\"python_function\": {\"model_path\": \"model.pkl\", \"predict_fn\": \"predict\", \"loader_module\": \"mlflow.sklearn\", \"python_version\": \"3.8.0\", \"env\": {\"conda\": \"conda.yaml\", \"virtualenv\": \"python_env.yaml\"}}, \"sklearn\": {\"pickled_model\": \"model.pkl\", \"sklearn_version\": \"0.24.2\", \"serialization_format\": \"cloudpickle\", \"code\": null}}, \"model_uuid\": \"aeffb7af31654fc9b34fdada998092a5\", \"mlflow_version\": \"2.0.1\"}]",
+    "mlflow.runName": "silent-dog-788",
+    "mlflow.source.git.commit": "d38984e536ac5102ccd495fdafe487a418378009",
+    "mlflow.source.name": "train.py",
+    "mlflow.source.type": "LOCAL",
+    "mlflow.user": "andre.mesarovic",
+    "mlflow_export_import.metadata.experiment_name": "sklearn_iris",
+    "mlflow_export_import.metadata.mlflow_version": "2.0.1",
+    "mlflow_export_import.metadata.timestamp": "1670303442",
+    "mlflow_export_import.metadata.timestamp_nice_local": "2022-12-06 00:10:42",
+    "mlflow_export_import.metadata.timestamp_nice_utc": "2022-12-06 05:10:42",
+    "mlflow_export_import.metadata.tracking_uri": "http://127.0.0.1:5020",
+    "mlflow_export_import.mlflow.log-model.history": "[{\"run_id\": \"8a6af43e756f433da7a90fd6b4e49c3a\", \"artifact_path\": \"sklearn-model\", \"utc_time_created\": \"2022-12-06 04:39:55.856989\", \"flavors\": {\"python_function\": {\"model_path\": \"model.pkl\", \"predict_fn\": \"predict\", \"loader_module\": \"mlflow.sklearn\", \"python_version\": \"3.8.0\", \"env\": {\"conda\": \"conda.yaml\", \"virtualenv\": \"python_env.yaml\"}}, \"sklearn\": {\"pickled_model\": \"model.pkl\", \"sklearn_version\": \"0.24.2\", \"serialization_format\": \"cloudpickle\", \"code\": null}}, \"model_uuid\": \"aeffb7af31654fc9b34fdada998092a5\", \"mlflow_version\": \"2.0.1\"}]",
+    "mlflow_export_import.mlflow.runName": "silent-dog-788",
+    "mlflow_export_import.mlflow.source.git.commit": "d38984e536ac5102ccd495fdafe487a418378009",
+    "mlflow_export_import.mlflow.source.name": "train.py",
+    "mlflow_export_import.mlflow.source.type": "LOCAL",
+    "mlflow_export_import.mlflow.user": "andre.mesarovic",
+    "mlflow_export_import.run_info.artifact_uri": "/Users/andre.mesarovic/work/mlflow_server/local_mlrun/mlruns/2/8a6af43e756f433da7a90fd6b4e49c3a/artifacts",
+    "mlflow_export_import.run_info.end_time": "1670301598938",
+    "mlflow_export_import.run_info.experiment_id": "2",
+    "mlflow_export_import.run_info.lifecycle_stage": "active",
+    "mlflow_export_import.run_info.run_id": "8a6af43e756f433da7a90fd6b4e49c3a",
+    "mlflow_export_import.run_info.run_name": "silent-dog-788",
+    "mlflow_export_import.run_info.run_uuid": "8a6af43e756f433da7a90fd6b4e49c3a",
+    "mlflow_export_import.run_info.start_time": "1670301595769",
+    "mlflow_export_import.run_info.status": "FINISHED",
+    "mlflow_export_import.run_info.user_id": "andre.mesarovic",
+    "mlflow_version": "2.0.1"
+  }
+}

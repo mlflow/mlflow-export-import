@@ -1,0 +1,28 @@
+{
+  "export_info": {
+    "mlflow_version": "2.0.1",
+    "mlflow_tracking_uri": "http://127.0.0.1:5020",
+    "export_time": {
+      "seconds": 1670304347,
+      "local_time": "2022-12-06 00:25:47",
+      "utc_time": "2022-12-06 05:25:47"
+    },
+    "num_total_runs": 2,
+    "num_ok_runs": 2,
+    "ok_runs": [
+      "8a6af43e756f433da7a90fd6b4e49c3a",
+      "5397ae67ee0c49139bf64834b4d27fab"
+    ],
+    "num_failed_runs": 0,
+    "failed_runs": []
+  },
+  "experiment": {
+    "experiment_id": "2",
+    "name": "sklearn_iris",
+    "artifact_location": "/opt/mlflow/server/mlruns/2",
+    "lifecycle_stage": "active",
+    "tags": {},
+    "creation_time": 1670301535680,
+    "last_update_time": 1670301535680
+  }
+}

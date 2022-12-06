@@ -1,0 +1,28 @@
+{
+  "info": {
+    "mlflow_version": "2.0.1",
+    "mlflow_tracking_uri": "http://127.0.0.1:5020",
+    "export_time": "2022-12-06 00:25:48",
+    "duration": 0.2,
+    "experiments": 2,
+    "total_runs": 3,
+    "ok_runs": 3,
+    "failed_runs": 0
+  },
+  "experiments": [
+    {
+      "id": "2",
+      "name": "sklearn_iris",
+      "ok_runs": 2,
+      "failed_runs": 0,
+      "duration": 0.1
+    },
+    {
+      "id": "1",
+      "name": "sklearn_wine",
+      "ok_runs": 1,
+      "failed_runs": 0,
+      "duration": 0.1
+    }
+  ]
+}
