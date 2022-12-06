@@ -5,10 +5,14 @@ Import a list of experiment from a directory.
 import os
 import json
 import click
-import mlflow
 from concurrent.futures import ThreadPoolExecutor
+
+import mlflow
+
 from mlflow_export_import import click_doc
 from mlflow_export_import.experiment.import_experiment import ExperimentImporter
+from mlflow_export_import import utils
+
 
 def _import_experiment(importer, exp_name, exp_input_dir):
     try:
@@ -17,9 +21,10 @@ def _import_experiment(importer, exp_name, exp_input_dir):
         import traceback
         traceback.print_exc()
 
+
 def import_experiments(client, input_dir, use_src_user_id=False, use_threads=False): 
-    path = os.path.join(input_dir,"manifest.json")
-    with open(path, "r") as f:
+    path = utils._read_manifest_json_file(input_dir, "experiments.json")
+    with open(path, "r", encoding="utf-8") as f:
         dct = json.loads(f.read())
     for exp in dct["experiments"]:
         print("  ",exp)

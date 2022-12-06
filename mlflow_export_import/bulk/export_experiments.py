@@ -98,7 +98,7 @@ def export_experiments(client, experiments, output_dir, export_source_tags=False
     }
     fs = _filesystem.get_filesystem(output_dir)
     fs.mkdirs(output_dir)
-    with open(os.path.join(output_dir, "manifest.json"), "w", encoding="utf-8") as f:
+    with open(os.path.join(output_dir, "experiments.json"), "w", encoding="utf-8") as f:
         f.write(json.dumps(dct,indent=2)+"\n")
 
     print(f"{len(experiments)} experiments exported")

@@ -96,6 +96,14 @@ def create_export_info():
 
 # Miscellaneous 
 
+def _read_manifest_json_file(input_dir, filename):
+    """ Handle depcrecated "manifest.json" instead of current MLflow object file name such as "experiments.json". Former file name will be eventually removed. """
+    path = os.path.join(input_dir, filename)
+    if not os.path.exists(path):
+        path = os.path.join(input_dir, "manifest.json") # NOTE: old deprecated, will be eventually removed
+    return path
+
+
 def strip_underscores(obj):
     return { k[1:]:v for (k,v) in obj.__dict__.items() }
 

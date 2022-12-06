@@ -26,6 +26,7 @@ def _remap(run_info_map):
 def _import_experiments(client, input_dir, use_src_user_id):
     start_time = time.time()
     manifest_path = os.path.join(input_dir,"experiments","manifest.json")
+    manifest_path = utils._read_manifest_json_file(os.path.join(input_dir,"experiments"), "experiments.json")
     manifest = utils.read_json_file(manifest_path)
     exps = manifest["experiments"]
     importer = ExperimentImporter(client, use_src_user_id)
@@ -56,7 +57,7 @@ def _import_models(client, input_dir, run_info_map, delete_model, import_source_
     max_workers = os.cpu_count() or 4 if use_threads else 1
     start_time = time.time()
     models_dir = os.path.join(input_dir, "models")
-    manifest_path = os.path.join(models_dir,"manifest.json")
+    manifest_path = utils._read_manifest_json_file(models_dir, "models.json")
     manifest = utils.read_json_file(manifest_path)
     models = manifest["ok_models"]
     importer = AllModelImporter(client, run_info_map, import_source_tags=import_source_tags)

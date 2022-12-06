@@ -59,7 +59,7 @@ def _export_models(client, model_names, output_dir, export_source_tags, notebook
 
     fs = _filesystem.get_filesystem(output_dir)
     fs.mkdirs(output_dir)
-    with open(os.path.join(output_dir, "manifest.json"), "w", encoding="utf-8") as f:
+    with open(os.path.join(output_dir, "models.json"), "w", encoding="utf-8") as f:
         f.write(json.dumps(manifest, indent=2)+"\n")
 
     print(f"{len(model_names)} models exported")
@@ -74,7 +74,7 @@ def export_models(client, model_names, output_dir, export_source_tags=False, not
     export_experiments.export_experiments(client, exps_to_export, out_dir, export_source_tags, notebook_formats, use_threads)
     _export_models(client, model_names, os.path.join(output_dir,"models"), export_source_tags, notebook_formats, stages, export_run=False, use_threads=use_threads)
     duration = round(time.time() - start_time, 1)
-    write_export_manifest_file(output_dir, duration, stages, notebook_formats)
+    write_export_manifest_file(output_dir, duration, stages, notebook_formats, "models_manifest.json")
     print(f"Duration for total registered models and versions' runs export: {duration} seconds")
 
 @click.command()

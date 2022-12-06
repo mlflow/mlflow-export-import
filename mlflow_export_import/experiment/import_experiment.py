@@ -28,21 +28,13 @@ class ExperimentImporter():
         self.dbx_client = DatabricksHttpClient()
 
 
-    def _read_experiment_json_file(self, input_dir):
-        """ Handle depcrecated "manifest.json" instead of current "experiment.json". Former file name will be eventually removed. """
-        path = os.path.join(input_dir, "experiment.json")
-        if not os.path.exists(path): 
-            path = os.path.join(input_dir, "manifest.json") # NOTE: old deprecated, will be eventually removed
-        return path
-
-
     def import_experiment(self, exp_name, input_dir, dst_notebook_dir=None):
         """
         :param: exp_name: Destination experiment name.
         :param: input_dir: Source experiment directory.
         :return: A map of source run IDs and destination run.info.
         """
-        manifest_path = self._read_experiment_json_file(input_dir)
+        manifest_path = utils._read_manifest_json_file(input_dir, "experiment.json")
         exp_dct = utils.read_json_file(manifest_path)
         tags = exp_dct["experiment"]["tags"] 
         mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, exp_name, tags)
