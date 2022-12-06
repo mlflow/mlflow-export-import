@@ -10,6 +10,7 @@ def dump_mlflow_info():
     mlflow_host = get_mlflow_host()
     print("  Real MLflow host:", mlflow_host)
     print("  MLFLOW_TRACKING_URI:", os.environ.get("MLFLOW_TRACKING_URI",""))
+    print("  MLFLOW_TRACKING_TOKEN:", os.environ.get("MLFLOW_TRACKING_TOKEN",""))
     print("  DATABRICKS_HOST:", os.environ.get("DATABRICKS_HOST",""))
     print("  DATABRICKS_TOKEN:", os.environ.get("DATABRICKS_TOKEN",""))
 
@@ -22,8 +23,9 @@ def get_mlflow_host():
 def get_mlflow_host_token():
     """ Returns the host (tracking URI) and token """
     uri = os.environ.get("MLFLOW_TRACKING_URI",None)
+    token = os.environ.get("MLFLOW_TRACKING_TOKEN",None)
     if uri is not None and uri != "databricks":
-        return (uri,None)
+        return (uri,token)
     try:
         from mlflow_export_import.common import databricks_cli_utils
         profile = os.environ.get("MLFLOW_PROFILE",None)
