@@ -9,7 +9,7 @@ import click
 import mlflow
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common import io_utils
-from mlflow_export_import import utils, click_doc
+from mlflow_export_import.common import utils, click_doc
 from mlflow_export_import.bulk import bulk_utils
 from mlflow_export_import.experiment.export_experiment import ExperimentExporter
 

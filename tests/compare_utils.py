@@ -2,7 +2,7 @@
 Compare run utilities.
 """
 
-from mlflow_export_import import utils
+from mlflow_export_import.common import utils
 from mlflow_export_import.common.source_tags import ExportTags, ImportTags
 import utils_test
 

@@ -6,7 +6,7 @@ See: https://www.mlflow.org/docs/latest/rest-api.html#request-limits.
 import mlflow
 import math 
 from mlflow.entities import Metric, Param, RunTag
-from mlflow_export_import import utils
+from mlflow_export_import.common import utils
 
 def _log_data(run_dct, run_id, batch_size, get_data, log_data, args_get_data=None):
     metadata = get_data(run_dct, args_get_data)

@@ -51,7 +51,7 @@ def set_experiment(mlflow_client, dbx_client, exp_name, tags=None):
     For Databricks, create the workspace directory if it doesn't exist.
     :return: Experiment ID
     """
-    from mlflow_export_import import utils
+    from mlflow_export_import.common import utils
     if utils.importing_into_databricks():
         create_workspace_dir(dbx_client, os.path.dirname(exp_name))
     try:

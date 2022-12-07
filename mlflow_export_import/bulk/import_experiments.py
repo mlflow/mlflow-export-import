@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import mlflow
 
-from mlflow_export_import import click_doc
+from mlflow_export_import.common import click_doc
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.experiment.import_experiment import ExperimentImporter
 

@@ -8,7 +8,7 @@ import click
 import mlflow
 from mlflow.exceptions import RestException
 
-from mlflow_export_import import click_doc
+from mlflow_export_import.common import click_doc
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common import timestamp_utils
 from mlflow_export_import.common import io_utils

@@ -10,7 +10,7 @@ from concurrent.futures import ThreadPoolExecutor
 import mlflow
 
 from mlflow_export_import.common import io_utils
-from mlflow_export_import import utils, click_doc
+from mlflow_export_import.common import utils, click_doc
 from mlflow_export_import.model.export_model import ModelExporter
 from mlflow_export_import.bulk import export_experiments
 from mlflow_export_import.bulk.model_utils import get_experiments_runs_of_models

@@ -9,7 +9,7 @@ import mlflow
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common.http_client import MlflowHttpClient
 from mlflow_export_import.common import io_utils
-from mlflow_export_import import utils, click_doc
+from mlflow_export_import.common import utils, click_doc
 from mlflow_export_import.run.export_run import RunExporter
 
 class ModelExporter():

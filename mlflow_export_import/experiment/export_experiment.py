@@ -10,7 +10,7 @@ from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common.iterators import SearchRunsIterator
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.run.export_run import RunExporter
-from mlflow_export_import import utils, click_doc
+from mlflow_export_import.common import utils, click_doc
 
 
 class ExperimentExporter():

@@ -6,8 +6,7 @@ import os
 import click
 import mlflow
 
-from mlflow_export_import import click_doc
-from mlflow_export_import import utils
+from mlflow_export_import.common import utils, click_doc
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common.http_client import DatabricksHttpClient

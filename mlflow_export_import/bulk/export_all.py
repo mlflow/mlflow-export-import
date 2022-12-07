@@ -7,7 +7,7 @@ import time
 import click
 import mlflow
 from mlflow_export_import.common import io_utils
-from mlflow_export_import import click_doc
+from mlflow_export_import.common import click_doc
 from mlflow_export_import.bulk.export_models import export_models
 from mlflow_export_import.bulk.export_experiments import export_experiments
 

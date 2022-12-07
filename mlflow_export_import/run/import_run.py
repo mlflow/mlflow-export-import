@@ -12,7 +12,7 @@ import mlflow
 from mlflow.entities import RunStatus
 from mlflow.utils.validation import MAX_PARAMS_TAGS_PER_BATCH, MAX_METRICS_PER_BATCH
 
-from mlflow_export_import import utils, click_doc
+from mlflow_export_import.common import utils, click_doc
 from mlflow_export_import.common.filesystem import mk_local_path
 from mlflow_export_import.common.source_tags import MlflowTags
 from mlflow_export_import.common.find_artifacts import find_artifacts
