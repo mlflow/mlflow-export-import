@@ -13,11 +13,12 @@ from mlflow.entities import RunStatus
 from mlflow.utils.validation import MAX_PARAMS_TAGS_PER_BATCH, MAX_METRICS_PER_BATCH
 
 from mlflow_export_import import utils, click_doc
-from mlflow_export_import import mk_local_path
+from mlflow_export_import.common.filesystem import mk_local_path
 from mlflow_export_import.common.source_tags import MlflowTags
 from mlflow_export_import.common.find_artifacts import find_artifacts
 from mlflow_export_import.common.http_client import DatabricksHttpClient
 from mlflow_export_import.common import mlflow_utils
+from mlflow_export_import.common import io_utils
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.run import run_data_importer
@@ -39,6 +40,7 @@ class RunImporter():
         :param dst_notebook_dir: Databricks destination workspace directory for notebook import.
         :param dst_notebook_dir_add_run_id: Add the run ID to the destination notebook directory.
         """
+
         self.mlflow_client = mlflow_client
         self.mlmodel_fix = mlmodel_fix
         self.use_src_user_id = use_src_user_id
@@ -67,7 +69,7 @@ class RunImporter():
         exp_id = mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, dst_exp_name)
         exp = self.mlflow_client.get_experiment(exp_id)
         src_run_path = os.path.join(input_dir,"run.json")
-        src_run_dct = utils.read_json_file(src_run_path)
+        src_run_dct = io_utils.read_json_file(src_run_path)
 
         run = self.mlflow_client.create_run(exp.experiment_id)
         run_id = run.info.run_id

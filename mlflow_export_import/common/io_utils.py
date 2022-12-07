@@ -34,6 +34,7 @@ def _create_create_export_info(my_info=None):
         info = { **info, **my_info }
     return { "export_info": info }
 
+
 def write_json(output_dir, file, dct, my_info=None):
     path = os.path.join(output_dir, file)
     info = _create_create_export_info(my_info)
@@ -42,3 +43,21 @@ def write_json(output_dir, file, dct, my_info=None):
     fs.mkdirs(output_dir)
     write_json_file(fs, path, dct)
     return fs
+
+
+def write_file(path, content):
+    with open(_filesystem.mk_local_path(path), "wb" ) as f:
+        f.write(content)
+
+
+def read_json_file(path):
+    with open(_filesystem.mk_local_path(path), "r", encoding="utf-8") as f:
+        return json.loads(f.read())
+
+
+def mk_manifest_json_path(input_dir, filename):
+    """ Handle depcrecated "manifest.json" instead of current MLflow object file name such as "experiments.json". Former file name will be eventually removed. """
+    path = os.path.join(input_dir, filename)
+    if not os.path.exists(path):
+        path = os.path.join(input_dir, "manifest.json") # NOTE: old deprecated, will be eventually removed
+    return path

@@ -3,14 +3,25 @@ Exports an experiment to a directory.
 """
 
 import os
-import mlflow
 import click
+import mlflow
+
 from mlflow_export_import import click_doc
-from mlflow_export_import import peek_at_experiment
-from mlflow_export_import.run.import_run import RunImporter
 from mlflow_export_import import utils
+from mlflow_export_import.common import io_utils
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common.http_client import DatabricksHttpClient
+from mlflow_export_import.common.filesystem import mk_local_path
+from mlflow_export_import.run.import_run import RunImporter
+
+
+def _peek_at_experiment(exp_dir):
+    manifest_path = os.path.join(exp_dir, "experiments.json")
+    with open(mk_local_path(manifest_path), "r", encoding="utf-8") as f:
+        content = f.read()
+    print("manifest path:",manifest_path)
+    print(content)
+
 
 class ExperimentImporter():
 
@@ -34,8 +45,9 @@ class ExperimentImporter():
         :param: input_dir: Source experiment directory.
         :return: A map of source run IDs and destination run.info.
         """
-        manifest_path = utils._read_manifest_json_file(input_dir, "experiment.json")
-        exp_dct = utils.read_json_file(manifest_path)
+
+        manifest_path = io_utils.mk_manifest_json_path(input_dir, "experiment.json")
+        exp_dct = io_utils.read_json_file(manifest_path)
         tags = exp_dct["experiment"]["tags"] 
         mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, exp_name, tags)
         run_ids = exp_dct["export_info"]["ok_runs"]
@@ -50,7 +62,7 @@ class ExperimentImporter():
             run_info_map[src_run_id] = dst_run.info
         print(f"Imported {len(run_ids)} runs into experiment '{exp_name}' from {input_dir}")
         if len(failed_run_ids) > 0:
-            print(f"Warning: {len(failed_run_ids)} failed runs were not imported - see {manifest_path}")
+            print(f"Warning: {len(failed_run_ids)} failed runs were not imported - see '{manifest_path}'")
         utils.nested_tags(self.mlflow_client, run_ids_map)
         return run_info_map
 
@@ -88,13 +100,14 @@ def main(input_dir, experiment_name, just_peek, use_src_user_id, dst_notebook_di
     for k,v in locals().items():
         print(f"  {k}: {v}")
     if just_peek:
-        peek_at_experiment(input_dir)
+        _peek_at_experiment(input_dir)
     else:
         client = mlflow.tracking.MlflowClient()
         importer = ExperimentImporter(
             client,
             use_src_user_id=use_src_user_id)
         importer.import_experiment(experiment_name, input_dir, dst_notebook_dir)
+
 
 if __name__ == "__main__":
     main()

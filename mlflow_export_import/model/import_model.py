@@ -8,11 +8,12 @@ import click
 import mlflow
 from mlflow.exceptions import RestException
 
-from mlflow_export_import import utils, click_doc
-from mlflow_export_import.common.source_tags import ImportTags
+from mlflow_export_import import click_doc
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common import timestamp_utils
+from mlflow_export_import.common import io_utils
 from mlflow_export_import.common import model_utils
+from mlflow_export_import.common.source_tags import ImportTags
 from mlflow_export_import.run.import_run import RunImporter
 
 def _fmt_timestamps(tag, dct, tags):
@@ -77,7 +78,7 @@ class BaseModelImporter():
         :return: Model import manifest.
         """
         path = os.path.join(input_dir, "model.json")
-        model_dct = utils.read_json_file(path)["registered_model"]
+        model_dct = io_utils.read_json_file(path)["registered_model"]
 
         print("Model to import:")
         print(f"  Name: {model_dct['name']}")

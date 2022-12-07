@@ -1,10 +1,6 @@
-import os
-import json
 import pandas as pd
 from tabulate import tabulate
-
 import mlflow
-from . import mk_local_path
 
 
 # Databricks tags that cannot be set
@@ -32,26 +28,9 @@ def set_dst_user_id(tags, user_id, use_src_user_id):
 
 # Miscellaneous 
 
-def _read_manifest_json_file(input_dir, filename):
-    """ Handle depcrecated "manifest.json" instead of current MLflow object file name such as "experiments.json". Former file name will be eventually removed. """
-    path = os.path.join(input_dir, filename)
-    if not os.path.exists(path):
-        path = os.path.join(input_dir, "manifest.json") # NOTE: old deprecated, will be eventually removed
-    return path
-
 
 def strip_underscores(obj):
     return { k[1:]:v for (k,v) in obj.__dict__.items() }
-
-
-def write_file(path, content):
-    with open(mk_local_path(path), "wb" ) as f:
-        f.write(content)
-
-
-def read_json_file(path):
-    with open(mk_local_path(path), "r", encoding="utf-8") as f:
-        return json.loads(f.read())
 
 
 def string_to_list(list_as_string):

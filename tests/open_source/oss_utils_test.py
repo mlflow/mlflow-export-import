@@ -49,7 +49,7 @@ def create_simple_run(client, run_name=None, use_metric_steps=False):
         mlflow.set_tag("my_tag", "my_val")
         mlflow.set_tag("my_uuid",mk_uuid())
         mlflow.sklearn.log_model(model, "model")
-        with open("info.txt", "w") as f:
+        with open("info.txt", "w", encoding="utf-8") as f:
             f.write("Hi artifact")
         mlflow.log_artifact("info.txt")
         mlflow.log_artifact("info.txt", "dir2")

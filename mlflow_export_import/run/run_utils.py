@@ -2,7 +2,7 @@
 import os
 import mlflow
 from mlflow_export_import import utils
-from mlflow_export_import.common.timestamp_utils import ts_now_seconds, ts_now_fmt_local, ts_now_fmt_utc, get_now_nice
+from mlflow_export_import.common.timestamp_utils import ts_now_seconds, ts_now_fmt_local, ts_now_fmt_utc
 from mlflow_export_import.common.source_tags import ExportTags, MlflowTags
 
 

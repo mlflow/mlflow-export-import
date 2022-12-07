@@ -10,8 +10,8 @@ from concurrent.futures import ThreadPoolExecutor
 import mlflow
 
 from mlflow_export_import import click_doc
+from mlflow_export_import.common import io_utils
 from mlflow_export_import.experiment.import_experiment import ExperimentImporter
-from mlflow_export_import import utils
 
 
 def _import_experiment(importer, exp_name, exp_input_dir):
@@ -23,7 +23,7 @@ def _import_experiment(importer, exp_name, exp_input_dir):
 
 
 def import_experiments(client, input_dir, use_src_user_id=False, use_threads=False): 
-    path = utils._read_manifest_json_file(input_dir, "experiments.json")
+    path = io_utils.mk_manifest_json_path(input_dir, "experiments.json")
     with open(path, "r", encoding="utf-8") as f:
         dct = json.loads(f.read())
     for exp in dct["experiments"]:

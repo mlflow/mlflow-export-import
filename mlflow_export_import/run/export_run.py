@@ -8,12 +8,12 @@ import traceback
 import click
 import mlflow
 
+from mlflow_export_import import utils, click_doc
 from mlflow_export_import.common.filesystem import mk_local_path
 from mlflow_export_import.common import io_utils
-from mlflow_export_import.common.http_client import DatabricksHttpClient
 from mlflow_export_import.common import MlflowExportImportException
+from mlflow_export_import.common.http_client import DatabricksHttpClient
 from mlflow_export_import.run import run_utils
-from mlflow_export_import import utils, click_doc
 
 print("MLflow Version:", mlflow.version.VERSION)
 print("MLflow Tracking URI:", mlflow.get_tracking_uri())
@@ -110,7 +110,7 @@ class RunExporter:
         try:
             rsp = self.dbx_client._get("workspace/export", params)
             notebook_path = os.path.join(notebook_dir, f"{notebook_name}.{extension}")
-            utils.write_file(notebook_path, rsp.content)
+            io_utils.write_file(notebook_path, rsp.content)
         except MlflowExportImportException as e:
             print(f"WARNING: Cannot save notebook '{notebook}'. {e}")
 
