@@ -8,9 +8,9 @@ import mlflow
 
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common.http_client import MlflowHttpClient
-from mlflow_export_import.common import filesystem as _filesystem
-from mlflow_export_import.run.export_run import RunExporter
+from mlflow_export_import.common import io_utils
 from mlflow_export_import import utils, click_doc
+from mlflow_export_import.run.export_run import RunExporter
 
 class ModelExporter():
 
@@ -48,9 +48,6 @@ class ModelExporter():
 
 
     def _export_model(self, model_name, output_dir):
-        fs = _filesystem.get_filesystem(output_dir)
-
-        fs.mkdirs(output_dir)
         output_versions = []
         versions = self.mlflow_client.search_model_versions(f"name='{model_name}'")
         print(f"Found {len(versions)} versions for model '{model_name}'")
@@ -86,21 +83,17 @@ class ModelExporter():
         output_versions.sort(key=lambda x: x["version"], reverse=False)
 
         model = self.http_client.get(f"registered-models/get", {"name": model_name})
-        export_info = { "export_info":
-            { **utils.create_export_info(),
-              **{ "num_target_stages": len(self.stages),
-                  "num_target_versions": len(self.versions),
-                  "num_src_versions": len(versions),
-                  "num_dst_versions": len(output_versions)
-                }
-            }
-        }
-        model = { **export_info, **model }
         model["registered_model"]["latest_versions"] = output_versions
 
+        my_info = {
+            "num_target_stages": len(self.stages),
+            "num_target_versions": len(self.versions),
+            "num_src_versions": len(versions),
+            "num_dst_versions": len(output_versions)
+        }
+        io_utils.write_json(output_dir, "model.json", model, my_info)
+
         print(f"Exported {exported_versions}/{len(output_versions)} versions for model '{model_name}'")
-        path = os.path.join(output_dir, "model.json")
-        utils.write_json_file(fs, path, model)
         return manifest
 
 

@@ -8,10 +8,11 @@ import traceback
 import click
 import mlflow
 
-from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common.filesystem import mk_local_path
+from mlflow_export_import.common import io_utils
 from mlflow_export_import.common.http_client import DatabricksHttpClient
 from mlflow_export_import.common import MlflowExportImportException
+from mlflow_export_import.run import run_utils
 from mlflow_export_import import utils, click_doc
 
 print("MLflow Version:", mlflow.version.VERSION)
@@ -51,22 +52,16 @@ class RunExporter:
         :param output_dir: Output directory.
         :return: whether export succeeded.
         """
-        fs = _filesystem.get_filesystem(output_dir)
         run = self.mlflow_client.get_run(run_id)
-        fs.mkdirs(output_dir)
-        tags = utils.create_source_tags(self.mlflow_client, run, self.export_source_tags)
+        tags = run_utils.create_source_tags(self.mlflow_client, run, self.export_source_tags)
         
-        dct = { **{ "export_info": utils.create_export_info() },
-                **{
-                    "info": utils.strip_underscores(run.info),
-                    "params": run.data.params,
-                    "metrics": self._get_metrics_with_steps(run),
-                    "tags": tags
-                }
+        content = {
+            "info": utils.strip_underscores(run.info),
+            "params": run.data.params,
+            "metrics": self._get_metrics_with_steps(run),
+            "tags": tags
         }
-
-        path = os.path.join(output_dir, "run.json")
-        utils.write_json_file(fs, path, dct)
+        fs = io_utils.write_json(output_dir, "run.json", content)
 
         # copy artifacts
         dst_path = os.path.join(output_dir,"artifacts")

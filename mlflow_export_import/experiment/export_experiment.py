@@ -6,9 +6,9 @@ import os
 import click
 import mlflow
 
-from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common.iterators import SearchRunsIterator
+from mlflow_export_import.common import io_utils
 from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils, click_doc
 
@@ -33,12 +33,7 @@ class ExperimentExporter():
         :return: Number of successful and number of failed runs.
         """
         exp = mlflow_utils.get_experiment(self.mlflow_client, exp_id_or_name)
-        exp_id = exp.experiment_id
         print(f"Exporting experiment '{exp.name}' (ID {exp.experiment_id}) to '{output_dir}'")
-        fs = _filesystem.get_filesystem(output_dir)
-        print("Filesystem:",type(fs).__name__)
-        fs.mkdirs(output_dir)
-        exp = self.mlflow_client.get_experiment(exp_id)
         ok_run_ids = []
         failed_run_ids = []
         j = -1
@@ -47,25 +42,19 @@ class ExperimentExporter():
                 run = self.mlflow_client.get_run(run_id)
                 self._export_run(j, run, output_dir, ok_run_ids, failed_run_ids)
         else:
-            for j,run in enumerate(SearchRunsIterator(self.mlflow_client, exp_id)):
+            for j,run in enumerate(SearchRunsIterator(self.mlflow_client, exp.experiment_id)):
                 self._export_run(j, run, output_dir, ok_run_ids, failed_run_ids)
 
-        export_info = {  "export_info": 
-            { **utils.create_export_info(),
-              **{ "num_total_runs": (j+1),
-                  "num_ok_runs": len(ok_run_ids),
-                  "ok_runs": ok_run_ids,
-                  "num_failed_runs": len(failed_run_ids),
-                  "failed_runs": failed_run_ids 
-                } 
-            }
+        content = { "experiment": utils.strip_underscores(exp) }
+        my_info = {
+            "num_total_runs": (j+1),
+            "num_ok_runs": len(ok_run_ids),
+            "ok_runs": ok_run_ids,
+            "num_failed_runs": len(failed_run_ids),
+            "failed_runs": failed_run_ids
         }
-        dct = { ** export_info,
-                **{ "experiment": utils.strip_underscores(exp)}
-        }
+        io_utils.write_json(output_dir, "experiment.json", content, my_info)
 
-        path = os.path.join(output_dir,"experiment.json")
-        utils.write_json_file(fs, path, dct)
         msg = f"for experiment '{exp.name}' (ID: {exp.experiment_id})"
         if len(failed_run_ids) == 0:
             print(f"All {len(ok_run_ids)} runs succesfully exported {msg}")

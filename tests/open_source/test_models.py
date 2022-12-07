@@ -1,4 +1,4 @@
-from mlflow_export_import.source_tags import ImportTags
+from mlflow_export_import.common.source_tags import ImportTags
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.model.export_model import ModelExporter
 from mlflow_export_import.model.import_model import ModelImporter

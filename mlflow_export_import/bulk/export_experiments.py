@@ -4,15 +4,15 @@ Exports experiments to a directory.
 
 import os
 import time
-import json
 from concurrent.futures import ThreadPoolExecutor
 import click
 import mlflow
 from mlflow_export_import.common import mlflow_utils
+from mlflow_export_import.common import io_utils
 from mlflow_export_import import utils, click_doc
 from mlflow_export_import.bulk import bulk_utils
 from mlflow_export_import.experiment.export_experiment import ExperimentExporter
-from mlflow_export_import.common import filesystem as _filesystem
+
 
 def _export_experiment(client, exp_id_or_name, output_dir, exporter, export_results, run_ids):
     exp = mlflow_utils.get_experiment(client, exp_id_or_name)
@@ -35,6 +35,7 @@ def _export_experiment(client, exp_id_or_name, output_dir, exporter, export_resu
         import traceback
         traceback.print_exc()
     return ok_runs, failed_runs
+
 
 def export_experiments(client, experiments, output_dir, export_source_tags=False, notebook_formats=None, use_threads=False):
     """
@@ -83,11 +84,8 @@ def export_experiments(client, experiments, output_dir, export_source_tags=False
     
     total_runs = ok_runs + failed_runs
     duration = round(time.time() - start_time, 1)
-    dct = { 
-        "info": {
-            "mlflow_version": mlflow.__version__,
-            "mlflow_tracking_uri": mlflow.get_tracking_uri(),
-            "export_time": utils.get_now_nice(),
+    content = { 
+        "experiments_summary": {
             "duration": duration,
             "experiments": len(experiments),
             "total_runs": total_runs,
@@ -96,10 +94,7 @@ def export_experiments(client, experiments, output_dir, export_source_tags=False
         },
         "experiments": export_results 
     }
-    fs = _filesystem.get_filesystem(output_dir)
-    fs.mkdirs(output_dir)
-    with open(os.path.join(output_dir, "experiments.json"), "w", encoding="utf-8") as f:
-        f.write(json.dumps(dct,indent=2)+"\n")
+    io_utils.write_json(output_dir, "experiments.json", content)
 
     print(f"{len(experiments)} experiments exported")
     print(f"{ok_runs}/{total_runs} runs succesfully exported")
@@ -137,7 +132,6 @@ def export_experiments(client, experiments, output_dir, export_source_tags=False
     default=False,
     show_default=True
 )
-
 def main(experiments, output_dir, export_source_tags, notebook_formats, use_threads): 
     print("Options:")
     for k,v in locals().items():
@@ -149,6 +143,7 @@ def main(experiments, output_dir, export_source_tags, notebook_formats, use_thre
         export_source_tags=export_source_tags,
         notebook_formats=notebook_formats,
         use_threads=use_threads)
+
 
 if __name__ == "__main__":
     main()

@@ -2,8 +2,8 @@
 Compare run utilities.
 """
 
-from mlflow_export_import.source_tags import ExportTags, ImportTags
 from mlflow_export_import import utils
+from mlflow_export_import.common.source_tags import ExportTags, ImportTags
 import utils_test
 
     

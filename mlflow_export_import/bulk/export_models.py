@@ -3,18 +3,19 @@ Exports models and their versions' backing run along with the experiment that th
 """
 
 import os
-import json
 import time
 import click
 from concurrent.futures import ThreadPoolExecutor
+
 import mlflow
+
+from mlflow_export_import.common import io_utils
+from mlflow_export_import import utils, click_doc
 from mlflow_export_import.model.export_model import ModelExporter
 from mlflow_export_import.bulk import export_experiments
-from mlflow_export_import.common import filesystem as _filesystem
-from mlflow_export_import import utils, click_doc
-from mlflow_export_import.bulk import write_export_manifest_file
 from mlflow_export_import.bulk.model_utils import get_experiments_runs_of_models
 from mlflow_export_import.bulk import bulk_utils
+
 
 def _export_models(client, model_names, output_dir, export_source_tags, notebook_formats, stages, export_run=True, use_threads=False):
     max_workers = os.cpu_count() or 4 if use_threads else 1
@@ -41,29 +42,22 @@ def _export_models(client, model_names, output_dir, export_source_tags, notebook
         else: failed_models.append(result[1])
 
     duration = round(time.time() - start_time, 1)
-    manifest = {
-        "info": {
-            "mlflow_version": mlflow.__version__,
-            "mlflow_tracking_uri": mlflow.get_tracking_uri(),
-            "export_time": utils.get_now_nice(),
-            "total_models": len(model_names),
-            "ok_models": len(ok_models),
-            "failed_models": len(failed_models),
-            "duration": duration
-        },
+
+    content = {
         "stages": stages,
         "notebook_formats": notebook_formats,
+        "num_total_models": len(model_names),
+        "num_ok_models": len(ok_models),
+        "num_failed_models": len(failed_models),
         "ok_models": ok_models,
-        "failed_models": failed_models
+        "failed_models": failed_models,
+        "duration": duration
     }
-
-    fs = _filesystem.get_filesystem(output_dir)
-    fs.mkdirs(output_dir)
-    with open(os.path.join(output_dir, "models.json"), "w", encoding="utf-8") as f:
-        f.write(json.dumps(manifest, indent=2)+"\n")
+    io_utils.write_json(output_dir, "models.json", content)
 
     print(f"{len(model_names)} models exported")
     print(f"Duration for registered models export: {duration} seconds")
+
 
 def export_models(client, model_names, output_dir, export_source_tags=False, notebook_formats=None, stages="", export_all_runs=False, use_threads=False):
     exps_and_runs = get_experiments_runs_of_models(client, model_names)
@@ -74,8 +68,16 @@ def export_models(client, model_names, output_dir, export_source_tags=False, not
     export_experiments.export_experiments(client, exps_to_export, out_dir, export_source_tags, notebook_formats, use_threads)
     _export_models(client, model_names, os.path.join(output_dir,"models"), export_source_tags, notebook_formats, stages, export_run=False, use_threads=use_threads)
     duration = round(time.time() - start_time, 1)
-    write_export_manifest_file(output_dir, duration, stages, notebook_formats, "models_manifest.json")
+    content = {
+        "summary": {
+            "stages": stages, 
+            "notebook_formats": notebook_formats
+        }
+    }
+    io_utils.write_json(output_dir, "models_manifest.json", content)
+
     print(f"Duration for total registered models and versions' runs export: {duration} seconds")
+
 
 @click.command()
 @click.option("--output-dir",
@@ -118,7 +120,6 @@ def export_models(client, model_names, output_dir, export_source_tags=False, not
     default=False,
     show_default=True
 )
-
 def main(models, output_dir, stages, export_source_tags, notebook_formats, export_all_runs, use_threads):
     print("Options:")
     for k,v in locals().items():
@@ -132,6 +133,7 @@ def main(models, output_dir, stages, export_source_tags, notebook_formats, expor
         stages=stages, 
         export_all_runs=export_all_runs, 
         use_threads=use_threads)
+
 
 if __name__ == "__main__":
     main()

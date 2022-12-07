@@ -14,12 +14,13 @@ from mlflow.utils.validation import MAX_PARAMS_TAGS_PER_BATCH, MAX_METRICS_PER_B
 
 from mlflow_export_import import utils, click_doc
 from mlflow_export_import import mk_local_path
+from mlflow_export_import.common.source_tags import MlflowTags
 from mlflow_export_import.common.find_artifacts import find_artifacts
 from mlflow_export_import.common.http_client import DatabricksHttpClient
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common import filesystem as _filesystem
-from mlflow_export_import.run import run_data_importer
 from mlflow_export_import.common import MlflowExportImportException
+from mlflow_export_import.run import run_data_importer
 
 
 class RunImporter():
@@ -87,7 +88,7 @@ class RunImporter():
         if utils.importing_into_databricks() and dst_notebook_dir:
             ndir = os.path.join(dst_notebook_dir, run_id) if self.dst_notebook_dir_add_run_id else dst_notebook_dir
             self._upload_databricks_notebook(input_dir, src_run_dct, ndir)
-        return (run, src_run_dct["tags"].get(utils.MlflowTags.TAG_PARENT_ID,None))
+        return (run, src_run_dct["tags"].get(MlflowTags.TAG_PARENT_ID,None))
 
 
     def _update_mlmodel_run_id(self, run_id):

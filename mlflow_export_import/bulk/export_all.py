@@ -6,12 +6,13 @@ import os
 import time
 import click
 import mlflow
+from mlflow_export_import.common import io_utils
+from mlflow_export_import import click_doc
 from mlflow_export_import.bulk.export_models import export_models
 from mlflow_export_import.bulk.export_experiments import export_experiments
-from mlflow_export_import import click_doc
-from mlflow_export_import.bulk import write_export_manifest_file
 
 ALL_STAGES = "Production,Staging,Archived,None" 
+
 
 def export_all(output_dir, export_source_tags=False, notebook_formats=None, use_threads=False):
     start_time = time.time()
@@ -32,7 +33,17 @@ def export_all(output_dir, export_source_tags=False, notebook_formats=None, use_
         notebook_formats=notebook_formats,
         use_threads=use_threads)
     duration = round(time.time() - start_time, 1)
-    write_export_manifest_file(output_dir, duration, ALL_STAGES, notebook_formats)
+
+    content = {
+        "summary": {
+            "stages": ALL_STAGES,
+            "notebook_formats": notebook_formats,
+            "duration": duration
+        }
+    }
+    io_utils.write_json(output_dir, "all_manifest.json", content)
+
+
     print(f"Duraton for entire tracking server export: {duration} seconds")
 
 @click.command()
@@ -59,12 +70,12 @@ def export_all(output_dir, export_source_tags=False, notebook_formats=None, use_
     default=False,
     show_default=True
 )
-
 def main(output_dir, export_source_tags, notebook_formats, use_threads):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
     export_all(output_dir, export_source_tags, notebook_formats, use_threads)
+
 
 if __name__ == "__main__":
     main()

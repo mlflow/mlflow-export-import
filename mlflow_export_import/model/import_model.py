@@ -8,17 +8,18 @@ import click
 import mlflow
 from mlflow.exceptions import RestException
 
-from mlflow_export_import.source_tags import ImportTags
-from mlflow_export_import.common import MlflowExportImportException
-from mlflow_export_import.run.import_run import RunImporter
 from mlflow_export_import import utils, click_doc
+from mlflow_export_import.common.source_tags import ImportTags
+from mlflow_export_import.common import MlflowExportImportException
+from mlflow_export_import.common import timestamp_utils
 from mlflow_export_import.common import model_utils
+from mlflow_export_import.run.import_run import RunImporter
 
 def _fmt_timestamps(tag, dct, tags):
     ts = dct[tag]
     tags[f"{ImportTags.TAG_PREFIX}.{tag}"] = ts
-    tags[f"{ImportTags.TAG_PREFIX}._{tag}_local"] = utils.fmt_ts_millis(ts)
-    tags[f"{ImportTags.TAG_PREFIX}._{tag}_utc"] = utils.fmt_ts_millis(ts, True)
+    tags[f"{ImportTags.TAG_PREFIX}._{tag}_local"] = timestamp_utils.fmt_ts_millis(ts)
+    tags[f"{ImportTags.TAG_PREFIX}._{tag}_utc"] = timestamp_utils.fmt_ts_millis(ts, True)
 
 
 class BaseModelImporter():

@@ -10,6 +10,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import mlflow
 from mlflow_export_import import utils, click_doc
+from mlflow_export_import.common import io_utils
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.experiment.import_experiment import ExperimentImporter
 from mlflow_export_import.model.import_model import AllModelImporter
@@ -79,7 +80,7 @@ def import_all(client, input_dir, delete_model, use_src_user_id=False, import_so
     duration = round(time.time() - start_time, 1)
     dct = { "duration": duration, "experiment_import": exp_res[1], "model_import": model_res }
     fs = _filesystem.get_filesystem(".")
-    utils.write_json_file(fs, "import_report.json", dct)
+    io_utils.write_json_file(fs, "import_report.json", dct)
     print("\nImport report:")
     print(json.dumps(dct,indent=2)+"\n")
 
