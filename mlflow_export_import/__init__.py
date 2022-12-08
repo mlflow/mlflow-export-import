@@ -2,11 +2,6 @@ import os
 import json
 import mlflow
 
-
-def  create_client(uri):
-    return mlflow.tracking.MlflowClient() if uri is None else mlflow.tracking.MlflowClient(uri)
-
-
 # monkey patch mlflow.tracking.MlflowClient to return tracking URI in __repr__
 
 def add_repr_to_MlflowClient():

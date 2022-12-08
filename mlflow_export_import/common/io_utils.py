@@ -14,31 +14,26 @@ def _mk_export_info():
     import mlflow
     import platform
     return {
-        "mlflow_version": mlflow.__version__,
-        "mlflow_tracking_uri": mlflow.get_tracking_uri(),
-        "user": os.getlogin(),
-        "platform": {
-            "python_version": platform.python_version(),
-            "system": platform.system()
-        },
-        ExportTags.TAG_EXPORT_TIME: {
-            "seconds": ts_now_seconds,
-            "local_time": ts_now_fmt_local,
-            "utc_time": ts_now_fmt_utc
+        "export_info": {
+            "mlflow_version": mlflow.__version__,
+            "mlflow_tracking_uri": mlflow.get_tracking_uri(),
+            "user": os.getlogin(),
+            "platform": {
+                "python_version": platform.python_version(),
+                "system": platform.system()
+            },
+            ExportTags.TAG_EXPORT_TIME: {
+                "seconds": ts_now_seconds,
+                "local_time": ts_now_fmt_local,
+                "utc_time": ts_now_fmt_utc
+            }
         }
     }
 
-def _create_create_export_info(my_info=None):
-    info = _mk_export_info()
-    if my_info:
-        info = { **info, **my_info }
-    return { "export_info": info }
 
-
-def write_json(output_dir, file, dct, my_info=None):
+def write_json(output_dir, file, dct):
     path = os.path.join(output_dir, file)
-    info = _create_create_export_info(my_info)
-    dct = { **info, **dct }
+    dct = { **_mk_export_info(), **dct }
     fs = _filesystem.get_filesystem(output_dir)
     fs.mkdirs(output_dir)
     write_json_file(fs, path, dct)

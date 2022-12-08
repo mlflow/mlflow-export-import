@@ -85,13 +85,15 @@ class ModelExporter():
         model = self.http_client.get(f"registered-models/get", {"name": model_name})
         model["registered_model"]["latest_versions"] = output_versions
 
-        my_info = {
-            "num_target_stages": len(self.stages),
-            "num_target_versions": len(self.versions),
-            "num_src_versions": len(versions),
-            "num_dst_versions": len(output_versions)
+        summary = {
+            "summary": {
+                "num_target_stages": len(self.stages),
+                "num_target_versions": len(self.versions),
+                "num_src_versions": len(versions),
+                "num_dst_versions": len(output_versions)
+            }
         }
-        io_utils.write_json(output_dir, "model.json", model, my_info)
+        io_utils.write_json(output_dir, "model.json", { **summary, **model} )
 
         print(f"Exported {exported_versions}/{len(output_versions)} versions for model '{model_name}'")
         return manifest

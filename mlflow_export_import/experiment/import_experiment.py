@@ -49,8 +49,9 @@ class ExperimentImporter():
         exp_dct = io_utils.read_json_file(manifest_path)
         tags = exp_dct["experiment"]["tags"] 
         mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, exp_name, tags)
-        run_ids = exp_dct["export_info"]["ok_runs"]
-        failed_run_ids = exp_dct["export_info"]["failed_runs"]
+        summary = exp_dct["summary"]
+        run_ids = summary["ok_runs"]
+        failed_run_ids = summary["failed_runs"]
         print(f"Importing {len(run_ids)} runs into experiment '{exp_name}' from {input_dir}")
         run_ids_map = {}
         run_info_map = {}
