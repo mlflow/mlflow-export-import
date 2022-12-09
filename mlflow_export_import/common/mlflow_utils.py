@@ -6,7 +6,7 @@ from mlflow_export_import.common import MlflowExportImportException
 def dump_mlflow_info():
     print("MLflow Info:")
     print("  MLflow Version:", mlflow.version.VERSION)
-    print("  Tracking URI:", mlflow.tracking.get_tracking_uri())
+    print("  Tracking URI:", mlflow.client.get_tracking_uri())
     mlflow_host = get_mlflow_host()
     print("  Real MLflow host:", mlflow_host)
     print("  MLFLOW_TRACKING_URI:", os.environ.get("MLFLOW_TRACKING_URI",""))
@@ -22,7 +22,7 @@ def get_mlflow_host():
 def get_mlflow_host_token():
     """ Returns the host (tracking URI) and token """
     uri = os.environ.get("MLFLOW_TRACKING_URI",None)
-    if uri is not None and uri != "databricks":
+    if uri is not None and not uri.startswith("databricks"):
         return (uri,None)
     try:
         from mlflow_export_import.common import databricks_cli_utils
@@ -95,4 +95,3 @@ def create_workspace_dir(dbx_client, workspace_dir):
     """
     print(f"Creating Databricks workspace directory '{workspace_dir}'")
     dbx_client.post("workspace/mkdirs", { "path": workspace_dir })
-
