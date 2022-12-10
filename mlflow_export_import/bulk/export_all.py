@@ -41,7 +41,7 @@ def export_all(output_dir, export_source_tags=False, notebook_formats=None, use_
             "duration": duration
         }
     }
-    io_utils.write_json(output_dir, "all_manifest.json", content)
+    io_utils.write_manifest_file(output_dir, "all_manifest.json", content)
 
 
     print(f"Duraton for entire tracking server export: {duration} seconds")

@@ -46,7 +46,7 @@ class ExperimentImporter():
         """
 
         manifest_path = io_utils.mk_manifest_json_path(input_dir, "experiment.json")
-        exp_dct = io_utils.read_json_file(manifest_path)
+        exp_dct = io_utils.read_file(manifest_path)
         tags = exp_dct["experiment"]["tags"] 
         mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, exp_name, tags)
 

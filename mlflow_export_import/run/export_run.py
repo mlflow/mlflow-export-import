@@ -9,7 +9,7 @@ import click
 import mlflow
 
 from mlflow_export_import.common import utils, click_doc
-from mlflow_export_import.common.filesystem import mk_local_path
+from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common.http_client import DatabricksHttpClient
@@ -61,7 +61,8 @@ class RunExporter:
             "metrics": self._get_metrics_with_steps(run),
             "tags": tags
         }
-        fs = io_utils.write_json(output_dir, "run.json", content)
+        io_utils.write_manifest_file(output_dir, "run.json", content)
+        fs =  _filesystem.get_filesystem(".")
 
         # copy artifacts
         dst_path = os.path.join(output_dir,"artifacts")
@@ -70,7 +71,7 @@ class RunExporter:
             artifacts = self.mlflow_client.list_artifacts(run.info.run_id)
             if len(artifacts) > 0: # Because of https://github.com/mlflow/mlflow/issues/2839
                 fs.mkdirs(dst_path)
-                self.mlflow_client.download_artifacts(run.info.run_id, "", dst_path=mk_local_path(dst_path))
+                self.mlflow_client.download_artifacts(run.info.run_id, "", dst_path=_filesystem.mk_local_path(dst_path))
             notebook = tags.get(MLFLOW_DATABRICKS_NOTEBOOK_PATH, None)
             if notebook is not None:
                 if len(self.notebook_formats) > 0:

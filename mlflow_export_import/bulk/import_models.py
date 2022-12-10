@@ -11,7 +11,6 @@ from concurrent.futures import ThreadPoolExecutor
 import mlflow
 from mlflow_export_import.common import click_doc
 from mlflow_export_import.common import io_utils
-from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.experiment.import_experiment import ExperimentImporter
 from mlflow_export_import.model.import_model import AllModelImporter
 
@@ -28,7 +27,7 @@ def _import_experiments(client, input_dir, use_src_user_id):
     start_time = time.time()
     manifest_path = os.path.join(input_dir,"experiments","manifest.json")
     manifest_path = io_utils.mk_manifest_json_path(os.path.join(input_dir,"experiments"), "experiments.json")
-    manifest = io_utils.read_json_file(manifest_path)
+    manifest = io_utils.read_file(manifest_path)
     exps = manifest["experiments"]
     importer = ExperimentImporter(client, use_src_user_id)
     print("Experiments:")
@@ -59,7 +58,7 @@ def _import_models(client, input_dir, run_info_map, delete_model, import_source_
     start_time = time.time()
     models_dir = os.path.join(input_dir, "models")
     manifest_path = io_utils.mk_manifest_json_path(models_dir, "models.json")
-    manifest = io_utils.read_json_file(manifest_path)
+    manifest = io_utils.read_file(manifest_path)
     models = manifest["ok_models"]
     importer = AllModelImporter(client, run_info_map, import_source_tags=import_source_tags)
 
@@ -79,8 +78,7 @@ def import_all(client, input_dir, delete_model, use_src_user_id=False, import_so
     model_res = _import_models(client, input_dir, run_info_map, delete_model, import_source_tags, verbose, use_threads)
     duration = round(time.time() - start_time, 1)
     dct = { "duration": duration, "experiment_import": exp_res[1], "model_import": model_res }
-    fs = _filesystem.get_filesystem(".")
-    io_utils.write_json_file(fs, "import_report.json", dct)
+    io_utils.write_file("import_report.json", dct)
     print("\nImport report:")
     print(json.dumps(dct,indent=2)+"\n")
 

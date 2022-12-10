@@ -78,7 +78,7 @@ class BaseModelImporter():
         :return: Model import manifest.
         """
         path = os.path.join(input_dir, "model.json")
-        model_dct = io_utils.read_json_file(path)["registered_model"]
+        model_dct = io_utils.read_file(path)["registered_model"]
 
         print("Model to import:")
         print(f"  Name: {model_dct['name']}")
