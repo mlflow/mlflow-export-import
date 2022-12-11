@@ -84,17 +84,16 @@ def export_experiments(client, experiments, output_dir, export_source_tags=False
     
     total_runs = ok_runs + failed_runs
     duration = round(time.time() - start_time, 1)
-    content = { 
-        "experiments_summary": {
-            "duration": duration,
-            "experiments": len(experiments),
-            "total_runs": total_runs,
-            "ok_runs": ok_runs,
-            "failed_runs": failed_runs
-        },
-        "experiments": export_results 
+
+    custom_info = {
+      "duration": duration,
+      "experiments": len(experiments),
+      "total_runs": total_runs,
+      "ok_runs": ok_runs,
+      "failed_runs": failed_runs
     }
-    io_utils.write_manifest_file(output_dir, "experiments.json", content)
+    content = { "experiments": export_results }
+    io_utils.write_manifest_file(output_dir, "experiments.json", content, custom_info)
 
     print(f"{len(experiments)} experiments exported")
     print(f"{ok_runs}/{total_runs} runs succesfully exported")

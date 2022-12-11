@@ -3,7 +3,6 @@ Import a list of experiment from a directory.
 """
 
 import os
-import json
 import click
 from concurrent.futures import ThreadPoolExecutor
 
@@ -23,19 +22,19 @@ def _import_experiment(importer, exp_name, exp_input_dir):
 
 
 def import_experiments(client, input_dir, use_src_user_id=False, use_threads=False): 
-    path = io_utils.mk_manifest_json_path(input_dir, "experiments.json")
-    with open(path, "r", encoding="utf-8") as f:
-        dct = json.loads(f.read())
-    for exp in dct["experiments"]:
+    dct = io_utils.read_file(os.path.join(input_dir, "experiments.json"))
+    exps = dct["experiments"]
+    for exp in exps:
         print("  ",exp)
 
     importer = ExperimentImporter(client, use_src_user_id=use_src_user_id)
     max_workers = os.cpu_count() or 4 if use_threads else 1
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        for exp in dct["experiments"]:
+        for exp in exps:
             exp_input_dir = os.path.join(input_dir,exp["id"])
             exp_name = exp["name"]
             executor.submit(_import_experiment, importer, exp_name, exp_input_dir)
+
 
 @click.command()
 @click.option("--input-dir", 
@@ -55,7 +54,6 @@ def import_experiments(client, input_dir, use_src_user_id=False, use_threads=Fal
     default=False,
     show_default=True
 )
-
 def main(input_dir, use_src_user_id, use_threads): 
     print("Options:")
     for k,v in locals().items():

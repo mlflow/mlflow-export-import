@@ -12,6 +12,7 @@ from mlflow_export_import.common import io_utils
 from mlflow_export_import.common import utils, click_doc
 from mlflow_export_import.run.export_run import RunExporter
 
+
 class ModelExporter():
 
     def __init__(self,  mlflow_client, export_source_tags=False, notebook_formats=None, stages=None, versions=None, export_run=True):
@@ -85,15 +86,13 @@ class ModelExporter():
         model = self.http_client.get(f"registered-models/get", {"name": model_name})
         model["registered_model"]["latest_versions"] = output_versions
 
-        summary = {
-            "summary": {
-                "num_target_stages": len(self.stages),
-                "num_target_versions": len(self.versions),
-                "num_src_versions": len(versions),
-                "num_dst_versions": len(output_versions)
-            }
+        custom_info = {
+            "num_target_stages": len(self.stages),
+            "num_target_versions": len(self.versions),
+            "num_src_versions": len(versions),
+            "num_dst_versions": len(output_versions)
         }
-        io_utils.write_manifest_file(output_dir, "model.json", { **summary, **model} )
+        io_utils.write_manifest_file(output_dir, "model.json", model, custom_info)
 
         print(f"Exported {exported_versions}/{len(output_versions)} versions for model '{model_name}'")
         return manifest

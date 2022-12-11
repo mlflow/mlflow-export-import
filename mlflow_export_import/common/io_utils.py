@@ -29,15 +29,17 @@ def _mk_export_info():
         }
     }
 
+ATTR_CUSTOM_INFO = "custom_info"
 
-def write_manifest_file(dir, file, dct):
+def write_manifest_file(dir, file, content, custom_info=None):
     """
     Write standard manifest JSON file with 'export_info' stanza.
     """
     path = os.path.join(dir, file)
-    dct = { **_mk_export_info(), **dct }
+    custom_info = { ATTR_CUSTOM_INFO: custom_info} if custom_info else {}
+    content = { **_mk_export_info(), **custom_info, **content }
     os.makedirs(dir, exist_ok=True)
-    write_file(path, dct)
+    write_file(path, content)
 
 
 def write_file(path, content):
@@ -66,11 +68,4 @@ def read_file(path):
 
 
 def mk_manifest_json_path(input_dir, filename):
-    """ 
-    Handle deprecated 'manifest.json' instead of current MLflow object file name such as 'experiments.json'. 
-    'manifest.json' file name will be eventually removed. 
-    """
-    path = os.path.join(input_dir, filename)
-    if not os.path.exists(path):
-        path = os.path.join(input_dir, "manifest.json") # NOTE: old deprecated, will be eventually removed
-    return path
+    return os.path.join(input_dir, filename)

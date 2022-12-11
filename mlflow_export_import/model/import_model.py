@@ -16,6 +16,7 @@ from mlflow_export_import.common import model_utils
 from mlflow_export_import.common.source_tags import ImportTags
 from mlflow_export_import.run.import_run import RunImporter
 
+
 def _fmt_timestamps(tag, dct, tags):
     ts = dct[tag]
     tags[f"{ImportTags.TAG_PREFIX}.{tag}"] = ts

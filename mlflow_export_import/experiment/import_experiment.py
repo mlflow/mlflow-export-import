@@ -10,15 +10,11 @@ from mlflow_export_import.common import utils, click_doc
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common.http_client import DatabricksHttpClient
-from mlflow_export_import.common.filesystem import mk_local_path
 from mlflow_export_import.run.import_run import RunImporter
 
 
-def _peek_at_experiment(exp_dir):
-    manifest_path = os.path.join(exp_dir, "experiments.json")
-    with open(mk_local_path(manifest_path), "r", encoding="utf-8") as f:
-        content = f.read()
-    print("manifest path:",manifest_path)
+def _peek_at_experiments(exp_dir):
+    content = io_utils.read_file(os.path.join(exp_dir,"experiments.json"))
     print(content)
 
 
@@ -50,12 +46,9 @@ class ExperimentImporter():
         tags = exp_dct["experiment"]["tags"] 
         mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, exp_name, tags)
 
-        if "summary" in exp_dct: # NOTE: format change - deprecated
-            summary = exp_dct["summary"]
-        else:
-            summary = exp_dct["export_info"]
-        run_ids = summary["ok_runs"]
-        failed_run_ids = summary["failed_runs"]
+        custom_info = exp_dct[io_utils.ATTR_CUSTOM_INFO]
+        run_ids = custom_info["ok_runs"]
+        failed_run_ids = custom_info["failed_runs"]
 
         print(f"Importing {len(run_ids)} runs into experiment '{exp_name}' from {input_dir}")
         run_ids_map = {}
@@ -105,7 +98,7 @@ def main(input_dir, experiment_name, just_peek, use_src_user_id, dst_notebook_di
     for k,v in locals().items():
         print(f"  {k}: {v}")
     if just_peek:
-        _peek_at_experiment(input_dir)
+        _peek_at_experiments(input_dir)
     else:
         client = mlflow.tracking.MlflowClient()
         importer = ExperimentImporter(

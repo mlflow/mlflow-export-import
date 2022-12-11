@@ -40,20 +40,19 @@ def _export_models(client, model_names, output_dir, export_source_tags, notebook
         result = future.result()
         if result[0]: ok_models.append(result[1])
         else: failed_models.append(result[1])
+    duration = round(time.time()-start_time, 1)
 
-    duration = round(time.time() - start_time, 1)
-
-    content = {
+    custom_info = {
         "stages": stages,
         "notebook_formats": notebook_formats,
         "num_total_models": len(model_names),
         "num_ok_models": len(ok_models),
         "num_failed_models": len(failed_models),
+        "duration": duration,
         "ok_models": ok_models,
-        "failed_models": failed_models,
-        "duration": duration
+        "failed_models": failed_models
     }
-    io_utils.write_manifest_file(output_dir, "models.json", content)
+    io_utils.write_manifest_file(output_dir, "models.json", {}, custom_info)
 
     print(f"{len(model_names)} models exported")
     print(f"Duration for registered models export: {duration} seconds")
@@ -67,14 +66,13 @@ def export_models(client, model_names, output_dir, export_source_tags=False, not
     exps_to_export = exp_ids if export_all_runs else exps_and_runs
     export_experiments.export_experiments(client, exps_to_export, out_dir, export_source_tags, notebook_formats, use_threads)
     _export_models(client, model_names, os.path.join(output_dir,"models"), export_source_tags, notebook_formats, stages, export_run=False, use_threads=use_threads)
-    duration = round(time.time() - start_time, 1)
-    content = {
-        "summary": {
-            "stages": stages, 
-            "notebook_formats": notebook_formats
-        }
+    duration = round(time.time()-start_time, 1)
+
+    custom_info = {
+      "stages": stages, 
+      "notebook_formats": notebook_formats
     }
-    io_utils.write_manifest_file(output_dir, "models_manifest.json", content)
+    io_utils.write_manifest_file(output_dir, "models.json", {}, custom_info)
 
     print(f"Duration for total registered models and versions' runs export: {duration} seconds")
 

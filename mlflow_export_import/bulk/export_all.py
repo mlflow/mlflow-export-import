@@ -42,9 +42,8 @@ def export_all(output_dir, export_source_tags=False, notebook_formats=None, use_
         }
     }
     io_utils.write_manifest_file(output_dir, "all_manifest.json", content)
-
-
     print(f"Duraton for entire tracking server export: {duration} seconds")
+
 
 @click.command()
 @click.option("--output-dir", 

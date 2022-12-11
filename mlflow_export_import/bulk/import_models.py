@@ -25,16 +25,16 @@ def _remap(run_info_map):
 
 def _import_experiments(client, input_dir, use_src_user_id):
     start_time = time.time()
-    manifest_path = os.path.join(input_dir,"experiments","manifest.json")
-    manifest_path = io_utils.mk_manifest_json_path(os.path.join(input_dir,"experiments"), "experiments.json")
-    manifest = io_utils.read_file(manifest_path)
+    manifest = io_utils.read_file(os.path.join(os.path.join(input_dir,"experiments","experiments.json")))
     exps = manifest["experiments"]
+
     importer = ExperimentImporter(client, use_src_user_id)
     print("Experiments:")
     for exp in exps: 
         print(" ",exp)
     run_info_map = {}
     exceptions = []
+
     for exp in exps: 
         exp_input_dir = os.path.join(input_dir, "experiments", exp["id"])
         try:
@@ -45,7 +45,7 @@ def _import_experiments(client, input_dir, use_src_user_id):
             import traceback
             traceback.print_exc()
 
-    duration = round(time.time() - start_time, 1)
+    duration = round(time.time()-start_time, 1)
     if len(exceptions) > 0:
         print(f"Errors: {len(exceptions)}")
     print(f"Duration: {duration} seconds")
@@ -57,9 +57,9 @@ def _import_models(client, input_dir, run_info_map, delete_model, import_source_
     max_workers = os.cpu_count() or 4 if use_threads else 1
     start_time = time.time()
     models_dir = os.path.join(input_dir, "models")
-    manifest_path = io_utils.mk_manifest_json_path(models_dir, "models.json")
-    manifest = io_utils.read_file(manifest_path)
-    models = manifest["ok_models"]
+
+    manifest = io_utils.read_file(os.path.join(os.path.join(models_dir,"models.json")))
+    models = manifest[io_utils.ATTR_CUSTOM_INFO]["ok_models"]
     importer = AllModelImporter(client, run_info_map, import_source_tags=import_source_tags)
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
@@ -67,7 +67,7 @@ def _import_models(client, input_dir, run_info_map, delete_model, import_source_
             dir = os.path.join(models_dir, model)
             executor.submit(importer.import_model, model, dir, delete_model, verbose)
 
-    duration = round(time.time() - start_time, 1)
+    duration = round(time.time()-start_time, 1)
     return { "models": len(models), "duration": duration }
 
 
@@ -76,7 +76,7 @@ def import_all(client, input_dir, delete_model, use_src_user_id=False, import_so
     exp_res = _import_experiments(client, input_dir, use_src_user_id)
     run_info_map = _remap(exp_res[0])
     model_res = _import_models(client, input_dir, run_info_map, delete_model, import_source_tags, verbose, use_threads)
-    duration = round(time.time() - start_time, 1)
+    duration = round(time.time()-start_time, 1)
     dct = { "duration": duration, "experiment_import": exp_res[1], "model_import": model_res }
     io_utils.write_file("import_report.json", dct)
     print("\nImport report:")
