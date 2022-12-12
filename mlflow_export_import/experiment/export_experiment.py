@@ -51,7 +51,10 @@ class ExperimentExporter():
             "num_failed_runs": len(failed_run_ids),
             "failed_runs": failed_run_ids
         }
-        content = { "experiment": utils.strip_underscores(exp) } 
+        exp_dct = utils.strip_underscores(exp) 
+        exp_dct["tags"] = dict(sorted(exp_dct["tags"].items()))
+        content = { "experiment": exp_dct }
+
         io_utils.write_manifest_file(output_dir, "experiment.json", content, custom_info)
 
         msg = f"for experiment '{exp.name}' (ID: {exp.experiment_id})"
