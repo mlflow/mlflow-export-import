@@ -3,7 +3,7 @@ import json
 
 from mlflow_export_import.common.timestamp_utils import ts_now_seconds, ts_now_fmt_local, ts_now_fmt_utc
 from mlflow_export_import.common import filesystem as _filesystem
-from mlflow_export_import.common.source_tags import ExportTags
+from mlflow_export_import.common.source_tags import ExportFields
 
 
 def _mk_export_info():
@@ -13,7 +13,7 @@ def _mk_export_info():
     import mlflow
     import platform
     return {
-        "export_info": {
+        ExportFields.EXPORT_INFO: {
             "mlflow_version": mlflow.__version__,
             "mlflow_tracking_uri": mlflow.get_tracking_uri(),
             "user": os.getlogin(),
@@ -21,7 +21,7 @@ def _mk_export_info():
                 "python_version": platform.python_version(),
                 "system": platform.system()
             },
-            ExportTags.TAG_EXPORT_TIME: {
+            ExportFields.EXPORT_TIME: {
                 "seconds": ts_now_seconds,
                 "local_time": ts_now_fmt_local,
                 "utc_time": ts_now_fmt_utc
@@ -29,14 +29,13 @@ def _mk_export_info():
         }
     }
 
-ATTR_CUSTOM_INFO = "custom_info"
 
 def write_manifest_file(dir, file, content, custom_info=None):
     """
     Write standard manifest JSON file with 'export_info' stanza.
     """
     path = os.path.join(dir, file)
-    custom_info = { ATTR_CUSTOM_INFO: custom_info} if custom_info else {}
+    custom_info = { ExportFields.CUSTOM_INFO: custom_info} if custom_info else {}
     content = { **_mk_export_info(), **custom_info, **content }
     os.makedirs(dir, exist_ok=True)
     write_file(path, content)

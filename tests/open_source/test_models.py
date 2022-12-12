@@ -1,4 +1,4 @@
-from mlflow_export_import.common.source_tags import ImportTags
+from mlflow_export_import.common.source_tags import ExportTags
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.model.export_model import ModelExporter
 from mlflow_export_import.model.import_model import ModelImporter
@@ -45,8 +45,8 @@ def _get_version_ids(model):
     return [vr.version for vr in model.latest_versions ]
 
 
-def _get_version_ids_2(model):
-    return [vr.tags[ImportTags.TAG_VERSION] for vr in model.latest_versions ]
+def _get_version_ids_dst(model):
+    return [vr.tags[f"{ExportTags.PREFIX_ROOT}.version"] for vr in model.latest_versions ]
 
 
 def test_export_import_model_first_two_versions(mlflow_context):
@@ -69,12 +69,12 @@ def test_export_import_model_two_from_middle_versions(mlflow_context):
     model_src, model_dst = _run_test_export_import_model_stages(mlflow_context, versions=["2","3","4"])
     assert len(model_dst.latest_versions) == 3
     ids_src = _get_version_ids(model_src)
-    ids_dst = _get_version_ids_2(model_dst)
+    ids_dst = _get_version_ids_dst(model_dst)
     assert set(ids_dst).issubset(set(ids_src))
 
     _compare_models(model_src, model_dst, mlflow_context.client_src!=mlflow_context.client_dst)
     for vr_dst in model_dst.latest_versions:
-        vr_src_id = vr_dst.tags[ImportTags.TAG_VERSION]
+        vr_src_id = vr_dst.tags[f"{ExportTags.PREFIX_ROOT}.version"]
         vr_src = [vr for vr in model_src.latest_versions if vr.version == vr_src_id ]
         assert(len(vr_src)) == 1
         vr_src = vr_src[0]

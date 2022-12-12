@@ -7,6 +7,8 @@ import mlflow
 import math 
 from mlflow.entities import Metric, Param, RunTag
 from mlflow_export_import.common import utils
+from mlflow_export_import.common.source_tags import ExportTags
+
 
 def _log_data(run_dct, run_id, batch_size, get_data, log_data, args_get_data=None):
     metadata = get_data(run_dct, args_get_data)
@@ -19,6 +21,7 @@ def _log_data(run_dct, run_id, batch_size, get_data, log_data, args_get_data=Non
         log_data(run_id, batch)
         res = res + batch
     
+
 def log_params(client, run_dct, run_id, batch_size):
     def get_data(run_dct, args):
         return [ Param(k,v) for k,v in run_dct["params"].items() ]
@@ -26,21 +29,31 @@ def log_params(client, run_dct, run_id, batch_size):
         client.log_batch(run_id, params=params)
     _log_data(run_dct, run_id, batch_size, get_data, log_data)
 
+
 def log_metrics(client, run_dct, run_id, batch_size):
+
     def get_data(run_dct, args=None):
         metrics = []
         for metric,steps in  run_dct["metrics"].items():
             for step in steps:
                 metrics.append(Metric(metric,step["value"],step["timestamp"],step["step"]))
         return metrics
+
     def log_data(run_id, metrics):
         client.log_batch(run_id, metrics=metrics)
+
     _log_data(run_dct, run_id, batch_size, get_data, log_data)
 
-def log_tags(client, run_dct, run_id, batch_size, in_databricks, src_user_id, use_src_user_id):
+
+def log_tags(client, run_dct, run_id, batch_size, import_source_tags, in_databricks, src_user_id, use_src_user_id):
+
     def get_data(run_dct, args):
         tags = run_dct["tags"]
         tags = utils.create_mlflow_tags_for_databricks_import(tags) # remove "mlflow" tags that cannot be imported into Databricks
+        info =  run_dct["info"]
+        if import_source_tags:
+            for k,v in info.items():
+                tags[f"{ExportTags.PREFIX_RUN_INFO}.{k}"] = str(v)
         tags = [ RunTag(k,v) for k,v in tags.items() ]
         if not in_databricks:
             utils.set_dst_user_id(tags, args["src_user_id"], args["use_src_user_id"])
@@ -56,6 +69,7 @@ def log_tags(client, run_dct, run_id, batch_size, in_databricks, src_user_id, us
     }
 
     _log_data(run_dct, run_id, batch_size, get_data, log_data, args_get)
+
 
 if __name__ == "__main__":
     import sys

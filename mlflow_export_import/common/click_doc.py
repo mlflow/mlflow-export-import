@@ -3,8 +3,6 @@ use_src_user_id = "Set the destination user ID to the source user ID. Source use
 
 export_source_tags = "Export source run metadata tags."
 
-export_source_tags = "Export source run information (RunInfo, MLflow system tags starting with 'mlflow' and metadata) under the 'mlflow_export_import' tag prefix. See README_individual.md for more details."
-
 import_source_tags = "Import source information for registered model and its versions ad tags in destination object."
 
 notebook_formats = "Databricks notebook formats. Values are SOURCE, HTML, JUPYTER or DBC (comma seperated)."

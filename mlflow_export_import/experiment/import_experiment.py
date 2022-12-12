@@ -11,6 +11,7 @@ from mlflow_export_import.common import io_utils
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common.http_client import DatabricksHttpClient
 from mlflow_export_import.run.import_run import RunImporter
+from mlflow_export_import.common.source_tags import ExportFields
 
 
 def _peek_at_experiments(exp_dir):
@@ -20,15 +21,18 @@ def _peek_at_experiments(exp_dir):
 
 class ExperimentImporter():
 
-    def __init__(self, mlflow_client, mlmodel_fix=True, use_src_user_id=False):
+    def __init__(self, mlflow_client, import_source_tags=False, mlmodel_fix=True, use_src_user_id=False):
         """
         :param mlflow_client: MLflow client.
+        :param import_source_tags: Import source information for MLFlow objects and create tags in destination object.
         :param use_src_user_id: Set the destination user ID to the source user ID.
                                 Source user ID is ignored when importing into
         """
         self.mlflow_client = mlflow_client
-        self.run_importer = RunImporter(self.mlflow_client, mlmodel_fix=mlmodel_fix, \
-            use_src_user_id=use_src_user_id, \
+        self.run_importer = RunImporter(self.mlflow_client, 
+            import_source_tags=import_source_tags,
+            mlmodel_fix=mlmodel_fix,
+            use_src_user_id=use_src_user_id,
             dst_notebook_dir_add_run_id=True)
         print("MLflowClient:",self.mlflow_client)
         self.dbx_client = DatabricksHttpClient()
@@ -46,7 +50,7 @@ class ExperimentImporter():
         tags = exp_dct["experiment"]["tags"] 
         mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, exp_name, tags)
 
-        custom_info = exp_dct[io_utils.ATTR_CUSTOM_INFO]
+        custom_info = exp_dct[ExportFields.CUSTOM_INFO]
         run_ids = custom_info["ok_runs"]
         failed_run_ids = custom_info["failed_runs"]
 
@@ -76,6 +80,12 @@ class ExperimentImporter():
     type=str,
     required=True
 )
+@click.option("--import-source-tags",
+    help=click_doc.import_source_tags,
+    type=bool,
+    default=False,
+    show_default=True
+)
 @click.option("--just-peek",
     help="Just display experiment metadata - do not import",
     type=bool,
@@ -92,8 +102,7 @@ class ExperimentImporter():
     required=False,
     show_default=True
 )
-
-def main(input_dir, experiment_name, just_peek, use_src_user_id, dst_notebook_dir):
+def main(input_dir, experiment_name, import_source_tags, just_peek, use_src_user_id, dst_notebook_dir):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
@@ -103,6 +112,7 @@ def main(input_dir, experiment_name, just_peek, use_src_user_id, dst_notebook_di
         client = mlflow.tracking.MlflowClient()
         importer = ExperimentImporter(
             client,
+            import_source_tags=import_source_tags,
             use_src_user_id=use_src_user_id)
         importer.import_experiment(experiment_name, input_dir, dst_notebook_dir)
 

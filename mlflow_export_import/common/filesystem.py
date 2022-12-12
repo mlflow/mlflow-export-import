@@ -49,7 +49,7 @@ class LocalFileSystem():
         os.makedirs(mk_local_path(path),exist_ok=True)
 
     def write(self, path, content):
-        with open(mk_local_path(path), 'w') as f:
+        with open(mk_local_path(path), "w", encoding="utf-8") as f:
             f.write(content)
 
 

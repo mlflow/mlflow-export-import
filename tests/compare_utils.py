@@ -3,16 +3,15 @@ Compare run utilities.
 """
 
 from mlflow_export_import.common import utils
-from mlflow_export_import.common.source_tags import ExportTags, ImportTags
+from mlflow_export_import.common.source_tags import ExportTags
 import utils_test
 
-    
-def compare_runs(client_src, client_dst, run1, run2, output_dir, export_source_tags=False):
-    if export_source_tags:
+def compare_runs(client_src, client_dst, run1, run2, output_dir, import_source_tags=False):
+    if import_source_tags:
         _compare_runs_with_source_tags(client_src, run1, run2)
     else:
         _compare_runs_without_source_tags(client_src, client_dst, run1, run2, output_dir)
-
+    
 
 def _compare_runs_without_source_tags(client_src, client_dst, run1, run2, output_dir):
     _compare_common_tags(run1, run2)
@@ -20,12 +19,13 @@ def _compare_runs_without_source_tags(client_src, client_dst, run1, run2, output
 
 
 def _compare_runs_with_source_tags(client_src, run1, run2):
-    exp = client_src.get_experiment(run1.info.experiment_id)
-    source_tags2 = { k:v for k,v in run2.data.tags.items() if k.startswith("mlflow_export_import.") }
-    assert exp.name == source_tags2[f"{ExportTags.TAG_PREFIX_METADATA}.experiment_name"]
+    assert run1.data.params == run2.data.params
+    assert run1.data.metrics == run2.data.metrics
+    source_tags2 = { k:v for k,v in run2.data.tags.items() if k.startswith(ExportTags.PREFIX_ROOT) }
+    assert len(source_tags2) > 0, f"Source tags starting with '{ExportTags.PREFIX_ROOT}' are missing"
     for k,v in utils.strip_underscores(run1.info).items():
         if k != "run_name":
-            assert str(v) == source_tags2[f"{ExportTags.TAG_PREFIX_RUN_INFO}.{k}"],f"Assert failed for RunInfo field '{k}'" # NOTE: tag values must be strings
+            assert str(v) == source_tags2[f"{ExportTags.PREFIX_RUN_INFO}.{k}"],f"Assert failed for RunInfo field '{k}'" # NOTE: tag values must be strings
 
 
 def _compare_common_tags(run1, run2):
@@ -83,7 +83,7 @@ def _compare_versions(mlflow_client_src, mlflow_client_dst, vr_src, vr_dst, outp
     if not utils.importing_into_databricks():
         assert vr_src.user_id == vr_dst.user_id
 
-    tags_dst = { k:v for k,v in vr_dst.tags.items() if not k.startswith(ImportTags.TAG_PREFIX) }
+    tags_dst = { k:v for k,v in vr_dst.tags.items() if not k.startswith(ExportTags.PREFIX_ROOT) }
     assert vr_src.tags == tags_dst
     
     assert vr_src.run_id != vr_dst.run_id

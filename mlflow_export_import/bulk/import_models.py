@@ -13,6 +13,7 @@ from mlflow_export_import.common import click_doc
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.experiment.import_experiment import ExperimentImporter
 from mlflow_export_import.model.import_model import AllModelImporter
+from mlflow_export_import.common.source_tags import ExportFields
 
 
 def _remap(run_info_map):
@@ -59,7 +60,7 @@ def _import_models(client, input_dir, run_info_map, delete_model, import_source_
     models_dir = os.path.join(input_dir, "models")
 
     manifest = io_utils.read_file(os.path.join(os.path.join(models_dir,"models.json")))
-    models = manifest[io_utils.ATTR_CUSTOM_INFO]["ok_models"]
+    models = manifest[ExportFields.CUSTOM_INFO]["ok_models"]
     importer = AllModelImporter(client, run_info_map, import_source_tags=import_source_tags)
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:

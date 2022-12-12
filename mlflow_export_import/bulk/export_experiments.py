@@ -37,7 +37,7 @@ def _export_experiment(client, exp_id_or_name, output_dir, exporter, export_resu
     return ok_runs, failed_runs
 
 
-def export_experiments(client, experiments, output_dir, export_source_tags=False, notebook_formats=None, use_threads=False):
+def export_experiments(client, experiments, output_dir, notebook_formats=None, use_threads=False):
     """
     :param: experiments: Can be either:
       - List of experiment names 
@@ -68,7 +68,7 @@ def export_experiments(client, experiments, output_dir, export_source_tags=False
     failed_runs = 0
     export_results = []
     futures = []
-    exporter = ExperimentExporter(client, export_source_tags, utils.string_to_list(notebook_formats))
+    exporter = ExperimentExporter(client, utils.string_to_list(notebook_formats))
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for exp_id_or_name in experiments:
             run_ids = experiments_dct.get(exp_id_or_name, None)
@@ -113,12 +113,6 @@ def export_experiments(client, experiments, output_dir, export_source_tags=False
     type=str,
     required=True
 )
-@click.option("--export-source-tags", 
-    help=click_doc.export_source_tags, 
-    type=bool, 
-    default=False, 
-    show_default=True
-)
 @click.option("--notebook-formats", 
     help=click_doc.notebook_formats, 
     type=str, 
@@ -131,7 +125,7 @@ def export_experiments(client, experiments, output_dir, export_source_tags=False
     default=False,
     show_default=True
 )
-def main(experiments, output_dir, export_source_tags, notebook_formats, use_threads): 
+def main(experiments, output_dir, notebook_formats, use_threads): 
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
@@ -139,7 +133,6 @@ def main(experiments, output_dir, export_source_tags, notebook_formats, use_thre
     export_experiments(client, 
         experiments=experiments,
         output_dir=output_dir,
-        export_source_tags=export_source_tags,
         notebook_formats=notebook_formats,
         use_threads=use_threads)
 

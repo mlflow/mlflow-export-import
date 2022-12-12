@@ -72,20 +72,22 @@ export-experiment \
   --notebook-formats DBC,SOURCE 
 ```
 
-#### Export directory structure
+#### Export directory structure 
 
-The output directory contains a manifest file and a subdirectory for each run (by run ID).
-The run directory contains a run.json
-([OSS](samples/oss_mlflow/individual/experiments/1/6ccadf17812d43929b093d75cca1c33f/run.json),
-[Databricks](samples/databricks/individual/experiments/sklearn_wine/16c36560c57a43fdb46e98f88a8d8819/run.json)),
-file containing run metadata and an artifact hierarchy.
+The [export directory](samples/oss_mlflow/individual/experiments/sklearn_wine) contains a [JSON export file](samples/oss_mlflow/individual/experiments/sklearn_wine/experiment.json)
+for the experiment and a subdirectory for each run. 
+The [run directory](samples/oss_mlflow/individual/experiments/sklearn_wine/eb66c160957d4a28b11d3f1b968df9cd) contains a [JSON export file](amples/oss_mlflow/individual/experiments/sklearn_wine/eb66c160957d4a28b11d3f1b968df9cd/run.json) containing run metadata and an artifact folder directory.
 
+Sample export directory
 ```
-+-manifest.json
-+-441985c7a04b4736921daad29fd4589d/
++-experiment.json
++-eb66c160957d4a28b11d3f1b968df9cd/
+| +-run.json
 | +-artifacts/
 |   +-plot.png
-|   +-sklearn-model/
+|   +-model/
+|     +-requirements.txt
+|     +-python_env.yaml
 |     +-model.pkl
 |     +-conda.yaml
 |     +-MLmodel
@@ -104,17 +106,25 @@ If the destination experiment already exists, the source runs will be added to i
 import-experiment --help 
 
 Options:
-  --input-dir TEXT           Input directory that contains the exported
-                             experiment.  [required]
-  --experiment-name TEXT     Destination experiment namethat contains the
-                             experiment.  [required]
-  --just-peek BOOLEAN        Just display experiment metadata - do not import.
-  --use-src-user-id BOOLEAN  Set the destination user ID to the source user
-                             ID. Source user ID is ignored when importing into
-                             Databricks since setting it is not allowed.
-  --dst-notebook-dir TEXT    Databricks destination workspace base directory
-                             for notebook. A run ID will be added to contain
-                             the run's notebook.
+  --input-dir TEXT                Source input directory that contains the
+                                  exported run.  [required]
+  --experiment-name TEXT          Destination experiment name.  [required]
+  --import-source-tags BOOLEAN    Import source information for registered
+                                  model and its versions ad tags in
+                                  destination object.  [default: False]
+  --mlmodel-fix BOOLEAN           Add correct run ID in destination MLmodel
+                                  artifact. Can be expensive for deeply nested
+                                  artifacts.  [default: True]
+  --use-src-user-id BOOLEAN       Set the destination user ID to the source
+                                  user ID. Source user ID is ignored when
+                                  importing into Databricks since setting it
+                                  is not allowed.  [default: False]
+  --dst-notebook-dir TEXT         Databricks destination workpsace directory
+                                  for notebook import.
+  --dst-notebook-dir-add-run-id TEXT
+                                  Add the run ID to the destination notebook
+                                  workspace directory.
+  --help                          Show this message and exit.
 ```
 
 #### Import examples
@@ -149,11 +159,6 @@ export-run --help
 Options:
   --run-id TEXT                   Run ID.  [required]
   --output-dir TEXT               Output directory.  [required]
-  --export-source-tagss BOOLEAN  Export source run information (RunInfo,
-                                 MLflow system tags starting with 'mlflow' and
-                                 metadata) under the 'mlflow_export_import'
-                                 tag prefix. See README.md for more details.
-                                 [default: False]
   --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
                                   JUPYTER or DBC (comma seperated).  [default: ]
 ```
@@ -176,53 +181,11 @@ Produces a directory with the following structure:
 |   +-model.pkl
 |   +-conda.yaml
 |   +-MLmodel
-| +-plot.png
-
 ```
+
 Sample run.json:
 [OSS](samples/oss_mlflow/individual/experiments/sklearn_wine/eb66c160957d4a28b11d3f1b968df9cd/run.json)
  \- [Databricks](samples/databricks/individual/experiments/sklearn_wine/f2e3f75c845d4365addbc9c0262a58a5/run.json).
-```
-{   
-  "info": {
-    "run-id": "50fa90e751eb4b3f9ba9cef0efe8ea30",
-    "experiment_id": "2",
-    ...
-  },
-  "params": {
-    "max_depth": "16",
-    "max_leaf_nodes": "32"
-  },
-  "metrics": {
-    "rmse": [
-      {
-        "value": 0.7367947360663162,
-        "timestamp": 1647391746393,
-        "step": 0
-      }
-    ],
-   "r2": [
-      {
-        "value": 0.28100217442439346,
-        "timestamp": 1647391746422,
-        "step": 0
-      }
-    ]
-  },
-  "tags": {
-    "mlflow.source.git.commit": "a42b9682074f4f07f1cb2cf26afedee96f357f83",
-    "mlflow.runName": "demo.sh",
-    "run_origin": "demo.sh",
-    "mlflow.source.type": "LOCAL",
-    "mlflow_export_import.metadata.tracking_uri": "http://localhost:5000",
-    "mlflow_export_import.metadata.timestamp": 1563572639,
-    "mlflow_export_import.metadata.timestamp_nice": "2019-07-19 21:43:59",
-    "mlflow_export_import.metadata.run-id": "130bca8d75e54febb2bfa46875a03d59",
-    "mlflow_export_import.metadata.experiment_id": "2",
-    "mlflow_export_import.metadata.experiment-name": "sklearn_wine"
-  }
-}
-```
 
 ### Import run
 
@@ -234,17 +197,20 @@ Imports a run from a directory.
 import-run --help
 
 Options:
-  --input-dir TEXT                Input directory that contains the exported
-                                  run.  [required]
+  --input-dir TEXT                Source input directory that contains the
+                                  exported run.  [required]
   --experiment-name TEXT          Destination experiment name.  [required]
+  --import-source-tags BOOLEAN    Import source information for registered
+                                  model and its versions ad tags in
+                                  destination object.  [default: False]
   --mlmodel-fix BOOLEAN           Add correct run ID in destination MLmodel
                                   artifact. Can be expensive for deeply nested
-                                  artifacts  [default: True]
+                                  artifacts.  [default: True]
   --use-src-user-id BOOLEAN       Set the destination user ID to the source
                                   user ID. Source user ID is ignored when
                                   importing into Databricks since setting it
                                   is not allowed.  [default: False]
-  --dst-notebook-dir TEXT         Databricks destination workspace directory
+  --dst-notebook-dir TEXT         Databricks destination workpsace directory
                                   for notebook import.
   --dst-notebook-dir-add-run-id TEXT
                                   Add the run ID to the destination notebook
@@ -288,22 +254,20 @@ Source: [export_model.py](mlflow_export_import/model/export_model.py).
 export-model --help
 
 Options:
-  --model TEXT                  Registered model name.  [required]
-  --output-dir TEXT             Output directory.  [required]
-  --export-source-tags BOOLEAN  Export source run information (RunInfo, MLflow
-                                system tags starting with 'mlflow' and
-                                metadata) under the 'mlflow_export_import' tag
-                                prefix. See README_individual.md for more
-                                details.  [default: False]
-  --notebook-formats TEXT       Databricks notebook formats. Values are
-                                SOURCE, HTML, JUPYTER or DBC (comma
-                                seperated).
-  --stages TEXT                 Stages to export (comma seperated). Default is
-                                all stages and all versions. Stages are
-                                Production, Staging, Archived and None.
-                                Mututally exclusive with option --versions.
-  --versions TEXT               Export specified versions (comma separated).
-                                Mututally exclusive with option --stages.
+  --input-dir TEXT              Input directory produced by export_model.py.
+                                [required]
+  --model TEXT                  New registered model name.  [required]
+  --experiment-name TEXT        Destination experiment name  - will be created
+                                if it does not exist.  [required]
+  --delete-model BOOLEAN        If the model exists, first delete the model
+                                and all its versions.  [default: False]
+  --import-source-tags BOOLEAN  Import source information for registered model
+                                and its versions ad tags in destination
+                                object.  [default: False]
+  --await-creation-for INTEGER  Await creation for specified seconds.
+  --sleep-time INTEGER          Sleep time for polling until
+                                version.status==READY.
+  --verbose BOOLEAN             Verbose.  [default: False]
 ```
 
 #### Example

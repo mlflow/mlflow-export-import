@@ -13,15 +13,15 @@ from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common import timestamp_utils
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.common import model_utils
-from mlflow_export_import.common.source_tags import ImportTags
+from mlflow_export_import.common.source_tags import ExportTags
 from mlflow_export_import.run.import_run import RunImporter
 
 
 def _fmt_timestamps(tag, dct, tags):
     ts = dct[tag]
-    tags[f"{ImportTags.TAG_PREFIX}.{tag}"] = ts
-    tags[f"{ImportTags.TAG_PREFIX}._{tag}_local"] = timestamp_utils.fmt_ts_millis(ts)
-    tags[f"{ImportTags.TAG_PREFIX}._{tag}_utc"] = timestamp_utils.fmt_ts_millis(ts, True)
+    tags[f"{ExportTags.PREFIX_ROOT}.{tag}"] = ts
+    tags[f"{ExportTags.PREFIX_ROOT}._{tag}_local"] = timestamp_utils.fmt_ts_millis(ts)
+    tags[f"{ExportTags.PREFIX_ROOT}._{tag}_utc"] = timestamp_utils.fmt_ts_millis(ts, True)
 
 
 class BaseModelImporter():
@@ -31,6 +31,7 @@ class BaseModelImporter():
         """
         :param mlflow_client: MLflow client or if None create default client.
         :param run_importer: RunImporter instance.
+        :param import_source_tags: Import source information for MLFlow objects and create tags in destination object.
         :param await_creation_for: Seconds to wait for model version crreation.
         """
         self.mlflow_client = mlflow_client 
@@ -56,7 +57,7 @@ class BaseModelImporter():
         if self.import_source_tags:
             for k,v in src_vr.items():
                 if k != "tags":
-                    tags[f"{ImportTags.TAG_PREFIX}.{k}"] = v
+                    tags[f"{ExportTags.PREFIX_ROOT}.{k}"] = v
             _fmt_timestamps("creation_timestamp", src_vr, tags)
             _fmt_timestamps("last_updated_timestamp", src_vr, tags)
 
@@ -100,7 +101,7 @@ class BaseModelImporter():
                 _fmt_timestamps("last_updated_timestamp", model_dct, tags)
                 for k,_ in model_dct.items():
                     if k != "tags":
-                        tags[f"{ImportTags.TAG_PREFIX}.{k}"] = model_dct[k]
+                        tags[f"{ExportTags.PREFIX_ROOT}.{k}"] = model_dct[k]
             self.mlflow_client.create_registered_model(model_name, tags, model_dct.get("description"))
             print(f"Created new registered model '{model_name}'")
         except RestException as e:
@@ -243,6 +244,12 @@ def _path_join(x,y):
     default=False,
     show_default=True
 )
+@click.option("--import-source-tags",
+    help=click_doc.import_source_tags,
+    type=bool,
+    default=False,
+    show_default=True
+)
 @click.option("--await-creation-for",
     help="Await creation for specified seconds.",
     type=int,
@@ -253,12 +260,6 @@ def _path_join(x,y):
     help="Sleep time for polling until version.status==READY.",
     type=int,
     default=5,
-)
-@click.option("--import-source-tags",
-    help=click_doc.import_source_tags,
-    type=bool,
-    default=False,
-    show_default=True
 )
 @click.option("--verbose",
     help="Verbose.",

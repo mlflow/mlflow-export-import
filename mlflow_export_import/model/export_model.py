@@ -15,17 +15,16 @@ from mlflow_export_import.run.export_run import RunExporter
 
 class ModelExporter():
 
-    def __init__(self,  mlflow_client, export_source_tags=False, notebook_formats=None, stages=None, versions=None, export_run=True):
+    def __init__(self,  mlflow_client, notebook_formats=None, stages=None, versions=None, export_run=True):
         """
         :param mlflow_client: MLflow client or if None create default client.
-        :param export_source_tags: Export source run metadata tags.
         :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
         :param stages: Stages to export. Default is all stages. Values are Production, Staging, Archived and None.
         :param export_run: Export the run that generated a registered model's version.
         """
         self.mlflow_client = mlflow_client
         self.http_client = MlflowHttpClient()
-        self.run_exporter = RunExporter(self.mlflow_client, export_source_tags=export_source_tags, notebook_formats=notebook_formats)
+        self.run_exporter = RunExporter(self.mlflow_client, notebook_formats=notebook_formats)
         self.stages = self._normalize_stages(stages)
         self.export_run = export_run
         self.versions = versions if versions else []
@@ -122,12 +121,6 @@ class ModelExporter():
     type=str,
     required=True
 )
-@click.option("--export-source-tags",
-    help=click_doc.export_source_tags,
-    type=bool,
-    default=False,
-    show_default=True
-)
 @click.option("--notebook-formats",
     help=click_doc.notebook_formats,
     type=str,
@@ -144,13 +137,13 @@ class ModelExporter():
     type=str,
     required=False
 )
-def main(model, output_dir, export_source_tags, notebook_formats, stages, versions):
+def main(model, output_dir, notebook_formats, stages, versions):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
     mlflow_client = mlflow.client.MlflowClient()
     versions = versions.split(",") if versions else []
-    exporter = ModelExporter(mlflow_client, export_source_tags=export_source_tags, notebook_formats=utils.string_to_list(notebook_formats), stages=stages, versions=versions)
+    exporter = ModelExporter(mlflow_client, notebook_formats=utils.string_to_list(notebook_formats), stages=stages, versions=versions)
     exporter.export_model(model, output_dir)
 
 

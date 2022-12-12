@@ -2,31 +2,38 @@
   "export_info": {
     "mlflow_version": "2.0.1",
     "mlflow_tracking_uri": "databricks",
-    "export_time": {
-      "seconds": 1670276599,
-      "local_time": "2022-12-05 16:43:19",
-      "utc_time": "2022-12-05 16:43:19"
+    "user": "andre",
+    "platform": {
+      "python_version": "3.8.15",
+      "system": "Darwin"
     },
+    "export_time": {
+      "seconds": 1670830443,
+      "local_time": "2022-12-12 02:34:03",
+      "utc_time": "2022-12-12 07:34:03"
+    }
+  },
+  "custom_info": {
     "num_total_runs": 1,
     "num_ok_runs": 1,
     "ok_runs": [
-      "eb33601ce4074af48071a6d2e4bef067"
+      "f2e3f75c845d4365addbc9c0262a58a5"
     ],
     "num_failed_runs": 0,
     "failed_runs": []
   },
   "experiment": {
-    "experiment_id": "12728143",
-    "name": "/Users/andre@databricks.com/experiments/imported/02_Sklearn_Train_Predict",
-    "artifact_location": "dbfs:/databricks/mlflow-tracking/12728143",
+    "experiment_id": "13373532",
+    "name": "/Users/andre@databricks.com/experiments/samples/andre_sample_sklearn_Train_Predict",
+    "artifact_location": "dbfs:/databricks/mlflow-tracking/13373532",
     "lifecycle_stage": "active",
     "tags": {
       "mlflow.ownerId": "100327",
-      "mlflow.experiment.sourceName": "/Users/andre@databricks.com/experiments/imported/02_Sklearn_Train_Predict",
+      "mlflow.experiment.sourceName": "/Users/andre@databricks.com/experiments/samples/andre_sample_sklearn_Train_Predict",
       "mlflow.ownerEmail": "andre@databricks.com",
       "mlflow.experimentType": "MLFLOW_EXPERIMENT"
     },
-    "creation_time": 1654870574134,
-    "last_update_time": 1656439756241
+    "creation_time": 1670600064781,
+    "last_update_time": 1670600162238
   }
 }

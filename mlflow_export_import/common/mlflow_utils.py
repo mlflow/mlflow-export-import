@@ -5,7 +5,7 @@ from mlflow_export_import.common import MlflowExportImportException
 
 def dump_mlflow_info():
     print("MLflow Info:")
-    print("  MLflow Version:", mlflow.version.VERSION)
+    print("  MLflow Version:", mlflow.__version__)
     print("  Tracking URI:", mlflow.client.get_tracking_uri())
     mlflow_host = get_mlflow_host()
     print("  Real MLflow host:", mlflow_host)

@@ -35,8 +35,8 @@ def test_metrics(mlflow_context):
 def test_tags(mlflow_context):
     run1, run2 = _init_test_runs(mlflow_context, 
         RunExporter(mlflow_context.client_src),
-        RunImporter(mlflow_context.client_dst, 
-        mlmodel_fix=True), num_tags=_num_tags)
+        RunImporter(mlflow_context.client_dst, mlmodel_fix=True), 
+        num_tags=_num_tags)
     assert len(run1.data.tags) >= MAX_PARAMS_TAGS_PER_BATCH + _num_tags
     compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, mlflow_context.output_dir)
 
@@ -84,4 +84,3 @@ def _create_run(client, num_params=None, num_metrics=None, num_tags=None):
         client.log_batch(run.info.run_id, tags=tags1)
 
     return exp, run
-

@@ -1,5 +1,11 @@
 # MLflow Export Import Source Tags
 
+<h2>
+<font color="red">
+Deprecated - Update WIP
+</font>
+</h2>
+
 ## Overview
 
 `export-source-tags` - Exports source information under the `mlflow_export_import` tag prefix. See section below for details.

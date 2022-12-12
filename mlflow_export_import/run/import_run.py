@@ -11,10 +11,10 @@ import base64
 import mlflow
 from mlflow.entities import RunStatus
 from mlflow.utils.validation import MAX_PARAMS_TAGS_PER_BATCH, MAX_METRICS_PER_BATCH
+from mlflow.utils.mlflow_tags import MLFLOW_PARENT_RUN_ID
 
 from mlflow_export_import.common import utils, click_doc
 from mlflow_export_import.common.filesystem import mk_local_path
-from mlflow_export_import.common.source_tags import MlflowTags
 from mlflow_export_import.common.find_artifacts import find_artifacts
 from mlflow_export_import.common.http_client import DatabricksHttpClient
 from mlflow_export_import.common import mlflow_utils
@@ -27,11 +27,13 @@ from mlflow_export_import.run import run_data_importer
 class RunImporter():
     def __init__(self, 
             mlflow_client, 
+            import_source_tags=False,
             mlmodel_fix=True, 
             use_src_user_id=False, \
             dst_notebook_dir_add_run_id=False):
         """ 
         :param mlflow_client: MLflow client.
+        :param import_source_tags: Import source information for MLFlow objects and create tags in destination object.
         :param mlmodel_fix: Add correct run ID in destination MLmodel artifact. 
                             Can be expensive for deeply nested artifacts.
         :param use_src_user_id: Set the destination user ID to the source user ID. 
@@ -47,6 +49,7 @@ class RunImporter():
         self.in_databricks = "DATABRICKS_RUNTIME_VERSION" in os.environ
         self.dst_notebook_dir_add_run_id = dst_notebook_dir_add_run_id
         self.dbx_client = DatabricksHttpClient()
+        self.import_source_tags = import_source_tags
         print(f"in_databricks: {self.in_databricks}")
         print(f"importing_into_databricks: {utils.importing_into_databricks()}")
 
@@ -90,7 +93,8 @@ class RunImporter():
         if utils.importing_into_databricks() and dst_notebook_dir:
             ndir = os.path.join(dst_notebook_dir, run_id) if self.dst_notebook_dir_add_run_id else dst_notebook_dir
             self._upload_databricks_notebook(input_dir, src_run_dct, ndir)
-        return (run, src_run_dct["tags"].get(MlflowTags.TAG_PARENT_ID,None))
+
+        return (run, src_run_dct["tags"].get(MLFLOW_PARENT_RUN_ID,None))
 
 
     def _update_mlmodel_run_id(self, run_id):
@@ -117,9 +121,11 @@ class RunImporter():
             run_dct, 
             run_id, 
             MAX_PARAMS_TAGS_PER_BATCH, 
+            self.import_source_tags,
             self.in_databricks, 
             src_user_id, 
-            self.use_src_user_id)
+            self.use_src_user_id
+    )
 
 
     def _upload_databricks_notebook(self, input_dir, src_run_dct, dst_notebook_dir):
@@ -167,6 +173,12 @@ class RunImporter():
     type=str,
     required=True
 )
+@click.option("--import-source-tags",
+    help=click_doc.import_source_tags,
+    type=bool,
+    default=False,
+    show_default=True
+)
 @click.option("--mlmodel-fix",
     help="Add correct run ID in destination MLmodel artifact. Can be expensive for deeply nested artifacts.", 
     type=bool, 
@@ -191,7 +203,7 @@ class RunImporter():
     required=False, 
     show_default=True
 )
-def main(input_dir, experiment_name, mlmodel_fix, use_src_user_id, \
+def main(input_dir, experiment_name, import_source_tags, mlmodel_fix, use_src_user_id, \
         dst_notebook_dir, dst_notebook_dir_add_run_id):
     print("Options:")
     for k,v in locals().items():
@@ -199,6 +211,7 @@ def main(input_dir, experiment_name, mlmodel_fix, use_src_user_id, \
     client = mlflow.tracking.MlflowClient()
     importer = RunImporter(
         client,
+        import_source_tags,
         mlmodel_fix=mlmodel_fix, 
         use_src_user_id=use_src_user_id, 
         dst_notebook_dir_add_run_id=dst_notebook_dir_add_run_id)

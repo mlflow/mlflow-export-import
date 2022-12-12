@@ -108,9 +108,9 @@ For more details, see:
 
 `export-source-tags` - Exports source information under the `mlflow_export_import` tag prefix. See section below for details.
 
-### MLflow Export Import Source Run Tags 
+### MLflow Export Import Source Tags 
 
-For ML governance purposes, original source run information is saved under the `mlflow_export_import` tag prefix. 
+For ML governance purposes, original source run information is saved under the `mlflow_export_import` tag prefix in the destination MLflow object.
 
 
 For details see [README_source_tags](README_source_tags.md).

@@ -2,11 +2,18 @@
   "export_info": {
     "mlflow_version": "2.0.1",
     "mlflow_tracking_uri": "http://127.0.0.1:5020",
-    "export_time": {
-      "seconds": 1670203523,
-      "local_time": "2022-12-04 20:25:23",
-      "utc_time": "2022-12-04 20:25:23"
+    "user": "andre",
+    "platform": {
+      "python_version": "3.8.15",
+      "system": "Darwin"
     },
+    "export_time": {
+      "seconds": 1670828894,
+      "local_time": "2022-12-12 02:08:14",
+      "utc_time": "2022-12-12 07:08:14"
+    }
+  },
+  "custom_info": {
     "num_total_runs": 1,
     "num_ok_runs": 1,
     "ok_runs": [
@@ -22,9 +29,9 @@
     "lifecycle_stage": "active",
     "tags": {
       "version_mlflow": "2.0.1",
-      "experiment_created": "2022-12-05 01:25:00"
+      "experiment_created": "2022-12-12 07:01:10"
     },
-    "creation_time": 1670203501203,
-    "last_update_time": 1670203501203
+    "creation_time": 1670828470588,
+    "last_update_time": 1670828470588
   }
 }

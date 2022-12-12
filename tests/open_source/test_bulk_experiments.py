@@ -57,14 +57,13 @@ def compare_experiments(mlflow_context, compare_func):
 
 # == Export/import Experiments tests
 
-def _run_test(mlflow_context, compare_func, export_source_tags=False, use_threads=False):
+def _run_test(mlflow_context, compare_func, use_threads=False):
     delete_experiments_and_models(mlflow_context)
     exps = [ create_test_experiment(mlflow_context.client_src, 3), create_test_experiment(mlflow_context.client_src, 4) ]
     exp_names = [ exp.name for exp in exps ]
     export_experiments(mlflow_context.client_src,
         experiments = exp_names,
         output_dir = mlflow_context.output_dir,
-        export_source_tags = export_source_tags,
         notebook_formats = notebook_formats,
         use_threads = use_threads)
 
@@ -78,8 +77,8 @@ def test_exp_basic(mlflow_context):
 def test_exp_basic_threads(mlflow_context):
     _run_test(mlflow_context, compare_runs, use_threads=True)
 
-def test_exp_with_source_tags(mlflow_context): 
-    _run_test(mlflow_context, compare_runs, export_source_tags=True)
+#def test_exp_with_source_tags(mlflow_context): # TODO
+    #_run_test(mlflow_context, compare_runs)
 
 def test_get_experiment_ids_from_comma_delimited_string(mlflow_context):
     exp_ids = bulk_utils.get_experiment_ids(mlflow_context.client_src, "exp1,exp2,exp3")

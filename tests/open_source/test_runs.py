@@ -5,8 +5,6 @@ from utils_test import create_output_dir
 from compare_utils import compare_runs
 from init_tests import mlflow_context
 
-_use_source_tags = True
-
 # == Setup
 
 _mlmodel_fix = True
@@ -27,17 +25,17 @@ def init_run_test(mlflow_context, exporter, importer, run_name=None, use_metric_
 def test_run_basic(mlflow_context):
     run1, run2 = init_run_test(mlflow_context, 
         RunExporter(mlflow_context.client_src), 
-        RunImporter(mlflow_context.client_dst, mlmodel_fix=_mlmodel_fix),
+        RunImporter(mlflow_context.client_dst, import_source_tags=False, mlmodel_fix=_mlmodel_fix),
         "test_run_basic")
     compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, mlflow_context.output_dir)
 
 
 def test_run_with_source_tags(mlflow_context):
     run1, run2 = init_run_test(mlflow_context, 
-        RunExporter(mlflow_context.client_src, export_source_tags=True), 
-        RunImporter(mlflow_context.client_dst, mlmodel_fix=_mlmodel_fix), 
+        RunExporter(mlflow_context.client_src),
+        RunImporter(mlflow_context.client_dst, import_source_tags=True, mlmodel_fix=_mlmodel_fix), 
         "test_run_with_source_tags")
-    compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, mlflow_context.output_dir, _use_source_tags)
+    compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, mlflow_context.output_dir, import_source_tags=True)
 
 
 def test_run_basic_use_metric_steps(mlflow_context): 
