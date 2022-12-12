@@ -8,3 +8,4 @@ class ExportFields:
 class ExportTags:
     PREFIX_ROOT    = "mlflow_export_import"
     PREFIX_RUN_INFO = f"{PREFIX_ROOT}.run_info"
+    PREFIX_MLFLOW = f"{PREFIX_ROOT}.mlflow"

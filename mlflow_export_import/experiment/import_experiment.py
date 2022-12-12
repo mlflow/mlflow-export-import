@@ -11,7 +11,7 @@ from mlflow_export_import.common import io_utils
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common.http_client import DatabricksHttpClient
 from mlflow_export_import.run.import_run import RunImporter
-from mlflow_export_import.common.source_tags import ExportFields
+from mlflow_export_import.common.source_tags import ExportFields, ExportTags
 
 
 def _peek_at_experiments(exp_dir):
@@ -36,6 +36,7 @@ class ExperimentImporter():
             dst_notebook_dir_add_run_id=True)
         print("MLflowClient:",self.mlflow_client)
         self.dbx_client = DatabricksHttpClient()
+        self.import_source_tags = import_source_tags
 
 
     def import_experiment(self, exp_name, input_dir, dst_notebook_dir=None):
@@ -48,6 +49,10 @@ class ExperimentImporter():
         manifest_path = io_utils.mk_manifest_json_path(input_dir, "experiment.json")
         exp_dct = io_utils.read_file(manifest_path)
         tags = exp_dct["experiment"]["tags"] 
+        if self.import_source_tags:
+            source_tags = utils.mk_source_tags(tags, "mlflow.", f"{ExportTags.PREFIX_MLFLOW}")
+            tags = { **tags, **source_tags }
+
         mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, exp_name, tags)
 
         custom_info = exp_dct[ExportFields.CUSTOM_INFO]
