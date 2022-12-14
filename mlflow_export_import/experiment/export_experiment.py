@@ -55,7 +55,7 @@ class ExperimentExporter():
         exp_dct["tags"] = dict(sorted(exp_dct["tags"].items()))
         content = { "experiment": exp_dct }
 
-        io_utils.write_manifest_file(output_dir, "experiment.json", content, custom_info)
+        io_utils.write_export_file(output_dir, "experiment.json", content, custom_info)
 
         msg = f"for experiment '{exp.name}' (ID: {exp.experiment_id})"
         if len(failed_run_ids) == 0:

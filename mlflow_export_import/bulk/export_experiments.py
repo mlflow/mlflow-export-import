@@ -93,7 +93,7 @@ def export_experiments(client, experiments, output_dir, notebook_formats=None, u
       "failed_runs": failed_runs
     }
     content = { "experiments": export_results }
-    io_utils.write_manifest_file(output_dir, "experiments.json", content, custom_info)
+    io_utils.write_export_file(output_dir, "experiments.json", content, custom_info)
 
     print(f"{len(experiments)} experiments exported")
     print(f"{ok_runs}/{total_runs} runs succesfully exported")

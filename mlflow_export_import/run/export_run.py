@@ -59,7 +59,7 @@ class RunExporter:
             "metrics": self._get_metrics_with_steps(run),
             "tags": tags
         }
-        io_utils.write_manifest_file(output_dir, "run.json", content)
+        io_utils.write_export_file(output_dir, "run.json", content)
         fs =  _filesystem.get_filesystem(".")
 
         # copy artifacts

@@ -91,7 +91,7 @@ class ModelExporter():
             "num_src_versions": len(versions),
             "num_dst_versions": len(output_versions)
         }
-        io_utils.write_manifest_file(output_dir, "model.json", model, custom_info)
+        io_utils.write_export_file(output_dir, "model.json", model, custom_info)
 
         print(f"Exported {exported_versions}/{len(output_versions)} versions for model '{model_name}'")
         return manifest
