@@ -22,7 +22,7 @@ def _import_experiment(importer, exp_name, exp_input_dir):
 
 
 def import_experiments(client, input_dir, use_src_user_id=False, use_threads=False): 
-    dct = io_utils.read_file(os.path.join(input_dir, "experiments.json"))
+    dct = io_utils.read_file_mlflow(os.path.join(input_dir, "experiments.json"))
     exps = dct["experiments"]
     for exp in exps:
         print("  ",exp)

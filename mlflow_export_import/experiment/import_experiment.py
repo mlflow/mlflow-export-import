@@ -46,16 +46,18 @@ class ExperimentImporter():
         :return: A map of source run IDs and destination run.info.
         """
 
-        manifest_path = io_utils.mk_manifest_json_path(input_dir, "experiment.json")
-        exp_dct = io_utils.read_file(manifest_path)
+        path = io_utils.mk_manifest_json_path(input_dir, "experiment.json")
+        exp_dct = io_utils.read_file(path)
+        custom_info = io_utils.get_custom(exp_dct)
+        exp_dct = io_utils.get_mlflow(exp_dct)
+
         tags = exp_dct["experiment"]["tags"] 
         if self.import_source_tags:
-            source_tags = utils.mk_source_tags(tags, "mlflow.", f"{ExportTags.PREFIX_MLFLOW}")
+            source_tags = utils.mk_source_tags(tags, "mlflow.", f"{ExportTags.PREFIX_ROOT}")
             tags = { **tags, **source_tags }
 
         mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, exp_name, tags)
 
-        custom_info = exp_dct[ExportFields.CUSTOM_INFO]
         run_ids = custom_info["ok_runs"]
         failed_run_ids = custom_info["failed_runs"]
 
@@ -69,7 +71,7 @@ class ExperimentImporter():
             run_info_map[src_run_id] = dst_run.info
         print(f"Imported {len(run_ids)} runs into experiment '{exp_name}' from {input_dir}")
         if len(failed_run_ids) > 0:
-            print(f"Warning: {len(failed_run_ids)} failed runs were not imported - see '{manifest_path}'")
+            print(f"Warning: {len(failed_run_ids)} failed runs were not imported - see '{path}'")
         utils.nested_tags(self.mlflow_client, run_ids_map)
         return run_info_map
 

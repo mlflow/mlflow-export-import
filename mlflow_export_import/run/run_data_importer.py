@@ -1,5 +1,6 @@
 """
-Module to account for importing MLflow run data (params, metrics and tags) that exceed API limits.
+Module to account for importing MLflow run data (params, metrics and tags) 
+Focus is on data that exceed API limits.
 See: https://www.mlflow.org/docs/latest/rest-api.html#request-limits.
 """
 
@@ -49,11 +50,12 @@ def log_tags(client, run_dct, run_id, batch_size, import_source_tags, in_databri
 
     def get_data(run_dct, args):
         tags = run_dct["tags"]
-        tags = utils.create_mlflow_tags_for_databricks_import(tags) # remove "mlflow" tags that cannot be imported into Databricks
-        info =  run_dct["info"]
         if import_source_tags:
-            source_tags = utils.mk_source_tags(info, None, f"{ExportTags.PREFIX_RUN_INFO}")
-            tags = { **tags, **source_tags }
+            source_mlflow_tags = utils.mk_source_tags(tags, "mlflow.", f"{ExportTags.PREFIX_TAG}") 
+            info =  run_dct["info"]
+            source_info_tags = utils.mk_source_tags(info, None, f"{ExportTags.PREFIX_RUN_INFO}")
+            tags = { **tags, **source_mlflow_tags, **source_info_tags }
+        tags = utils.create_mlflow_tags_for_databricks_import(tags) # remove "mlflow" tags that cannot be imported into Databricks
         tags = [ RunTag(k,v) for k,v in tags.items() ]
         if not in_databricks:
             utils.set_dst_user_id(tags, args["src_user_id"], args["use_src_user_id"])

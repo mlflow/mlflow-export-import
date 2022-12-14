@@ -1,7 +1,7 @@
 from mlflow_export_import.experiment.export_experiment import ExperimentExporter
 from mlflow_export_import.experiment.import_experiment import ExperimentImporter
 from oss_utils_test import create_simple_run, init_output_dirs, create_dst_experiment_name
-from compare_utils import compare_runs
+from compare_utils import compare_runs, compare_experiment_tags
 from compare_utils import dump_runs
 from init_tests import mlflow_context
 
@@ -25,13 +25,11 @@ def _init_exp_test(mlflow_context, exporter, importer, verbose=False):
     return exp1, exp2, run1, run2
 
 
-def _compare_experiments(exp1, exp2):
+def _compare_experiments(exp1, exp2, import_source_tags=False):
     assert exp1.name == exp2.name
     assert exp1.lifecycle_stage == exp2.lifecycle_stage
-    assert exp1.tags == exp2.tags
-    assert exp1.tags == exp2.tags
-    assert exp1.tags == exp2.tags
     assert exp1.artifact_location != exp2.artifact_location
+    compare_experiment_tags(exp1.tags, exp2.tags, import_source_tags)
 
 
 def test_exp_basic(mlflow_context):
@@ -40,7 +38,8 @@ def test_exp_basic(mlflow_context):
         ExperimentImporter(mlflow_context.client_dst), 
         verbose=True)
     _compare_experiments(exp1, exp2)
-    compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, mlflow_context.output_dir)
+    compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, 
+        mlflow_context.output_dir)
 
 
 def test_exp_with_source_tags(mlflow_context):
@@ -48,5 +47,7 @@ def test_exp_with_source_tags(mlflow_context):
        ExperimentExporter(mlflow_context.client_src),
        ExperimentImporter(mlflow_context.client_dst, import_source_tags=True), 
        verbose=False)
-    _compare_experiments(exp1, exp2)
-    compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, mlflow_context.output_dir, import_source_tags=True)
+    _compare_experiments(exp1, exp2, True)
+    compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, 
+        mlflow_context.output_dir, 
+        import_source_tags=True)

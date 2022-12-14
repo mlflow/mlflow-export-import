@@ -48,10 +48,12 @@ def _export_models(client, model_names, output_dir, notebook_formats, stages, ex
         "num_ok_models": len(ok_models),
         "num_failed_models": len(failed_models),
         "duration": duration,
-        "ok_models": ok_models,
         "failed_models": failed_models
     }
-    io_utils.write_manifest_file(output_dir, "models.json", {}, custom_info)
+    content = {
+        "models": ok_models,
+    }
+    io_utils.write_export_file(output_dir, "models.json", content, custom_info)
 
     print(f"{len(model_names)} models exported")
     print(f"Duration for registered models export: {duration} seconds")
@@ -71,7 +73,7 @@ def export_models(client, model_names, output_dir, notebook_formats=None, stages
       "stages": stages, 
       "notebook_formats": notebook_formats
     }
-    io_utils.write_manifest_file(output_dir, "models.json", {}, custom_info)
+    io_utils.write_export_file(output_dir, "models.json", {}, custom_info)
 
     print(f"Duration for total registered models and versions' runs export: {duration} seconds")
 

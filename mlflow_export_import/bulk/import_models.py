@@ -13,7 +13,6 @@ from mlflow_export_import.common import click_doc
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.experiment.import_experiment import ExperimentImporter
 from mlflow_export_import.model.import_model import AllModelImporter
-from mlflow_export_import.common.source_tags import ExportFields
 
 
 def _remap(run_info_map):
@@ -26,8 +25,9 @@ def _remap(run_info_map):
 
 def _import_experiments(client, input_dir, use_src_user_id):
     start_time = time.time()
-    manifest = io_utils.read_file(os.path.join(os.path.join(input_dir,"experiments","experiments.json")))
-    exps = manifest["experiments"]
+
+    dct = io_utils.read_file_mlflow(os.path.join(os.path.join(input_dir,"experiments","experiments.json")))
+    exps = dct["experiments"]
 
     importer = ExperimentImporter(client, use_src_user_id)
     print("Experiments:")
@@ -57,10 +57,10 @@ def _import_experiments(client, input_dir, use_src_user_id):
 def _import_models(client, input_dir, run_info_map, delete_model, import_source_tags, verbose, use_threads):
     max_workers = os.cpu_count() or 4 if use_threads else 1
     start_time = time.time()
-    models_dir = os.path.join(input_dir, "models")
 
-    manifest = io_utils.read_file(os.path.join(os.path.join(models_dir,"models.json")))
-    models = manifest[ExportFields.CUSTOM_INFO]["ok_models"]
+    models_dir = os.path.join(input_dir, "models")
+    models = io_utils.read_file_mlflow(os.path.join(os.path.join(models_dir,"models.json")))
+    models = models["models"]
     importer = AllModelImporter(client, run_info_map, import_source_tags=import_source_tags)
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:

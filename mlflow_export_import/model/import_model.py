@@ -19,9 +19,9 @@ from mlflow_export_import.run.import_run import RunImporter
 
 def _fmt_timestamps(tag, dct, tags):
     ts = dct[tag]
-    tags[f"{ExportTags.PREFIX_ROOT}.{tag}"] = ts
-    tags[f"{ExportTags.PREFIX_ROOT}._{tag}_local"] = timestamp_utils.fmt_ts_millis(ts)
-    tags[f"{ExportTags.PREFIX_ROOT}._{tag}_utc"] = timestamp_utils.fmt_ts_millis(ts, True)
+    tags[f"{ExportTags.PREFIX_FIELD}.{tag}"] = ts
+    #tags[f"{ExportTags.PREFIX_FIELD}._{tag}_local"] = timestamp_utils.fmt_ts_millis(ts)
+    tags[f"{ExportTags.PREFIX_FIELD}._{tag}_utc"] = timestamp_utils.fmt_ts_millis(ts, True)
 
 
 class BaseModelImporter():
@@ -55,19 +55,24 @@ class BaseModelImporter():
         kwargs = {"await_creation_for": self.await_creation_for } if self.await_creation_for else {}
         tags = src_vr["tags"]
         if self.import_source_tags:
-            for k,v in src_vr.items():
-                if k != "tags":
-                    tags[f"{ExportTags.PREFIX_ROOT}.{k}"] = v
-            _fmt_timestamps("creation_timestamp", src_vr, tags)
-            _fmt_timestamps("last_updated_timestamp", src_vr, tags)
+            self._set_source_tags(src_vr, tags)
 
         version = self.mlflow_client.create_model_version(model_name, dst_source, dst_run_id, \
             description=src_vr["description"], tags=tags, **kwargs)
+
         model_utils.wait_until_version_is_ready(self.mlflow_client, model_name, version, sleep_time=sleep_time)
         if src_current_stage != "None":
             active_stages = [ "Production", "Staging" ]
             archive_existing_versions = src_current_stage in active_stages
             self.mlflow_client.transition_model_version_stage(model_name, version.version, src_current_stage, archive_existing_versions)
+
+
+    def _set_source_tags(self, dct, tags):
+        for k,v in dct.items():
+            if k != "tags":
+                tags[f"{ExportTags.PREFIX_FIELD}.{k}"] = v
+        _fmt_timestamps("creation_timestamp", dct, tags)
+        _fmt_timestamps("last_updated_timestamp", dct, tags)
 
 
     def _import_model(self, model_name, input_dir, delete_model=False):
@@ -80,7 +85,7 @@ class BaseModelImporter():
         :return: Model import manifest.
         """
         path = os.path.join(input_dir, "model.json")
-        model_dct = io_utils.read_file(path)["registered_model"]
+        model_dct = io_utils.read_file_mlflow(path)["registered_model"]
 
         print("Model to import:")
         print(f"  Name: {model_dct['name']}")
@@ -97,11 +102,7 @@ class BaseModelImporter():
         try:
             tags = { e["key"]:e["value"] for e in model_dct.get("tags", {}) }
             if self.import_source_tags:
-                _fmt_timestamps("creation_timestamp", model_dct, tags)
-                _fmt_timestamps("last_updated_timestamp", model_dct, tags)
-                for k,_ in model_dct.items():
-                    if k != "tags":
-                        tags[f"{ExportTags.PREFIX_ROOT}.{k}"] = model_dct[k]
+                self._set_source_tags(model_dct, tags)
             self.mlflow_client.create_registered_model(model_name, tags, model_dct.get("description"))
             print(f"Created new registered model '{model_name}'")
         except RestException as e:

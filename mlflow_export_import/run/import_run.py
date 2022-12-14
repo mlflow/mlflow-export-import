@@ -72,7 +72,7 @@ class RunImporter():
         exp_id = mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, dst_exp_name)
         exp = self.mlflow_client.get_experiment(exp_id)
         src_run_path = os.path.join(input_dir,"run.json")
-        src_run_dct = io_utils.read_file(src_run_path)
+        src_run_dct = io_utils.read_file_mlflow(src_run_path)
 
         run = self.mlflow_client.create_run(exp.experiment_id)
         run_id = run.info.run_id
@@ -98,7 +98,9 @@ class RunImporter():
 
 
     def _update_mlmodel_run_id(self, run_id):
-        """ Patch to fix the run_id in the destination MLmodel file since there is no API to get all model artifacts of a run. """
+        """ 
+        Patch to fix the run_id in the destination MLmodel file since there is no API to get all model artifacts of a run.
+        """
         mlmodel_paths = find_artifacts(run_id, "", "MLmodel")
         for mlmodel_path in mlmodel_paths:
             model_path = mlmodel_path.replace("/MLmodel","")

@@ -28,6 +28,20 @@ def _compare_runs_with_source_tags(client_src, run1, run2):
             assert str(v) == source_tags2[f"{ExportTags.PREFIX_RUN_INFO}.{k}"],f"Assert failed for RunInfo field '{k}'" # NOTE: tag values must be strings
 
 
+def compare_experiment_tags(tags1, tags2, import_source_tags=False):
+    if not import_source_tags:
+        assert tags1 == tags2
+        return 
+
+    mlflow_tags1 = { k:v for k,v in tags1.items() if k.startswith("mlflow.") }
+    source_tags2 = { k:v for k,v in tags2.items() if k.startswith(ExportTags.PREFIX_ROOT) }
+    mlflow_tags2 = { k.replace(f"{ExportTags.PREFIX_ROOT}.",""):v for k,v in source_tags2.items() }
+    assert mlflow_tags1 == mlflow_tags2
+
+    tags2_no_source_tags = { k:v for k,v in tags2.items() if not k.startswith(ExportTags.PREFIX_ROOT) }
+    assert tags1 == tags2_no_source_tags
+
+
 def _compare_common_tags(run1, run2):
     tags1 = { k:v for k,v in run1.data.tags.items() if not k.startswith("mlflow") }
     tags2 = { k:v for k,v in run2.data.tags.items() if not k.startswith("mlflow") }

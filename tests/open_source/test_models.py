@@ -46,7 +46,7 @@ def _get_version_ids(model):
 
 
 def _get_version_ids_dst(model):
-    return [vr.tags[f"{ExportTags.PREFIX_ROOT}.version"] for vr in model.latest_versions ]
+    return [vr.tags[f"{ExportTags.PREFIX_FIELD}.version"] for vr in model.latest_versions ]
 
 
 def test_export_import_model_first_two_versions(mlflow_context):
@@ -74,7 +74,7 @@ def test_export_import_model_two_from_middle_versions(mlflow_context):
 
     _compare_models(model_src, model_dst, mlflow_context.client_src!=mlflow_context.client_dst)
     for vr_dst in model_dst.latest_versions:
-        vr_src_id = vr_dst.tags[f"{ExportTags.PREFIX_ROOT}.version"]
+        vr_src_id = vr_dst.tags[f"{ExportTags.PREFIX_FIELD}.version"]
         vr_src = [vr for vr in model_src.latest_versions if vr.version == vr_src_id ]
         assert(len(vr_src)) == 1
         vr_src = vr_src[0]

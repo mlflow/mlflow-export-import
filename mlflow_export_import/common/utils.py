@@ -34,7 +34,7 @@ def mk_source_tags(tags, src_prefix, dst_prefix):
     Extract keys form dict starting with src_prefix and return them with new key starting with dst_prefix.
     """
     if src_prefix:
-        return { f"{dst_prefix}.{k}":str(v) for k,v in tags.items() if k.startswith(dst_prefix) }
+        return { f"{dst_prefix}.{k}":str(v) for k,v in tags.items() if k.startswith(src_prefix) }
     else:
         return { f"{dst_prefix}.{k}":str(v) for k,v in tags.items() }
 
