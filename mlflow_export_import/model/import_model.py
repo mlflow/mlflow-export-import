@@ -9,18 +9,17 @@ import mlflow
 from mlflow.exceptions import RestException
 
 from mlflow_export_import.common import click_doc
-from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common import timestamp_utils
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.common import model_utils
 from mlflow_export_import.common.source_tags import ExportTags
+from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.run.import_run import RunImporter
 
 
 def _fmt_timestamps(tag, dct, tags):
     ts = dct[tag]
     tags[f"{ExportTags.PREFIX_FIELD}.{tag}"] = ts
-    #tags[f"{ExportTags.PREFIX_FIELD}._{tag}_local"] = timestamp_utils.fmt_ts_millis(ts)
     tags[f"{ExportTags.PREFIX_FIELD}._{tag}_utc"] = timestamp_utils.fmt_ts_millis(ts, True)
 
 
@@ -35,7 +34,7 @@ class BaseModelImporter():
         :param await_creation_for: Seconds to wait for model version crreation.
         """
         self.mlflow_client = mlflow_client 
-        self.run_importer = run_importer if run_importer else RunImporter(self.mlflow_client, mlmodel_fix=True)
+        self.run_importer = run_importer if run_importer else RunImporter(self.mlflow_client, import_source_tags=import_source_tags, mlmodel_fix=True)
         self.import_source_tags = import_source_tags 
         self.await_creation_for = await_creation_for 
 

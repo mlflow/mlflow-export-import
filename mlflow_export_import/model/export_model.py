@@ -62,7 +62,7 @@ class ModelExporter():
             opath = os.path.join(output_dir,run_id)
             opath = opath.replace("dbfs:", "/dbfs")
             dct = { "version": vr.version, "stage": vr.current_stage, "run_id": run_id, "description": vr.description, "tags": vr.tags }
-            print(f"Exporting: {dct}")
+            print(f"Exporting version: {dct}")
             manifest.append(dct)
             try:
                 if self.export_run:
