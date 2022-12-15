@@ -41,7 +41,7 @@ def _export_models(client, model_names, output_dir, notebook_formats, stages, ex
         else: failed_models.append(result[1])
     duration = round(time.time()-start_time, 1)
 
-    custom_info = {
+    info_attr = {
         "stages": stages,
         "notebook_formats": notebook_formats,
         "num_total_models": len(model_names),
@@ -50,10 +50,10 @@ def _export_models(client, model_names, output_dir, notebook_formats, stages, ex
         "duration": duration,
         "failed_models": failed_models
     }
-    content = {
+    mlflow_attr = {
         "models": ok_models,
     }
-    io_utils.write_export_file(output_dir, "models.json", content, custom_info)
+    io_utils.write_export_file(output_dir, "models.json", __file__, mlflow_attr, info_attr)
 
     print(f"{len(model_names)} models exported")
     print(f"Duration for registered models export: {duration} seconds")
@@ -69,11 +69,11 @@ def export_models(client, model_names, output_dir, notebook_formats=None, stages
     _export_models(client, model_names, os.path.join(output_dir,"models"), notebook_formats, stages, export_run=False, use_threads=use_threads)
     duration = round(time.time()-start_time, 1)
 
-    custom_info = {
+    info_attr = {
       "stages": stages, 
       "notebook_formats": notebook_formats
     }
-    io_utils.write_export_file(output_dir, "models.json", {}, custom_info)
+    io_utils.write_export_file(output_dir, "models.json", __file__, {}, info_attr)
 
     print(f"Duration for total registered models and versions' runs export: {duration} seconds")
 

@@ -44,7 +44,7 @@ class ExperimentExporter():
             for j,run in enumerate(SearchRunsIterator(self.mlflow_client, exp.experiment_id)):
                 self._export_run(j, run, output_dir, ok_run_ids, failed_run_ids)
 
-        custom_info = {
+        info_attr = {
             "num_total_runs": (j+1),
             "num_ok_runs": len(ok_run_ids),
             "ok_runs": ok_run_ids,
@@ -53,9 +53,9 @@ class ExperimentExporter():
         }
         exp_dct = utils.strip_underscores(exp) 
         exp_dct["tags"] = dict(sorted(exp_dct["tags"].items()))
-        content = { "experiment": exp_dct }
 
-        io_utils.write_export_file(output_dir, "experiment.json", content, custom_info)
+        mlflow_attr = { "experiment": exp_dct }
+        io_utils.write_export_file(output_dir, "experiment.json", __file__, mlflow_attr, info_attr)
 
         msg = f"for experiment '{exp.name}' (ID: {exp.experiment_id})"
         if len(failed_run_ids) == 0:

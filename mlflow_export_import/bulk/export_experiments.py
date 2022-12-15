@@ -85,15 +85,15 @@ def export_experiments(client, experiments, output_dir, notebook_formats=None, u
     total_runs = ok_runs + failed_runs
     duration = round(time.time() - start_time, 1)
 
-    custom_info = {
+    info_attr = {
       "duration": duration,
       "experiments": len(experiments),
       "total_runs": total_runs,
       "ok_runs": ok_runs,
       "failed_runs": failed_runs
     }
-    content = { "experiments": export_results }
-    io_utils.write_export_file(output_dir, "experiments.json", content, custom_info)
+    mlflow_attr = { "experiments": export_results }
+    io_utils.write_export_file(output_dir, "experiments.json", __file__, mlflow_attr, info_attr)
 
     print(f"{len(experiments)} experiments exported")
     print(f"{ok_runs}/{total_runs} runs succesfully exported")

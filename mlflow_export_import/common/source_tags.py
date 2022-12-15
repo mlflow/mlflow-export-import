@@ -8,7 +8,6 @@ class ExportFields:
 
 class ExportTags:
     """ Tags source export tags. """
-    #PREFIX_ROOT    = "mlflow_export_import"
     PREFIX_ROOT    = "mlflow_exim"
     PREFIX_RUN_INFO = f"{PREFIX_ROOT}.run_info"
     PREFIX_MLFLOW = f"{PREFIX_ROOT}.mlflow"

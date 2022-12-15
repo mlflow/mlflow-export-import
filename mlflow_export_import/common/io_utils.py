@@ -6,7 +6,7 @@ from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common.source_tags import ExportFields
 
 
-def _mk_export_info():
+def _mk_system_attr(script):
     """
     Create common standard JSON stanza containing internal export information.
     """
@@ -14,6 +14,7 @@ def _mk_export_info():
     import platform
     return {
         ExportFields.SYSTEM: {
+            "script": os.path.basename(script),
             "export_time": ts_now_seconds,
             "_export_time": ts_now_fmt_utc,
             "mlflow_version": mlflow.__version__,
@@ -27,16 +28,16 @@ def _mk_export_info():
     }
 
 
-def write_export_file(dir, file, content, custom_info=None):
+def write_export_file(dir, file, script, mlflow_attr, info_attr=None):
     """
     Write standard formatted JSON file.
     """
     path = os.path.join(dir, file)
-    custom_info = { ExportFields.INFO: custom_info} if custom_info else {}
-    content = { ExportFields.MLFLOW: content}
-    content = { **_mk_export_info(), **custom_info, **content }
+    info_attr = { ExportFields.INFO: info_attr} if info_attr else {}
+    mlflow_attr = { ExportFields.MLFLOW: mlflow_attr}
+    mlflow_attr = { **_mk_system_attr(script), **info_attr, **mlflow_attr }
     os.makedirs(dir, exist_ok=True)
-    write_file(path, content)
+    write_file(path, mlflow_attr)
 
 
 def write_file(path, content):
@@ -64,7 +65,7 @@ def read_file(path):
             return json.loads(f.read())
 
 
-def get_custom(export_dct):
+def get_info(export_dct):
     return export_dct[ExportFields.INFO]
 
 

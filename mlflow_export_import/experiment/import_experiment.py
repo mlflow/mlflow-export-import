@@ -11,7 +11,7 @@ from mlflow_export_import.common import io_utils
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common.http_client import DatabricksHttpClient
 from mlflow_export_import.run.import_run import RunImporter
-from mlflow_export_import.common.source_tags import ExportFields, ExportTags
+from mlflow_export_import.common.source_tags import ExportTags
 
 
 def _peek_at_experiments(exp_dir):
@@ -48,7 +48,7 @@ class ExperimentImporter():
 
         path = io_utils.mk_manifest_json_path(input_dir, "experiment.json")
         exp_dct = io_utils.read_file(path)
-        custom_info = io_utils.get_custom(exp_dct)
+        info = io_utils.get_info(exp_dct)
         exp_dct = io_utils.get_mlflow(exp_dct)
 
         tags = exp_dct["experiment"]["tags"] 
@@ -58,8 +58,8 @@ class ExperimentImporter():
 
         mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, exp_name, tags)
 
-        run_ids = custom_info["ok_runs"]
-        failed_run_ids = custom_info["failed_runs"]
+        run_ids = info["ok_runs"]
+        failed_run_ids = info["failed_runs"]
 
         print(f"Importing {len(run_ids)} runs into experiment '{exp_name}' from {input_dir}")
         run_ids_map = {}

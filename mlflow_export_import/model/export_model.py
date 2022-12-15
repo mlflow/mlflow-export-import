@@ -17,7 +17,7 @@ class ModelExporter():
 
     def __init__(self,  mlflow_client, notebook_formats=None, stages=None, versions=None, export_run=True):
         """
-        :param mlflow_client: MLflow client or if None create default client.
+        :param mlflow_client: MlflowClient
         :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
         :param stages: Stages to export. Default is all stages. Values are Production, Staging, Archived and None.
         :param export_run: Export the run that generated a registered model's version.
@@ -25,12 +25,11 @@ class ModelExporter():
         self.mlflow_client = mlflow_client
         self.http_client = MlflowHttpClient()
         self.run_exporter = RunExporter(self.mlflow_client, notebook_formats=notebook_formats)
-        self.stages = self._normalize_stages(stages)
         self.export_run = export_run
+        self.stages = self._normalize_stages(stages)
         self.versions = versions if versions else []
         if len(self.stages) > 0 and len(self.versions) > 0:
             raise MlflowExportImportException(f"Both stages {self.stages} and versions {self.versions} cannot be set")
-        self.export_run = export_run
 
 
     def export_model(self, model_name, output_dir):
@@ -62,7 +61,7 @@ class ModelExporter():
             opath = os.path.join(output_dir,run_id)
             opath = opath.replace("dbfs:", "/dbfs")
             dct = { "version": vr.version, "stage": vr.current_stage, "run_id": run_id, "description": vr.description, "tags": vr.tags }
-            print(f"Exporting version: {dct}")
+            print(f"Exporting verions {vr.version} to '{opath}'")
             manifest.append(dct)
             try:
                 if self.export_run:
@@ -85,13 +84,13 @@ class ModelExporter():
         model = self.http_client.get(f"registered-models/get", {"name": model_name})
         model["registered_model"]["latest_versions"] = output_versions
 
-        custom_info = {
+        info_attr = {
             "num_target_stages": len(self.stages),
             "num_target_versions": len(self.versions),
             "num_src_versions": len(versions),
             "num_dst_versions": len(output_versions)
         }
-        io_utils.write_export_file(output_dir, "model.json", model, custom_info)
+        io_utils.write_export_file(output_dir, "model.json", __file__, model, info_attr)
 
         print(f"Exported {exported_versions}/{len(output_versions)} versions for model '{model_name}'")
         return manifest

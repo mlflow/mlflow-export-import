@@ -53,13 +53,13 @@ class RunExporter:
         tags = run.data.tags
         tags = dict(sorted(tags.items()))
         
-        content = {
+        mlflow_attr = {
             "info": utils.strip_underscores(run.info),
             "params": run.data.params,
             "metrics": self._get_metrics_with_steps(run),
             "tags": tags
         }
-        io_utils.write_export_file(output_dir, "run.json", content)
+        io_utils.write_export_file(output_dir, "run.json", __file__, mlflow_attr)
         fs =  _filesystem.get_filesystem(".")
 
         # copy artifacts
