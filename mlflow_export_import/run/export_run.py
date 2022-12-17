@@ -86,7 +86,11 @@ class RunExporter:
     def _export_notebook(self, output_dir, notebook, tags, fs):
         notebook_dir = os.path.join(output_dir, "artifacts", "notebooks")
         fs.mkdirs(notebook_dir)
-        revision_id = tags["mlflow.databricks.notebookRevisionID"]
+        tag = "mlflow.databricks.notebookRevisionID"
+        revision_id = tags.get(tag, None)
+        if not revision_id:
+            print("NOTE: Cannot download notebook '{notebook}' since tag '{tag}' does not exist. Notebook is probably a Git Repo notebook")
+            return 
         notebook_path = tags["mlflow.databricks.notebookPath"]
         notebook_name = os.path.basename(notebook_path)
         manifest = { 
