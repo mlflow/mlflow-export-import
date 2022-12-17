@@ -4,6 +4,7 @@ import json
 from mlflow_export_import.common.timestamp_utils import ts_now_seconds, ts_now_fmt_utc
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common.source_tags import ExportFields
+from mlflow_export_import.common.pkg_version import get_version #
 
 
 def _mk_system_attr(script):
@@ -14,6 +15,7 @@ def _mk_system_attr(script):
     import platform
     return {
         ExportFields.SYSTEM: {
+            "package_version": get_version(),
             "script": os.path.basename(script),
             "export_time": ts_now_seconds,
             "_export_time": ts_now_fmt_utc,
