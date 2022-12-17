@@ -21,6 +21,17 @@ For more details on MLflow objects (Databricks MLflow) see the [Databricks MLflo
   * Backup your MLflow objects to external storage so they can be restored if needed.
   * Disaster recovery. Save your MLflow objects to external storage so they can be replicated to another tracking server.
 
+### MLflow Objects
+
+These are the MLflow objects and their attributes that can be exported.
+
+| Object | REST | Python | SQL |
+|----|---|---|--|
+| Run | [link]( https://mlflow.org/docs/latest/rest-api.html#run) | [link](https://mlflow.org/docs/latest/python_api/mlflow.entities.html#mlflow.entities.Run) | [link](https://github.com/amesar/mlflow-resources/blob/master/database_schemas/schema_mlflow_2.0.1.sql#L166) |
+| Experiment | [link](https://mlflow.org/docs/latest/rest-api.html#mlflowexperiment) | [link](https://mlflow.org/docs/latest/python_api/mlflow.entities.html#mlflow.entities.Experiment) | [link](https://github.com/amesar/mlflow-resources/blob/master/database_schemas/schema_mlflow_2.0.1.sql#L37) |
+| Registered Model | [link](https://mlflow.org/docs/latest/rest-api.html#registeredmodel) | [link](https://mlflow.org/docs/latest/python_api/mlflow.entities.html#mlflow.entities.model_registry.RegisteredModel) | [link](https://github.com/amesar/mlflow-resources/blob/master/database_schemas/schema_mlflow_2.0.1.sql#L152) |
+| Registered Model Version | [link](https://mlflow.org/docs/latest/rest-api.html#modelversion) | [link](https://mlflow.org/docs/latest/python_api/mlflow.entities.html#mlflow.entities.model_registry.ModelVersion) | [link](https://github.com/amesar/mlflow-resources/blob/master/database_schemas/schema_mlflow_2.0.1.sql#L102) |
+
 ### MLflow Export Import scenarios
 
 |Source tracking server | Destination tracking server | Note |
@@ -41,19 +52,19 @@ For more details on MLflow objects (Databricks MLflow) see the [Databricks MLflo
 
 There are two sets of Python scripts:
 
-* [Individual tools](README_individual.md). Use these tools to copy individual MLflow objects between tracking servers. 
+* [Single tools](README_single.md). Use these tools to copy single MLflow objects between tracking servers. 
 They allow you to specify a different destination object name.
 For example, if you want to clone the experiment `/Mary/Experiments/Iris` under a new name, you can specify the target experiment name as `/John/Experiments/Iris`.
 
-* [Collection tools](README_collection.md). High-level tools to copy an entire tracking server or a collection of MLflow objects.
+* [Bulk tools](README_bulk.md). High-level tools to copy an entire tracking server or a collection of MLflow objects.
 Full object referential integrity is maintained as well as the original MLflow object names.
 
 ### Databricks notebooks
 
 Databricks notebooks simply invoke their corresponding Python scripts.
-Note that only `Individual` notebooks are currently available.
+Note that only `Single` notebooks are currently available.
 
-See [README](databricks_notebooks/individual/README.md).
+See [README](databricks_notebooks/single/README.md).
 
 ### Other
 * [Miscellanous tools](README_tools.md) 
@@ -90,8 +101,8 @@ This is is not a limitation of mlflow-export-import but rather of the MLflow fil
 See the `dst-notebook-dir` option for `Import Run`.
 * As another convenience, the import tools allows you to import the exported notebook into a Databricks workspace directory. 
 For more details, see:
-  *  [README_individual - Import run](README_individual.md#Import-run)
-  *  [README_individual - Import experiment](README_individual.md#Import-experiment)
+  *  [README_single - Import run](README_single.md#Import-run)
+  *  [README_single - Import experiment](README_single.md#Import-experiment)
 * You must export a notebook in the SOURCE format for the notebook to be imported.
 
 

@@ -31,7 +31,7 @@ If the `export-source-tags` option is set on an export tool, three sets of sourc
 
 ## Open Source Mlflow Export Import Tags
 
-See [sample run tags](samples/oss_mlflow/individual/experiments/sklearn_wine/eb66c160957d4a28b11d3f1b968df9cd/run.json).
+See [sample run tags](samples/oss_mlflow/single/experiments/sklearn_wine/eb66c160957d4a28b11d3f1b968df9cd/run.json).
 
 #### MLflow system tags
 
@@ -69,7 +69,7 @@ See [sample run tags](samples/oss_mlflow/individual/experiments/sklearn_wine/eb6
 
 ## Databricks MLflow source tags
 
-See [sample run tags](samples/databricks/individual/experiments/sklearn_wine/f2e3f75c845d4365addbc9c0262a58a5/run.json).
+See [sample run tags](samples/databricks/single/experiments/sklearn_wine/f2e3f75c845d4365addbc9c0262a58a5/run.json).
 
 #### MLflow system tags 
 

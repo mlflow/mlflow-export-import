@@ -1,4 +1,4 @@
-# MLflow Export Import - Collection Tools
+# MLflow Export Import - Bulk Tools
 
 ## Overview
 
@@ -12,7 +12,7 @@ Three types of Collection tools:
 
 Notes:
 * Original source model and experiment names are preserved.
-* Leverages the [Individual tools](README_individual.md) as basic building blocks.
+* Leverages the [Single tools](README_single.md) as basic building blocks.
 
 ### Tools
 
@@ -112,7 +112,7 @@ When exporting a registered models the following model's associated objects are 
 | +-4273c31c45744ec385f3654c63c31360/
 | | +-run.json
 
-For further directory structure see the `individual` tool sections for experiments and models further below.
+For further directory structure see the `single` tool sections for experiments and models further below.
 
 
 ### Export registered models 
@@ -138,7 +138,7 @@ Options:
   --export-source-tags BOOLEAN  Export source run information (RunInfo, MLflow
                                 system tags starting with 'mlflow' and
                                 metadata) under the 'mlflow_export_import' tag
-                                prefix. See README_individual.md for more
+                                prefix. See README_single.md for more
                                 details.  [default: False]
   --notebook-formats TEXT       Databricks notebook formats. Values are
                                 SOURCE, HTML, JUPYTER or DBC (comma
@@ -241,7 +241,7 @@ Options:
   --export-source-tags BOOLEAN  Export source run information (RunInfo, MLflow
                                 system tags starting with 'mlflow' and
                                 metadata) under the 'mlflow_export_import' tag
-                                prefix. See README_individual.md for more
+                                prefix. See README_single.md for more
                                 details.  [default: False]
   --notebook-formats TEXT       Databricks notebook formats. Values are
                                 SOURCE, HTML, JUPYTER or DBC (comma

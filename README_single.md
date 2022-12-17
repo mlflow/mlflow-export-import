@@ -1,9 +1,9 @@
-# MLflow Export Import - Individual Tools
+# MLflow Export Import - Single Object Tools
 
 ## Overview
 
-The `Individual` tools allow you to export and import individual MLflow objects between tracking servers.
-They allow you to specify a different destination object name.
+The `Single` tools allow you to export and import individual MLflow objects between tracking servers.
+These tools allow you to specify a different destination object name.
 
 For example, if you want to clone the experiment `/Mary/Experiment/Iris` under a new name, you can specify the target experiment name as `/John/Experiment/Iris`.
 
@@ -74,9 +74,9 @@ export-experiment \
 
 #### Export directory structure 
 
-The [export directory](samples/oss_mlflow/individual/experiments/sklearn_wine) contains a [JSON export file](samples/oss_mlflow/individual/experiments/sklearn_wine/experiment.json)
+The [export directory](samples/oss_mlflow/single/experiments/sklearn_wine) contains a [JSON export file](samples/oss_mlflow/single/experiments/sklearn_wine/experiment.json)
 for the experiment and a subdirectory for each run. 
-The [run directory](samples/oss_mlflow/individual/experiments/sklearn_wine/eb66c160957d4a28b11d3f1b968df9cd) contains a [JSON export file](amples/oss_mlflow/individual/experiments/sklearn_wine/eb66c160957d4a28b11d3f1b968df9cd/run.json) containing run metadata and an artifact folder directory.
+The [run directory](samples/oss_mlflow/single/experiments/sklearn_wine/eb66c160957d4a28b11d3f1b968df9cd) contains a [JSON export file](amples/oss_mlflow/single/experiments/sklearn_wine/eb66c160957d4a28b11d3f1b968df9cd/run.json) containing run metadata and an artifact folder directory.
 
 Sample export directory
 ```
@@ -184,8 +184,8 @@ Produces a directory with the following structure:
 ```
 
 Sample run.json:
-[OSS](samples/oss_mlflow/individual/experiments/sklearn_wine/eb66c160957d4a28b11d3f1b968df9cd/run.json)
- \- [Databricks](samples/databricks/individual/experiments/sklearn_wine/f2e3f75c845d4365addbc9c0262a58a5/run.json).
+[OSS](samples/oss_mlflow/single/experiments/sklearn_wine/eb66c160957d4a28b11d3f1b968df9cd/run.json)
+ \- [Databricks](samples/databricks/single/experiments/sklearn_wine/f2e3f75c845d4365addbc9c0262a58a5/run.json).
 
 ### Import run
 
@@ -300,8 +300,8 @@ Output export directory example.
 ```
 
 Sample model.json:
-[OSS](samples/oss_mlflow/individual/models/sklearn_wine/model.json)
-\- [Databricks](samples/databricks/individual/models/model.json).
+[OSS](samples/oss_mlflow/single/models/sklearn_wine/model.json)
+\- [Databricks](samples/databricks/single/models/model.json).
 ```
 {
   "registered_model": {
