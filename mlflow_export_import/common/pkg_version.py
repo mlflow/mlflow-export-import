@@ -1,7 +1,9 @@
-
-from importlib.metadata import version
+from importlib.metadata import version, PackageNotFoundError
 
 pkg = "mlflow_export_import"
 
 def get_version():
-    return version(pkg)
+    try:
+        return version(pkg)
+    except PackageNotFoundError:
+        return ""
