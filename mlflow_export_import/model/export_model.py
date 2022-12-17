@@ -36,7 +36,7 @@ class ModelExporter():
         """
         :param model_name: Registered model name.
         :param output_dir: Output directory.
-        :return: Returns bool if export succeeded and the model name.
+        :return: Returns bool (if export succeeded) and the model name.
         """
         try:
             self._export_model(model_name, output_dir)
@@ -57,16 +57,17 @@ class ModelExporter():
                 continue
             if len(self.versions) > 0 and not vr.version in self.versions:
                 continue
-            run_id = vr.run_id
-            opath = os.path.join(output_dir,run_id)
+            opath = os.path.join(output_dir, vr.run_id)
             opath = opath.replace("dbfs:", "/dbfs")
-            dct = { "version": vr.version, "stage": vr.current_stage, "run_id": run_id, "description": vr.description, "tags": vr.tags }
+            dct = { "version": vr.version, "stage": vr.current_stage, 
+                "run_id": vr.run_id,
+                "description": vr.description, "tags": vr.tags }
             print(f"Exporting verions {vr.version} to '{opath}'")
             manifest.append(dct)
             try:
                 if self.export_run:
-                    self.run_exporter.export_run(run_id, opath)
-                run = self.mlflow_client.get_run(run_id)
+                    self.run_exporter.export_run(vr.run_id, opath)
+                run = self.mlflow_client.get_run(vr.run_id)
                 dct = dict(vr)
                 dct["_run_artifact_uri"] = run.info.artifact_uri
                 experiment = mlflow.get_experiment(run.info.experiment_id)

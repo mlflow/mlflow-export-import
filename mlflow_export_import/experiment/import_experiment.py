@@ -58,7 +58,7 @@ class ExperimentImporter():
 
         mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, exp_name, tags)
 
-        run_ids = info["ok_runs"]
+        run_ids = exp_dct["runs"]
         failed_run_ids = info["failed_runs"]
 
         print(f"Importing {len(run_ids)} runs into experiment '{exp_name}' from {input_dir}")

@@ -47,14 +47,13 @@ class ExperimentExporter():
         info_attr = {
             "num_total_runs": (j+1),
             "num_ok_runs": len(ok_run_ids),
-            "ok_runs": ok_run_ids,
             "num_failed_runs": len(failed_run_ids),
             "failed_runs": failed_run_ids
         }
         exp_dct = utils.strip_underscores(exp) 
         exp_dct["tags"] = dict(sorted(exp_dct["tags"].items()))
 
-        mlflow_attr = { "experiment": exp_dct }
+        mlflow_attr = { "experiment": exp_dct , "runs": ok_run_ids }
         io_utils.write_export_file(output_dir, "experiment.json", __file__, mlflow_attr, info_attr)
 
         msg = f"for experiment '{exp.name}' (ID: {exp.experiment_id})"
