@@ -103,12 +103,7 @@ def export_experiments(client, experiments, output_dir, notebook_formats=None, u
 
 
 @click.command()
-@click.option("--experiments", 
-    help="Experiment names or IDs (comma delimited).  \
-        For example, 'sklearn_wine,sklearn_iris' or '1,2'. 'all' will export all experiments.",
-    type=str,
-    required=True
-)
+@opt_experiments
 @opt_output_dir
 @opt_notebook_formats
 @opt_use_threads
