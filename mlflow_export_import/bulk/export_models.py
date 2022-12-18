@@ -9,8 +9,8 @@ from concurrent.futures import ThreadPoolExecutor
 
 import mlflow
 
-from mlflow_export_import.common import io_utils
-from mlflow_export_import.common import utils, click_doc
+from mlflow_export_import.common.click_options import *
+from mlflow_export_import.common import utils, io_utils
 from mlflow_export_import.model.export_model import ModelExporter
 from mlflow_export_import.bulk import export_experiments
 from mlflow_export_import.bulk.model_utils import get_experiments_runs_of_models
@@ -79,38 +79,20 @@ def export_models(client, model_names, output_dir, notebook_formats=None, stages
 
 
 @click.command()
-@click.option("--output-dir",
-     help="Output directory.", 
-     type=str,
-     required=True
-)
+@opt_output_dir
+@opt_notebook_formats
+@opt_stages
+@opt_use_threads
 @click.option("--models", 
     help="Registered model names (comma delimited).  \
         For example, 'model1,model2'. 'all' will export all models.",
     type=str,
     required=True
 )
-@click.option("--notebook-formats", 
-    help=click_doc.notebook_formats, 
-    type=str,
-    default="", 
-    show_default=True
-)
-@click.option("--stages", 
-    help=click_doc.model_stages, 
-    type=str,
-    required=False
-)
 @click.option("--export-all-runs", 
     help="Export all runs of experiment or just runs associated with registered model versions.", 
     type=bool, 
     default=False, 
-    show_default=True
-)
-@click.option("--use-threads",
-    help=click_doc.use_threads,
-    type=bool,
-    default=False,
     show_default=True
 )
 def main(models, output_dir, stages, notebook_formats, export_all_runs, use_threads):

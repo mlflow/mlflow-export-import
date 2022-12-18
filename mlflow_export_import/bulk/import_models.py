@@ -9,7 +9,7 @@ import click
 from concurrent.futures import ThreadPoolExecutor
 
 import mlflow
-from mlflow_export_import.common import click_doc
+from mlflow_export_import.common.click_options import *
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.experiment.import_experiment import ExperimentImporter
 from mlflow_export_import.model.import_model import AllModelImporter
@@ -85,42 +85,12 @@ def import_all(client, input_dir, delete_model, use_src_user_id=False, import_so
 
 
 @click.command()
-@click.option("--input-dir", 
-    help="Input directory.", 
-    required=True, 
-    type=str
-)
-@click.option("--delete-model", 
-    help=click_doc.delete_model, 
-    type=bool, 
-    default=False, 
-    show_default=True
-)
-@click.option("--verbose", 
-    type=bool, 
-    help="Verbose.", 
-    default=False, 
-    show_default=True
-)
-@click.option("--use-src-user-id", 
-    help=click_doc.use_src_user_id, 
-    type=bool, 
-    default=False, 
-    show_default=True
-)
-@click.option("--import-source-tags",
-    help=click_doc.import_source_tags,
-    type=bool,
-    default=False,
-    show_default=True
-)
-@click.option("--use-threads",
-    help=click_doc.use_threads,
-    type=bool,
-    default=False,
-    show_default=True
-)
-
+@opt_input_dir
+@opt_delete_model
+@opt_use_src_user_id
+@opt_verbose
+@opt_import_source_tags
+@opt_use_threads
 
 def main(input_dir, delete_model, use_src_user_id, import_source_tags, verbose, use_threads):
     print("Options:")

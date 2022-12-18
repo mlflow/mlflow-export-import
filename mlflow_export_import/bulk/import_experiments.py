@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import mlflow
 
-from mlflow_export_import.common import click_doc
+from mlflow_export_import.common.click_options import *
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.experiment.import_experiment import ExperimentImporter
 
@@ -37,23 +37,9 @@ def import_experiments(client, input_dir, use_src_user_id=False, use_threads=Fal
 
 
 @click.command()
-@click.option("--input-dir", 
-    help="Input directory.", 
-    type=str,
-    required=True
-)
-@click.option("--use-src-user-id", 
-    help=click_doc.use_src_user_id, 
-    type=bool, 
-    default=False, 
-    show_default=True
-)
-@click.option("--use-threads",
-    help=click_doc.use_threads,
-    type=bool,
-    default=False,
-    show_default=True
-)
+@opt_input_dir
+@opt_use_src_user_id
+@opt_use_threads
 def main(input_dir, use_src_user_id, use_threads): 
     print("Options:")
     for k,v in locals().items():

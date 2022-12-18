@@ -6,10 +6,11 @@ import os
 import click
 import mlflow
 
+from mlflow_export_import.common import utils
+from mlflow_export_import.common import io_utils
+from mlflow_export_import.common.click_options import *
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common.http_client import MlflowHttpClient
-from mlflow_export_import.common import io_utils
-from mlflow_export_import.common import utils, click_doc
 from mlflow_export_import.run.export_run import RunExporter
 
 
@@ -111,32 +112,12 @@ class ModelExporter():
 
 
 @click.command()
-@click.option("--model",
-    help="Registered model name.",
-    type=str,
-    required=True
-)
-@click.option("--output-dir",
-    help="Output directory.",
-    type=str,
-    required=True
-)
-@click.option("--notebook-formats",
-    help=click_doc.notebook_formats,
-    type=str,
-    default="",
-    show_default=True
-)
-@click.option("--stages",
-    help=f"{click_doc.model_stages} Mututally exclusive with option --versions." ,
-    type=str,
-    required=False
-)
-@click.option("--versions",
-    help="Export specified versions (comma separated). Mututally exclusive with option --stages.",
-    type=str,
-    required=False
-)
+@opt_model
+@opt_output_dir
+@opt_notebook_formats
+@opt_stages
+@opt_versions
+
 def main(model, output_dir, notebook_formats, stages, versions):
     print("Options:")
     for k,v in locals().items():

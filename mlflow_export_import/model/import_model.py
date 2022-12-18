@@ -8,7 +8,7 @@ import click
 import mlflow
 from mlflow.exceptions import RestException
 
-from mlflow_export_import.common import click_doc
+from mlflow_export_import.common.click_options import *
 from mlflow_export_import.common import timestamp_utils
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.common import model_utils
@@ -223,33 +223,11 @@ def _path_join(x,y):
 
 
 @click.command()
-@click.option("--input-dir",
-    help="Input directory produced by export_model.py.",
-    type=str,
-    required=True
-)
-@click.option("--model",
-    help="New registered model name.",
-    type=str,
-    required=True,
-)
-@click.option("--experiment-name",
-    help="Destination experiment name  - will be created if it does not exist.",
-    type=str,
-    required=True
-)
-@click.option("--delete-model",
-    help=click_doc.delete_model,
-    type=bool,
-    default=False,
-    show_default=True
-)
-@click.option("--import-source-tags",
-    help=click_doc.import_source_tags,
-    type=bool,
-    default=False,
-    show_default=True
-)
+@opt_input_dir
+@opt_model
+@opt_experiment_name
+@opt_delete_model
+@opt_import_source_tags
 @click.option("--await-creation-for",
     help="Await creation for specified seconds.",
     type=int,
@@ -261,12 +239,8 @@ def _path_join(x,y):
     type=int,
     default=5,
 )
-@click.option("--verbose",
-    help="Verbose.",
-    type=bool,
-    default=False,
-    show_default=True
-)
+@opt_verbose
+
 def main(input_dir, model, experiment_name, delete_model, await_creation_for, import_source_tags, verbose, sleep_time):
     print("Options:")
     for k,v in locals().items():

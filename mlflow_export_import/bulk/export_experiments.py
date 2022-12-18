@@ -7,9 +7,9 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 import click
 import mlflow
-from mlflow_export_import.common import mlflow_utils
-from mlflow_export_import.common import io_utils
-from mlflow_export_import.common import utils, click_doc
+
+from mlflow_export_import.common.click_options import *
+from mlflow_export_import.common import utils, io_utils, mlflow_utils
 from mlflow_export_import.bulk import bulk_utils
 from mlflow_export_import.experiment.export_experiment import ExperimentExporter
 
@@ -103,28 +103,15 @@ def export_experiments(client, experiments, output_dir, notebook_formats=None, u
 
 
 @click.command()
-@click.option("--output-dir", 
-    help="Output directory.", 
-    required=True
-)
 @click.option("--experiments", 
     help="Experiment names or IDs (comma delimited).  \
         For example, 'sklearn_wine,sklearn_iris' or '1,2'. 'all' will export all experiments.",
     type=str,
     required=True
 )
-@click.option("--notebook-formats", 
-    help=click_doc.notebook_formats, 
-    type=str, 
-    default="", 
-    show_default=True
-)
-@click.option("--use-threads",
-    help=click_doc.use_threads,
-    type=bool,
-    default=False,
-    show_default=True
-)
+@opt_output_dir
+@opt_notebook_formats
+@opt_use_threads
 def main(experiments, output_dir, notebook_formats, use_threads): 
     print("Options:")
     for k,v in locals().items():

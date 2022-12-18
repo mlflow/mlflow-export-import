@@ -13,7 +13,8 @@ from mlflow.entities import RunStatus
 from mlflow.utils.validation import MAX_PARAMS_TAGS_PER_BATCH, MAX_METRICS_PER_BATCH
 from mlflow.utils.mlflow_tags import MLFLOW_PARENT_RUN_ID
 
-from mlflow_export_import.common import utils, click_doc
+from mlflow_export_import.common import utils
+from mlflow_export_import.common.click_options import *
 from mlflow_export_import.common.filesystem import mk_local_path
 from mlflow_export_import.common.find_artifacts import find_artifacts
 from mlflow_export_import.common.http_client import DatabricksHttpClient
@@ -165,48 +166,30 @@ class RunImporter():
 
 
 @click.command()
-@click.option("--input-dir",
-    help="Source input directory that contains the exported run.", 
-    required=True, 
-    type=str
-)
-@click.option("--experiment-name",
-    help="Destination experiment name.", 
-    type=str,
-    required=True
-)
-@click.option("--import-source-tags",
-    help=click_doc.import_source_tags,
-    type=bool,
-    default=False,
-    show_default=True
-)
+@opt_input_dir
+@opt_import_source_tags
+@opt_experiment_name
+@opt_use_src_user_id
+@opt_dst_notebook_dir
 @click.option("--mlmodel-fix",
     help="Add correct run ID in destination MLmodel artifact. Can be expensive for deeply nested artifacts.", 
     type=bool, 
     default=True, 
     show_default=True
 )
-@click.option("--use-src-user-id",
-    help=click_doc.use_src_user_id, 
-    type=bool, 
-    default=False, 
-    show_default=True
-)
-@click.option("--dst-notebook-dir",
-    help="Databricks destination workpsace directory for notebook import.",
-    type=str, 
-    required=False, 
-    show_default=True
-)
 @click.option("--dst-notebook-dir-add-run-id",
     help="Add the run ID to the destination notebook workspace directory.",
-    type=str, 
-    required=False, 
+    type=str,
+    required=False,
     show_default=True
 )
-def main(input_dir, experiment_name, import_source_tags, mlmodel_fix, use_src_user_id, \
-        dst_notebook_dir, dst_notebook_dir_add_run_id):
+def main(input_dir, 
+        experiment_name, 
+        import_source_tags,
+        mlmodel_fix, 
+        use_src_user_id,
+        dst_notebook_dir, 
+        dst_notebook_dir_add_run_id):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")

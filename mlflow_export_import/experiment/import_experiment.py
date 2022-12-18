@@ -6,7 +6,8 @@ import os
 import click
 import mlflow
 
-from mlflow_export_import.common import utils, click_doc
+from mlflow_export_import.common import utils
+from mlflow_export_import.common.click_options import *
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common.http_client import DatabricksHttpClient
@@ -77,37 +78,15 @@ class ExperimentImporter():
 
 
 @click.command()
-@click.option("--input-dir",
-    help="Input path - directory",
-    type=str,
-    required=True
-)
-@click.option("--experiment-name",
-    help="Destination experiment name",
-    type=str,
-    required=True
-)
-@click.option("--import-source-tags",
-    help=click_doc.import_source_tags,
-    type=bool,
-    default=False,
-    show_default=True
-)
+@opt_experiment_name
+@opt_input_dir
+@opt_import_source_tags
+@opt_use_src_user_id
+@opt_dst_notebook_dir
 @click.option("--just-peek",
     help="Just display experiment metadata - do not import",
     type=bool,
     default=False
-)
-@click.option("--use-src-user-id",
-    help=click_doc.use_src_user_id,
-    type=bool,
-    default=False
-)
-@click.option("--dst-notebook-dir",
-    help="Databricks destination workpsace base directory for notebook. A run ID will be added to contain the run's notebook.",
-    type=str,
-    required=False,
-    show_default=True
 )
 def main(input_dir, experiment_name, import_source_tags, just_peek, use_src_user_id, dst_notebook_dir):
     print("Options:")

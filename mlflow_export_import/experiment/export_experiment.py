@@ -6,11 +6,12 @@ import os
 import click
 import mlflow
 
+from mlflow_export_import.common.click_options import *
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common.iterators import SearchRunsIterator
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.run.export_run import RunExporter
-from mlflow_export_import.common import utils, click_doc
+from mlflow_export_import.common import utils
 
 
 class ExperimentExporter():
@@ -76,22 +77,10 @@ class ExperimentExporter():
 
 
 @click.command()
-@click.option("--experiment",
-    help="Experiment name or ID.", 
-    type=str,
-    required=True
-)
-@click.option("--output-dir",
-    help="Output directory.", 
-    type=str,
-    required=True
-)
-@click.option("--notebook-formats",
-    help=click_doc.notebook_formats, 
-    type=str, 
-    default="", 
-    show_default=True
-)
+@opt_experiment
+@opt_output_dir
+@opt_notebook_formats
+
 def main(experiment, output_dir, notebook_formats):
     print("Options:")
     for k,v in locals().items():

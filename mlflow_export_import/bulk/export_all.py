@@ -6,8 +6,9 @@ import os
 import time
 import click
 import mlflow
+
+from mlflow_export_import.common.click_options import *
 from mlflow_export_import.common import io_utils
-from mlflow_export_import.common import click_doc
 from mlflow_export_import.bulk.export_models import export_models
 from mlflow_export_import.bulk.export_experiments import export_experiments
 
@@ -44,23 +45,10 @@ def export_all(output_dir, notebook_formats=None, use_threads=False):
 
 
 @click.command()
-@click.option("--output-dir", 
-    help="Output directory.", 
-    type=str,
-    required=True
-)
-@click.option("--notebook-formats", 
-    help=click_doc.notebook_formats, 
-    type=str,
-    default="", 
-    show_default=True
-)
-@click.option("--use-threads",
-    help=click_doc.use_threads,
-    type=bool,
-    default=False,
-    show_default=True
-)
+@opt_output_dir
+@opt_notebook_formats
+@opt_use_threads
+
 def main(output_dir, notebook_formats, use_threads):
     print("Options:")
     for k,v in locals().items():
