@@ -1,5 +1,41 @@
 # MLflow Export Import - Miscellanous Tools
 
+## Download notebook with revision
+
+This tool downloads a notebook with a specific revision.
+
+Note that the parameter `revision_timestamp` which represents the revision ID to the API endpoint `workspace/export` is not publicly documented.
+
+**Usage**
+```
+download-notebook --help
+
+Options:
+  --output-dir TEXT        Output directory.  [required]
+  --notebook TEXT          Notebook path.  [required]
+  --revision TEXT          Notebook revision. If not specified will download
+                           the latest revision.
+  --notebook-formats TEXT  Databricks notebook formats. Values are SOURCE,
+                           HTML, JUPYTER or DBC (comma seperated).  [default:
+                           SOURCE]
+```
+
+**Example**
+```
+download-notebook \
+  --output-dir out \
+  --notebook /Users/andre@mycompany.com/mlflow/02a_Sklearn_Train_Predict \
+  --revision 12345 \
+  --notebook-formats SOURCE,DBC
+```
+
+```
+ls -c1 out
+
+02a_Sklearn_Train_Predict.dbc
+02a_Sklearn_Train_Predict.source
+```
+
 ## Call http_client - MLflow API or Databricks API
 
 A convenience script to directly invoke either the MLflow API or Databricks API.

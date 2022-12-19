@@ -9,11 +9,14 @@ import click
 import mlflow
 
 from mlflow_export_import.common import utils
-from mlflow_export_import.common.click_options import *
+from mlflow_export_import.common.click_options import opt_run_id, opt_output_dir, opt_notebook_formats
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import io_utils
-from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common.http_client import DatabricksHttpClient
+from mlflow_export_import.notebook.download_notebook import download_notebook
+
+from mlflow.utils.mlflow_tags import MLFLOW_DATABRICKS_NOTEBOOK_PATH
+MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID = "mlflow.databricks.notebookRevisionID" # NOTE: not in mlflow/utils/mlflow_tags.py
 
 print("MLflow Version:", mlflow.__version__)
 print("MLflow Tracking URI:", mlflow.get_tracking_uri())
@@ -64,7 +67,7 @@ class RunExporter:
         fs =  _filesystem.get_filesystem(".")
 
         # copy artifacts
-        dst_path = os.path.join(output_dir,"artifacts")
+        dst_path = os.path.join(output_dir, "artifacts")
         try:
             from mlflow.utils.mlflow_tags import MLFLOW_DATABRICKS_NOTEBOOK_PATH
             artifacts = self.mlflow_client.list_artifacts(run.info.run_id)
@@ -78,6 +81,7 @@ class RunExporter:
             elif len(self.notebook_formats) > 0:
                 print(f"WARNING: Cannot export notebook since tag '{MLFLOW_DATABRICKS_NOTEBOOK_PATH}' is not set.")
             return True
+
         except Exception as e:
             print("ERROR: run_id:", run.info.run_id, "Exception:", e)
             traceback.print_exc()
@@ -87,36 +91,18 @@ class RunExporter:
     def _export_notebook(self, output_dir, notebook, tags, fs):
         notebook_dir = os.path.join(output_dir, "artifacts", "notebooks")
         fs.mkdirs(notebook_dir)
-        tag = "mlflow.databricks.notebookRevisionID"
-        revision_id = tags.get(tag, None)
+        revision_id = tags.get(MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID, None)
         if not revision_id:
-            print(f"NOTE: Cannot download notebook '{notebook}' since tag '{tag}' does not exist. Notebook is probably a Git Repo notebook")
+            print(f"NOTE: Cannot download notebook '{notebook}' since tag '{MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID}' does not exist. Notebook is probably a Git Repo notebook")
             return 
-        notebook_path = tags["mlflow.databricks.notebookPath"]
-        notebook_name = os.path.basename(notebook_path)
         manifest = { 
-           "mlflow.databricks.notebookRevisionID": revision_id, 
-           "mlflow.databricks.notebookPath": notebook_path,
-           "mlflow.databricks.export-notebook-revision": revision_id }
+           MLFLOW_DATABRICKS_NOTEBOOK_PATH: tags[MLFLOW_DATABRICKS_NOTEBOOK_PATH],
+           MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID: revision_id,
+           "formats": self.notebook_formats
+        }
         path = os.path.join(notebook_dir, "manifest.json")
         fs.write(path, (json.dumps(manifest, indent=2)+"\n"))
-        for format in self.notebook_formats:
-            self._export_notebook_format(notebook_dir, notebook, format, format.lower(), notebook_name, revision_id)
-
-
-    def _export_notebook_format(self, notebook_dir, notebook, format, extension, notebook_name, revision_id):
-        params = { 
-            "path": notebook, 
-            "direct_download": True,
-            "format": format,
-            "revision_timestamp": revision_id 
-        }
-        try:
-            rsp = self.dbx_client._get("workspace/export", params)
-            notebook_path = os.path.join(notebook_dir, f"{notebook_name}.{extension}")
-            io_utils.write_file(notebook_path, rsp.content)
-        except MlflowExportImportException as e:
-            print(f"WARNING: Cannot save notebook '{notebook}'. {e}")
+        download_notebook(notebook_dir, notebook, revision_id, self.notebook_formats, self.dbx_client)
 
 
 @click.command()
