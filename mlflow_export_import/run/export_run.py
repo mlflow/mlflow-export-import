@@ -90,7 +90,7 @@ class RunExporter:
         tag = "mlflow.databricks.notebookRevisionID"
         revision_id = tags.get(tag, None)
         if not revision_id:
-            print("NOTE: Cannot download notebook '{notebook}' since tag '{tag}' does not exist. Notebook is probably a Git Repo notebook")
+            print(f"NOTE: Cannot download notebook '{notebook}' since tag '{tag}' does not exist. Notebook is probably a Git Repo notebook")
             return 
         notebook_path = tags["mlflow.databricks.notebookPath"]
         notebook_name = os.path.basename(notebook_path)
