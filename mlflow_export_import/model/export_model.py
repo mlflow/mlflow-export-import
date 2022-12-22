@@ -2,12 +2,13 @@
 Export a registered model and all the experiment runs associated with each version.
 """
 
+import json
 import os
 import click
 import mlflow
+from mlflow.utils.proto_json_utils import message_to_json
 
 from mlflow_export_import.common import MlflowExportImportException
-from mlflow_export_import.common.http_client import MlflowHttpClient
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import import utils, click_doc
@@ -23,7 +24,6 @@ class ModelExporter():
         :param export_run: Export the run that generated a registered model's version.
         """
         self.mlflow_client = mlflow_client
-        self.http_client = MlflowHttpClient()
         self.run_exporter = RunExporter(self.mlflow_client, export_source_tags=export_source_tags, notebook_formats=notebook_formats)
         self.stages = self._normalize_stages(stages)
         self.export_run = export_run
@@ -85,7 +85,10 @@ class ModelExporter():
                     traceback.print_exc()
         output_versions.sort(key=lambda x: x["version"], reverse=False)
 
-        model = self.http_client.get(f"registered-models/get", {"name": model_name})
+        model_obj = self.mlflow_client.get_registered_model(model_name)
+        model_proto = model_obj.to_proto()
+        model = json.loads(message_to_json(model_proto))
+
         export_info = { "export_info":
             { **utils.create_export_info(),
               **{ "num_target_stages": len(self.stages),
@@ -95,7 +98,7 @@ class ModelExporter():
                 }
             }
         }
-        model = { **export_info, **model }
+        model = {'registered_model': model, **export_info }
         model["registered_model"]["latest_versions"] = output_versions
 
         print(f"Exported {exported_versions}/{len(output_versions)} versions for model '{model_name}'")
