@@ -3,6 +3,7 @@ Import a registered model and all the experiment runs associated with its latest
 """
 
 import os
+from urllib.parse import urlparse
 import click
 
 import mlflow
@@ -45,8 +46,8 @@ class BaseModelImporter():
         :param sleep_time: Seconds to wait for model version crreation.
         """
         src_current_stage = src_vr["current_stage"]
-        dst_source = dst_source.replace("file://","") # OSS MLflow
-        if not dst_source.startswith("dbfs:") and not os.path.exists(dst_source):
+        parsed_dst_source = urlparse(dst_source)
+        if parsed_dst_source.scheme == "file" and not os.path.exists(dst_source):
             raise MlflowExportImportException(f"'source' argument for MLflowClient.create_model_version does not exist: {dst_source}")
         kwargs = {"await_creation_for": self.await_creation_for } if self.await_creation_for else {}
         tags = src_vr["tags"]
@@ -189,7 +190,7 @@ class AllModelImporter(BaseModelImporter):
         for vr in model_dct["latest_versions"]:
             src_run_id = vr["run_id"]
             dst_run_id = self.run_info_map[src_run_id].run_id
-            mlflow.set_experiment(vr["_experiment_name"])
+            # mlflow.set_experiment(vr["_experiment_name"]) Is it thread-safe?
             self.import_version(model_name, vr, dst_run_id, sleep_time)
         if verbose:
             model_utils.dump_model_versions(self.mlflow_client, model_name)
