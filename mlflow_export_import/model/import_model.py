@@ -190,7 +190,7 @@ class AllModelImporter(BaseModelImporter):
         for vr in model_dct["latest_versions"]:
             src_run_id = vr["run_id"]
             dst_run_id = self.run_info_map[src_run_id].run_id
-            # mlflow.set_experiment(vr["_experiment_name"])
+            # mlflow.set_experiment(vr["_experiment_name"]) Is it thread-safe?
             self.import_version(model_name, vr, dst_run_id, sleep_time)
         if verbose:
             model_utils.dump_model_versions(self.mlflow_client, model_name)
