@@ -56,12 +56,21 @@ Each object export file is comprised of three JSON parts:
 }
 ```
 
-## Sample export JSON files
 
-| Mode | OSS | Databricks |
-|----|---|---|
-| Single | [Experiments](samples/oss_mlflow/single/experiments) | [Experiments](samples/databricks/single/experiments) |
-| Single | [Models](samples/oss_mlflow/single/models) | [Models](samples/databricks/single/models) |
-| Bulk | [Experiments](samples/oss_mlflow/bulk/experiments) | [Experiments](samples/databricks/bulk/experiments) |
-| Bulk | [Models](samples/oss_mlflow/bulk/models) | [Models](samples/databricks/bulk/models) |
+## Sample export JSON files 
+
+For Databricks all examples are for workspace notebooks except the `Git Repo` column.
+
+Column legend:
+* Basic - Basic default export.
+* Src Tags - Import source tags into destination tracking server. 
+* Git Repo - Databricks Repo notebook. 
+
+| Mode | Object | OSS    |          | Databricks |          |   |
+|------|--------|--------|----------|------------|----------|---|
+|      |        | **Basic**  | **Src Tags** | **Basic**      | **Src Tags** | **Git Repo** |
+| Single | Experiment | [link](samples/oss_mlflow/single/experiments/basic) |[link](samples/oss_mlflow/single/experiments/src_tags) | [link](samples/databricks/single/experiments/basic) | [link](samples/databricks/single/experiments/src_tags) | [link](samples/databricks/single/experiments/git_repo) |
+| Single | Model | [link](samples/oss_mlflow/single/models/basic/model.json) |[link](samples/oss_mlflow/single/models/src_tags/model.json) | [link](samples/databricks/single/models/basic/model.json) | [link](samples/databricks/single/models/src_tags/model.json) |  |
+| Bulk | Experiment | [link](samples/oss_mlflow/bulk/experiments) | | [link](samples/databricks/bulk/experiments) |  | |
+| Bulk | Model | [link](samples/oss_mlflow/bulk/experiments) || [link](samples/databricks/bulk/models) | | |
 

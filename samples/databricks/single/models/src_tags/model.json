@@ -1,0 +1,134 @@
+{
+  "system": {
+    "package_version": "1.1.2",
+    "script": "export_model.py",
+    "export_time": 1671259389,
+    "_export_time": "2022-12-17 06:43:09",
+    "mlflow_version": "2.0.1",
+    "mlflow_tracking_uri": "databricks",
+    "user": "andre",
+    "platform": {
+      "python_version": "3.8.15",
+      "system": "Darwin"
+    }
+  },
+  "info": {
+    "num_target_stages": 0,
+    "num_target_versions": 0,
+    "num_src_versions": 2,
+    "num_dst_versions": 2
+  },
+  "mlflow": {
+    "registered_model": {
+      "name": "Sklearn_Wine_Quality",
+      "creation_timestamp": 1671259230454,
+      "last_updated_timestamp": 1671259303616,
+      "user_id": "andre@mycompany.com",
+      "latest_versions": [
+        {
+          "creation_timestamp": 1671259248550,
+          "current_stage": "Staging",
+          "description": "",
+          "last_updated_timestamp": 1671259255251,
+          "name": "Sklearn_Wine_Quality",
+          "run_id": "3a77cd544c574932b3004fa5de2c3b42",
+          "run_link": "",
+          "source": "dbfs:/databricks/mlflow-tracking/13392175/3a77cd544c574932b3004fa5de2c3b42/artifacts/sklearn-model",
+          "status": "READY",
+          "status_message": "",
+          "tags": {
+            "mlflow_exim.field._creation_timestamp_utc": "2022-12-08 04:49:33",
+            "mlflow_exim.field._experiment_name": "/Users/andre@mycompany.com/mlflow/mlflow-export-import/export_samples/andre_sample_sklearn_Train_Predict",
+            "mlflow_exim.field._last_updated_timestamp_utc": "2022-12-08 11:02:42",
+            "mlflow_exim.field._run_artifact_uri": "dbfs:/databricks/mlflow-tracking/13368311/547660cf5db3450388e1f26afb83fbe9/artifacts",
+            "mlflow_exim.field.creation_timestamp": "1670474973332",
+            "mlflow_exim.field.current_stage": "Staging",
+            "mlflow_exim.field.description": "",
+            "mlflow_exim.field.last_updated_timestamp": "1670497361763",
+            "mlflow_exim.field.name": "andre_sample_sklearn_Train_Predict",
+            "mlflow_exim.field.run_id": "547660cf5db3450388e1f26afb83fbe9",
+            "mlflow_exim.field.run_link": "",
+            "mlflow_exim.field.source": "dbfs:/databricks/mlflow-tracking/13368311/547660cf5db3450388e1f26afb83fbe9/artifacts/sklearn-model",
+            "mlflow_exim.field.status": "READY",
+            "mlflow_exim.field.status_message": "",
+            "mlflow_exim.field.user_id": "andre@mycompany.com",
+            "mlflow_exim.field.version": "2"
+          },
+          "user_id": "andre@mycompany.com",
+          "version": "2",
+          "_run_artifact_uri": "dbfs:/databricks/mlflow-tracking/13392175/3a77cd544c574932b3004fa5de2c3b42/artifacts",
+          "_experiment_name": "/Users/andre@mycompany.com/experiments/imported/Sklearn_Wine_Quality"
+        },
+        {
+          "creation_timestamp": 1671259296926,
+          "current_stage": "Production",
+          "description": "",
+          "last_updated_timestamp": 1671259303616,
+          "name": "Sklearn_Wine_Quality",
+          "run_id": "74c60cd94932419ba849d31f3f291cbc",
+          "run_link": "",
+          "source": "dbfs:/databricks/mlflow-tracking/13392175/74c60cd94932419ba849d31f3f291cbc/artifacts/sklearn-model",
+          "status": "READY",
+          "status_message": "",
+          "tags": {
+            "mlflow_exim.field._creation_timestamp_utc": "2022-12-12 09:07:29",
+            "mlflow_exim.field._experiment_name": "/Users/andre@mycompany.com/mlflow/mlflow-export-import/export_samples/andre_sample_sklearn_Train_Predict",
+            "mlflow_exim.field._last_updated_timestamp_utc": "2022-12-12 09:07:36",
+            "mlflow_exim.field._run_artifact_uri": "dbfs:/databricks/mlflow-tracking/13368311/fb5ad45332b241a89d73da6e7aff8b36/artifacts",
+            "mlflow_exim.field.creation_timestamp": "1670836049446",
+            "mlflow_exim.field.current_stage": "Production",
+            "mlflow_exim.field.description": "",
+            "mlflow_exim.field.last_updated_timestamp": "1670836055687",
+            "mlflow_exim.field.name": "andre_sample_sklearn_Train_Predict",
+            "mlflow_exim.field.run_id": "fb5ad45332b241a89d73da6e7aff8b36",
+            "mlflow_exim.field.run_link": "",
+            "mlflow_exim.field.source": "dbfs:/databricks/mlflow-tracking/13368311/fb5ad45332b241a89d73da6e7aff8b36/artifacts/sklearn-model",
+            "mlflow_exim.field.status": "READY",
+            "mlflow_exim.field.status_message": "",
+            "mlflow_exim.field.user_id": "andre@mycompany.com",
+            "mlflow_exim.field.version": "6",
+            "ver_tag": "hello"
+          },
+          "user_id": "andre@mycompany.com",
+          "version": "6",
+          "_run_artifact_uri": "dbfs:/databricks/mlflow-tracking/13392175/74c60cd94932419ba849d31f3f291cbc/artifacts",
+          "_experiment_name": "/Users/andre@mycompany.com/experiments/imported/Sklearn_Wine_Quality"
+        }
+      ],
+      "tags": [
+        {
+          "key": "mlflow_exim.field._creation_timestamp_utc",
+          "value": "2022-12-08 04:45:49"
+        },
+        {
+          "key": "mlflow_exim.field._last_updated_timestamp_utc",
+          "value": "2022-12-12 09:07:36"
+        },
+        {
+          "key": "mlflow_exim.field.creation_timestamp",
+          "value": "1670474748916"
+        },
+        {
+          "key": "mlflow_exim.field.last_updated_timestamp",
+          "value": "1670836055687"
+        },
+        {
+          "key": "mlflow_exim.field.latest_versions",
+          "value": "[{'creation_timestamp': 1670474749010, 'current_stage': 'Archived', 'description': '', 'last_updated_timestamp': 1670600462111, 'name': 'andre_sample_sklearn_Train_Predict', 'run_id': '332e5cf57df94c4c8f923c65dc43bafc', 'run_link': '', 'source': 'dbfs:/databricks/mlflow-tracking/13368311/332e5cf57df94c4c8f923c65dc43bafc/artifacts/sklearn-model', 'status': 'READY', 'status_message': '', 'tags': {}, 'user_id': 'andre@mycompany.com', 'version': '1', '_run_artifact_uri': 'dbfs:/databricks/mlflow-tracking/13368311/332e5cf57df94c4c8f923c65dc43bafc/artifacts', '_experiment_name': '/Users/andre@mycompany.com/mlflow/mlflow-export-import/export_samples/andre_sample_sklearn_Train_Predict'}, {'creation_timestamp': 1670474973332, 'current_stage': 'Staging', 'description': '', 'last_updated_timestamp': 1670497361763, 'name': 'andre_sample_sklearn_Train_Predict', 'run_id': '547660cf5db3450388e1f26afb83fbe9', 'run_link': '', 'source': 'dbfs:/databricks/mlflow-tracking/13368311/547660cf5db3450388e1f26afb83fbe9/artifacts/sklearn-model', 'status': 'READY', 'status_message': '', 'tags': {}, 'user_id': 'andre@mycompany.com', 'version': '2', '_run_artifact_uri': 'dbfs:/databricks/mlflow-tracking/13368311/547660cf5db3450388e1f26afb83fbe9/artifacts', '_experiment_name': '/Users/andre@mycompany.com/mlflow/mlflow-export-import/export_samples/andre_sample_sklearn_Train_Predict'}, {'creation_timestamp': 1670600071283, 'current_stage': 'Archived', 'description': '', 'last_updated_timestamp': 1670600462111, 'name': 'andre_sample_sklearn_Train_Predict', 'run_id': 'd80a017f2edd48609baff72aa843e892', 'run_link': '', 'source': 'dbfs:/databricks/mlflow-tracking/13373532/d80a017f2edd48609baff72aa843e892/artifacts/sklearn-model', 'status': 'READY', 'status_message': '', 'tags': {}, 'user_id': 'andre@mycompany.com', 'version': '3', '_run_artifact_uri': 'dbfs:/databricks/mlflow-tracking/13373532/d80a017f2edd48609baff72aa843e892/artifacts', '_experiment_name': '/Users/andre@mycompany.com/experiments/samples/andre_sample_sklearn_Train_Predict'}, {'creation_timestamp': 1670600165397, 'current_stage': 'Archived', 'description': '', 'last_updated_timestamp': 1670600462111, 'name': 'andre_sample_sklearn_Train_Predict', 'run_id': '8b9519b32be847b19e7ec8fa63739611', 'run_link': '', 'source': 'dbfs:/databricks/mlflow-tracking/13373532/8b9519b32be847b19e7ec8fa63739611/artifacts/sklearn-model', 'status': 'READY', 'status_message': '', 'tags': {}, 'user_id': 'andre@mycompany.com', 'version': '4', '_run_artifact_uri': 'dbfs:/databricks/mlflow-tracking/13373532/8b9519b32be847b19e7ec8fa63739611/artifacts', '_experiment_name': '/Users/andre@mycompany.com/experiments/samples/andre_sample_sklearn_Train_Predict'}, {'creation_timestamp': 1670600455913, 'current_stage': 'Archived', 'description': '', 'last_updated_timestamp': 1670836055687, 'name': 'andre_sample_sklearn_Train_Predict', 'run_id': '0cca4c956d9d4ca29b3b7612eb16bf20', 'run_link': '', 'source': 'dbfs:/databricks/mlflow-tracking/13368311/0cca4c956d9d4ca29b3b7612eb16bf20/artifacts/sklearn-model', 'status': 'READY', 'status_message': '', 'tags': {}, 'user_id': 'andre@mycompany.com', 'version': '5', '_run_artifact_uri': 'dbfs:/databricks/mlflow-tracking/13368311/0cca4c956d9d4ca29b3b7612eb16bf20/artifacts', '_experiment_name': '/Users/andre@mycompany.com/mlflow/mlflow-export-import/export_samples/andre_sample_sklearn_Train_Predict'}, {'creation_timestamp': 1670836049446, 'current_stage': 'Production', 'description': '', 'last_updated_timestamp': 1670836055687, 'name': 'andre_sample_sklearn_Train_Predict', 'run_id': 'fb5ad45332b241a89d73da6e7aff8b36', 'run_link': '', 'source': 'dbfs:/databricks/mlflow-tracking/13368311/fb5ad45332b241a89d73da6e7aff8b36/artifacts/sklearn-model', 'status': 'READY', 'status_message': '', 'tags': {'ver_tag': 'hello'}, 'user_id': 'andre@mycompany.com', 'version': '6', '_run_artifact_uri': 'dbfs:/databricks/mlflow-tracking/13368311/fb5ad45332b241a89d73da6e7aff8b36/artifacts', '_experiment_name': '/Users/andre@mycompany.com/mlflow/mlflow-export-import/export_samples/andre_sample_sklearn_Train_Predict'}]"
+        },
+        {
+          "key": "mlflow_exim.field.name",
+          "value": "andre_sample_sklearn_Train_Predict"
+        },
+        {
+          "key": "mlflow_exim.field.user_id",
+          "value": "andre@mycompany.com"
+        },
+        {
+          "key": "sample_tag",
+          "value": "hi"
+        }
+      ]
+    }
+  }
+}
