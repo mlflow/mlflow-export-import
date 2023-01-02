@@ -1,7 +1,7 @@
 
-## Options
+# Options
 
-### Common options 
+## Common options 
 
 `notebook-formats` - If exporting a Databricks run, the run's notebook revision can be saved in the specified formats (comma-delimited argument). Each format is saved in the notebooks folder of the run's artifact root directory as `notebook.{format}`. Supported formats are  SOURCE, HTML, JUPYTER and DBC. See Databricks [Export Format](https://docs.databricks.com/dev-tools/api/latest/workspace.html#notebookexportformat) documentation.
 
@@ -9,7 +9,7 @@
 
 `export-source-tags` - Exports source information under the `mlflow_export_import` tag prefix. See section below for details.
 
-### MLflow Export Import Source Tags 
+## MLflow Export Import Source Tags 
 
 For ML governance purposes, original source run information is saved under the `mlflow_export_import` tag prefix in the destination MLflow object.
 

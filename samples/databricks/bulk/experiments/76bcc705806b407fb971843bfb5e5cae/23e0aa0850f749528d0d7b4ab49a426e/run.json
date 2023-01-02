@@ -1,0 +1,62 @@
+{
+  "system": {
+    "package_version": "1.1.2",
+    "script": "export_run.py",
+    "export_time": 1672631409,
+    "_export_time": "2023-01-02 03:50:09",
+    "mlflow_version": "2.1.1",
+    "mlflow_tracking_uri": "databricks",
+    "user": "andre",
+    "platform": {
+      "python_version": "3.8.15",
+      "system": "Darwin"
+    }
+  },
+  "mlflow": {
+    "info": {
+      "run_uuid": "23e0aa0850f749528d0d7b4ab49a426e",
+      "run_id": "23e0aa0850f749528d0d7b4ab49a426e",
+      "experiment_id": "76bcc705806b407fb971843bfb5e5cae",
+      "user_id": "",
+      "status": "FINISHED",
+      "start_time": 1671430436354,
+      "end_time": 1671430445613,
+      "lifecycle_stage": "active",
+      "artifact_uri": "dbfs:/databricks/mlflow-tracking/76bcc705806b407fb971843bfb5e5cae/23e0aa0850f749528d0d7b4ab49a426e/artifacts",
+      "run_name": "2022-12-19 06:13:56"
+    },
+    "params": {},
+    "metrics": {
+      "degree": [
+        {
+          "value": 5.0,
+          "timestamp": 1671430436663,
+          "step": 0
+        }
+      ]
+    },
+    "tags": {
+      "mlflow.databricks.cluster.id": "0318-151752-abed99",
+      "mlflow.databricks.cluster.info": "{\"cluster_name\":\"Shared Autoscaling Americas\",\"spark_version\":\"11.3.x-cpu-ml-scala2.12\",\"node_type_id\":\"i3.4xlarge\",\"driver_node_type_id\":\"i3.4xlarge\",\"autotermination_minutes\":120,\"disk_spec\":{\"disk_count\":0},\"autoscale\":{\"min_workers\":1,\"max_workers\":8,\"target_workers\":1}}",
+      "mlflow.databricks.cluster.libraries": "{\"installable\":[],\"redacted\":[]}",
+      "mlflow.databricks.gitRepoCommit": "da878fd08a528ab58d76aed61909b9e13db89048",
+      "mlflow.databricks.gitRepoProvider": "gitHub",
+      "mlflow.databricks.gitRepoReference": "main",
+      "mlflow.databricks.gitRepoReferenceType": "branch",
+      "mlflow.databricks.gitRepoRelativePath": "01_Iris_Train",
+      "mlflow.databricks.gitRepoStatus": "unknown",
+      "mlflow.databricks.gitRepoUrl": "https://github.com/amesar/dbx-repo-mlflow",
+      "mlflow.databricks.notebook.commandID": "4435231978567305549_7706534529835479024_3eb1ab966b624a36b8f0a8a7a24e599d",
+      "mlflow.databricks.notebookID": "13333928",
+      "mlflow.databricks.notebookPath": "/Repos/andre@mycompany.com/dbx-repo-mlflow/01_Iris_Train",
+      "mlflow.databricks.webappURL": "https://demo.cloud.databricks.com",
+      "mlflow.databricks.workspaceID": "0",
+      "mlflow.databricks.workspaceURL": "https://demo.cloud.databricks.com",
+      "mlflow.log-model.history": "[{\"artifact_path\":\"model\",\"flavors\":{\"python_function\":{\"predict_fn\":\"predict\",\"model_path\":\"model.pkl\",\"loader_module\":\"mlflow.sklearn\",\"env\":\"conda.yaml\",\"python_version\":\"3.9.5\"},\"sklearn\":{\"pickled_model\":\"model.pkl\",\"sklearn_version\":\"0.24.2\",\"serialization_format\":\"cloudpickle\",\"code\":null}},\"run_id\":\"23e0aa0850f749528d0d7b4ab49a426e\",\"model_uuid\":\"bc44b04d4f43405395fb619541fd6dd2\",\"utc_time_created\":\"2022-12-19 06:13:56.765460\",\"mlflow_version\":\"1.29.0\",\"databricks_runtime\":\"11.3.x-cpu-ml-scala2.12\"}]",
+      "mlflow.runName": "2022-12-19 06:13:56",
+      "mlflow.source.name": "/Repos/andre@mycompany.com/dbx-repo-mlflow/01_Iris_Train",
+      "mlflow.source.type": "NOTEBOOK",
+      "mlflow.user": "andre@mycompany.com"
+    }
+  }
+}

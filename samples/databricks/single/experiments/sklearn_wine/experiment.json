@@ -24,13 +24,13 @@
   },
   "experiment": {
     "experiment_id": "13373532",
-    "name": "/Users/andre@databricks.com/experiments/samples/andre_sample_sklearn_Train_Predict",
+    "name": "/Users/andre@mycompany.com/experiments/samples/andre_sample_sklearn_Train_Predict",
     "artifact_location": "dbfs:/databricks/mlflow-tracking/13373532",
     "lifecycle_stage": "active",
     "tags": {
       "mlflow.ownerId": "100327",
-      "mlflow.experiment.sourceName": "/Users/andre@databricks.com/experiments/samples/andre_sample_sklearn_Train_Predict",
-      "mlflow.ownerEmail": "andre@databricks.com",
+      "mlflow.experiment.sourceName": "/Users/andre@mycompany.com/experiments/samples/andre_sample_sklearn_Train_Predict",
+      "mlflow.ownerEmail": "andre@mycompany.com",
       "mlflow.experimentType": "MLFLOW_EXPERIMENT"
     },
     "creation_time": 1670600064781,

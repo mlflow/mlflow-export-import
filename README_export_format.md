@@ -60,8 +60,8 @@ Each object export file is comprised of three JSON parts:
 
 | Mode | OSS | Databricks |
 |----|---|---|
-| Individual | [Experiments](samples/oss_mlflow/single/experiments) | [Experiments](samples/databricks/single/experiments) |
-| Individual | [Models](samples/oss_mlflow/single/models) | [Models](samples/databricks/single/models) |
-| Collection | [Experiments](samples/oss_mlflow/bulk/experiments) | [Experiments](samples/databricks/bulk/experiments) |
-| Collection | [Models](samples/oss_mlflow/bulk/models) | [Models](samples/databricks/bulk/models) |
+| Single | [Experiments](samples/oss_mlflow/single/experiments) | [Experiments](samples/databricks/single/experiments) |
+| Single | [Models](samples/oss_mlflow/single/models) | [Models](samples/databricks/single/models) |
+| Bulk | [Experiments](samples/oss_mlflow/bulk/experiments) | [Experiments](samples/databricks/bulk/experiments) |
+| Bulk | [Models](samples/oss_mlflow/bulk/models) | [Models](samples/databricks/bulk/models) |
 
