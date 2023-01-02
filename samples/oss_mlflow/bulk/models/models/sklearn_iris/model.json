@@ -1,56 +1,47 @@
 {
-  "export_info": {
-    "mlflow_version": "2.0.1",
+  "system": {
+    "package_version": "1.1.2",
+    "script": "export_model.py",
+    "export_time": 1672601766,
+    "_export_time": "2023-01-01 19:36:06",
+    "mlflow_version": "2.1.1",
     "mlflow_tracking_uri": "http://127.0.0.1:5020",
-    "export_time": {
-      "seconds": 1670304347,
-      "local_time": "2022-12-06 00:25:47",
-      "utc_time": "2022-12-06 05:25:47"
-    },
+    "user": "andre.mesarovic",
+    "platform": {
+      "python_version": "3.8.15",
+      "system": "Darwin"
+    }
+  },
+  "info": {
     "num_target_stages": 2,
     "num_target_versions": 0,
-    "num_src_versions": 2,
-    "num_dst_versions": 2
+    "num_src_versions": 1,
+    "num_dst_versions": 1
   },
-  "registered_model": {
-    "name": "sklearn_iris",
-    "creation_timestamp": 1670301537631,
-    "last_updated_timestamp": 1670301597677,
-    "latest_versions": [
-      {
-        "creation_timestamp": 1670301537640,
-        "current_stage": "Production",
-        "description": "",
-        "last_updated_timestamp": 1670301537661,
-        "name": "sklearn_iris",
-        "run_id": "5397ae67ee0c49139bf64834b4d27fab",
-        "run_link": "",
-        "source": "/opt/mlflow/server/mlruns/2/5397ae67ee0c49139bf64834b4d27fab/artifacts/artifacts/sklearn-model",
-        "status": "READY",
-        "status_message": "",
-        "tags": {},
-        "user_id": "",
-        "version": "1",
-        "_run_artifact_uri": "/opt/mlflow/server/mlruns/2/5397ae67ee0c49139bf64834b4d27fab/artifacts",
-        "_experiment_name": "sklearn_iris"
-      },
-      {
-        "creation_timestamp": 1670301597668,
-        "current_stage": "Production",
-        "description": "",
-        "last_updated_timestamp": 1670301597677,
-        "name": "sklearn_iris",
-        "run_id": "8a6af43e756f433da7a90fd6b4e49c3a",
-        "run_link": "",
-        "source": "/opt/mlflow/server/mlruns/2/8a6af43e756f433da7a90fd6b4e49c3a/artifacts/artifacts/sklearn-model",
-        "status": "READY",
-        "status_message": "",
-        "tags": {},
-        "user_id": "",
-        "version": "2",
-        "_run_artifact_uri": "/opt/mlflow/server/mlruns/2/8a6af43e756f433da7a90fd6b4e49c3a/artifacts",
-        "_experiment_name": "sklearn_iris"
-      }
-    ]
+  "mlflow": {
+    "registered_model": {
+      "name": "sklearn_iris",
+      "creation_timestamp": 1672601581580,
+      "last_updated_timestamp": 1672601581600,
+      "latest_versions": [
+        {
+          "creation_timestamp": 1672601581587,
+          "current_stage": "Staging",
+          "description": "",
+          "last_updated_timestamp": 1672601581600,
+          "name": "sklearn_iris",
+          "run_id": "dee04cd7f0054008a3c8fe0260feb814",
+          "run_link": "",
+          "source": "/Users/andre.mesarovic/work/mlflow_server/local_mlrun/mlruns/2/dee04cd7f0054008a3c8fe0260feb814/artifacts/artifacts/sklearn-model",
+          "status": "READY",
+          "status_message": "",
+          "tags": {},
+          "user_id": "",
+          "version": "1",
+          "_run_artifact_uri": "/Users/andre.mesarovic/work/mlflow_server/local_mlrun/mlruns/2/dee04cd7f0054008a3c8fe0260feb814/artifacts",
+          "_experiment_name": "sklearn_iris"
+        }
+      ]
+    }
   }
 }

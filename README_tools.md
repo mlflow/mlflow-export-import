@@ -1,4 +1,4 @@
-# MLflow Export Import - Miscellanous Tools
+# MLflow Export Import Tools
 
 ## Download notebook with revision
 
@@ -71,3 +71,40 @@ http-client \
   --resource experiments/create \
   --data '{"name": "my_experiment"}'
 ```
+
+## List all registered models
+
+Calls the `registered-models/list` MLflow API endpoint and creates the file `registered_models.json`.
+```
+list-models
+```
+
+cat registered_models.json
+```
+{
+  "registered_models": [
+    {
+      "name": "keras_mnist",
+      "creation_timestamp": "1601399113433",
+      "last_updated_timestamp": "1601399504920",
+      "latest_versions": [
+        {
+          "name": "keras_mnist",
+          "version": "1",
+          "creation_timestamp": "1601399113486",
+          "last_updated_timestamp": "1601399504920",
+          "current_stage": "Archived",
+          "description": "",
+          "source": "file:///opt/mlflow/server/mlruns/1/9176458a78194d819e55247eee7531c3/artifacts/keras-model",
+          "run_id": "9176458a78194d819e55247eee7531c3",
+          "status": "READY",
+          "run_link": ""
+        },
+```
+
+## Workflow API
+
+* [README.md](mlflow_export_import/workflow_api/README.md)
+* The `WorkflowApiClient` is a Python wrapper around the Databricks REST API to execute job runs in a synchronous polling manner.
+* Although a generic tool, in terms of mlflow-export-import, its main use is for testing Databricks notebook jobs.
+
