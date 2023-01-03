@@ -5,7 +5,7 @@
 High-level tools to copy an entire tracking server or a collection of MLflow objects (runs, experiments and registered models).
 Full object referential integrity is maintained as well as the original MLflow object names.
 
-Three types of Collection tools:
+Three types of bulk tools:
 * All - all MLflow objects of the tracking server.
 * Registered models - models and their versions' run and the run's experiment.
 * Experiments.
@@ -94,13 +94,9 @@ When exporting a registered models the following model's associated objects are 
 | | | +-run.json
 | | | +-artifacts/
 | | | | +-sklearn-model/
-| | | |   +-requirements.txt
-| | | |   +-python_env.yaml
-| | | |   +-model.pkl
-| | | |   +-conda.yaml
-| | | |   +-MLmodel
 | | +-4273c31c45744ec385f3654c63c31360
 | | | +-run.json
+| | | +-artifacts/
 | | | . . .
 | 
 +-models/
@@ -214,13 +210,9 @@ Export/import experiments to a directory.
 | | +-run.json
 | | +-artifacts/
 | | | +-sklearn-model/
-| | |   +-requirements.txt
-| | |   +-python_env.yaml
-| | |   +-model.pkl
-| | |   +-conda.yaml
-| | |   +-MLmodel
 | +-4273c31c45744ec385f3654c63c31360/
 | | +-run.json
+| | +-artifacts/
 | | +- . . .
 ```
 
@@ -233,21 +225,14 @@ Export several (or all) experiments to a directory.
 export-experiments --help
 
 Options:
-  --output-dir TEXT             Output directory.  [required]
-  --experiments TEXT            Experiment names or IDs (comma delimited).
-                                For example, 'sklearn_wine,sklearn_iris' or
-                                '1,2'. 'all' will export all experiments.
-                                [required]
-  --export-source-tags BOOLEAN  Export source run information (RunInfo, MLflow
-                                system tags starting with 'mlflow' and
-                                metadata) under the 'mlflow_export_import' tag
-                                prefix. See README_single.md for more
-                                details.  [default: False]
-  --notebook-formats TEXT       Databricks notebook formats. Values are
-                                SOURCE, HTML, JUPYTER or DBC (comma
-                                seperated).
-  --use-threads BOOLEAN         Process export/import in parallel using
-                                threads.  [default: False]
+  --experiments TEXT       Experiment names or IDs (comma delimited).
+                           For example, 'sklearn_wine,sklearn_iris' or '1,2'.
+                           'all' will export all experiments.  [required]
+  --output-dir TEXT        Output directory.  [required]
+  --notebook-formats TEXT  Databricks notebook formats. Values are SOURCE,
+                           HTML, JUPYTER or DBC (comma seperated).
+  --use-threads BOOLEAN    Process export/import in parallel using threads.
+                           [default: False]
 ```
 
 #### Examples
@@ -283,78 +268,100 @@ Duration: 1.6 seonds
 
 #### Export directory structure
 
-The output directory contains a manifest file and a subdirectory for each experiment (by experiment ID).
+The root output directory contains an experiments.json file and a subdirectory for each experiment (named for the experiment ID).
 
-Each experiment subdirectory in turn contains its own manifest file and a subdirectory for each run.
+Each experiment subdirectory in turn contains its own experiment.json file and a subdirectory for each run.
 The run directory contains a run.json file containing run metadata and artifact directories.
 
 In the example below we have two experiments - 1 and 7. Experiment 1 (sklearn) has two runs (f4eaa7ddbb7c41148fe03c530d9b486f and 5f80bb7cd0fc40038e0e17abe22b304c) whereas experiment 7 (sparkml) has one run (ffb7f72a8dfb46edb4b11aed21de444b).
 
 ```
-+-manifest.json
++-experiments.json
 +-1/
-| +-manifest.json
+| +-experiment.json
 | +-f4eaa7ddbb7c41148fe03c530d9b486f/
 | | +-run.json
 | | +-artifacts/
-| |   +-plot.png
 | |   +-sklearn-model/
-| |   | +-model.pkl
-| |   | +-conda.yaml
-| |   | +-MLmodel
 | |   +-onnx-model/
-| |     +-model.onnx
-| |     +-conda.yaml
-| |     +-MLmodel
 | +-5f80bb7cd0fc40038e0e17abe22b304c/
 | | +-run.json
 |   +-artifacts/
-|     +-plot.png
 |     +-sklearn-model/
-|     | +-model.pkl
-|     | +-conda.yaml
-|     | +-MLmodel
 |     +-onnx-model/
-|       +-model.onnx
-|       +-conda.yaml
-|       +-MLmodel
 +-7/
-| +-manifest.json
+| +-experiment.json
 | +-ffb7f72a8dfb46edb4b11aed21de444b/
 | | +-run.json
 |   +-artifacts/
 |     +-spark-model/
-|     | +-sparkml/
-|     |   +-stages/
-|     |   +-metadata/
 |     +-mleap-model/
-|       +-mleap/
-|         +-model/
 ```
 
-Sample:
+Sample experiments.json
 ```
 {
-  "info": {
-    "mlflow_version": "1.11.0",
-    "mlflow_tracking_uri": "http://localhost:5000",
-    "export_time": "2020-09-10 20:23:45"
+  "system": {
+    "package_version": "1.1.2",
+    "script": "export_experiments.py"
   },
-  "experiments": [
-    {
-      "id": "1",
-      "name": "sklearn"
-    },
-    {
-      "id": "7",
-      "name": "sparkml"
-    }
-  ]
-}
+  "info": {
+    "duration": 0.2,
+    "experiments": 3,
+    "total_runs": 2,
+    "ok_runs": 2,
+    "failed_runs": 0
+  },
+  "mlflow": {
+    "experiments": [
+      {
+        "id": "2",
+        "name": "sklearn",
+        "ok_runs": 1,
+        "failed_runs": 0,
+        "duration": 0.1
+      },
+      {
+        "id": "2",
+        "name": "sparkml",
+        "ok_runs": 1,
+        "failed_runs": 0,
+        "duration": 0.1
+      },
 ```
 
-Sample:
+Sample experiment.json
+```
+{
+  "system": {
+    "package_version": "1.1.2",
+  }
+  "info": {
+    "num_total_runs": 1,
+    "num_ok_runs": 1,
+    "num_failed_runs": 0,
+    "failed_runs": []
+  },
+  "mlflow": {
+    "experiment": {
+      "experiment_id": "1",
+      "name": "sklearn_wine",
+      "artifact_location": "/Users/andre.mesarovic/work/mlflow_server/local_mlrun/mlruns/1",
+      "lifecycle_stage": "active",
+      "tags": {
+        "experiment_created": "2022-12-15 02:17:43",
+        "version_mlflow": "2.0.1"
+      },
+      "creation_time": 1671070664091,
+      "last_update_time": 1671070664091
+    }
+    "runs": [
+      "a83cebbccbca41299360c695c5ea72f3"
+    ],
+  }
+```
 
+Sample experiment.json
 ```
 {
   "experiment": {
@@ -391,14 +398,12 @@ If the experiment already exists, the source runs will be added to it.
 import-experiments --help
 
 Options:
-  --input-dir TEXT                Input directory.  [required]
-  --experiment-name-prefix TEXT   If specified, added as prefix to experiment name.
-  --use-src-user-id BOOLEAN       Set the destination user ID to the source
-                                  user ID. Source user ID is ignored when
-                                  importing into Databricks since setting it
-                                  is not allowed.  [default: False]
-  --use-threads BOOLEAN           Process the export/import in parallel using
-                                  threads.  [default: False]
+  --input-dir TEXT           Input path - directory  [required]
+  --use-src-user-id BOOLEAN  Set the destination user ID to the source user
+                             ID. Source user ID is ignored when importing into
+                             Databricks since setting it is not allowed.
+  --use-threads BOOLEAN      Process export/import in parallel using threads.
+                             [default: False]
 ```
 
 #### Examples
@@ -409,6 +414,5 @@ import-experiments --input-dir out
 
 ```
 import-experiments \
-  --input-dir out \
-  --experiment-name-prefix imported_
+  --input-dir out
 ```

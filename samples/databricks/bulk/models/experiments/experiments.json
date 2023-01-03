@@ -23,14 +23,14 @@
     "experiments": [
       {
         "id": "13368311",
-        "name": "/Users/andre@mycompany.com/mlflow/mlflow-export-import/export_samples/andre_sample_sklearn_Train_Predict",
+        "name": "/Users/andre@mycompany.com/mlflow/mlflow-export-import/export_samples/Sklearn_WineQuality",
         "ok_runs": 4,
         "failed_runs": 0,
         "duration": 18.9
       },
       {
         "id": "13373532",
-        "name": "/Users/andre@mycompany.com/experiments/samples/andre_sample_sklearn_Train_Predict",
+        "name": "/Users/andre@mycompany.com/experiments/samples/Sklearn_WineQuality",
         "ok_runs": 2,
         "failed_runs": 0,
         "duration": 9.2

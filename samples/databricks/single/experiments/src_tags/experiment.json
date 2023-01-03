@@ -29,7 +29,7 @@
         "mlflow.experimentType": "MLFLOW_EXPERIMENT",
         "mlflow.ownerEmail": "andre@mycompany.com",
         "mlflow.ownerId": "100327",
-        "mlflow_exim.mlflow.experiment.sourceName": "/Users/andre@mycompany.com/mlflow/mlflow-export-import/export_samples/andre_sample_sklearn_Train_Predict",
+        "mlflow_exim.mlflow.experiment.sourceName": "/Users/andre@mycompany.com/mlflow/mlflow-export-import/export_samples/Sklearn_WineQuality",
         "mlflow_exim.mlflow.experimentType": "MLFLOW_EXPERIMENT",
         "mlflow_exim.mlflow.ownerEmail": "andre@mycompany.com",
         "mlflow_exim.mlflow.ownerId": "100327",

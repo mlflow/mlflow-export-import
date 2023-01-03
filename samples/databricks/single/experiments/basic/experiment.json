@@ -24,12 +24,12 @@
   },
   "experiment": {
     "experiment_id": "13373532",
-    "name": "/Users/andre@mycompany.com/experiments/samples/andre_sample_sklearn_Train_Predict",
+    "name": "/Users/andre@mycompany.com/experiments/samples/Sklearn_WineQuality",
     "artifact_location": "dbfs:/databricks/mlflow-tracking/13373532",
     "lifecycle_stage": "active",
     "tags": {
       "mlflow.ownerId": "100327",
-      "mlflow.experiment.sourceName": "/Users/andre@mycompany.com/experiments/samples/andre_sample_sklearn_Train_Predict",
+      "mlflow.experiment.sourceName": "/Users/andre@mycompany.com/experiments/samples/Sklearn_WineQuality",
       "mlflow.ownerEmail": "andre@mycompany.com",
       "mlflow.experimentType": "MLFLOW_EXPERIMENT"
     },

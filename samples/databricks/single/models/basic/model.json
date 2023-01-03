@@ -20,7 +20,7 @@
   },
   "mlflow": {
     "registered_model": {
-      "name": "andre_sample_sklearn_Train_Predict",
+      "name": "Sklearn_WineQuality",
       "creation_timestamp": 1670474748916,
       "last_updated_timestamp": 1670836055687,
       "user_id": "andre@mycompany.com",
@@ -30,7 +30,7 @@
           "current_stage": "Staging",
           "description": "",
           "last_updated_timestamp": 1670497361763,
-          "name": "andre_sample_sklearn_Train_Predict",
+          "name": "Sklearn_WineQuality",
           "run_id": "547660cf5db3450388e1f26afb83fbe9",
           "run_link": "",
           "source": "dbfs:/databricks/mlflow-tracking/13368311/547660cf5db3450388e1f26afb83fbe9/artifacts/sklearn-model",
@@ -40,14 +40,14 @@
           "user_id": "andre@mycompany.com",
           "version": "2",
           "_run_artifact_uri": "dbfs:/databricks/mlflow-tracking/13368311/547660cf5db3450388e1f26afb83fbe9/artifacts",
-          "_experiment_name": "/Users/andre@mycompany.com/mlflow/mlflow-export-import/export_samples/andre_sample_sklearn_Train_Predict"
+          "_experiment_name": "/Users/andre@mycompany.com/mlflow/mlflow-export-import/export_samples/Sklearn_WineQuality"
         },
         {
           "creation_timestamp": 1670836049446,
           "current_stage": "Production",
           "description": "",
           "last_updated_timestamp": 1670836055687,
-          "name": "andre_sample_sklearn_Train_Predict",
+          "name": "Sklearn_WineQuality",
           "run_id": "fb5ad45332b241a89d73da6e7aff8b36",
           "run_link": "",
           "source": "dbfs:/databricks/mlflow-tracking/13368311/fb5ad45332b241a89d73da6e7aff8b36/artifacts/sklearn-model",
@@ -59,7 +59,7 @@
           "user_id": "andre@mycompany.com",
           "version": "6",
           "_run_artifact_uri": "dbfs:/databricks/mlflow-tracking/13368311/fb5ad45332b241a89d73da6e7aff8b36/artifacts",
-          "_experiment_name": "/Users/andre@mycompany.com/mlflow/mlflow-export-import/export_samples/andre_sample_sklearn_Train_Predict"
+          "_experiment_name": "/Users/andre@mycompany.com/mlflow/mlflow-export-import/export_samples/Sklearn_WineQuality"
         }
       ],
       "tags": [

@@ -7,6 +7,8 @@ These tools allow you to specify a different destination object name.
 
 For example, if you want to clone the experiment `/Mary/Experiment/Iris` under a new name, you can specify the target experiment name as `/John/Experiment/Iris`.
 
+See sample JSON export files [here](README_export_format.md#sample-export-json-files).
+
 ### Tools
 
 | MLflow Object | Documentation | Code |
@@ -74,9 +76,9 @@ export-experiment \
 
 #### Export directory structure 
 
-The [export directory](samples/oss_mlflow/single/experiments/sklearn_wine) contains a [JSON export file](samples/oss_mlflow/single/experiments/sklearn_wine/experiment.json)
+The [export directory](samples/oss_mlflow/single/experiments/basic) contains a [JSON export file](samples/oss_mlflow/single/experiments/basic/experiment.json)
 for the experiment and a subdirectory for each run. 
-The [run directory](samples/oss_mlflow/single/experiments/sklearn_wine/eb66c160957d4a28b11d3f1b968df9cd) contains a [JSON export file](amples/oss_mlflow/single/experiments/sklearn_wine/eb66c160957d4a28b11d3f1b968df9cd/run.json) containing run metadata and an artifact folder directory.
+The [run directory](samples/oss_mlflow/single/experiments/basic/eb66c160957d4a28b11d3f1b968df9cd) contains a [JSON export file](samples/oss_mlflow/single/experiments/basic/eb66c160957d4a28b11d3f1b968df9cd/run.json) containing run metadata and an artifact folder directory.
 
 Sample export directory
 ```
@@ -183,9 +185,10 @@ Produces a directory with the following structure:
 |   +-MLmodel
 ```
 
-Sample run.json:
-[OSS](samples/oss_mlflow/single/experiments/sklearn_wine/eb66c160957d4a28b11d3f1b968df9cd/run.json)
- \- [Databricks](samples/databricks/single/experiments/sklearn_wine/f2e3f75c845d4365addbc9c0262a58a5/run.json).
+Sample run.json files:
+[OSS](samples/oss_mlflow/single/experiments/basic/eb66c160957d4a28b11d3f1b968df9cd/run.json)
+\- [Databricks](samples/databricks/single/experiments/basic/f2e3f75c845d4365addbc9c0262a58a5/run.json).
+
 
 ### Import run
 
@@ -219,10 +222,10 @@ Options:
 
 #### Import examples
 
-Directory `out` is where you exported your run.
-
 ##### Local import example
 ```
+export MLFLOW_TRACKING_URI=databricks
+
 import-run \
   --run-id 50fa90e751eb4b3f9ba9cef0efe8ea30 \
   --input out \
@@ -233,6 +236,7 @@ import-run \
 
 ```
 export MLFLOW_TRACKING_URI=databricks
+
 run.import-run \
   --run-id 50fa90e751eb4b3f9ba9cef0efe8ea30 \
   --input out \
@@ -299,11 +303,12 @@ Output export directory example.
 +-model.json
 ```
 
-Sample model.json:
-[OSS](samples/oss_mlflow/single/models/sklearn_wine/model.json)
-\- [Databricks](samples/databricks/single/models/model.json).
+Sample model.json files:
+[OSS](samples/oss_mlflow/single/models/basic/model.json)
+\- [Databricks](samples/databricks/single/models/basic/model.json).
 ```
 {
+"mlflow": {
   "registered_model": {
     "name": "sklearn_wine",
     "creation_timestamp": "1587517284168",
