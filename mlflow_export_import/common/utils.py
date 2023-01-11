@@ -29,16 +29,6 @@ def set_dst_user_id(tags, user_id, use_src_user_id):
 # Miscellaneous 
 
 
-def mk_source_tags(tags, src_prefix, dst_prefix):
-    """" 
-    Extract keys form dict starting with src_prefix and return them with new key starting with dst_prefix.
-    """
-    if src_prefix:
-        return { f"{dst_prefix}.{k}":str(v) for k,v in tags.items() if k.startswith(src_prefix) }
-    else:
-        return { f"{dst_prefix}.{k}":str(v) for k,v in tags.items() }
-
-
 def strip_underscores(obj):
     return { k[1:]:v for (k,v) in obj.__dict__.items() }
 

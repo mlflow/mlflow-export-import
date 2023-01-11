@@ -12,7 +12,7 @@ from mlflow_export_import.common import io_utils
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common.http_client import DatabricksHttpClient
 from mlflow_export_import.run.import_run import RunImporter
-from mlflow_export_import.common.source_tags import ExportTags
+from mlflow_export_import.common.source_tags import set_source_tags_for_field, mk_source_tags_mlflow_tag, fmt_timestamps
 
 
 def _peek_at_experiments(exp_dir):
@@ -54,9 +54,12 @@ class ExperimentImporter():
 
         tags = exp_dct["experiment"]["tags"] 
         if self.import_source_tags:
-            source_tags = utils.mk_source_tags(tags, "mlflow.", f"{ExportTags.PREFIX_ROOT}")
+            source_tags = mk_source_tags_mlflow_tag(tags)
             tags = { **tags, **source_tags }
-
+            exp = exp_dct["experiment"]
+            set_source_tags_for_field(exp, tags)
+            fmt_timestamps("creation_time", exp, tags)
+            fmt_timestamps("last_update_time", exp, tags)
         mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, exp_name, tags)
 
         run_ids = exp_dct["runs"]

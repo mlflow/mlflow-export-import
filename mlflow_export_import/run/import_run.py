@@ -14,7 +14,10 @@ from mlflow.utils.validation import MAX_PARAMS_TAGS_PER_BATCH, MAX_METRICS_PER_B
 from mlflow.utils.mlflow_tags import MLFLOW_PARENT_RUN_ID
 
 from mlflow_export_import.common import utils
-from mlflow_export_import.common.click_options import *
+
+from mlflow_export_import.common.click_options import opt_input_dir, opt_import_source_tags,\
+  opt_experiment_name, opt_use_src_user_id, opt_dst_notebook_dir
+
 from mlflow_export_import.common.filesystem import mk_local_path
 from mlflow_export_import.common.find_artifacts import find_artifacts
 from mlflow_export_import.common.http_client import DatabricksHttpClient

@@ -8,7 +8,7 @@ import utils_test
 
 def compare_runs(client_src, client_dst, run1, run2, output_dir, import_source_tags=False):
     if import_source_tags:
-        _compare_runs_with_source_tags(client_src, run1, run2)
+        _compare_runs_with_source_tags(run1, run2)
     else:
         _compare_runs_without_source_tags(client_src, client_dst, run1, run2, output_dir)
     
@@ -18,7 +18,7 @@ def _compare_runs_without_source_tags(client_src, client_dst, run1, run2, output
     _compare_runs_without_tags(client_src, client_dst, run1, run2, output_dir)
 
 
-def _compare_runs_with_source_tags(client_src, run1, run2):
+def _compare_runs_with_source_tags(run1, run2):
     assert run1.data.params == run2.data.params
     assert run1.data.metrics == run2.data.metrics
     source_tags2 = { k:v for k,v in run2.data.tags.items() if k.startswith(ExportTags.PREFIX_ROOT) }
@@ -27,15 +27,14 @@ def _compare_runs_with_source_tags(client_src, run1, run2):
         if k != "run_name":
             assert str(v) == source_tags2[f"{ExportTags.PREFIX_RUN_INFO}.{k}"],f"Assert failed for RunInfo field '{k}'" # NOTE: tag values must be strings
 
-
 def compare_experiment_tags(tags1, tags2, import_source_tags=False):
     if not import_source_tags:
         assert tags1 == tags2
         return 
 
+    source_tags2 = { k:v for k,v in tags2.items() if k.startswith(ExportTags.PREFIX_MLFLOW_TAG) } 
     mlflow_tags1 = { k:v for k,v in tags1.items() if k.startswith("mlflow.") }
-    source_tags2 = { k:v for k,v in tags2.items() if k.startswith(ExportTags.PREFIX_ROOT) }
-    mlflow_tags2 = { k.replace(f"{ExportTags.PREFIX_ROOT}.",""):v for k,v in source_tags2.items() }
+    mlflow_tags2 = { k.replace(f"{ExportTags.PREFIX_MLFLOW_TAG}.","mlflow."):v for k,v in source_tags2.items() }
     assert mlflow_tags1 == mlflow_tags2
 
     tags2_no_source_tags = { k:v for k,v in tags2.items() if not k.startswith(ExportTags.PREFIX_ROOT) }

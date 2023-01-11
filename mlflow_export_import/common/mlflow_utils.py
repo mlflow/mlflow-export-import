@@ -1,5 +1,6 @@
 import os
 import mlflow
+from mlflow.exceptions import RestException
 from mlflow_export_import.common import MlflowExportImportException
 
 
@@ -57,7 +58,9 @@ def set_experiment(mlflow_client, dbx_client, exp_name, tags=None):
     try:
         if not tags: tags = {}
         return mlflow_client.create_experiment(exp_name, tags=tags)
-    except Exception:
+    except RestException as ex:
+        if ex.error_code != "RESOURCE_ALREADY_EXISTS":
+            raise(ex)
         exp = mlflow_client.get_experiment_by_name(exp_name)
         return exp.experiment_id
 

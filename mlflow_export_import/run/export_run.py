@@ -69,7 +69,6 @@ class RunExporter:
         # copy artifacts
         dst_path = os.path.join(output_dir, "artifacts")
         try:
-            from mlflow.utils.mlflow_tags import MLFLOW_DATABRICKS_NOTEBOOK_PATH
             artifacts = self.mlflow_client.list_artifacts(run.info.run_id)
             if len(artifacts) > 0: # Because of https://github.com/mlflow/mlflow/issues/2839
                 fs.mkdirs(dst_path)

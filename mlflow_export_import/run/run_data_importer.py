@@ -9,6 +9,7 @@ import math
 from mlflow.entities import Metric, Param, RunTag
 from mlflow_export_import.common import utils
 from mlflow_export_import.common.source_tags import ExportTags
+from mlflow_export_import.common.source_tags import mk_source_tags_mlflow_tag, mk_source_tags
 
 
 def _log_data(run_dct, run_id, batch_size, get_data, log_data, args_get_data=None):
@@ -51,9 +52,9 @@ def log_tags(client, run_dct, run_id, batch_size, import_source_tags, in_databri
     def get_data(run_dct, args):
         tags = run_dct["tags"]
         if import_source_tags:
-            source_mlflow_tags = utils.mk_source_tags(tags, "mlflow.", f"{ExportTags.PREFIX_TAG}") 
+            source_mlflow_tags = mk_source_tags_mlflow_tag(tags)
             info =  run_dct["info"]
-            source_info_tags = utils.mk_source_tags(info, None, f"{ExportTags.PREFIX_RUN_INFO}")
+            source_info_tags = mk_source_tags(info, f"{ExportTags.PREFIX_RUN_INFO}")
             tags = { **tags, **source_mlflow_tags, **source_info_tags }
         tags = utils.create_mlflow_tags_for_databricks_import(tags) # remove "mlflow" tags that cannot be imported into Databricks
         tags = [ RunTag(k,v) for k,v in tags.items() ]
