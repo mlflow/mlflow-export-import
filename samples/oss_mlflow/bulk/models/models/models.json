@@ -6,7 +6,7 @@
     "_export_time": "2023-01-01 19:36:06",
     "mlflow_version": "2.1.1",
     "mlflow_tracking_uri": "http://127.0.0.1:5020",
-    "user": "andre.mesarovic",
+    "user": "andre",
     "platform": {
       "python_version": "3.8.15",
       "system": "Darwin"

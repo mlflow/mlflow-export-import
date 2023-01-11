@@ -10,12 +10,12 @@
       "run_uuid": "8a6af43e756f433da7a90fd6b4e49c3a",
       "run_id": "8a6af43e756f433da7a90fd6b4e49c3a",
       "experiment_id": "2",
-      "user_id": "andre.mesarovic",
+      "user_id": "andre",
       "status": "FINISHED",
       "start_time": 1670301595769,
       "end_time": 1670301598938,
       "lifecycle_stage": "active",
-      "artifact_uri": "/Users/andre.mesarovic/work/mlflow_server/local_mlrun/mlruns/2/8a6af43e756f433da7a90fd6b4e49c3a/artifacts",
+      "artifact_uri": "/opt/mlflow/server/mlruns/2/8a6af43e756f433da7a90fd6b4e49c3a/artifacts",
       "run_name": "silent-dog-788"
     },
     "params": {
@@ -45,7 +45,7 @@
       "mlflow.source.git.commit": "d38984e536ac5102ccd495fdafe487a418378009",
       "mlflow.source.name": "train.py",
       "mlflow.source.type": "LOCAL",
-      "mlflow.user": "andre.mesarovic",
+      "mlflow.user": "andre",
       "mlflow_export_import.metadata.experiment_name": "sklearn_iris",
       "mlflow_export_import.metadata.mlflow_version": "2.0.1",
       "mlflow_export_import.metadata.timestamp": "1670303442",
@@ -57,8 +57,8 @@
       "mlflow_export_import.mlflow.source.git.commit": "d38984e536ac5102ccd495fdafe487a418378009",
       "mlflow_export_import.mlflow.source.name": "train.py",
       "mlflow_export_import.mlflow.source.type": "LOCAL",
-      "mlflow_export_import.mlflow.user": "andre.mesarovic",
-      "mlflow_export_import.run_info.artifact_uri": "/Users/andre.mesarovic/work/mlflow_server/local_mlrun/mlruns/2/8a6af43e756f433da7a90fd6b4e49c3a/artifacts",
+      "mlflow_export_import.mlflow.user": "andre",
+      "mlflow_export_import.run_info.artifact_uri": "/opt/mlflow/server/mlruns/2/8a6af43e756f433da7a90fd6b4e49c3a/artifacts",
       "mlflow_export_import.run_info.end_time": "1670301598938",
       "mlflow_export_import.run_info.experiment_id": "2",
       "mlflow_export_import.run_info.lifecycle_stage": "active",
@@ -67,7 +67,7 @@
       "mlflow_export_import.run_info.run_uuid": "8a6af43e756f433da7a90fd6b4e49c3a",
       "mlflow_export_import.run_info.start_time": "1670301595769",
       "mlflow_export_import.run_info.status": "FINISHED",
-      "mlflow_export_import.run_info.user_id": "andre.mesarovic",
+      "mlflow_export_import.run_info.user_id": "andre",
       "mlflow_version": "2.0.1"
     }
   }
