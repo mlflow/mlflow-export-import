@@ -33,14 +33,12 @@ def export_all(output_dir, notebook_formats=None, use_threads=False):
         use_threads=use_threads)
     duration = round(time.time() - start_time, 1)
 
-    mlflow_attr = {
-        "summary": {
-            "stages": ALL_STAGES,
-            "notebook_formats": notebook_formats,
-            "duration": duration
-        }
+    info_attr = {
+        "stages": ALL_STAGES,
+        "notebook_formats": notebook_formats,
+        "duration": duration
     }
-    io_utils.write_export_file(output_dir, "all_manifest.json", __file__, mlflow_attr)
+    io_utils.write_export_file(output_dir, "manifest.json", __file__, {}, info_attr)
     print(f"Duraton for entire tracking server export: {duration} seconds")
 
 
@@ -48,7 +46,6 @@ def export_all(output_dir, notebook_formats=None, use_threads=False):
 @opt_output_dir
 @opt_notebook_formats
 @opt_use_threads
-
 def main(output_dir, notebook_formats, use_threads):
     print("Options:")
     for k,v in locals().items():

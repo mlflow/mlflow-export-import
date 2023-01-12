@@ -68,13 +68,6 @@ def export_models(client, model_names, output_dir, notebook_formats=None, stages
     export_experiments.export_experiments(client, exps_to_export, out_dir, notebook_formats, use_threads)
     _export_models(client, model_names, os.path.join(output_dir,"models"), notebook_formats, stages, export_run=False, use_threads=use_threads)
     duration = round(time.time()-start_time, 1)
-
-    info_attr = {
-      "stages": stages, 
-      "notebook_formats": notebook_formats
-    }
-    io_utils.write_export_file(output_dir, "models.json", __file__, {}, info_attr)
-
     print(f"Duration for total registered models and versions' runs export: {duration} seconds")
 
 

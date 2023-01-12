@@ -6,7 +6,7 @@ from mlflow_export_import.bulk import bulk_utils
 def get_experiments_runs_of_models(client, model_names, show_experiments=False, show_runs=False):
     """ Get experiments and runs to to export. """
     model_names = bulk_utils.get_model_names(client, model_names)
-    print("Models:")
+    print(f"{len(model_names)} Models:")
     for model_name in model_names:
         print(f"  {model_name}")
     exps_and_runs = {}
