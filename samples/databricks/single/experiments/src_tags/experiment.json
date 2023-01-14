@@ -2,9 +2,9 @@
   "system": {
     "package_version": "1.1.2",
     "script": "export_experiment.py",
-    "export_time": 1671254815,
-    "_export_time": "2022-12-17 05:26:55",
-    "mlflow_version": "2.0.1",
+    "export_time": 1673720094,
+    "_export_time": "2023-01-14 18:14:54",
+    "mlflow_version": "2.1.1",
     "mlflow_tracking_uri": "databricks",
     "user": "andre",
     "platform": {
@@ -13,32 +13,40 @@
     }
   },
   "info": {
-    "num_total_runs": 2,
-    "num_ok_runs": 2,
+    "num_total_runs": 1,
+    "num_ok_runs": 1,
     "num_failed_runs": 0,
     "failed_runs": []
   },
   "mlflow": {
     "experiment": {
       "experiment_id": "13392174",
-      "name": "/Users/andre@mycompany.com/experiments/imported/02a_Sklearn_Train_Predict_2022_12_16",
-      "artifact_location": "dbfs:/databricks/mlflow-tracking/13392174",
+      "name": "/Users/andre@mycompany.com/experiments/imported/02a_Sklearn_Train_Predict_2023_01_10_a1",
+      "artifact_location": "dbfs:/databricks/mlflow-tracking/13410958",
       "lifecycle_stage": "active",
       "tags": {
-        "mlflow.experiment.sourceName": "/Users/andre@mycompany.com/experiments/imported/02a_Sklearn_Train_Predict_2022_12_16",
+        "mlflow.experiment.sourceName": "/Users/andre@mycompany.com/experiments/imported/02a_Sklearn_Train_Predict_2023_01_10_a1",
         "mlflow.experimentType": "MLFLOW_EXPERIMENT",
         "mlflow.ownerEmail": "andre@mycompany.com",
         "mlflow.ownerId": "100327",
-        "mlflow_exim.mlflow.experiment.sourceName": "/Users/andre@mycompany.com/mlflow/mlflow-export-import/export_samples/Sklearn_WineQuality",
-        "mlflow_exim.mlflow.experimentType": "MLFLOW_EXPERIMENT",
-        "mlflow_exim.mlflow.ownerEmail": "andre@mycompany.com",
-        "mlflow_exim.mlflow.ownerId": "100327",
+        "mlflow_exim.field._creation_time": "2022-12-08 04:45:38",
+        "mlflow_exim.field._last_update_time": "2022-12-12 09:07:26",
+        "mlflow_exim.field.artifact_location": "dbfs:/databricks/mlflow-tracking/13368311",
+        "mlflow_exim.field.creation_time": "1670474737597",
+        "mlflow_exim.field.experiment_id": "13368311",
+        "mlflow_exim.field.last_update_time": "1670836045601",
+        "mlflow_exim.field.lifecycle_stage": "active",
+        "mlflow_exim.field.name": "/Users/andre@mycompany.com/mlflow/mlflow-export-import/export_samples/andre_sample_sklearn_Train_Predict",
+        "mlflow_exim.mlflow_tag.experiment.sourceName": "/Users/andre@mycompany.com/mlflow/mlflow-export-import/export_samples/andre_sample_sklearn_Train_Predict",
+        "mlflow_exim.mlflow_tag.experimentType": "MLFLOW_EXPERIMENT",
+        "mlflow_exim.mlflow_tag.ownerEmail": "andre@mycompany.com",
+        "mlflow_exim.mlflow_tag.ownerId": "100327",
         "timestamp": "2022-12-12 09:07:23",
         "version_mlflow": "1.29.0"
       },
-      "creation_time": 1671254747913,
-      "last_update_time": 1671254753817
-    }
+      "creation_time": 1673365293023,
+      "last_update_time": 1673365298864
+    },
     "runs": [
       "2f7ba8ad16c04c65a2ea94ccd534c074"
     ]
