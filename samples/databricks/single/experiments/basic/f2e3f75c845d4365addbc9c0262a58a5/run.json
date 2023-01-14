@@ -62,6 +62,7 @@
     "mlflow.source.type": "NOTEBOOK",
     "mlflow.user": "andre@mycompany.com",
     "save_signature": "False",
+    "sparkDatasourceInfo": "path=dbfs:/user/hive/warehouse/andre.db/wine_quality,version=0,format=delta",
     "timestamp": "2022-12-09 15:36:02",
     "version.DATABRICKS_RUNTIME_VERSION": "11.3",
     "version.mlflow": "1.29.0",
