@@ -59,7 +59,7 @@ Each object export file is comprised of three JSON parts:
 
 ## Sample export JSON files 
 
-For Databricks all examples are for workspace notebooks except the `Git Repo` column.
+For Databricks, all examples use workspace notebooks except the `Git Repo` column.
 
 Column legend:
 * Basic - Basic default export.

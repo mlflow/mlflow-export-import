@@ -42,6 +42,9 @@ These are the MLflow objects and their attributes that can be exported.
 | Registered Model | [link](https://mlflow.org/docs/latest/rest-api.html#registeredmodel) | [link](https://mlflow.org/docs/latest/python_api/mlflow.entities.html#mlflow.entities.model_registry.RegisteredModel) | [link](https://github.com/amesar/mlflow-resources/blob/master/database_schemas/schema_mlflow_2.0.1.sql#L152) |
 | Registered Model Version | [link](https://mlflow.org/docs/latest/rest-api.html#modelversion) | [link](https://mlflow.org/docs/latest/python_api/mlflow.entities.html#mlflow.entities.model_registry.ModelVersion) | [link](https://github.com/amesar/mlflow-resources/blob/master/database_schemas/schema_mlflow_2.0.1.sql#L102) |
 
+MLflow provides rudimentary capabilities for tracking lineage regarding the original source objects.
+See [README_governance](README_governance.md).
+
 ## Tools Overview
 
 There are two dimensions to the MLflow Export Import tools:
