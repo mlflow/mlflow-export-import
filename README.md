@@ -201,6 +201,7 @@ See [tests/README](tests/README.md) for details.
 * [README_limitations.md](README_limitations.md)
 * [README_options.md](README_options.md)
 * [README_export_format.md](README_export_format.md)
+* [README_governance.md](README_governance.md)
 * [tests/README.md](tests/README.md)
   * [tests/open_source/README.md](tests/open_source/README.md)
   * [tests/databricks/README.md](tests/databricks/README.md)
