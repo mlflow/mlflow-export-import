@@ -1,4 +1,5 @@
 import os
+import getpass
 import json
 
 from mlflow_export_import.common.timestamp_utils import ts_now_seconds, ts_now_fmt_utc
@@ -21,7 +22,7 @@ def _mk_system_attr(script):
             "_export_time": ts_now_fmt_utc,
             "mlflow_version": mlflow.__version__,
             "mlflow_tracking_uri": mlflow.get_tracking_uri(),
-            "user": os.getlogin(),
+            "user": getpass.getuser(),
             "platform": {
                 "python_version": platform.python_version(),
                 "system": platform.system()
