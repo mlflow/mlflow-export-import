@@ -1,5 +1,6 @@
 # Databricks notebook source
 # MAGIC %md ## Export All
+# MAGIC * Export all the MLflow registered models and all experiments of a tracking server.
 
 # COMMAND ----------
 
@@ -32,6 +33,6 @@ from mlflow_export_import.bulk.export_all import export_all
 
 # COMMAND ----------
 
-export_all(output_dir, 
+export_all(output_dir=output_dir, 
            notebook_formats=notebook_formats, 
            use_threads=use_threads)
