@@ -29,7 +29,7 @@ def _import_experiments(client, input_dir, use_src_user_id):
     dct = io_utils.read_file_mlflow(os.path.join(os.path.join(input_dir,"experiments","experiments.json")))
     exps = dct["experiments"]
 
-    importer = ExperimentImporter(client, use_src_user_id)
+    importer = ExperimentImporter(client, use_src_user_id=use_src_user_id)
     print("Experiments:")
     for exp in exps: 
         print(" ",exp)
@@ -61,7 +61,7 @@ def _import_models(client, input_dir, run_info_map, delete_model, import_source_
     models_dir = os.path.join(input_dir, "models")
     models = io_utils.read_file_mlflow(os.path.join(os.path.join(models_dir,"models.json")))
     models = models["models"]
-    importer = AllModelImporter(client, run_info_map, import_source_tags=import_source_tags)
+    importer = AllModelImporter(client, run_info_map=run_info_map, import_source_tags=import_source_tags)
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for model in models:

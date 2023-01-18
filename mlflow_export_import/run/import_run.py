@@ -199,7 +199,7 @@ def main(input_dir,
     client = mlflow.tracking.MlflowClient()
     importer = RunImporter(
         client,
-        import_source_tags,
+        import_source_tags=import_source_tags,
         mlmodel_fix=mlmodel_fix, 
         use_src_user_id=use_src_user_id, 
         dst_notebook_dir_add_run_id=dst_notebook_dir_add_run_id)

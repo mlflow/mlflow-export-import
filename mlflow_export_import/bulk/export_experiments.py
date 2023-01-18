@@ -68,7 +68,7 @@ def export_experiments(client, experiments, output_dir, notebook_formats=None, u
     failed_runs = 0
     export_results = []
     futures = []
-    exporter = ExperimentExporter(client, utils.string_to_list(notebook_formats))
+    exporter = ExperimentExporter(client, notebook_formats=utils.string_to_list(notebook_formats))
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for exp_id_or_name in experiments:
             run_ids = experiments_dct.get(exp_id_or_name, None)
