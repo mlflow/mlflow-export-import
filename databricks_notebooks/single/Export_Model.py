@@ -22,7 +22,9 @@
 # MAGIC 
 # MAGIC ##### Widgets
 # MAGIC * Model - Registered model name.
-# MAGIC * Destination base folder - Base output directory to which the model name will be appended to.
+# MAGIC * Output base directory - Base output directory to which the model name will be appended to.
+# MAGIC * Notebook formats to export.
+# MAGIC * Stages to export.
 # MAGIC 
 # MAGIC #### Setup
 # MAGIC * See Setup in [README]($./_README).
@@ -44,14 +46,11 @@ dbutils.widgets.text("2. Output base directory", "")
 output_dir = dbutils.widgets.get("2. Output base directory")
 output_dir += f"/{model_name}"
 
-dbutils.widgets.dropdown("3. Export source tags","no",["yes","no"])
-export_source_tags = dbutils.widgets.get("3. Export source tags") == "yes"
-
-notebook_formats = get_notebook_formats(4)
+notebook_formats = get_notebook_formats(3)
 
 all_stages = [ "All", "Production", "Staging", "Archived", "None" ]
-dbutils.widgets.multiselect("5. Stages", all_stages[0], all_stages)
-stages = dbutils.widgets.get("5. Stages")
+dbutils.widgets.multiselect("4. Stages", all_stages[0], all_stages)
+stages = dbutils.widgets.get("4. Stages")
 if stages == "All": 
     stages = None
 else:
@@ -60,15 +59,14 @@ else:
 
 print("model_name:", model_name)
 print("output_dir:", output_dir)
-print("export_source_tags:", export_source_tags)
 print("notebook_formats:", notebook_formats)
 print("stages:", stages)
 
 # COMMAND ----------
 
-if len(model_name)==0: raise Exception("ERROR: 'Model' widget is required")
-if len(output_dir)==0: raise Exception("ERROR: 'Destination base folder' widget is required")
-  
+assert_widget(model_name, "1. Model")
+assert_widget(output_dir, "2. Output base directory")
+
 import mlflow
 
 # COMMAND ----------
@@ -81,23 +79,15 @@ display_registered_model_uri(model_name)
 
 # COMMAND ----------
 
-# MAGIC %md ### Remove any previous exported model data
-# MAGIC 
-# MAGIC Note: may be a bit finicky (S3 eventual consistency). Just try the remove again if subsequent export fails.
-
-# COMMAND ----------
-
-dbutils.fs.rm(output_dir, True)
-dbutils.fs.mkdirs(output_dir)
-
-# COMMAND ----------
-
 # MAGIC %md ### Export the model
 
 # COMMAND ----------
 
 from mlflow_export_import.model.export_model import ModelExporter
-exporter = ModelExporter(mlflow.tracking.MlflowClient(), export_source_tags, notebook_formats, stages)
+exporter = ModelExporter(
+    mlflow.client.MlflowClient(),
+    notebook_formats = notebook_formats, 
+    stages = stages)
 exporter.export_model(model_name, output_dir)
 
 # COMMAND ----------

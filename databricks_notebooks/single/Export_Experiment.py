@@ -49,20 +49,16 @@ experiment_id_or_name = dbutils.widgets.get("1. Experiment ID or Name")
 dbutils.widgets.text("2. Output base directory", "") 
 output_dir = dbutils.widgets.get("2. Output base directory")
 
-dbutils.widgets.dropdown("3. Export source tags","no",["yes","no"])
-export_source_tags = dbutils.widgets.get("3. Export source tags") == "yes"
-
-notebook_formats = get_notebook_formats(4)
+notebook_formats = get_notebook_formats(3)
 
 print("experiment_id_or_name:", experiment_id_or_name)
 print("output_dir:", output_dir)
-print("export_source_tags:", export_source_tags)
 print("notebook_formats:", notebook_formats)
 
 # COMMAND ----------
 
-if len(experiment_id_or_name)==0: raise Exception("ERROR: Experiment ID or Name is required")
-if len(output_dir)==0: raise Exception("ERROR: DBFS destination base folder is required")
+assert_widget(experiment_id_or_name, "1. Experiment ID or Name")
+assert_widget(output_dir, "2. Output base directory")
   
 import mlflow
 from mlflow_export_import.common import mlflow_utils 
@@ -70,7 +66,9 @@ from mlflow_export_import.common import mlflow_utils
 client = mlflow.tracking.MlflowClient()
 experiment = mlflow_utils.get_experiment(client, experiment_id_or_name)
 output_dir = f"{output_dir}/{experiment.experiment_id}"
-experiment.experiment_id, experiment.name, output_dir
+print("experiment_id:",experiment.experiment_id)
+print("experiment_name:",experiment.name)       
+print("output_dir:",output_dir)
 
 # COMMAND ----------
 
@@ -97,10 +95,19 @@ dbutils.fs.rm(output_dir, False)
 
 # COMMAND ----------
 
+# %sh ls -l /dbfs/mnt/andre-work/exim/experiments
+# 12927081/12927081/b29df707abcc4d21bf7b3d5c182a12a2
+
+# COMMAND ----------
+
 from mlflow_export_import.experiment.export_experiment import ExperimentExporter
 
-exporter = ExperimentExporter(client, export_source_tags, notebook_formats)
-exporter.export_experiment(experiment.experiment_id, output_dir)
+exporter = ExperimentExporter(
+    client, 
+    notebook_formats = notebook_formats)
+exporter.export_experiment(
+    exp_id_or_name = experiment.experiment_id, 
+    output_dir = output_dir)
 
 # COMMAND ----------
 
