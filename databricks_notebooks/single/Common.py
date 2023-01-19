@@ -1,5 +1,7 @@
 # Databricks notebook source
-# MAGIC %sh pip install mlflow-export-import
+# MAGIC %sh 
+# MAGIC #pip install mlflow-export-import
+# MAGIC pip install git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
 
 # COMMAND ----------
 
@@ -55,3 +57,14 @@ def get_notebook_formats(num):
     notebook_formats = notebook_formats.split(",")
     if "" in notebook_formats: notebook_formats.remove("")
     return notebook_formats
+
+# COMMAND ----------
+
+import mlflow
+print("mlflow.version:",mlflow.__version__)
+
+# COMMAND ----------
+
+def assert_widget(value, name):
+    if len(value.rstrip())==0: 
+        raise Exception(f"ERROR: '{name}' widget is required")
