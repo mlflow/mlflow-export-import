@@ -11,7 +11,7 @@
 
 # COMMAND ----------
 
-# MAGIC %sh pip install mlflow-export-import
+# MAGIC %run ./Common
 
 # COMMAND ----------
 
@@ -36,8 +36,11 @@ print("use_threads:",use_threads)
 
 # COMMAND ----------
 
-if len(experiments)==0: raise Exception("ERROR: Experiments are required")
-if len(output_dir)==0: raise Exception("ERROR: Output base directory is required")
+assert_widget(experiments, "1. Experiments")
+assert_widget(output_dir, "2. Output base directory")
+
+if len(experiments)==0: raise Exception("ERROR: '1. Experiments' widget is required")
+if len(output_dir)==0: raise Exception("ERROR: '2. Output base directory' widget is required")
 
 # COMMAND ----------
 
