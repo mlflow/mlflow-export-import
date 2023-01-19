@@ -3,14 +3,14 @@
 # MAGIC 
 # MAGIC #### Overview
 # MAGIC * Exports an experiment and its runs (artifacts too) to a DBFS directory.
-# MAGIC * Output file `manifest.json` contains top-level experiment metadata.
+# MAGIC * Output file `experiment.json` contains top-level experiment metadata.
 # MAGIC * Each run and its artifacts are stored as a sub-directory whose name is that of the run_id.
 # MAGIC * Notebooks also can be exported in several formats.
 # MAGIC 
 # MAGIC ##### Output folder
 # MAGIC ```
 # MAGIC 
-# MAGIC +-model.json
+# MAGIC +-experiment.json
 # MAGIC +-d2309e6c74dc4679b576a37abf6b6af8/
 # MAGIC | +-run.json
 # MAGIC | +-artifacts/
@@ -23,10 +23,7 @@
 # MAGIC 
 # MAGIC ##### Widgets
 # MAGIC * Experiment ID or name - Either the experiment ID or experiment name.
-# MAGIC * Output base directory - Base output folder of the exported experiment. All the experiment data will be saved here under the experiment ID folder.
-# MAGIC * Export source tags - Export source tags such as:
-# MAGIC   * mlflow_export_import.info.experiment_id
-# MAGIC   * mlflow_export_import.metadata.experiment-name	
+# MAGIC * Output base directory - Base output folder of the exported experiment. All the experiment data will be saved here under the experiment ID folder.	
 # MAGIC * Notebook formats:
 # MAGIC   * Standard Databricks notebook formats such as SOURCE, HTML, JUPYTER, DBC. See [Databricks Export Format](https://docs.databricks.com/dev-tools/api/latest/workspace.html#notebookexportformat) documentation.
 # MAGIC 
