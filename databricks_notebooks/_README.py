@@ -22,15 +22,6 @@
 # MAGIC 
 # MAGIC #### Notebooks 
 # MAGIC 
-# MAGIC ##### Bulk Notebooks
-# MAGIC 
-# MAGIC | MLflow Object | Notebook | CLI Notebook |
-# MAGIC |-------|-------|---|
-# MAGIC | Models | [Export_Models]($./bulk/Export_Models) |  |
-# MAGIC |    | [Import_Models]($./bulk/Import_Models) |  |
-# MAGIC | Experiments | [Export_Experiments]($./bulk/Export_Experiments) | [Export_Experiments_CLI]($./bulk/Export_Experiments_CLI) |
-# MAGIC |    | [Import_Experiments]($./bulk/Import_Experiments) | |
-# MAGIC 
 # MAGIC ##### Single Notebooks
 # MAGIC 
 # MAGIC | MLflow Object | Notebook | 
@@ -43,6 +34,15 @@
 # MAGIC |    | [Import_Run]($./single/Import_Run) |
 # MAGIC | | [Common]($./single/Common) |
 # MAGIC 
+# MAGIC ##### Bulk Notebooks
+# MAGIC 
+# MAGIC | MLflow Object | Notebook | CLI Notebook |
+# MAGIC |-------|-------|---|
+# MAGIC | Models | [Export_Models]($./bulk/Export_Models) |  |
+# MAGIC |    | [Import_Models]($./bulk/Import_Models) |  |
+# MAGIC | Experiments | [Export_Experiments]($./bulk/Export_Experiments) | [Export_Experiments_CLI]($./bulk/Export_Experiments_CLI) |
+# MAGIC |    | [Import_Experiments]($./bulk/Import_Experiments) | |
+# MAGIC 
 # MAGIC   
 # MAGIC #### Limitations
 # MAGIC 
@@ -54,27 +54,22 @@
 # MAGIC 
 # MAGIC #### Setup
 # MAGIC 
-# MAGIC There are two different ways to install the package.
+# MAGIC There are two different ways to install the package using notebook scoped libraries. 
+# MAGIC See:
+# MAGIC * [Install notebook-scoped libraries with %pip](https://docs.databricks.com/libraries/notebooks-python-libraries.html#install-notebook-scoped-libraries-with-pip).
+# MAGIC * [Common]($./Common) notebook.
 # MAGIC 
-# MAGIC ##### Install package in notebook
+# MAGIC **Install from PyPI**
+# MAGIC ```
+# MAGIC pip install mlflow-export-import
+# MAGIC ```
 # MAGIC 
-# MAGIC This is the default executed in the [Common]($./Common) notebook.
-# MAGIC 
-# MAGIC [Install notebook-scoped libraries with %pip](https://docs.databricks.com/libraries/notebooks-python-libraries.html#install-notebook-scoped-libraries-with-pip).
+# MAGIC **Install from github**
 # MAGIC 
 # MAGIC ```
 # MAGIC pip install git+https:///github.com/amesar/mlflow-export-import/#egg=mlflow-export-import
 # MAGIC ```
-# MAGIC 
-# MAGIC ##### Install package as a wheel on cluster 
-# MAGIC 
-# MAGIC Build the wheel artifact on your laptop, upload it to DBFS and then [install it on your cluster](https://docs.databricks.com/libraries/cluster-libraries.html).
-# MAGIC 
-# MAGIC ```
-# MAGIC python setup.py bdist_wheel
-# MAGIC databricks fs cp dist/mlflow_export_import-1.0.0-py3-none-any.whl {MY_DBFS_PATH}
-# MAGIC ```
 
 # COMMAND ----------
 
-# MAGIC %md Last updated: 2023-01-18
+# MAGIC %md Last updated: 2023-01-19
