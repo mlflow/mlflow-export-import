@@ -22,7 +22,9 @@
 # MAGIC 
 # MAGIC ##### Widgets
 # MAGIC * Model - Registered model name.
-# MAGIC * Destination base folder - Base output directory to which the model name will be appended to.
+# MAGIC * Output base directory - Base output directory to which the model name will be appended to.
+# MAGIC * Notebook formats to export.
+# MAGIC * Stages to export.
 # MAGIC 
 # MAGIC #### Setup
 # MAGIC * See Setup in [README]($./_README).
@@ -74,17 +76,6 @@ import mlflow
 # COMMAND ----------
 
 display_registered_model_uri(model_name)
-
-# COMMAND ----------
-
-# MAGIC %md ### Remove any previous exported model data
-# MAGIC 
-# MAGIC Note: may be a bit finicky (S3 eventual consistency). Just try the remove again if subsequent export fails.
-
-# COMMAND ----------
-
-dbutils.fs.rm(output_dir, True)
-dbutils.fs.mkdirs(output_dir)
 
 # COMMAND ----------
 
