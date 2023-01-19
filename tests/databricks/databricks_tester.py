@@ -70,8 +70,7 @@ class DatabricksTester():
             "notebook_path": nb_path,
             "base_parameters": {
               "1. Run ID": run.info.run_id,
-              "2. Output base directory": self.output_run_base_dir,
-              "3. Export source tags": _export_src_tags
+              "2. Output base directory": self.output_run_base_dir
             }
         }
         return self._run_job(nb_name, notebook_task)
@@ -84,8 +83,7 @@ class DatabricksTester():
             "notebook_path": nb_path,
             "base_parameters": {
               "1. Experiment ID or Name": self.ml_exp_path,
-              "2. Output base directory": self.output_exp_base_dir,
-              "3. Export source tags": _export_src_tags
+              "2. Output base directory": self.output_exp_base_dir
             }
         }
         return self._run_job(nb_name, notebook_task)
@@ -98,8 +96,7 @@ class DatabricksTester():
             "notebook_path": nb_path,
             "base_parameters": {
               "1. Model": self.model_name,
-              "2. Output base directory": self.output_model_base_dir,
-              "3. Export source tags": _export_src_tags,
+              "2. Output base directory": self.output_model_base_dir
             }
         }
         return self._run_job(nb_name, notebook_task)
