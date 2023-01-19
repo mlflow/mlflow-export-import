@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %md ### Import Model
+# MAGIC %md ### Import Registered Model
 # MAGIC 
 # MAGIC ##### Overview
 # MAGIC 
@@ -9,7 +9,8 @@
 # MAGIC ##### Widgets
 # MAGIC * Model - new registered model name.
 # MAGIC * Experiment name - contains runs created for model versions.
-# MAGIC * Input folder - Input directory containing the exported model.
+# MAGIC * Input directory - Input directory containing the exported model.
+# MAGIC * Delete model - delete model and its versions before importing.
 # MAGIC 
 # MAGIC #### Limitations
 # MAGIC * There is a bug where you cannot create a model with the same name as a deleted model.
@@ -19,8 +20,7 @@
 
 # COMMAND ----------
 
-dbutils.widgets.removeAll()
-
+# MAGIC %run ./Common
 
 # COMMAND ----------
 
@@ -33,22 +33,22 @@ experiment_name = dbutils.widgets.get("2. Destination experiment name")
 dbutils.widgets.text("3. Input directory", "") 
 input_dir = dbutils.widgets.get("3. Input directory")
 
+dbutils.widgets.dropdown("4. Delete model","no",["yes","no"])
+delete_model = dbutils.widgets.get("4. Delete model") == "yes"
+
 import os
 os.environ["INPUT_DIR"] = input_dir.replace("dbfs:","/dbfs")
 
 print("model_name:",model_name)
 print("input_dir:",input_dir)
 print("experiment_name:",experiment_name)
+print("delete_model:",delete_model)
 
 # COMMAND ----------
 
-if len(input_dir)==0: raise Exception("ERROR: Input directory is required")
-if len(input_dir)==0: raise Exception("ERROR: model name is required")
-if len(experiment_name)==0: raise Exception("ERROR: Destination experiment name is required")
-
-# COMMAND ----------
-
-# MAGIC %run ./Common
+assert_widget(model_name, "1. Model name")
+assert_widget(experiment_name, "2. Destination experiment name")
+assert_widget(input_dir, "3. Input directory")
 
 # COMMAND ----------
 
@@ -70,7 +70,10 @@ if len(experiment_name)==0: raise Exception("ERROR: Destination experiment name 
 
 from mlflow_export_import.model.import_model import ModelImporter
 importer = ModelImporter(mlflow.tracking.MlflowClient())
-importer.import_model(model_name, input_dir, experiment_name, delete_model=True)
+importer.import_model(model_name, 
+                      input_dir = input_dir, 
+                      experiment_name = experiment_name, 
+                      delete_model = delete_model)
 
 # COMMAND ----------
 
