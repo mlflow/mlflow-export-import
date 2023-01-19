@@ -1,10 +1,19 @@
 # Databricks notebook source
 # MAGIC %md ## Export All
-# MAGIC * Export all the MLflow registered models and all experiments of a tracking server.
+# MAGIC 
+# MAGIC Export all the MLflow registered models and all experiments of a tracking server.
+# MAGIC 
+# MAGIC Widgets
+# MAGIC * Models - comma seperated registered model names to be exported. 'all' will export all models.
+# MAGIC * Output directory
+# MAGIC * Stages - comma seperated stages to be exported
+# MAGIC * Export all runs 
+# MAGIC * Notebook formats
+# MAGIC * Use threads
 
 # COMMAND ----------
 
-# MAGIC %sh pip install mlflow-export-import
+# MAGIC %run ./Common
 
 # COMMAND ----------
 
@@ -19,12 +28,13 @@ notebook_formats = dbutils.widgets.get("2. Notebook formats")
 dbutils.widgets.dropdown("3. Use threads","no",["yes","no"])
 use_threads = dbutils.widgets.get("3. Use threads") == "yes"
  
-if output_dir=="":
-    raise Exception("Missing widget '1. Output base directory'")
- 
 print("output_dir:",output_dir)
 print("notebook_formats:",notebook_formats)
 print("use_threads:",use_threads)
+
+# COMMAND ----------
+
+assert_widget(output_dir, "1. Output directory")
 
 # COMMAND ----------
 
