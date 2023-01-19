@@ -35,11 +35,12 @@ def write_export_file(dir, file, script, mlflow_attr, info_attr=None):
     """
     Write standard formatted JSON file.
     """
+    dir = _filesystem.mk_local_path(dir)
     path = os.path.join(dir, file)
     info_attr = { ExportFields.INFO: info_attr} if info_attr else {}
     mlflow_attr = { ExportFields.MLFLOW: mlflow_attr}
     mlflow_attr = { **_mk_system_attr(script), **info_attr, **mlflow_attr }
-    os.makedirs(dir, exist_ok=True)
+    res = os.makedirs(dir, exist_ok=True)
     write_file(path, mlflow_attr)
 
 
