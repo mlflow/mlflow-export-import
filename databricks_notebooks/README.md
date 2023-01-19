@@ -16,14 +16,14 @@ To import the notebooks into your Databricks workspace you can either import an 
 
 Use the [workspace import_dir](https://docs.databricks.com/dev-tools/cli/workspace-cli.html#import-a-directory-from-your-local-filesystem-into-a-workspace) Databricks CLI command.
 ```
-databricks workspace import_dir single/git /Users/me@mycompany.com/mlflow-export-import
+databricks workspace import_dir single /Users/me@mycompany.com/mlflow-export-import
 ```
 
 **Import a notebook**
 
 Use the [workspace import](https://docs.databricks.com/dev-tools/cli/workspace-cli.html#import-a-file-from-your-local-filesystem-into-a-workspace) Databricks CLI command.
 ```
-databricks workspace import --language PYTHON single/git/ImportRun.py  /Users/me@mycompany.com/mlflow-export-import/_README 
+databricks workspace import --language PYTHON single/ImportRun.py  /Users/me@mycompany.com/mlflow-export-import/_README 
 ```
 
 **Note**
@@ -31,31 +31,21 @@ databricks workspace import --language PYTHON single/git/ImportRun.py  /Users/me
 A separate _README import is needed since there is apparently a glitch in that when the _README file is checked into git, a `.py` extension is not added.
 
 
-## Individual Databricks notebooks
+## Databricks notebooks
 
-**Columns**
-* Notebook - name of notebook.
-* git import - Databricks github sync format.
-* HTML - Viewable convenience format. Note that the widgets are not displayed.
+**Single Notebooks**
 
-**Notebooks**
-
-| Notebook | git code | HTML | 
-|----------|----------|---------|
-| Export_Run | [link](single/git/Export_Run.py) | [link](single/html/Export_Run.html) |
-| Import_Run | [link](single/git/Import_Run.py) | [link](single/html/Import_Run.html) | 
-| Export_Experiment | [link](single/git/Export_Experiment.py) | [link](single/html/Export_Experiment.html) 
-| Import_Experiment | [link](single/git/Import_Experiment.py) | [link](single/html/Import_Experiment.html) |
-| Export_Model | [link](single/git/Export_Model.py) | [link](single/html/Export_Model.html) | 
-| Import_Model | [link](single/git/Import_Model.py) | [link](single/html/Import_Model.html) |
-| Common | [link](single/git/Common.py) | [link](html/Common.single/html) | 
-| _README | [link](single/git/_README) | [link](singlsingle/html/_README.html) |
+| Export | Import |
+|----------|----------|
+| [Export_Run](single/Export_Run.py) | [Import_Run](single/Import_Run.py) |
+| [Export_Experiment](single/Export_Experiment.py) | [Import_Experiment.py](single/Import_Experiment.py) |
+| [Export_Model](single/Export_Model.py) | [Import_Model.py](single/Import_Model.py) |
 
 
-## Bulk Databricks notebooks
+**Bulk notebooks**
 
 | Export | Import |
 | ---- | ---- |
 | [Export_Experiments](bulk/Export_Experiments.py) | [Import_Experiments](bulk/Import_Experiments.py) |
-| Export Model | Import Model |
-| Export All | Import All |
+| [Export_Models](bulk/Export_Models.py) | [Import_Models](bulk/Import_Models.py) |
+| [Export_All](bulk/Export_All.py) | Use [Import_Models](bulk/Import_Models.py) |

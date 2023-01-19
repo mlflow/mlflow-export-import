@@ -65,8 +65,6 @@ Full object referential integrity is maintained (e.g. an imported registered mod
 
 [Databricks notebooks](databricks_notebooks/README.md)
 simply invoke the corresponding Python classes.
-Note that only `Single` notebooks are currently available as examples.
-
 
 
 ## Limitations
