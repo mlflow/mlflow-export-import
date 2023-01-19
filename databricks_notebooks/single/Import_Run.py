@@ -12,11 +12,6 @@
 
 # COMMAND ----------
 
-dbutils.widgets.removeAll()
-
-
-# COMMAND ----------
-
 # MAGIC %md ### Setup
 
 # COMMAND ----------
@@ -36,8 +31,8 @@ print("experiment_name:",experiment_name)
 
 # COMMAND ----------
 
-if len(input_dir)==0: raise Exception("ERROR: Input directory is required")
-if len(experiment_name)==0: raise Exception("ERROR: Destination experiment name is required")
+assert_widget(experiment_name, "1. Destination experiment name")
+assert_widget(input_dir, "2. Input base directory")
 
 # COMMAND ----------
 
@@ -47,7 +42,7 @@ if len(experiment_name)==0: raise Exception("ERROR: Destination experiment name 
 
 import mlflow
 from mlflow_export_import.run.import_run import RunImporter
-importer = RunImporter(mlflow.tracking.MlflowClient())
+importer = RunImporter(mlflow.client.MlflowClient())
 run, _ = importer.import_run(experiment_name, input_dir)
 run.info.run_id
 
