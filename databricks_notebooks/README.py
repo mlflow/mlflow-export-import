@@ -22,26 +22,26 @@
 # MAGIC 
 # MAGIC #### Notebooks 
 # MAGIC 
-# MAGIC ##### Collection Notebooks
+# MAGIC ##### Bulk Notebooks
+# MAGIC 
+# MAGIC | MLflow Object | Notebook | CLI Notebook |
+# MAGIC |-------|-------|---|
+# MAGIC | Models | [Export_Models]($./bulk/Export_Models) |  |
+# MAGIC |    | [Import_Models]($./bulk/Import_Models) |  |
+# MAGIC | Experiments | [Export_Experiments]($./bulk/Export_Experiments) | [Export_Experiments_CLI]($./bulk/Export_Experiments_CLI) |
+# MAGIC |    | [Import_Experiments]($./bulk/Import_Experiments) | |
+# MAGIC 
+# MAGIC ##### Single Notebooks
 # MAGIC 
 # MAGIC | MLflow Object | Notebook | 
 # MAGIC |-------|-------|
-# MAGIC | Models | [Export_Models]($./collection/Export_Models) |
-# MAGIC |    | [Import_Models]($./collection/Import_Models) | 
-# MAGIC | Experiments | [Export_Experiments]($./collection/Export_Experiments) |
-# MAGIC |    | [Export_Experiments]($./collection/Export_Experiments) | 
-# MAGIC 
-# MAGIC ##### Individual Notebooks
-# MAGIC 
-# MAGIC | MLflow Object | Notebook | 
-# MAGIC |-------|-------|
-# MAGIC | Model | [Export_Model]($./individual/Export_Model) |
-# MAGIC |    | [Import_Model]($./individual/Import_Model) | 
-# MAGIC | Experiment | [Export_Experiment]($./individual/Export_Experiment) |
-# MAGIC |    | [Import_Experiment]($./individual/Import_Experiment) | 
-# MAGIC | Run | [Export_Run]($./individual/Export_Run) |
-# MAGIC |    | [Import_Run]($./individual/Import_Run) |
-# MAGIC | | [Common]($./individual/Common) |
+# MAGIC | Model | [Export_Model]($./single/Export_Model) |
+# MAGIC |    | [Import_Model]($./single/Import_Model) | 
+# MAGIC | Experiment | [Export_Experiment]($./single/Export_Experiment) 
+# MAGIC |    | [Import_Experiment]($./single/Import_Experiment) | 
+# MAGIC | Run | [Export_Run]($./individsingleual/Export_Run) |
+# MAGIC |    | [Import_Run]($./single/Import_Run) |
+# MAGIC | | [Common]($./single/Common) |
 # MAGIC 
 # MAGIC   
 # MAGIC #### Limitations
@@ -74,9 +74,7 @@
 # MAGIC python setup.py bdist_wheel
 # MAGIC databricks fs cp dist/mlflow_export_import-1.0.0-py3-none-any.whl {MY_DBFS_PATH}
 # MAGIC ```
-# MAGIC 
-# MAGIC Note, on the demo shard the wheel can be found at: `dbfs:/home/andre.mesarovic@databricks.com/lib/wheels/mlflow_export_import-1.0.0-py3-none-any.whl`
 
 # COMMAND ----------
 
-# MAGIC %md Last updated: 2022-08-12
+# MAGIC %md Last updated: 2023-01-18
