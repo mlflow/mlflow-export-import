@@ -21,11 +21,9 @@
 # MAGIC ##### Widgets
 # MAGIC * Run ID 
 # MAGIC * Output base directory - Base output folder of the exported run.
-# MAGIC * Export source tags - Log source metadata such as:
-# MAGIC   * mlflow_export_import.info.experiment_id
-# MAGIC   * mlflow_export_import.metadata.experiment-name	
 # MAGIC * Notebook formats:
-# MAGIC   * Standard Databricks notebook formats such as SOURCE, HTML, JUPYTER, DBC. See [Databricks Export Format](https://docs.databricks.com/dev-tools/api/latest/workspace.html#notebookexportformat)  documentation.
+# MAGIC   * Standard Databricks notebook formats such as SOURCE, HTML, JUPYTER, DBC. 
+# MAGIC   * See [Databricks Export Format](https://docs.databricks.com/dev-tools/api/latest/workspace.html#notebookexportformat)  documentation.
 # MAGIC   
 # MAGIC #### Setup
 # MAGIC * See Setup in [README]($./_README).
@@ -47,19 +45,16 @@ dbutils.widgets.text("2. Output base directory", "")
 output_dir = dbutils.widgets.get("2. Output base directory")
 output_dir += f"/{run_id}"
 
-dbutils.widgets.dropdown("3. Export source tags","no",["yes","no"])
-export_source_tags = dbutils.widgets.get("3. Export source tags") == "yes"
-notebook_formats = get_notebook_formats(4)
+notebook_formats = get_notebook_formats(3)
 
 print("run_id:", run_id)
 print("output_dir:", output_dir)
-print("export_source_tags:", export_source_tags)
 print("notebook_formats:", notebook_formats)
 
 # COMMAND ----------
 
-if len(run_id)==0: raise Exception("ERROR: Run ID is required")
-if len(output_dir)==0: raise Exception("ERROR: DBFS destination is required")
+assert_widget(run_id, "1. Run ID")
+assert_widget(output_dir, "2. Output base directory")
   
 import mlflow
 
@@ -86,7 +81,8 @@ dbutils.fs.rm(output_dir, True)
 # COMMAND ----------
 
 from mlflow_export_import.run.export_run import RunExporter
-exporter = RunExporter(mlflow.tracking.MlflowClient(), export_source_tags, notebook_formats)
+exporter = RunExporter(mlflow.tracking.MlflowClient(), 
+                       notebook_formats=notebook_formats)
 exporter.export_run(run_id, output_dir)
 
 # COMMAND ----------
