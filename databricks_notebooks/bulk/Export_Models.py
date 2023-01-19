@@ -7,15 +7,15 @@
 # MAGIC 
 # MAGIC Widgets
 # MAGIC * Models - comma seperated registered model names to be exported. 'all' will export all models.
-# MAGIC * Output folder
+# MAGIC * Output base directory
 # MAGIC * Stages - comma seperated stages to be exported
-# MAGIC * Export all runs 
+# MAGIC * Export all runs of experiment
 # MAGIC * Notebook formats
 # MAGIC * Use threads
 
 # COMMAND ----------
 
-# MAGIC %sh pip install mlflow-export-import
+# MAGIC %run ./Common
 
 # COMMAND ----------
 
@@ -54,8 +54,8 @@ print("use_threads:",use_threads)
 
 # COMMAND ----------
 
-if len(models)==0: raise Exception("ERROR: Models are required")
-if len(output_dir)==0: raise Exception("ERROR: Output base directory is required")
+assert_widget(models, "1. Models")
+assert_widget(output_dir, "2. Output base directory")
 
 # COMMAND ----------
 
@@ -89,7 +89,7 @@ export_models(mlflow.client.MlflowClient(),
 
 # COMMAND ----------
 
-# MAGIC %sh cat $OUTPUT_DIR/manifest.json
+# MAGIC %sh cat $OUTPUT_DIR/models/models.json
 
 # COMMAND ----------
 
@@ -97,4 +97,4 @@ export_models(mlflow.client.MlflowClient(),
 
 # COMMAND ----------
 
-# MAGIC %sh cat $OUTPUT_DIR/experiments/manifest.json
+# MAGIC %sh cat $OUTPUT_DIR/experiments/experiments.json
