@@ -76,9 +76,9 @@ class RunExporter:
             notebook = tags.get(MLFLOW_DATABRICKS_NOTEBOOK_PATH, None)
             if notebook is not None:
                 if len(self.notebook_formats) > 0:
-                    self._export_notebook(output_dir, notebook, run.data.tags, fs)
+                    self._export_notebook(output_dir, notebook, run, fs)
             elif len(self.notebook_formats) > 0:
-                print(f"WARNING: Cannot export notebook since tag '{MLFLOW_DATABRICKS_NOTEBOOK_PATH}' is not set.")
+                print(f"WARNING: Cannot export notebook for run '{run_id}' since tag '{MLFLOW_DATABRICKS_NOTEBOOK_PATH}' is not set.")
             return True
 
         except Exception as e:
@@ -87,15 +87,15 @@ class RunExporter:
             return False
 
 
-    def _export_notebook(self, output_dir, notebook, tags, fs):
+    def _export_notebook(self, output_dir, notebook, run, fs):
         notebook_dir = os.path.join(output_dir, "artifacts", "notebooks")
         fs.mkdirs(notebook_dir)
-        revision_id = tags.get(MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID, None)
+        revision_id = run.data.tags.get(MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID, None)
         if not revision_id:
-            print(f"NOTE: Cannot download notebook '{notebook}' since tag '{MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID}' does not exist. Notebook is probably a Git Repo notebook")
+            print(f"NOTE: Cannot download notebook '{notebook}' for run '{run.info.run_id}' since tag '{MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID}' does not exist. Notebook is probably a Git Repo notebook")
             return 
         manifest = { 
-           MLFLOW_DATABRICKS_NOTEBOOK_PATH: tags[MLFLOW_DATABRICKS_NOTEBOOK_PATH],
+           MLFLOW_DATABRICKS_NOTEBOOK_PATH: run.data.tags[MLFLOW_DATABRICKS_NOTEBOOK_PATH],
            MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID: revision_id,
            "formats": self.notebook_formats
         }
