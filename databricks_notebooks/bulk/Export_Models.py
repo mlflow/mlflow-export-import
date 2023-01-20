@@ -1,17 +1,17 @@
 # Databricks notebook source
 # MAGIC %md ## Export Models
 # MAGIC 
-# MAGIC Export specified or all models.
-# MAGIC 
-# MAGIC See https://github.com/mlflow/mlflow-export-import/blob/master/README_collection.md#registered-models for description of widget options.
+# MAGIC Export specified models, their version runs and the experiments that the runs belong to.
 # MAGIC 
 # MAGIC Widgets
 # MAGIC * Models - comma seperated registered model names to be exported. 'all' will export all models.
-# MAGIC * Output base directory
-# MAGIC * Stages - comma seperated stages to be exported
-# MAGIC * Export all runs of experiment
+# MAGIC * Output base directory.
+# MAGIC * Stages - stages to be exported.
+# MAGIC * Export all runs - export all runs of experiment that is linked to a registered model.
 # MAGIC * Notebook formats
 # MAGIC * Use threads
+# MAGIC 
+# MAGIC For description of widget options see: https://github.com/mlflow/mlflow-export-import/blob/master/README_bulk.md#registered-models.
 
 # COMMAND ----------
 
