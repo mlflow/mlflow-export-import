@@ -16,8 +16,11 @@ def get_experiments_runs_of_models(client, model_names, show_experiments=False, 
             try:
                 run = client.get_run(vr.run_id)
                 exps_and_runs.setdefault(run.info.experiment_id,[]).append(run.info.run_id)
-            except mlflow.exceptions.RestException:
-                print(f"WARNING: run {vr.run_id} of version {vr.version} of model '{model_name}' does not exist")
+            except mlflow.exceptions.MlflowException as e:
+                if e.error_code == "RESOURCE_DOES_NOT_EXIST":
+                    print(f"WARNING: run '{vr.run_id}' of version {vr.version} of model '{model_name}' does not exist")
+                else:
+                    print(f"WARNING: run '{vr.run_id}' of version {vr.version} of model '{model_name}': Error.code: {e.error_code}. Error.message: {e.message}")
     if show_experiments:
         show_experiments_runs_of_models(exps_and_runs, show_runs)
     return exps_and_runs
