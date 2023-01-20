@@ -1,13 +1,13 @@
 # Databricks notebook source
 # MAGIC %md ## Export Experiments
 # MAGIC 
+# MAGIC Export multiple experiments and all their runs.
+# MAGIC 
 # MAGIC Widgets
-# MAGIC * Experiments - comma delimited - either experiment ID or experiment name. 'all' will export all experiments
-# MAGIC * Output base directory - s3 mounted shared directory between source and destination workspaces
+# MAGIC * Experiments - comma delimited list of either experiment ID or experiment name. `all` will export all experiments.
+# MAGIC * Output base directory - cloud mounted shared directory between source and destination workspaces.
 # MAGIC * Notebook formats
 # MAGIC * Use threads
-# MAGIC 
-# MAGIC See https://github.com/mlflow/mlflow-export-import/blob/master/README_collection.md#experiments.
 
 # COMMAND ----------
 
@@ -39,9 +39,6 @@ print("use_threads:",use_threads)
 assert_widget(experiments, "1. Experiments")
 assert_widget(output_dir, "2. Output base directory")
 
-if len(experiments)==0: raise Exception("ERROR: '1. Experiments' widget is required")
-if len(output_dir)==0: raise Exception("ERROR: '2. Output base directory' widget is required")
-
 # COMMAND ----------
 
 import mlflow
@@ -65,11 +62,13 @@ output_dir
 
 # COMMAND ----------
 
-# MAGIC %sh echo $OUTPUT_DIR
+# MAGIC %sh 
+# MAGIC echo "OUTPUT_DIR: $OUTPUT_DIR" ; echo
+# MAGIC ls $OUTPUT_DIR
 
 # COMMAND ----------
 
-# MAGIC %sh cat $OUTPUT_DIR/manifest.json
+# MAGIC %sh cat $OUTPUT_DIR/experiments.json
 
 # COMMAND ----------
 
