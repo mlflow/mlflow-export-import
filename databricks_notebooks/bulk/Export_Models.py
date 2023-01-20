@@ -4,14 +4,14 @@
 # MAGIC Export specified models, their version runs and the experiments that the runs belong to.
 # MAGIC 
 # MAGIC Widgets
-# MAGIC * Models - comma seperated registered model names to be exported. 'all' will export all models.
+# MAGIC * Models - comma seperated registered model names to be exported. `all` will export all models.
 # MAGIC * Output base directory.
 # MAGIC * Stages - stages to be exported.
 # MAGIC * Export all runs - export all runs of experiment that is linked to a registered model.
-# MAGIC * Notebook formats
-# MAGIC * Use threads
+# MAGIC * Notebook formats.
+# MAGIC * Use threads.
 # MAGIC 
-# MAGIC For description of widget options see: https://github.com/mlflow/mlflow-export-import/blob/master/README_bulk.md#registered-models.
+# MAGIC See: https://github.com/mlflow/mlflow-export-import/blob/master/README_bulk.md#registered-models.
 
 # COMMAND ----------
 
@@ -81,7 +81,7 @@ export_models(mlflow.client.MlflowClient(),
 
 # MAGIC %sh 
 # MAGIC echo $OUTPUT_DIR
-# MAGIC ls $OUTPUT_DIR
+# MAGIC ls -l $OUTPUT_DIR
 
 # COMMAND ----------
 
