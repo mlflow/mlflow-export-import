@@ -4,36 +4,25 @@
 ## Overview
 
 * Set of Databricks notebooks to perform MLflow export and import operations.
-* Use these notebooks when you want to migrate MLflow objects from one Databricks workspace (tracking server) to another.
+* Use these notebooks when you want to copy MLflow objects from one Databricks workspace (tracking server) to another.
+* In order to copy MLflow objects between workspaces, you will need to set up a shared cloud bucket mounted on each workspace's DBFS.
 * The notebooks are generated with the Databricks [GitHub version control](https://docs.databricks.com/notebooks/github-version-control.html) feature.
-* You will need to set up a shared cloud bucket mounted on DBFS in your source and destination workspaces.
 
 ## Import notebooks into Databricks workspace
 
-To import the notebooks into your Databricks workspace you can either import an single notebook or a directory of notebooks.
-
-**Import a directory**
-
-Use the [workspace import_dir](https://docs.databricks.com/dev-tools/cli/workspace-cli.html#import-a-directory-from-your-local-filesystem-into-a-workspace) Databricks CLI command.
+Use the Databricks REST API command [databricks workspace import_dir](https://docs.databricks.com/dev-tools/cli/workspace-cli.html#import-a-directory-from-your-local-filesystem-into-a-workspace) to import the notebooks into a workspace.
 ```
-databricks workspace import_dir single /Users/me@mycompany.com/mlflow-export-import
+git clone https://github.com/mlflow/mlflow-export-import
+databricks workspace import_dir \
+  databricks_notebooks \
+  /Users/me@mycompany.com/tools
 ```
-
-**Import a notebook**
-
-Use the [workspace import](https://docs.databricks.com/dev-tools/cli/workspace-cli.html#import-a-file-from-your-local-filesystem-into-a-workspace) Databricks CLI command.
-```
-databricks workspace import --language PYTHON single/ImportRun.py  /Users/me@mycompany.com/mlflow-export-import/_README 
-```
-
-**Note**
-
-A separate _README import is needed since there is apparently a glitch in that when the _README file is checked into git, a `.py` extension is not added.
-
 
 ## Databricks notebooks
 
 **Single Notebooks**
+
+Copy one MLflow object and control its destination object name.
 
 | Export | Import |
 |----------|----------|
@@ -43,6 +32,8 @@ A separate _README import is needed since there is apparently a glitch in that w
 
 
 **Bulk notebooks**
+
+Copy multiple MLflow objects. The target object name will be the same as the source object.
 
 | Export | Import |
 | ---- | ---- |
