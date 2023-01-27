@@ -8,7 +8,8 @@ import click
 import mlflow
 from mlflow.exceptions import RestException
 
-from mlflow_export_import.common.click_options import *
+from mlflow_export_import.common.click_options import opt_input_dir, opt_model, \
+  opt_experiment_name, opt_delete_model, opt_import_source_tags, opt_verbose
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.common import model_utils
 from mlflow_export_import.common.source_tags import set_source_tags_for_field, fmt_timestamps
@@ -46,7 +47,6 @@ class BaseModelImporter():
         :param dst_source: Destination version 'source' field.
         :param sleep_time: Seconds to wait for model version crreation.
         """
-        src_current_stage = src_vr["current_stage"]
         dst_source = dst_source.replace("file://","") # OSS MLflow
         if not dst_source.startswith("dbfs:") and not os.path.exists(dst_source):
             raise MlflowExportImportException(f"'source' argument for MLflowClient.create_model_version does not exist: {dst_source}")
@@ -59,10 +59,7 @@ class BaseModelImporter():
             description=src_vr["description"], tags=tags, **kwargs)
 
         model_utils.wait_until_version_is_ready(self.mlflow_client, model_name, version, sleep_time=sleep_time)
-        if src_current_stage != "None":
-            active_stages = [ "Production", "Staging" ]
-            archive_existing_versions = src_current_stage in active_stages
-            self.mlflow_client.transition_model_version_stage(model_name, version.version, src_current_stage, archive_existing_versions)
+        self.mlflow_client.transition_model_version_stage(model_name, version.version, src_vr["current_stage"])
 
 
     def _import_model(self, model_name, input_dir, delete_model=False):
@@ -231,7 +228,6 @@ def _path_join(x,y):
     default=5,
 )
 @opt_verbose
-
 def main(input_dir, model, experiment_name, delete_model, await_creation_for, import_source_tags, verbose, sleep_time):
     print("Options:")
     for k,v in locals().items():

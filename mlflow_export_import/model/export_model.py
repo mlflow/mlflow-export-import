@@ -8,7 +8,9 @@ import mlflow
 
 from mlflow_export_import.common import utils
 from mlflow_export_import.common import io_utils
-from mlflow_export_import.common.click_options import *
+#from mlflow_export_import.common.click_options import *
+from mlflow_export_import.common.click_options import opt_model, opt_output_dir, \
+    opt_notebook_formats, opt_stages, opt_versions
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common.http_client import MlflowHttpClient
 from mlflow_export_import.run.export_run import RunExporter
@@ -43,7 +45,7 @@ class ModelExporter():
             self._export_model(model_name, output_dir)
             return True, model_name
         except Exception as e:
-            print("ERROR:", e)
+            print("ERROR: export_model:", e)
             return False, model_name
 
 
@@ -63,7 +65,7 @@ class ModelExporter():
             dct = { "version": vr.version, "stage": vr.current_stage, 
                 "run_id": vr.run_id,
                 "description": vr.description, "tags": vr.tags }
-            print(f"Exporting verions {vr.version} to '{opath}'")
+            print(f"Exporting model '{model_name}' version {vr.version} stage '{vr.current_stage}' to '{opath}'")
             manifest.append(dct)
             try:
                 if self.export_run:
