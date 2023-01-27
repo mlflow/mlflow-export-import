@@ -1,6 +1,8 @@
 import time
 from mlflow.exceptions import RestException
 from mlflow.entities.model_registry.model_version_status import ModelVersionStatus
+from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
+
 
 def delete_model(client, model_name, sleep_time=5):
     """ Delete a model and all its versions. """
@@ -16,34 +18,46 @@ def delete_model(client, model_name, sleep_time=5):
     except RestException:
         pass
 
+
 def wait_until_version_is_ready(client, model_name, model_version, sleep_time=1, iterations=100):
     """ Due to blob eventual consistency, wait until a newly created version is in READY state. """
     start = time.time()
     for _ in range(iterations):
-        version = client.get_model_version(model_name, model_version.version)
-        status = ModelVersionStatus.from_string(version.status)
-        _show_version(version)
+        vr = client.get_model_version(model_name, model_version.version)
+        status = ModelVersionStatus.from_string(vr.status)
+        print(f"Version: id={vr.version} status={vr.status} state={vr.current_stage}")
         if status == ModelVersionStatus.READY:
             break
         time.sleep(sleep_time)
     end = time.time()
     print(f"Waited {round(end-start,2)} seconds")
 
-def _show_version(version):
-    print(f"Version: id={version.version} status={version.status} state={version.current_stage}")
 
-def dump_model_versions(client, model_name):
+def show_versions(model_name, versions, msg):
+    """ Display as table registered model versions. """
     import pandas as pd
     from tabulate import tabulate
-    versions = client.get_latest_versions(model_name)
-    versions = [ [vr.version, vr.current_stage] for vr in versions ]
-    df = pd.DataFrame(versions, columns = ["Version","Stage"])
-    print(f"\nLatest {len(versions)} versions")
+    versions = [ [vr.version, vr.current_stage, vr.status, vr.run_id,
+           fmt_ts_millis(vr.creation_timestamp),
+           fmt_ts_millis(vr.last_updated_timestamp),
+           vr.description
+       ] for vr in versions ]
+    df = pd.DataFrame(versions, columns = [
+        "version",
+        "current_stage",
+        "status", 
+        "run_id", 
+        "creation_timestamp",
+        "last_updated_timestamp",
+        "description"
+    ])
+    print(f"\n'{msg}' {len(versions)} versions for model '{model_name}'")
     print(tabulate(df, headers="keys", tablefmt="psql", showindex=False))
 
+
+def dump_model_versions(client, model_name):
+    """ Display as table 'latest' and 'all' registered model versions. """
+    versions = client.get_latest_versions(model_name)
+    show_versions(model_name, versions, "Latest")
     versions = client.search_model_versions(f"name='{model_name}'")
-    versions = sorted(versions, key=lambda x: x.current_stage)
-    versions = [ [vr.version, vr.current_stage, vr.status] for vr in versions ]
-    df = pd.DataFrame(versions, columns = ["Version","Stage", "Status"])
-    print(f"\nSearch {len(versions)} versions:")
-    print(tabulate(df, headers="keys", tablefmt="psql", showindex=False))
+    show_versions(model_name, versions, "All")
