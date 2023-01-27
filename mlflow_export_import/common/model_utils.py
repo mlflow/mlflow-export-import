@@ -7,7 +7,8 @@ from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
 def delete_model(client, model_name, sleep_time=5):
     """ Delete a model and all its versions. """
     try:
-        versions = client.get_latest_versions(model_name)
+        ##versions = client.get_latest_versions(model_name)
+        versions = client.search_model_versions(f"name='{model_name}'") # TODO: handle page token
         print(f"Deleting model '{model_name}' and {len(versions)} versions")
         for v in versions:
             print(f"  version={v.version} status={v.status} stage={v.current_stage} run_id={v.run_id}")
@@ -37,7 +38,11 @@ def show_versions(model_name, versions, msg):
     """ Display as table registered model versions. """
     import pandas as pd
     from tabulate import tabulate
-    versions = [ [vr.version, vr.current_stage, vr.status, vr.run_id,
+    versions = [ [
+           int(vr.version),
+           vr.current_stage, 
+           vr.status, 
+           vr.run_id,
            fmt_ts_millis(vr.creation_timestamp),
            fmt_ts_millis(vr.last_updated_timestamp),
            vr.description
@@ -51,6 +56,7 @@ def show_versions(model_name, versions, msg):
         "last_updated_timestamp",
         "description"
     ])
+    df.sort_values(by=["version"], ascending=False, inplace=True)
     print(f"\n'{msg}' {len(versions)} versions for model '{model_name}'")
     print(tabulate(df, headers="keys", tablefmt="psql", showindex=False))
 
