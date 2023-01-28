@@ -6,7 +6,7 @@
 # COMMAND ----------
 
 import mlflow
-client = mlflow.tracking.MlflowClient()
+client = mlflow.client.MlflowClient()
 
 # COMMAND ----------
 
