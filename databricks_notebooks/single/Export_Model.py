@@ -44,7 +44,6 @@ model_name = dbutils.widgets.get("1. Model")
 
 dbutils.widgets.text("2. Output base directory", "") 
 output_dir = dbutils.widgets.get("2. Output base directory")
-output_dir += f"/{model_name}"
 
 notebook_formats = get_notebook_formats(3)
 
@@ -67,7 +66,10 @@ print("stages:", stages)
 assert_widget(model_name, "1. Model")
 assert_widget(output_dir, "2. Output base directory")
 
+output_dir += f"/{model_name}"
+
 import mlflow
+print("output_dir:", output_dir)
 
 # COMMAND ----------
 
