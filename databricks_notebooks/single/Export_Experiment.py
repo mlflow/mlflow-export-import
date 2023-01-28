@@ -5,7 +5,7 @@
 # MAGIC * Exports an experiment and its runs (artifacts too) to a DBFS directory.
 # MAGIC * Output file `experiment.json` contains top-level experiment metadata.
 # MAGIC * Each run and its artifacts are stored as a sub-directory whose name is that of the run_id.
-# MAGIC * Notebooks also can be exported in several formats.
+# MAGIC * Notebooks can be exported in several formats.
 # MAGIC 
 # MAGIC ##### Output folder
 # MAGIC ```
@@ -60,12 +60,12 @@ assert_widget(output_dir, "2. Output base directory")
 import mlflow
 from mlflow_export_import.common import mlflow_utils 
 
-client = mlflow.tracking.MlflowClient()
+client = mlflow.client.MlflowClient()
 experiment = mlflow_utils.get_experiment(client, experiment_id_or_name)
 output_dir = f"{output_dir}/{experiment.experiment_id}"
-print("experiment_id:",experiment.experiment_id)
-print("experiment_name:",experiment.name)       
-print("output_dir:",output_dir)
+print("experiment_id:", experiment.experiment_id)
+print("experiment_name:", experiment.name)       
+print("output_dir:", output_dir)
 
 # COMMAND ----------
 
@@ -92,16 +92,12 @@ dbutils.fs.rm(output_dir, False)
 
 # COMMAND ----------
 
-# %sh ls -l /dbfs/mnt/andre-work/exim/experiments
-# 12927081/12927081/b29df707abcc4d21bf7b3d5c182a12a2
-
-# COMMAND ----------
-
 from mlflow_export_import.experiment.export_experiment import ExperimentExporter
 
 exporter = ExperimentExporter(
     client, 
     notebook_formats = notebook_formats)
+
 exporter.export_experiment(
     exp_id_or_name = experiment.experiment_id, 
     output_dir = output_dir)
