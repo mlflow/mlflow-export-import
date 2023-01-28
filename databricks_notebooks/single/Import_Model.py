@@ -39,10 +39,10 @@ delete_model = dbutils.widgets.get("4. Delete model") == "yes"
 import os
 os.environ["INPUT_DIR"] = input_dir.replace("dbfs:","/dbfs")
 
-print("model_name:",model_name)
-print("input_dir:",input_dir)
-print("experiment_name:",experiment_name)
-print("delete_model:",delete_model)
+print("model_name:", model_name)
+print("input_dir:", input_dir)
+print("experiment_name:", experiment_name)
+print("delete_model:", delete_model)
 
 # COMMAND ----------
 
@@ -69,7 +69,7 @@ assert_widget(input_dir, "3. Input directory")
 # COMMAND ----------
 
 from mlflow_export_import.model.import_model import ModelImporter
-importer = ModelImporter(mlflow.tracking.MlflowClient())
+importer = ModelImporter(mlflow.client.MlflowClient())
 importer.import_model(model_name, 
                       input_dir = input_dir, 
                       experiment_name = experiment_name, 
