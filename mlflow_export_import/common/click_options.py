@@ -65,7 +65,10 @@ def opt_import_source_tags(function):
 
 def opt_use_src_user_id(function):
     function = click.option("--use-src-user-id",
-        help= "Set the destination user ID to the source user ID. Source user ID is ignored when importing into Databricks since setting it is not allowed.",
+        help= """Set the destination user field to the source user field. 
+                 Only valid for open source MLflow. 
+                 When importing into Databricks, the source user field is ignored since it is automatically picked up from your Databricks access token. 
+                 There is no MLflow API endpoint to explicity set the user field for any objects such as Run or Experiment.""",
         type=bool,
         default=False
     )(function)

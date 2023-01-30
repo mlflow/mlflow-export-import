@@ -23,7 +23,7 @@ System attributes by definition cannot be preserved since MLflow will set their 
 
 For example, if your source *creation_time* was *2022-12-08 04:45:38*, the imported target *creation_time* value will be different such as *2023-01-14 18:14:54*.
 
-For lineage purposes, there is an option *--import-source-tags* to preserve the original values of system attributes as tags starting with the prefix *mlflow_exim*.
+For lineage purposes, the option *--import-source-tags* preserves the original values of system attributes as tags starting with the prefix *mlflow_exim*.
 When using this option, all source object fields and system tags will be imported under the *mlflow_exim* prefix.
 
 These preserved attributes are called *source tags*.
