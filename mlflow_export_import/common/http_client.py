@@ -6,6 +6,7 @@ from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common import USER_AGENT
 
+
 class HttpClient():
     """ Wrapper for GET and POST methods for Databricks REST APIs  - standard Databricks API and MLflow API. """
     def __init__(self, api_name, host=None, token=None):
@@ -16,10 +17,10 @@ class HttpClient():
         """
         self.api_uri = "?"
         if host is None:
-            (host,token) = mlflow_utils.get_mlflow_host_token()
+            (host, token) = mlflow_utils.get_mlflow_host_token()
             if host is None:
                 raise MlflowExportImportException("MLflow host or token is not configured correctly")
-        self.api_uri = os.path.join(host,api_name)
+        self.api_uri = os.path.join(host, api_name)
         self.token = token
 
     def _get(self, resource, params=None):
@@ -65,9 +66,11 @@ class HttpClient():
     def __repr__(self): 
         return self.api_uri
 
+
 class DatabricksHttpClient(HttpClient):
     def __init__(self, host=None, token=None):
         super().__init__("api/2.0", host, token)
+
 
 class MlflowHttpClient(HttpClient):
     def __init__(self, host=None, token=None):
@@ -87,7 +90,7 @@ def main(api, resource, method, params, data, output_file, verbose):
     def write_output(rsp, output_file):
         if output_file:
             print(f"Output file: {output_file}")
-            with open(output_file, "w") as f:
+            with open(output_file, "w", encoding="utf-8") as f:
                 f.write(rsp.text)
         else:
             print(rsp.text)
@@ -109,6 +112,7 @@ def main(api, resource, method, params, data, output_file, verbose):
         write_output(rsp, output_file)
     else:
         print(f"ERROR: Unsupported HTTP method '{method}'")
+
 
 if __name__ == "__main__":
     main()

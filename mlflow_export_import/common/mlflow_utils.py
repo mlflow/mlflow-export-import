@@ -1,18 +1,6 @@
 import os
-import mlflow
 from mlflow.exceptions import RestException
 from mlflow_export_import.common import MlflowExportImportException
-
-
-def dump_mlflow_info():
-    print("MLflow Info:")
-    print("  MLflow Version:", mlflow.__version__)
-    print("  Tracking URI:", mlflow.client.get_tracking_uri())
-    mlflow_host = get_mlflow_host()
-    print("  Real MLflow host:", mlflow_host)
-    print("  MLFLOW_TRACKING_URI:", os.environ.get("MLFLOW_TRACKING_URI",""))
-    print("  DATABRICKS_HOST:", os.environ.get("DATABRICKS_HOST",""))
-    print("  DATABRICKS_TOKEN:", os.environ.get("DATABRICKS_TOKEN",""))
 
 
 def get_mlflow_host():
@@ -22,17 +10,19 @@ def get_mlflow_host():
 
 def get_mlflow_host_token():
     """ Returns the host (tracking URI) and token """
-    uri = os.environ.get("MLFLOW_TRACKING_URI",None)
+
+    uri = os.environ.get("MLFLOW_TRACKING_URI", None)
     if uri is not None and not uri.startswith("databricks"):
-        return (uri,None)
+        return (uri, None)
     try:
         from mlflow_export_import.common import databricks_cli_utils
-        profile = os.environ.get("MLFLOW_PROFILE",None)
+        toks = uri.split("//")
+        profile = uri.split("//")[1] if len(toks) > 1 else None
         return databricks_cli_utils.get_host_token(profile)
     #except databricks_cli.utils.InvalidConfigurationError as e:
     except Exception as e: # TODO: make more specific
-        print("WARNING:",e)
-        return (None,None)
+        print("WARNING:", e)
+        return (None, None)
 
 
 def get_experiment(mlflow_client, exp_id_or_name):
@@ -82,7 +72,7 @@ def delete_model(mlflow_client, model_name):
     print(f"Deleting {len(versions)} versions of model '{model_name}'")
     for vr in versions:
         if vr.current_stage == "None":
-            mlflow_client.delete_model_version(model_name,vr.version)
+            mlflow_client.delete_model_version(model_name, vr.version)
     mlflow_client.delete_registered_model(model_name)
 
 
