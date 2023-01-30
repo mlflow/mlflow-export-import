@@ -9,7 +9,8 @@ import click
 from concurrent.futures import ThreadPoolExecutor
 
 import mlflow
-from mlflow_export_import.common.click_options import *
+from mlflow_export_import.common.click_options import opt_input_dir, opt_delete_model, opt_use_src_user_id, \
+    opt_verbose, opt_import_source_tags, opt_use_threads
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.experiment.import_experiment import ExperimentImporter
 from mlflow_export_import.model.import_model import AllModelImporter
@@ -63,16 +64,28 @@ def _import_models(client, input_dir, run_info_map, delete_model, import_source_
     models = models["models"]
     importer = AllModelImporter(client, run_info_map=run_info_map, import_source_tags=import_source_tags)
 
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+    if use_threads:
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            for model in models:
+                dir = os.path.join(models_dir, model)
+                executor.submit(importer.import_model, model, dir, delete_model, verbose)
+    else:
         for model in models:
             dir = os.path.join(models_dir, model)
-            executor.submit(importer.import_model, model, dir, delete_model, verbose)
+            importer.import_model(model, dir, delete_model, verbose)
 
     duration = round(time.time()-start_time, 1)
     return { "models": len(models), "duration": duration }
 
 
-def import_all(client, input_dir, delete_model, use_src_user_id=False, import_source_tags=False, verbose=False, use_threads=False):
+def import_all(client, 
+        input_dir, 
+        delete_model, 
+        use_src_user_id=False, 
+        import_source_tags=False, 
+        verbose=False, 
+        use_threads=False
+    ):
     start_time = time.time()
     exp_res = _import_experiments(client, input_dir, use_src_user_id)
     run_info_map = _remap(exp_res[0])
@@ -91,7 +104,6 @@ def import_all(client, input_dir, delete_model, use_src_user_id=False, import_so
 @opt_verbose
 @opt_import_source_tags
 @opt_use_threads
-
 def main(input_dir, delete_model, use_src_user_id, import_source_tags, verbose, use_threads):
     print("Options:")
     for k,v in locals().items():

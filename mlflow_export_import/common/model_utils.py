@@ -7,7 +7,6 @@ from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
 def delete_model(client, model_name, sleep_time=5):
     """ Delete a model and all its versions. """
     try:
-        ##versions = client.get_latest_versions(model_name)
         versions = client.search_model_versions(f"name='{model_name}'") # TODO: handle page token
         print(f"Deleting model '{model_name}' and {len(versions)} versions")
         for v in versions:
@@ -18,6 +17,14 @@ def delete_model(client, model_name, sleep_time=5):
         client.delete_registered_model(model_name)
     except RestException:
         pass
+
+
+def list_model_versions(client, model_name, get_latest_versions=False):
+    """ List 'all' or the 'latest' versions of registered model. """
+    if get_latest_versions:
+        return client.get_latest_versions(model_name)
+    else:
+        return client.search_model_versions(f"name='{model_name}'")
 
 
 def wait_until_version_is_ready(client, model_name, model_version, sleep_time=1, iterations=100):

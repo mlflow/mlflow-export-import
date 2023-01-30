@@ -1,5 +1,5 @@
 """
-Import a registered model and all the experiment runs associated with its latest versions.
+Import a registered model and all the experiment runs associated with its versions.
 """
 
 import os
@@ -9,7 +9,7 @@ import mlflow
 from mlflow.exceptions import RestException
 
 from mlflow_export_import.common.click_options import opt_input_dir, opt_model, \
-  opt_experiment_name, opt_delete_model, opt_import_source_tags, opt_verbose
+    opt_experiment_name, opt_delete_model, opt_import_source_tags, opt_verbose
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.common import model_utils
 from mlflow_export_import.common.source_tags import set_source_tags_for_field, fmt_timestamps
@@ -55,11 +55,18 @@ class BaseModelImporter():
         if self.import_source_tags:
             _set_source_tags_for_field(src_vr, tags)
 
-        version = self.mlflow_client.create_model_version(model_name, dst_source, dst_run_id, \
-            description=src_vr["description"], tags=tags, **kwargs)
+        dst_vr = self.mlflow_client.create_model_version(
+            model_name, 
+            dst_source, dst_run_id, \
+            description=src_vr["description"], 
+            tags=tags, **kwargs
+        )
 
-        model_utils.wait_until_version_is_ready(self.mlflow_client, model_name, version, sleep_time=sleep_time)
-        self.mlflow_client.transition_model_version_stage(model_name, version.version, src_vr["current_stage"])
+        model_utils.wait_until_version_is_ready(self.mlflow_client, model_name, dst_vr, sleep_time=sleep_time)
+        src_current_stage = src_vr["current_stage"]
+        print(f"Importing model '{model_name}' version {dst_vr.version} stage '{src_current_stage}'")
+        if src_current_stage != "None": # fails for Databricks but no OSS
+            self.mlflow_client.transition_model_version_stage(model_name, dst_vr.version, src_current_stage)
 
 
     def _import_model(self, model_name, input_dir, delete_model=False):
@@ -78,7 +85,7 @@ class BaseModelImporter():
         print(f"  Name: {model_dct['name']}")
         print(f"  Description: {model_dct.get('description','')}")
         print(f"  Tags: {model_dct.get('tags','')}")
-        print(f"  {len(model_dct['latest_versions'])} latest versions")
+        print(f"  {len(model_dct['versions'])} versions")
         print(f"  path: {path}")
 
         if not model_name:
@@ -103,7 +110,9 @@ class ModelImporter(BaseModelImporter):
     """ Low-level 'point' model importer.  """
 
     def __init__(self, mlflow_client, run_importer=None, import_source_tags=False, await_creation_for=None):
-        super().__init__(mlflow_client, run_importer, import_source_tags=import_source_tags, await_creation_for=await_creation_for)
+        super().__init__(mlflow_client, 
+            run_importer, import_source_tags=import_source_tags, 
+            await_creation_for=await_creation_for)
 
 
     def import_model(self, model_name, input_dir, experiment_name, delete_model=False, verbose=False, sleep_time=30):
@@ -120,7 +129,7 @@ class ModelImporter(BaseModelImporter):
         model_dct = self._import_model(model_name, input_dir, delete_model)
         mlflow.set_experiment(experiment_name)
         print("Importing versions:")
-        for vr in model_dct["latest_versions"]:
+        for vr in model_dct["versions"]:
             run_id = self._import_run(input_dir, experiment_name, vr)
             self.import_version(model_name, vr, run_id, sleep_time)
         if verbose:
@@ -177,8 +186,8 @@ class AllModelImporter(BaseModelImporter):
         :return: Model import manifest.
         """
         model_dct = self._import_model(model_name, input_dir, delete_model)
-        print("Importing latest versions:")
-        for vr in model_dct["latest_versions"]:
+        print("Importing versions:")
+        for vr in model_dct["versions"]:
             src_run_id = vr["run_id"]
             dst_run_id = self.run_info_map[src_run_id].run_id
             mlflow.set_experiment(vr["_experiment_name"])

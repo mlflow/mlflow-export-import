@@ -35,6 +35,15 @@ def opt_stages(function):
     )(function)
     return function
 
+def opt_export_latest_versions(function):
+    function = click.option("--export-latest-versions",
+        help="Export latest registered model versions instead of all versions.",
+        type=bool,
+        default=False,
+        show_default=True
+    )(function)
+    return function
+
 # == import
 
 def opt_input_dir(function):

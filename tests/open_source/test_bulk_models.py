@@ -76,7 +76,7 @@ def test_exp_basic_threads(mlflow_context):
 def test_exp_with_source_tags(mlflow_context):
     _run_test(mlflow_context, compare_runs)
 
-# == Test number of if all runs of an experiment or just those of the version are exported
+# == Test number if all runs of an experiment or just those of the version are exported
 
 def _add_version(client, model_name, run, stage):
     source = f"{run.info.artifact_uri}/model"
@@ -92,7 +92,7 @@ def _export_models(client, model_name, output_dir, export_all_runs):
 
 _num_runs1, _num_runs2 = (2, 3)
 
-def _test_export_runs(mlflow_context, export_all_runs):
+def _run_test_export_runs(mlflow_context, export_all_runs):
     delete_experiments_and_models(mlflow_context)
     client1 = mlflow_context.client_src
     exp1 = create_test_experiment(client1, _num_runs1)
@@ -119,7 +119,7 @@ def test_export_all_experiment_runs(mlflow_context):
     """ 
     Test that we export all runs of experiments that are referenced by version runs.
     """
-    num_runs = _test_export_runs(mlflow_context, True)
+    num_runs = _run_test_export_runs(mlflow_context, True)
     assert num_runs == _num_runs1 + _num_runs2
 
 
@@ -127,7 +127,7 @@ def test_export_only_version_runs(mlflow_context):
     """ 
     Test that we export only runs referenced by version.
     """
-    num_runs = _test_export_runs(mlflow_context, False)
+    num_runs = _run_test_export_runs(mlflow_context, False)
     assert num_runs == 2
 
 

@@ -71,7 +71,7 @@ def _compare_artifacts(client_src, client_dst, run1, run2, run_artifact_dir1, ru
     assert utils_test.compare_dirs(path1, path2)
 
 
-def _compare_models(model_src, model_dst, compare_name):
+def compare_models(model_src, model_dst, compare_name):
     if compare_name: 
         assert model_src.name == model_dst.name
     else:
@@ -81,12 +81,12 @@ def _compare_models(model_src, model_dst, compare_name):
 
 
 def compare_models_with_versions(mlflow_client_src, mlflow_client_dst, model_src, model_dst, output_dir):
-    _compare_models(model_src, model_dst, mlflow_client_src!=mlflow_client_dst)
+    compare_models(model_src, model_dst, mlflow_client_src!=mlflow_client_dst)
     for (vr_src, vr_dst) in zip(model_src.latest_versions, model_dst.latest_versions):
-        _compare_versions(mlflow_client_src, mlflow_client_dst, vr_src, vr_dst, output_dir)
+        compare_versions(mlflow_client_src, mlflow_client_dst, vr_src, vr_dst, output_dir)
 
 
-def _compare_versions(mlflow_client_src, mlflow_client_dst, vr_src, vr_dst, output_dir):
+def compare_versions(mlflow_client_src, mlflow_client_dst, vr_src, vr_dst, output_dir):
     assert vr_src.current_stage == vr_dst.current_stage
     assert vr_src.description == vr_dst.description
     assert vr_src.status == vr_dst.status

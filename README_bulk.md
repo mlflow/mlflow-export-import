@@ -40,17 +40,25 @@ Source: [export_all.py](mlflow_export_import/bulk/export_all.py).
 export-all --help
 
 Options:
-  --output-dir TEXT             Output directory.  [required]
-  --export-source-tags BOOLEAN  Export source run information (RunInfo, MLflow
-                                system tags starting with 'mlflow' and
-                                metadata) under the 'mlflow_export_import' tag
-                                prefix. See README.md for more details.
-                                [default: False]
-  --notebook-formats TEXT       Databricks notebook formats. Values are
-                                SOURCE, HTML, JUPYTER or DBC (comma
-                                seperated).
-  --use-threads BOOLEAN         Process export/import in parallel using
-                                threads.  [default: False]
+  --output-dir TEXT               Output directory.  [required]
+  --models TEXT                   Registered model names (comma delimited).
+                                  For example, 'model1,model2'. 'all' will
+                                  export all models.  [required]
+  --export-latest-versions BOOLEAN
+                                  Export latest registered model versions
+                                  instead of all versions.  [default: False]
+  --stages TEXT                   Stages to export (comma seperated). Default
+                                  is all stages and all versions. Stages are
+                                  Production, Staging, Archived and None.
+                                  Mututally exclusive with option --versions.
+  --export-all-runs BOOLEAN       Export all runs of experiment or just runs
+                                  associated with registered model versions.
+                                  [default: False]
+  --notebook-formats TEXT         Databricks notebook formats. Values are
+                                  SOURCE, HTML, JUPYTER or DBC (comma
+                                  seperated).
+  --use-threads BOOLEAN           Process export/import in parallel using
+                                  threads.  [default: False]
 ```
 #### Example
 
@@ -73,7 +81,7 @@ import-all --input-dir out
 Tools that copy registered models and their versions' runs along with the runs' experiment.
 
 When exporting a registered models the following model's associated objects are exported:
-* All the latest versions of a model.
+* All the versions of a model.
 * The run associated with each version.
 * The experiment that the run belongs to.
 

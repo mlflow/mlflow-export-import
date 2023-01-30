@@ -5,7 +5,7 @@ from mlflow_export_import.model.import_model import ModelImporter
 from mlflow_export_import.model.import_model import _extract_model_path
 
 import oss_utils_test 
-from compare_utils import compare_models_with_versions, _compare_models, _compare_versions
+from compare_utils import compare_models_with_versions, compare_models, compare_versions
 from init_tests import mlflow_context
 
 
@@ -59,12 +59,6 @@ def test_export_import_model_first_two_versions(mlflow_context):
         assert(id == ids_src[j])
 
 
-def _compare_models_with_versions(mlflow_client_src, mlflow_client_dst, model_src, model_dst, output_dir):
-    _compare_models(model_src, model_dst, mlflow_client_src!=mlflow_client_dst)
-    for (vr_src, vr_dst) in zip(model_src.latest_versions, model_dst.latest_versions):
-        _compare_versions(mlflow_client_src, mlflow_client_dst, vr_src, vr_dst, output_dir)
-
-
 def test_export_import_model_two_from_middle_versions(mlflow_context):
     model_src, model_dst = _run_test_export_import_model_stages(mlflow_context, versions=["2","3","4"])
     assert len(model_dst.latest_versions) == 3
@@ -72,14 +66,14 @@ def test_export_import_model_two_from_middle_versions(mlflow_context):
     ids_dst = _get_version_ids_dst(model_dst)
     assert set(ids_dst).issubset(set(ids_src))
 
-    _compare_models(model_src, model_dst, mlflow_context.client_src!=mlflow_context.client_dst)
+    compare_models(model_src, model_dst, mlflow_context.client_src!=mlflow_context.client_dst)
     for vr_dst in model_dst.latest_versions:
         vr_src_id = vr_dst.tags[f"{ExportTags.PREFIX_FIELD}.version"]
         vr_src = [vr for vr in model_src.latest_versions if vr.version == vr_src_id ]
         assert(len(vr_src)) == 1
         vr_src = vr_src[0]
         assert(vr_src.version == vr_src_id)
-        _compare_versions(mlflow_context.client_src, mlflow_context.client_dst, vr_src, vr_dst, mlflow_context.output_dir)
+        compare_versions(mlflow_context.client_src, mlflow_context.client_dst, vr_src, vr_dst, mlflow_context.output_dir)
 
 
 # Internal
