@@ -36,18 +36,18 @@ class HttpClient():
     def get(self, resource, params=None):
         return json.loads(self._get(resource, params).text)
 
-    def _post(self, resource, data):
+    def _post(self, resource, data=None):
         """ Executes an HTTP POST call
         :param resource: Relative path name of resource such as runs/search
         :param data: Post request payload
         """
         uri = self._mk_uri(resource)
-        data = json.dumps(data)
+        data = json.dumps(data) if data else None
         rsp = requests.post(uri, headers=self._mk_headers(), data=data)
-        self._check_response(rsp,uri)
+        self._check_response(rsp, uri, data)
         return rsp
 
-    def post(self, resource, data):
+    def post(self, resource, data=None):
         return json.loads(self._post(resource, data).text)
 
     def _mk_headers(self):
