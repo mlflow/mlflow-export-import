@@ -40,10 +40,10 @@ class BaseIterator(metaclass=ABCMeta):
             return self.paged_list[0]
 
 
-class ListExperimentsIterator(BaseIterator):
+class SearchExperimentsIterator(BaseIterator):
     """
     Usage:
-        experiments = ListExperimentsIterator(client, max_results)
+        experiments = SearchExperimentsIterator(client, max_results)
         for experiment in experiments:
             print(experiment)
     """
@@ -55,10 +55,10 @@ class ListExperimentsIterator(BaseIterator):
         return self.client.search_experiments(max_results=self.max_results, page_token=self.paged_list.token)
 
 
-class ListRegisteredModelsIterator(BaseIterator):
+class SearchRegisteredModelsIterator(BaseIterator):
     """
     Usage:
-        models = ListRegisteredModelsIterator(client, max_results)
+        models = SearchRegisteredModelsIterator(client, max_results)
         for model in models:
             print(model)
     """
