@@ -1,4 +1,5 @@
 from abc import abstractmethod, ABCMeta
+from mlflow.entities import ViewType
 
 MAX_RESULTS = 500
 
@@ -15,8 +16,9 @@ class BaseIterator(metaclass=ABCMeta):
     def _call_next(self):
         pass
 
-    def __init__(self, client, max_results=MAX_RESULTS):
+    def __init__(self, client, max_results=MAX_RESULTS, filter=None):
         self.client = client
+        self.filter = filter
         self.max_results = max_results
         self.idx = 0
         self.paged_list = None
@@ -48,11 +50,28 @@ class SearchExperimentsIterator(BaseIterator):
             print(experiment)
     """
 
+    def __init__(self, client, view_type=ViewType.ACTIVE_ONLY, max_results=MAX_RESULTS, filter=None):
+        super().__init__(client, max_results, filter)
+        self.view_type = view_type
+
     def _call_iter(self):
-        return self.client.search_experiments(max_results=self.max_results)
+        return self.client.search_experiments(max_results=self.max_results, filter_string=self.filter, view_type=self.view_type)
 
     def _call_next(self):
-        return self.client.search_experiments(max_results=self.max_results, page_token=self.paged_list.token)
+        return self.client.search_experiments(max_results=self.max_results, page_token=self.paged_list.token, filter_string=self.filter, view_type=self.view_type)
+
+
+
+class SearchRunsIterator(BaseIterator):
+    def __init__(self, client, experiment_id, max_results=MAX_RESULTS, filter=None):
+        super().__init__(client, max_results, filter)
+        self.experiment_id = experiment_id
+
+    def _call_iter(self):
+        return self.client.search_runs(self.experiment_id, self.filter, max_results=self.max_results)
+
+    def _call_next(self):
+        return self.client.search_runs(self.experiment_id, self.filter, max_results=self.max_results, page_token=self.paged_list.token)
 
 
 class SearchRegisteredModelsIterator(BaseIterator):
@@ -62,34 +81,11 @@ class SearchRegisteredModelsIterator(BaseIterator):
         for model in models:
             print(model)
     """
+    def __init__(self, client, max_results=MAX_RESULTS, filter=None):
+        super().__init__(client, max_results, filter)
 
     def _call_iter(self):
-        return self.client.search_registered_models(max_results=self.max_results)
+        return self.client.search_registered_models(self.filter, max_results=self.max_results)
 
     def _call_next(self):
-        return self.client.search_registered_models(max_results=self.max_results, page_token=self.paged_list.token)
-
-
-class SearchRunsIterator(BaseIterator):
-    def __init__(self, client, experiment_id, max_results=MAX_RESULTS, query=""):
-        super().__init__(client, max_results)
-        self.experiment_id = experiment_id
-        self.query = query
-
-    def _call_iter(self):
-        return self.client.search_runs(self.experiment_id, self.query, max_results=self.max_results)
-
-    def _call_next(self):
-        return self.client.search_runs(self.experiment_id, self.query, max_results=self.max_results, page_token=self.paged_list.token)
-
-
-class SearchRegisteredModelsIterator(BaseIterator):
-    def __init__(self, client, max_results=MAX_RESULTS, query=""):
-        super().__init__(client, max_results)
-        self.query = query
-
-    def _call_iter(self):
-        return self.client.search_registered_models(self.query, max_results=self.max_results)
-
-    def _call_next(self):
-        return self.client.search_registered_models(self.query, max_results=self.max_results, page_token=self.paged_list.token)
+        return self.client.search_registered_models(self.filter, max_results=self.max_results, page_token=self.paged_list.token)
