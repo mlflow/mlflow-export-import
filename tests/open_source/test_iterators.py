@@ -28,7 +28,7 @@ def _create_experiments(client, num_experiments):
 def _run_test_list_experiments(client, num_experiments, max_results):
     _create_experiments(client, num_experiments)
     experiments1 = list_experiments(client)
-    experiments2 = SearchExperimentsIterator(client, max_results)
+    experiments2 = SearchExperimentsIterator(client, max_results=max_results)
     assert len(experiments1) == len(list(experiments2))
 
 def test_list_experiments_max_results_LT_num_experiments(mlflow_context):
@@ -46,7 +46,7 @@ def test_list_experiments_max_results_custom(mlflow_context):
     _create_experiments(mlflow_context.client_src, num_experiments)
     experiments1 = list_experiments(mlflow_context.client_src)
     assert len(experiments1) == num_experiments
-    experiments2 = SearchExperimentsIterator(mlflow_context.client_src, max_results)
+    experiments2 = SearchExperimentsIterator(mlflow_context.client_src, max_results=max_results)
     assert len(experiments1) == len(list(experiments2))
 
 # ==== List registered models
