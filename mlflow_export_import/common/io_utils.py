@@ -1,6 +1,7 @@
 import os
 import getpass
 import json
+import yaml
 
 from mlflow_export_import.common.timestamp_utils import ts_now_seconds, ts_now_fmt_utc
 from mlflow_export_import.common import filesystem as _filesystem
@@ -46,12 +47,15 @@ def write_export_file(dir, file, script, mlflow_attr, info_attr=None):
 
 def write_file(path, content):
     """
-    Write a JSON or text file.
+    Write to JSON, YAML or text file.
     """
     path = _filesystem.mk_local_path(path)
     if path.endswith(".json"):
         with open(path, "w", encoding="utf-8") as f:
             f.write(json.dumps(content, indent=2)+"\n")
+    elif path.endswith(".yaml") or path.endswith(".yml"):
+        with open(path, "w", encoding="utf-8") as f:
+            yaml.dump(content, f)
     else:
         with open(path, "wb" ) as f:
             f.write(content)
@@ -59,14 +63,15 @@ def write_file(path, content):
 
 def read_file(path):
     """
-    Read a JSON or text file.
+    Read a JSON, YAML or text file.
     """
-    if path.endswith(".json"):
-        with open(_filesystem.mk_local_path(path), "r", encoding="utf-8") as f:
+    with open(_filesystem.mk_local_path(path), "r", encoding="utf-8") as f:
+        if path.endswith(".json"):
             return json.loads(f.read())
-    else:
-        with open(_filesystem.mk_local_path(path), "r", encoding="utf-8") as f:
-            return json.loads(f.read())
+        elif path.endswith(".yaml") or path.endswith(".yml"):
+            return yaml.safe_load(f)
+        else:
+            return f.read()
 
 
 def get_info(export_dct):
