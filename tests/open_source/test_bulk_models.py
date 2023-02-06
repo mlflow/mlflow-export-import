@@ -131,12 +131,13 @@ def test_export_only_version_runs(mlflow_context):
     assert num_runs == 2
 
 
-# == Simple parsing tests
+# == Pparsing tests for extracting model names from CLI comma-delimitd string option 
 
 def test_get_model_names_from_comma_delimited_string(mlflow_context):
     delete_experiments_and_models(mlflow_context)
     model_names = bulk_utils.get_model_names(mlflow_context.client_src,"model1,model2,model3")
     assert len(model_names) == 3
+
 
 def test_get_model_names_from_all_string(mlflow_context):
     delete_experiments_and_models(mlflow_context)

@@ -195,25 +195,39 @@ class AllModelImporter(BaseModelImporter):
         if verbose:
             model_utils.dump_model_versions(self.mlflow_client, model_name)
 
+
     def import_version(self, model_name, src_vr, dst_run_id, sleep_time):
         src_run_id = src_vr["run_id"]
-        model_path = _extract_model_path(src_vr["source"], src_run_id)
+        model_path = _extract_model_path(src_vr["source"], src_run_id) # get path to model artifact
         dst_artifact_uri = self.run_info_map[src_run_id].artifact_uri
         dst_source = f"{dst_artifact_uri}/{model_path}"
         self._import_version(model_name, src_vr, dst_run_id, dst_source, sleep_time)
 
 
 def _extract_model_path(source, run_id):
+    """
+    Extract relative path to model artifact from version source field
+    :param source: 'source' field of registered model version
+    :param run_id: Run ID in the 'source field 
+    :return: relative path to the model artifact 
+    """
     idx = source.find(run_id)
+    if idx == -1:
+        raise MlflowExportImportException(f"Cannot find run ID '{run_id}' in registered model version source field '{source}'")
     model_path = source[1+idx+len(run_id):]
-    if model_path.startswith("artifacts/"): # Bizarre - sometimes there is no 'artifacts' after run_id
-        model_path = model_path.replace("artifacts/","")
+    pattern = "artifacts"
+
+    idx = source.find(pattern)
+    if idx == -1: # Bizarre - sometimes there is no 'artifacts' after run_id
+        model_path = ""
+    else:
+        model_path = source[1+idx+len(pattern):]
     return model_path
 
 
-def _path_join(x,y):
+def _path_join(x, y):
     """ Account for DOS backslash """
-    path = os.path.join(x,y)
+    path = os.path.join(x, y)
     if path.startswith("dbfs:"):
         path = path.replace("\\","/") 
     return path

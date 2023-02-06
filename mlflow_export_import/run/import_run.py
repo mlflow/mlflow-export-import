@@ -3,7 +3,6 @@ Imports a run from a directory.
 """
 
 import os
-import yaml
 import tempfile
 import click
 import base64
@@ -103,20 +102,25 @@ class RunImporter():
 
     def _update_mlmodel_run_id(self, run_id):
         """ 
-        Patch to fix the run_id in the destination MLmodel file since there is no API to get all model artifacts of a run.
+        Workaround to fix the run_id in the destination MLmodel file since there is no method to get all model artifacts of a run.
+
+        Since an MLflow run does not keeps track of its models, there is no method to retrieve the artifact path to all its models.
+        This workaround recursively searches the run's root artifact directory for all MLmodel files, and assumes their directory
+        represents a path to the model.
         """
+
         mlmodel_paths = find_artifacts(run_id, "", "MLmodel")
         for mlmodel_path in mlmodel_paths:
             model_path = mlmodel_path.replace("/MLmodel","")
             local_path = self.mlflow_client.download_artifacts(run_id, mlmodel_path)
-            with open(local_path, "r", encoding="utf-8") as f:
-                mlmodel = yaml.safe_load(f)
+            mlmodel = io_utils.read_file(local_path, "yaml")
             mlmodel["run_id"] = run_id
             with tempfile.TemporaryDirectory() as dir:
                 output_path = os.path.join(dir, "MLmodel")
-                with open(output_path, "w", encoding="utf-8") as f:
-                    yaml.dump(mlmodel, f)
-                self.mlflow_client.log_artifact(run_id, output_path,  f"{model_path}")
+                io_utils.write_file(output_path, mlmodel, "yaml")
+                if model_path == "MLmodel":
+                    model_path = ""
+                self.mlflow_client.log_artifact(run_id, output_path, model_path)
 
 
     def _import_run_data(self, run_dct, run_id, src_user_id):

@@ -1,8 +1,9 @@
+import os
 from mlflow_export_import.common.source_tags import ExportTags
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.model.export_model import ModelExporter
 from mlflow_export_import.model.import_model import ModelImporter
-from mlflow_export_import.model.import_model import _extract_model_path
+from mlflow_export_import.model.import_model import _extract_model_path, _path_join
 
 import oss_utils_test 
 from compare_utils import compare_models_with_versions, compare_models, compare_versions
@@ -121,22 +122,62 @@ def _create_run(client):
     return client.get_run(run.info.run_id)
 
 
-# Simple tests for parsing
+# Parsing test for _extract_model_path to extract from version `source` field
 
+_exp_id = "1812"
 _run_id = "48cf29167ddb4e098da780f0959fb4cf"
-_model_path = "models:/my_model"
+_local_path_base = os.path.join("dbfs:/databricks/mlflow-tracking", _exp_id, _run_id)
 
 
-def test_extract_model_path_databricks(mlflow_context):
-    source = f"dbfs:/databricks/mlflow-tracking/4072937019901104/{_run_id}/artifacts/{_model_path}"
-    _run_test_extract_model_path(source)
+def test_extract_no_artifacts():
+    source = os.path.join(_local_path_base)
+    model_path = _extract_model_path(source, _run_id)
+    assert model_path == ""
 
 
-def test_extract_model_path_oss(mlflow_context):
-    source = f"/opt/mlflow_context/local_mlrun/mlruns/3/{_run_id}/artifacts/{_model_path}"
-    _run_test_extract_model_path(source)
+def test_extract_just_artifacts():
+    source = os.path.join(_local_path_base, "artifacts")
+    model_path = _extract_model_path(source, _run_id)
+    assert model_path == ""
 
 
-def _run_test_extract_model_path(source):
-    model_path2 = _extract_model_path(source, _run_id)
-    assert _model_path == model_path2
+def test_extract_just_artifacts_slash():
+    source = os.path.join(_local_path_base, "artifacts/")
+    model_path = _extract_model_path(source, _run_id)
+    assert model_path == ""
+
+
+def test_extract_model():
+    source = os.path.join(_local_path_base, "artifacts","model")
+    model_path = _extract_model_path(source, _run_id)
+    assert model_path == "model"
+
+
+def test_extract_model_sklearn():
+    source = os.path.join(_local_path_base, "artifacts","model/sklearn")
+    model_path = _extract_model_path(source, _run_id)
+    assert model_path == "model/sklearn"
+
+
+def _test_extract_no_run_id():
+    source = os.path.join(_local_path_base, "artifacts")
+    try:
+        _extract_model_path(source, "1215")
+        assert False
+    except MlflowExportImportException:
+        pass
+
+
+# == Test for DOS path adjustment
+
+_base_dir = "dbfs:/mlflow/1812"
+_expected_path = "dbfs:/mlflow/1812/model"
+
+def test_path_join_frontslash():
+    res = _path_join(_base_dir, "model")
+    assert res == os.path.join(_expected_path)
+
+def test_path_join_backslash():
+    dir = _base_dir.replace("/","\\")
+    res = _path_join(dir, "model")
+    assert res == os.path.join(_expected_path)
