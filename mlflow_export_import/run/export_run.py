@@ -12,6 +12,7 @@ from mlflow_export_import.common import utils
 from mlflow_export_import.common.click_options import opt_run_id, opt_output_dir, opt_notebook_formats
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import io_utils
+from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
 from mlflow_export_import.common.http_client import DatabricksHttpClient
 from mlflow_export_import.notebook.download_notebook import download_notebook
 
@@ -57,8 +58,11 @@ class RunExporter:
         tags = run.data.tags
         tags = dict(sorted(tags.items()))
         
+        info = utils.strip_underscores(run.info)
+        info["_start_time"] = fmt_ts_millis(run.info.start_time)
+        info["_end_time"] = fmt_ts_millis(run.info.end_time)
         mlflow_attr = {
-            "info": utils.strip_underscores(run.info),
+            "info": info,
             "params": run.data.params,
             "metrics": self._get_metrics_with_steps(run),
             "tags": tags
@@ -108,7 +112,6 @@ class RunExporter:
 @opt_run_id
 @opt_output_dir
 @opt_notebook_formats
-
 def main(run_id, output_dir, notebook_formats):
     print("Options:")
     for k,v in locals().items():

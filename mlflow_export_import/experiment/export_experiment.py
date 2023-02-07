@@ -6,12 +6,13 @@ import os
 import click
 import mlflow
 
-from mlflow_export_import.common.click_options import *
-from mlflow_export_import.common import mlflow_utils
+from mlflow_export_import.common.click_options import opt_experiment, opt_output_dir, opt_notebook_formats
 from mlflow_export_import.common.iterators import SearchRunsIterator
 from mlflow_export_import.common import io_utils
-from mlflow_export_import.run.export_run import RunExporter
 from mlflow_export_import.common import utils
+from mlflow_export_import.common import mlflow_utils
+from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
+from mlflow_export_import.run.export_run import RunExporter
 
 
 class ExperimentExporter():
@@ -52,6 +53,8 @@ class ExperimentExporter():
             "failed_runs": failed_run_ids
         }
         exp_dct = utils.strip_underscores(exp) 
+        exp_dct["_creation_time"] = fmt_ts_millis(exp.creation_time)
+        exp_dct["_last_update_time"] = fmt_ts_millis(exp.last_update_time)
         exp_dct["tags"] = dict(sorted(exp_dct["tags"].items()))
 
         mlflow_attr = { "experiment": exp_dct , "runs": ok_run_ids }
@@ -80,7 +83,6 @@ class ExperimentExporter():
 @opt_experiment
 @opt_output_dir
 @opt_notebook_formats
-
 def main(experiment, output_dir, notebook_formats):
     print("Options:")
     for k,v in locals().items():
@@ -90,6 +92,7 @@ def main(experiment, output_dir, notebook_formats):
         client,
         notebook_formats=utils.string_to_list(notebook_formats))
     exporter.export_experiment(experiment, output_dir)
+
 
 if __name__ == "__main__":
     main()
