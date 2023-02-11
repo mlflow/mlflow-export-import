@@ -11,25 +11,34 @@ from mlflow_export_import.common.pkg_version import get_version #
 
 def _mk_system_attr(script):
     """
-    Create common standard JSON stanza containing internal export information.
+    Create system JSON stanza containing internal export information.
     """
     import mlflow
     import platform
-    return {
-        ExportFields.SYSTEM: {
-            "package_version": get_version(),
-            "script": os.path.basename(script),
-            "export_time": ts_now_seconds,
-            "_export_time": ts_now_fmt_utc,
-            "mlflow_version": mlflow.__version__,
-            "mlflow_tracking_uri": mlflow.get_tracking_uri(),
-            "user": getpass.getuser(),
-            "platform": {
-                "python_version": platform.python_version(),
-                "system": platform.system()
+    dct = {
+        "package_version": get_version(),
+        "script": os.path.basename(script),
+        "export_time": ts_now_seconds,
+        "_export_time": ts_now_fmt_utc,
+        "mlflow_version": mlflow.__version__,
+        "mlflow_tracking_uri": mlflow.get_tracking_uri(),
+        "platform": {
+            "python_version": platform.python_version(),
+            "system": platform.system(),
+            "version": platform.version(),
+            "processor": platform.processor()
+        },
+        "user": getpass.getuser(),
+    }
+    dbr = os.environ.get("DATABRICKS_RUNTIME_VERSION", None)
+    if dbr:
+        dct2 = {
+            "databricks": {
+                 "DATABRICKS_RUNTIME_VERSION": dbr,
             }
         }
-    }
+        dct = { **dct, **dct2 }
+    return { ExportFields.SYSTEM: dct }
 
 
 def write_export_file(dir, file, script, mlflow_attr, info_attr=None):
