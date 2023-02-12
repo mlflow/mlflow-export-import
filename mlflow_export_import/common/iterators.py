@@ -89,3 +89,20 @@ class SearchRegisteredModelsIterator(BaseIterator):
 
     def _call_next(self):
         return self.client.search_registered_models(self.filter, max_results=self.max_results, page_token=self.paged_list.token)
+
+
+class SearchModelVersionsIterator(BaseIterator):
+    """
+    Usage:
+        models = SearchRegisteredModelsIterator(client)
+        for model in models:
+            print(model)
+    """
+    def __init__(self, client, filter=None):
+        super().__init__(client, filter=filter)
+
+    def _call_iter(self):
+        return self.client.search_model_versions(self.filter)
+
+    def _call_next(self):
+        return self.client.search_model_versions(self.filter, page_token=self.paged_list.token)
