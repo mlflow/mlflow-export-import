@@ -92,7 +92,6 @@ def import_all(client,
     model_res = _import_models(client, input_dir, run_info_map, delete_model, import_source_tags, verbose, use_threads)
     duration = round(time.time()-start_time, 1)
     dct = { "duration": duration, "experiment_import": exp_res[1], "model_import": model_res }
-    io_utils.write_file("import_report.json", dct)
     print("\nImport report:")
     print(json.dumps(dct,indent=2)+"\n")
 

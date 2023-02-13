@@ -71,7 +71,7 @@ class ExperimentExporter():
 
     def _export_run(self, idx, run, output_dir, ok_run_ids, failed_run_ids):
         run_dir = os.path.join(output_dir, run.info.run_id)
-        print(f"Exporting run {idx+1}: {run.info.run_id}")
+        print(f"Exporting run {idx+1}: {run.info.run_id} of experiment {run.info.experiment_id}")
         res = self.run_exporter.export_run(run.info.run_id, run_dir)
         if res:
             ok_run_ids.append(run.info.run_id)

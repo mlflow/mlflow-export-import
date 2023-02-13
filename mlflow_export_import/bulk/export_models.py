@@ -54,8 +54,13 @@ def _export_models(client,
     duration = round(time.time()-start_time, 1)
 
     info_attr = {
+        "model_names": model_names,
         "stages": stages,
+        "export_run": export_run,
+        "export_latest_versions": export_latest_versions,
         "notebook_formats": notebook_formats,
+        "use_threads": use_threads,
+        "output_dir": output_dir,
         "num_total_models": len(model_names),
         "num_ok_models": len(ok_models),
         "num_failed_models": len(failed_models),
@@ -69,6 +74,8 @@ def _export_models(client,
 
     print(f"{len(model_names)} models exported")
     print(f"Duration for registered models export: {duration} seconds")
+
+    return info_attr
 
 
 def export_models(client, 
@@ -85,11 +92,26 @@ def export_models(client,
     start_time = time.time()
     out_dir = os.path.join(output_dir, "experiments")
     exps_to_export = exp_ids if export_all_runs else exps_and_runs
-    export_experiments.export_experiments(client, exps_to_export, out_dir, notebook_formats, use_threads)
-    _export_models(client, model_names, os.path.join(output_dir,"models"), notebook_formats, stages,
+    res_exps = export_experiments.export_experiments(client, exps_to_export, out_dir, notebook_formats, use_threads)
+    res_models =_export_models(client, model_names, os.path.join(output_dir,"models"), notebook_formats, stages,
         export_run=False, use_threads=use_threads, export_latest_versions=export_latest_versions)
     duration = round(time.time()-start_time, 1)
     print(f"Duration for total registered models and versions' runs export: {duration} seconds")
+
+    info_attr = {
+        "model_names": model_names,
+        "stages": stages,
+        "export_all_runs": export_all_runs,
+        "export_latest_versions": export_latest_versions,
+        "notebook_formats": notebook_formats,
+        "use_threads": use_threads,
+        "output_dir": output_dir,
+        "models": res_models,
+        "experiments": res_exps
+    }
+    io_utils.write_export_file(output_dir, "manifest.json", __file__, {}, info_attr)
+
+    return info_attr
 
 
 @click.command()
@@ -110,7 +132,6 @@ def export_models(client,
 )
 @opt_notebook_formats
 @opt_use_threads
-
 def main(models, output_dir, stages, notebook_formats, export_all_runs, use_threads, export_latest_versions):
     print("Options:")
     for k,v in locals().items():

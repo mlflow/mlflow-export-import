@@ -8,7 +8,8 @@ from concurrent.futures import ThreadPoolExecutor
 import click
 import mlflow
 
-from mlflow_export_import.common.click_options import *
+from mlflow_export_import.common.click_options import opt_experiments, opt_output_dir, \
+    opt_notebook_formats, opt_use_threads
 from mlflow_export_import.common import utils, io_utils, mlflow_utils
 from mlflow_export_import.bulk import bulk_utils
 from mlflow_export_import.experiment.export_experiment import ExperimentExporter
@@ -100,6 +101,8 @@ def export_experiments(client, experiments, output_dir, notebook_formats=None, u
     if failed_runs > 0:
         print(f"{failed_runs}/{total_runs} runs failed")
     print(f"Duration for experiments export: {duration} seconds")
+
+    return info_attr
 
 
 @click.command()

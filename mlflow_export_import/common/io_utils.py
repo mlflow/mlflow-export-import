@@ -25,7 +25,6 @@ def _mk_system_attr(script):
         "platform": {
             "python_version": platform.python_version(),
             "system": platform.system(),
-            "version": platform.version(),
             "processor": platform.processor()
         },
         "user": getpass.getuser(),
