@@ -54,8 +54,7 @@ class ModelExporter():
 
 
     def _export_versions(self, model_name, versions, output_dir):
-        output_versions = []
-        exported_versions = 0
+        output_versions, failed_versions = ([], [])
         for vr in versions:
             if len(self.stages) > 0 and not vr.current_stage.lower() in self.stages:
                 continue
@@ -79,22 +78,23 @@ class ModelExporter():
                 experiment = mlflow.get_experiment(run.info.experiment_id)
                 dct["_experiment_name"] = experiment.name
                 output_versions.append(dct)
-                exported_versions += 1
             except mlflow.exceptions.RestException as e:
                 if "RESOURCE_DOES_NOT_EXIST: Run" in str(e):
                     print(f"WARNING: Run for version {vr.version} does not exist. {e}")
                 else:
                     import traceback
                     traceback.print_exc()
+                dct = { "version": vr.version, "run_id": vr.run_id, "error": e.message }
+                failed_versions.append(dct) # XX
         output_versions.sort(key=lambda x: x["version"], reverse=False)
-        return output_versions
+        return output_versions, failed_versions
 
 
     def _export_model(self, model_name, output_dir):
         ori_versions = model_utils.list_model_versions(self.mlflow_client, model_name, self.export_latest_versions)
         msg = "latest" if self.export_latest_versions else "all"
         print(f"Found {len(ori_versions)} '{msg}' versions for model '{model_name}'")
-        versions = self._export_versions(model_name, ori_versions, output_dir)
+        versions, failed_versions = self._export_versions(model_name, ori_versions, output_dir)
 
         model = self.http_client.get(f"registered-models/get", {"name": model_name})
         model["registered_model"]["versions"] = versions
@@ -104,7 +104,8 @@ class ModelExporter():
             "num_target_stages": len(self.stages),
             "num_target_versions": len(self.versions),
             "num_src_versions": len(versions),
-            "num_dst_versions": len(versions)
+            "num_dst_versions": len(versions),
+            "failed_versions": failed_versions
         }
         io_utils.write_export_file(output_dir, "model.json", __file__, model, info_attr)
 
