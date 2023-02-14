@@ -3,6 +3,9 @@
 
 ## General Limitations
 
+* The MLflow API returns uneven error codes especially when calling the Datbaricks tracking server (some 404 should be 403, etc.).
+MLflow Export Import does a best effort to recover and not terminate the overall export/import, and indicate the root cause.
+
 * If the run linked to a registered model version does not exist (has been deleted) the version is not exported 
   since when importing [MLflowClient.create_model_version](https://mlflow.org/docs/latest/python_api/mlflow.client.html#mlflow.client.MlflowClient.create_model_version) requires a run ID.
 * If the run linked to a registered model version does not exist (has been deleted) the version is not exported 
