@@ -89,15 +89,15 @@ When exporting a registered models the following model's associated objects are 
 * `export-models` - exports registered models and their versions' backing run along with the experiment that the run belongs to.
 * `import-models` - imports models and their versions' runs and experiments from the above exported directory.
 
-**Output directory structure of models export**
+**Output directory**
 
 ```
 +-manifest.json
 |
 +-experiments/
-| +-manifest.json
+| +-experiments.json
 | +-1/
-| | +-manifest.json
+| | +-experiment.json
 | | +-5bd3b8a44faf4803989544af5cb4d66e/
 | | | +-run.json
 | | | +-artifacts/
@@ -108,15 +108,12 @@ When exporting a registered models the following model's associated objects are 
 | | | . . .
 | 
 +-models/
-| +-manifest.json
+| +-models.json
 | +-sklearn_iris/
 | | +-model.json
 ```
 
-| +-4273c31c45744ec385f3654c63c31360/
-| | +-run.json
-
-For further directory structure see the `single` tool sections for experiments and models further below.
+For further directory structure see the `single` tool sections for experiments and models.
 
 
 ### Export registered models 
@@ -216,11 +213,9 @@ import-models  --input-dir out
 
 Export/import experiments to a directory.
 
-**Output directory structure of models export**
+**Output directory**
 ```
-+-manifest.json
-
-+-manifest.json
++-experiments.json
 | +-5bd3b8a44faf4803989544af5cb4d66e/
 | | +-run.json
 | | +-artifacts/
