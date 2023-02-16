@@ -79,7 +79,6 @@ Calls the `registered-models/list` MLflow API endpoint and creates the file `reg
 list-models
 ```
 
-cat registered_models.json
 ```
 {
   "registered_models": [
