@@ -68,7 +68,7 @@ def opt_use_src_user_id(function):
         help= """Set the destination user field to the source user field. 
                  Only valid for open source MLflow. 
                  When importing into Databricks, the source user field is ignored since it is automatically picked up from your Databricks access token. 
-                 There is no MLflow API endpoint to explicity set the user field for any objects such as Run or Experiment.""",
+                 There is no MLflow API endpoint to explicity set the user_id for Run and Registered Model.""",
         type=bool,
         default=False
     )(function)
@@ -110,7 +110,7 @@ def opt_versions(function):
 
 def opt_use_threads(function):
     click.option("--use-threads",
-        help="Process export/import in parallel using threads.",
+        help="Process in parallel using threads. Experimental: needs improved logging.",
         type=bool,
         default=False,
         show_default=True)(function)

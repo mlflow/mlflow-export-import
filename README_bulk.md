@@ -40,25 +40,11 @@ Source: [export_all.py](mlflow_export_import/bulk/export_all.py).
 export-all --help
 
 Options:
-  --output-dir TEXT               Output directory.  [required]
-  --models TEXT                   Registered model names (comma delimited).
-                                  For example, 'model1,model2'. 'all' will
-                                  export all models.  [required]
-  --export-latest-versions BOOLEAN
-                                  Export latest registered model versions
-                                  instead of all versions.  [default: False]
-  --stages TEXT                   Stages to export (comma seperated). Default
-                                  is all stages and all versions. Stages are
-                                  Production, Staging, Archived and None.
-                                  Mututally exclusive with option --versions.
-  --export-all-runs BOOLEAN       Export all runs of experiment or just runs
-                                  associated with registered model versions.
-                                  [default: False]
-  --notebook-formats TEXT         Databricks notebook formats. Values are
-                                  SOURCE, HTML, JUPYTER or DBC (comma
-                                  seperated).
-  --use-threads BOOLEAN           Process export/import in parallel using
-                                  threads.  [default: False]
+  --output-dir TEXT        Output directory.  [required]
+  --notebook-formats TEXT  Databricks notebook formats. Values are SOURCE,
+                           HTML, JUPYTER or DBC (comma seperated).
+  --use-threads BOOLEAN    Process in parallel using threads. Experimental:
+                           needs improved logging.  [default: False]
 ```
 #### Example
 
@@ -132,26 +118,25 @@ Source: [export_models.py](mlflow_export_import/bulk/export_models.py).
 export-models --help
 
 Options:
-  --output-dir TEXT             Output directory.  [required]
-  --models TEXT                 Registered model names (comma delimited).
-                                For example, 'model1,model2'. 'all' will
-                                export all models.  [required]
-  --export-source-tags BOOLEAN  Export source run information (RunInfo, MLflow
-                                system tags starting with 'mlflow' and
-                                metadata) under the 'mlflow_export_import' tag
-                                prefix. See README_single.md for more
-                                details.  [default: False]
-  --notebook-formats TEXT       Databricks notebook formats. Values are
-                                SOURCE, HTML, JUPYTER or DBC (comma
-                                seperated).
-  --stages TEXT                 Stages to export (comma seperated). Default is
-                                all stages. Values are Production, Staging,
-                                Archived and None.
-  --export-all-runs BOOLEAN     Export all runs of experiment or just runs
-                                associated with registered model versions.
-                                [default: False]
-  --use-threads BOOLEAN         Process export/import in parallel using
-                                threads.  [default: False]
+  --output-dir TEXT               Output directory.  [required]
+  --models TEXT                   Registered model names (comma delimited).
+                                  For example, 'model1,model2'. 'all' will
+                                  export all models.  [required]
+  --export-latest-versions BOOLEAN
+                                  Export latest registered model versions
+                                  instead of all versions.  [default: False]
+  --stages TEXT                   Stages to export (comma seperated). Default
+                                  is all stages and all versions. Stages are
+                                  Production, Staging, Archived and None.
+                                  Mututally exclusive with option --versions.
+  --export-all-runs BOOLEAN       Export all runs of experiment or just runs
+                                  associated with registered model versions.
+                                  [default: False]
+  --notebook-formats TEXT         Databricks notebook formats. Values are
+                                  SOURCE, HTML, JUPYTER or DBC (comma
+                                  seperated).
+  --use-threads BOOLEAN           Process in parallel using threads.
+                                  Experimental: needs improved logging.
 ```
 
 #### Examples
@@ -194,14 +179,15 @@ Options:
                                 source user field is ignored since it is
                                 automatically picked up from your Databricks
                                 access token.  There is no MLflow API endpoint
-                                to explicity set the user field for any
-                                objects such as Run or Experiment.
+                                to explicity set the user_id for Run and
+                                Registered Model.
   --verbose BOOLEAN             Verbose.  [default: False]
   --import-source-tags BOOLEAN  Import source information for registered model
                                 and its versions ad tags in destination
                                 object.  [default: False]
-  --use-threads BOOLEAN         Process export/import in parallel using
-                                threads.  [default: False]
+  --use-threads BOOLEAN         Process in parallel using threads.
+                                Experimental: needs improved logging.
+                                [default: False]
 ```
 
 #### Examples
@@ -241,8 +227,8 @@ Options:
   --output-dir TEXT        Output directory.  [required]
   --notebook-formats TEXT  Databricks notebook formats. Values are SOURCE,
                            HTML, JUPYTER or DBC (comma seperated).
-  --use-threads BOOLEAN    Process export/import in parallel using threads.
-                           [default: False]
+  --use-threads BOOLEAN    Process in parallel using threads. Experimental:
+                           needs improved logging.  [default: False]
 ```
 
 #### Examples
@@ -414,11 +400,13 @@ Options:
                              importing into Databricks, the source user field
                              is ignored since it is automatically picked up
                              from your Databricks access token.  There is no
-                             MLflow API endpoint to explicity set the user
-                             field for any objects such as Run or Experiment.
-  --use-threads BOOLEAN      Process export/import in parallel using threads.
-                             [default: False]
+                             MLflow API endpoint to explicity set the user_id
+                             for Run and Registered Model.
+  --use-threads BOOLEAN      Process in parallel using threads. Experimental:
+                             needs improved logging.  [default: False]
 ```
+
+
 
 #### Examples
 
