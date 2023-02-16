@@ -108,7 +108,22 @@ If the destination experiment already exists, the source runs will be added to i
 import-experiment --help 
 
 Options:
-
+  --experiment-name TEXT        Destination experiment name  [required]
+  --input-dir TEXT              Input path - directory  [required]
+  --import-source-tags BOOLEAN  Import source information for registered model
+                                and its versions ad tags in destination
+                                object.  [default: False]
+  --use-src-user-id BOOLEAN     Set the destination user field to the source
+                                user field.  Only valid for open source
+                                MLflow.  When importing into Databricks, the
+                                source user field is ignored since it is
+                                automatically picked up from your Databricks
+                                access token.  There is no MLflow API endpoint
+                                to explicity set the user field for any
+                                objects such as Run or Experiment.
+  --dst-notebook-dir TEXT       Databricks destination workpsace base
+                                directory for notebook. A run ID will be added
+                                to contain the run's notebook.
 ```
 
 #### Import examples
