@@ -47,12 +47,15 @@ def set_experiment(mlflow_client, dbx_client, exp_name, tags=None):
         create_workspace_dir(dbx_client, os.path.dirname(exp_name))
     try:
         if not tags: tags = {}
-        return mlflow_client.create_experiment(exp_name, tags=tags)
+        exp_id = mlflow_client.create_experiment(exp_name, tags=tags)
+        exp = mlflow_client.get_experiment(exp_id)
+        print(f"Created experiment '{exp.name}' with location '{exp.artifact_location}'")
     except RestException as ex:
         if ex.error_code != "RESOURCE_ALREADY_EXISTS":
             raise(ex)
         exp = mlflow_client.get_experiment_by_name(exp_name)
-        return exp.experiment_id
+        print(f"Using existing experiment '{exp.name}' with location '{exp.artifact_location}'")
+    return exp.experiment_id
 
 
 def get_first_run(mlflow_client, exp_id_or_name):
