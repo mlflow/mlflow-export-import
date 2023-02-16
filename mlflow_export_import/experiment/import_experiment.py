@@ -15,11 +15,6 @@ from mlflow_export_import.run.import_run import RunImporter
 from mlflow_export_import.common.source_tags import set_source_tags_for_field, mk_source_tags_mlflow_tag, fmt_timestamps
 
 
-def _peek_at_experiments(exp_dir):
-    content = io_utils.read_file(os.path.join(exp_dir,"experiments.json"))
-    print(content)
-
-
 class ExperimentImporter():
 
     def __init__(self, mlflow_client, import_source_tags=False, mlmodel_fix=True, use_src_user_id=False):
@@ -35,7 +30,7 @@ class ExperimentImporter():
             mlmodel_fix=mlmodel_fix,
             use_src_user_id=use_src_user_id,
             dst_notebook_dir_add_run_id=True)
-        print("MLflowClient:",self.mlflow_client)
+        print("MLflowClient:", self.mlflow_client)
         self.dbx_client = DatabricksHttpClient()
         self.import_source_tags = import_source_tags
 
@@ -65,7 +60,7 @@ class ExperimentImporter():
         run_ids = exp_dct["runs"]
         failed_run_ids = info["failed_runs"]
 
-        print(f"Importing {len(run_ids)} runs into experiment '{exp_name}' from {input_dir}")
+        print(f"Importing {len(run_ids)} runs into experiment '{exp_name}' from '{input_dir}'")
         run_ids_map = {}
         run_info_map = {}
         for src_run_id in run_ids:
@@ -73,7 +68,7 @@ class ExperimentImporter():
             dst_run_id = dst_run.info.run_id
             run_ids_map[src_run_id] = { "dst_run_id": dst_run_id, "src_parent_run_id": src_parent_run_id }
             run_info_map[src_run_id] = dst_run.info
-        print(f"Imported {len(run_ids)} runs into experiment '{exp_name}' from {input_dir}")
+        print(f"Imported {len(run_ids)} runs into experiment '{exp_name}' from '{input_dir}'")
         if len(failed_run_ids) > 0:
             print(f"Warning: {len(failed_run_ids)} failed runs were not imported - see '{path}'")
         utils.nested_tags(self.mlflow_client, run_ids_map)
@@ -86,17 +81,10 @@ class ExperimentImporter():
 @opt_import_source_tags
 @opt_use_src_user_id
 @opt_dst_notebook_dir
-@click.option("--just-peek",
-    help="Just display experiment metadata - do not import",
-    type=bool,
-    default=False
-)
-def main(input_dir, experiment_name, import_source_tags, just_peek, use_src_user_id, dst_notebook_dir):
+def main(input_dir, experiment_name, import_source_tags, use_src_user_id, dst_notebook_dir):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    if just_peek:
-        _peek_at_experiments(input_dir)
     else:
         client = mlflow.tracking.MlflowClient()
         importer = ExperimentImporter(
