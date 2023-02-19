@@ -3,11 +3,12 @@ from tabulate import tabulate
 import mlflow
 
 
-# Databricks tags that cannot be set
+# Databricks tags that cannot or should not be set
 _DATABRICKS_SKIP_TAGS = set([
   "mlflow.user",
   "mlflow.log-model.history",
-  "mlflow.rootRunId"
+  "mlflow.rootRunId",
+  "mlflow.experiment.sourceType", "mlflow.experiment.sourceId"
   ])
 
 

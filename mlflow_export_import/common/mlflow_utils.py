@@ -47,6 +47,7 @@ def set_experiment(mlflow_client, dbx_client, exp_name, tags=None):
         create_workspace_dir(dbx_client, os.path.dirname(exp_name))
     try:
         if not tags: tags = {}
+        tags = utils.create_mlflow_tags_for_databricks_import(tags)
         exp_id = mlflow_client.create_experiment(exp_name, tags=tags)
         exp = mlflow_client.get_experiment(exp_id)
         print(f"Created experiment '{exp.name}' with location '{exp.artifact_location}'")
