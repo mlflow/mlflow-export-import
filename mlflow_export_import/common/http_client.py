@@ -6,6 +6,7 @@ from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common import USER_AGENT
 
+TIMEOUT = 15
 
 class HttpClient():
     """ Wrapper for GET and POST methods for Databricks REST APIs  - standard Databricks API and MLflow API. """
@@ -29,7 +30,7 @@ class HttpClient():
         :param params: Dict of query parameters 
         """
         uri = self._mk_uri(resource)
-        rsp = requests.get(uri, headers=self._mk_headers(), json=params)
+        rsp = requests.get(uri, headers=self._mk_headers(), json=params, timeout=TIMEOUT)
         self._check_response(rsp, uri, params)
         return rsp
 
@@ -43,7 +44,7 @@ class HttpClient():
         """
         uri = self._mk_uri(resource)
         data = json.dumps(data) if data else None
-        rsp = requests.post(uri, headers=self._mk_headers(), data=data)
+        rsp = requests.post(uri, headers=self._mk_headers(), data=data, timeout=TIMEOUT)
         self._check_response(rsp, uri, data)
         return rsp
 
@@ -61,7 +62,11 @@ class HttpClient():
 
     def _check_response(self, rsp, uri, params=None):
         if rsp.status_code < 200 or rsp.status_code > 299:
-            raise MlflowExportImportException(f"HTTP status code: {rsp.status_code}. Reason: {rsp.reason}. URI: {uri}. Params: {params}.")
+            #print("rsp.text:",rsp.text)
+            raise MlflowExportImportException(rsp.reason,
+               http_status_code=rsp.status_code,
+               http_reason=rsp.reason,
+               uri=uri, params=params)
 
     def __repr__(self): 
         return self.api_uri

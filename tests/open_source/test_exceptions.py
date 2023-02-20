@@ -1,6 +1,6 @@
 import json
 from mlflow_export_import.common import MlflowExportImportException
-from mlflow_export_import.common.mlflow_utils import dump_exception
+#from mlflow_export_import.common.mlflow_utils import dump_exception
 from mlflow.exceptions import MlflowException
 from mlflow.exceptions import RestException
 from mlflow.exceptions import BAD_REQUEST, INTERNAL_ERROR
@@ -77,11 +77,17 @@ def test_ctor_exception_message_2():
     _assert_ex(ex1, ex2, _msg_child, _msg_base)
 
 
+# Test kwargs
+def test_kwargs():
+    ex = MlflowExportImportException(_msg_base, reason="Ouch", year=2023)
+    _assert_message(ex, "reason", "Ouch")
+    _assert_message(ex, "year", 2023)
+
 # == Helper
 
 def _assert_ex(ex1, ex2, msg, src_msg, mlflow_error_code=INTERNAL_ERROR):
-    dump_exception(ex1,"assert_ex Ex1")
-    dump_exception(ex2,"assert_ex Ex2")
+    #dump_exception(ex1,"assert_ex Ex1")
+    #dump_exception(ex2,"assert_ex Ex2")
     _assert_messages(ex2, msg, src_msg)
     assert ex2.src_exception == ex1
     if issubclass(ex1.__class__, MlflowException):

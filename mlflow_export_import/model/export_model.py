@@ -34,7 +34,8 @@ class ModelExporter():
         self.versions = versions if versions else []
         self.export_latest_versions = export_latest_versions
         if len(self.stages) > 0 and len(self.versions) > 0:
-            raise MlflowExportImportException(f"Both stages {self.stages} and versions {self.versions} cannot be set")
+            raise MlflowExportImportException(
+                f"Both stages {self.stages} and versions {self.versions} cannot be set", http_status_code=400)
 
 
     def export_model(self, model_name, output_dir):
@@ -80,12 +81,12 @@ class ModelExporter():
                 output_versions.append(dct)
             except mlflow.exceptions.RestException as e:
                 if "RESOURCE_DOES_NOT_EXIST: Run" in str(e):
-                    print(f"WARNING: Run for version {vr.version} does not exist. {e}")
+                    print(f"WARNING: Run for model version {model_name}/{vr.version} does not exist. {e}")
                 else:
                     import traceback
                     traceback.print_exc()
                 dct = { "version": vr.version, "run_id": vr.run_id, "error": e.message }
-                failed_versions.append(dct) # XX
+                failed_versions.append(dct)
         output_versions.sort(key=lambda x: x["version"], reverse=False)
         return output_versions, failed_versions
 

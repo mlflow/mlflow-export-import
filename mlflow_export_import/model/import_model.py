@@ -49,7 +49,7 @@ class BaseModelImporter():
         """
         dst_source = dst_source.replace("file://","") # OSS MLflow
         if not dst_source.startswith("dbfs:") and not os.path.exists(dst_source):
-            raise MlflowExportImportException(f"'source' argument for MLflowClient.create_model_version does not exist: {dst_source}")
+            raise MlflowExportImportException(f"'source' argument for MLflowClient.create_model_version does not exist: {dst_source}", http_status_code=404)
         kwargs = {"await_creation_for": self.await_creation_for } if self.await_creation_for else {}
         tags = src_vr["tags"]
         if self.import_source_tags:
@@ -213,7 +213,7 @@ def _extract_model_path(source, run_id):
     """
     idx = source.find(run_id)
     if idx == -1:
-        raise MlflowExportImportException(f"Cannot find run ID '{run_id}' in registered model version source field '{source}'")
+        raise MlflowExportImportException(f"Cannot find run ID '{run_id}' in registered model version source field '{source}'", http_status_code=404)
     model_path = source[1+idx+len(run_id):]
     pattern = "artifacts"
 

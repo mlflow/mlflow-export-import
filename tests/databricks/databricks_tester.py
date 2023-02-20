@@ -249,7 +249,7 @@ class DatabricksTester():
 
     def _delete_cluster(self):
         if isinstance(self.cluster_spec, dict):
-            print(f"Deleting cluster self.cluster_id")
+            print(f"Deleting cluster {self.cluster_id}")
             self.cluster_api.permanent_delete(self.cluster_id)
 
 
@@ -265,7 +265,7 @@ class DatabricksTester():
             cluster = self.cluster_api.create_cluster(self.cluster_spec)
             cluster_id = cluster["cluster_id"]
         else:
-            raise Exception(f"Unknown cluster type: {type(self.cluster_spec)}. Muar be a string or dict.")
+            raise Exception(f"Unknown cluster type: {type(self.cluster_spec)}. Must be a string or dict.")
         cluster = self.cluster_api.get_cluster(cluster_id)
         print(f"Using cluster: id={cluster_id} name={cluster['cluster_name']}")
         return cluster_id

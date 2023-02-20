@@ -31,8 +31,8 @@ def get_experiment(mlflow_client, exp_id_or_name):
     if exp is None:
         try:
             exp = mlflow_client.get_experiment(exp_id_or_name)
-        except Exception:
-            raise MlflowExportImportException(f"Cannot find experiment ID or name '{exp_id_or_name}'. Client: {mlflow_client}'")
+        except Exception as ex:
+            raise MlflowExportImportException(ex, f"Cannot find experiment ID or name '{exp_id_or_name}'. Client: {mlflow_client}'")
     return exp
 
 
@@ -53,7 +53,7 @@ def set_experiment(mlflow_client, dbx_client, exp_name, tags=None):
         print(f"Created experiment '{exp.name}' with location '{exp.artifact_location}'")
     except RestException as ex:
         if ex.error_code != "RESOURCE_ALREADY_EXISTS":
-            raise(ex)
+            raise MlflowExportImportException(ex, f"Cannot create experiment '{exp_name}'")
         exp = mlflow_client.get_experiment_by_name(exp_name)
         print(f"Using existing experiment '{exp.name}' with location '{exp.artifact_location}'")
     return exp.experiment_id

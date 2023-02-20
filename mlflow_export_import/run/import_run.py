@@ -92,7 +92,7 @@ class RunImporter():
             self.mlflow_client.set_terminated(run_id, RunStatus.to_string(RunStatus.FAILED))
             import traceback
             traceback.print_exc()
-            raise MlflowExportImportException from e
+            raise MlflowExportImportException(e, f"Importing run {run_id} of experiment '{exp.name}' failed")
         if utils.importing_into_databricks() and dst_notebook_dir:
             ndir = os.path.join(dst_notebook_dir, run_id) if self.dst_notebook_dir_add_run_id else dst_notebook_dir
             self._upload_databricks_notebook(input_dir, src_run_dct, ndir)
