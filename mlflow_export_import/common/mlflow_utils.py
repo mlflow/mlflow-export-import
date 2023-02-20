@@ -92,3 +92,28 @@ def create_workspace_dir(dbx_client, workspace_dir):
     """
     print(f"Creating Databricks workspace directory '{workspace_dir}'")
     dbx_client.post("workspace/mkdirs", { "path": workspace_dir })
+
+
+# == Dump exception functions
+
+
+def dump_exception(ex, msg=""):
+    from mlflow.exceptions import MlflowException
+    if issubclass(ex.__class__,MlflowException):
+        _dump_MlflowException(ex, msg)
+    else:
+        _dump_exception(ex, msg)
+
+def _dump_exception(ex, msg=""):
+    print(f"==== {ex.__class__.__name__}: {msg} =====")
+    print(f"  type: {type(ex)}")
+    print(f"  ex:   '{ex}'")
+    print(f"  attrs:")
+    for k,v in ex.__dict__.items():
+        print(f"    {k}: {v}")
+
+
+def _dump_MlflowException(ex, msg=""):
+    _dump_exception(ex, msg)
+    print(f"  get_http_status_code(): {ex.get_http_status_code()}")
+    print(f"  serialize_as_json():    {ex.serialize_as_json()}") 
