@@ -51,6 +51,22 @@ class HttpClient():
     def post(self, resource, data=None):
         return json.loads(self._post(resource, data).text)
 
+
+    def _delete(self, resource, data=None):
+        """ Executes an HTTP POST call
+        :param resource: Relative path name of resource such as runs/search
+        :param data: Post request payload
+        """
+        uri = self._mk_uri(resource)
+        data = json.dumps(data) if data else None
+        rsp = requests.delete(uri, headers=self._mk_headers(), data=data, timeout=TIMEOUT)
+        self._check_response(rsp, uri, data)
+        return rsp
+
+    def delete(self, resource, data=None):
+        return json.loads(self._delete(resource, data).text)
+
+
     def _mk_headers(self):
         headers = { "User-Agent": USER_AGENT }
         if self.token:
