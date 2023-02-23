@@ -43,7 +43,7 @@ def set_experiment(mlflow_client, dbx_client, exp_name, tags=None):
     :return: Experiment ID
     """
     from mlflow_export_import.common import utils
-    if utils.importing_into_databricks():
+    if utils.get_import_target_implementation() == utils.MLFlowImplementation.DATABRICKS:
         create_workspace_dir(dbx_client, os.path.dirname(exp_name))
     try:
         if not tags: tags = {}
