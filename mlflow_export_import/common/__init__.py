@@ -29,6 +29,3 @@ class MlflowExportImportException(Exception):
 
     def __str__(self):
         return json.dumps(self.kwargs)
-
-
-USER_AGENT = "mlflow-export-import/1.0.0"

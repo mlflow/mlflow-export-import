@@ -10,7 +10,7 @@ from mlflow_export_import.common import utils
 from mlflow_export_import.common.click_options import *
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.common import mlflow_utils
-from mlflow_export_import.common.http_client import DatabricksHttpClient
+from mlflow_export_import.client.http_client import DatabricksHttpClient
 from mlflow_export_import.run.import_run import RunImporter
 from mlflow_export_import.common.source_tags import set_source_tags_for_field, mk_source_tags_mlflow_tag, fmt_timestamps
 

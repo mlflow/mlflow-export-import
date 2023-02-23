@@ -11,7 +11,7 @@ from mlflow_export_import.common import io_utils
 from mlflow_export_import.common.click_options import opt_model, opt_output_dir, \
     opt_notebook_formats, opt_stages, opt_versions, opt_export_latest_versions
 from mlflow_export_import.common import MlflowExportImportException
-from mlflow_export_import.common.http_client import MlflowHttpClient
+from mlflow_export_import.client.http_client import MlflowHttpClient
 from mlflow_export_import.common import model_utils 
 from mlflow_export_import.run.export_run import RunExporter
 

@@ -13,7 +13,7 @@ from mlflow_export_import.common.click_options import opt_run_id, opt_output_dir
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
-from mlflow_export_import.common.http_client import DatabricksHttpClient
+from mlflow_export_import.client.http_client import DatabricksHttpClient
 from mlflow_export_import.notebook.download_notebook import download_notebook
 
 from mlflow.utils.mlflow_tags import MLFLOW_DATABRICKS_NOTEBOOK_PATH

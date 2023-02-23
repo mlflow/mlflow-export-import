@@ -3,7 +3,7 @@ Lists all registered models.
 """
 
 import json
-from mlflow_export_import.common.http_client import MlflowHttpClient
+from mlflow_export_import.client.http_client import MlflowHttpClient
 
 def main():
     print("Options:")

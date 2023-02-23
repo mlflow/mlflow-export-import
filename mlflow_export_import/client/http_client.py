@@ -2,9 +2,9 @@ import os
 import json
 import requests
 import click
-from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common import MlflowExportImportException
-from mlflow_export_import.common import USER_AGENT
+from mlflow_export_import.client import USER_AGENT
+from mlflow_export_import.client import mlflow_auth_utils
 
 TIMEOUT = 15
 
@@ -18,7 +18,7 @@ class HttpClient():
         """
         self.api_uri = "?"
         if host is None:
-            (host, token) = mlflow_utils.get_mlflow_host_token()
+            (host, token) = mlflow_auth_utils.get_mlflow_host_token()
             if host is None:
                 raise MlflowExportImportException("MLflow host or token is not configured correctly")
         self.api_uri = os.path.join(host, api_name)

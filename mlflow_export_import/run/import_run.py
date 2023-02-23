@@ -19,7 +19,7 @@ from mlflow_export_import.common.click_options import opt_input_dir, opt_import_
 
 from mlflow_export_import.common.filesystem import mk_local_path
 from mlflow_export_import.common.find_artifacts import find_artifacts
-from mlflow_export_import.common.http_client import DatabricksHttpClient
+from mlflow_export_import.client.http_client import DatabricksHttpClient
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.common import filesystem as _filesystem

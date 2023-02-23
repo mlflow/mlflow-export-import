@@ -8,7 +8,7 @@ import click
 from mlflow_export_import.common.click_options import opt_output_dir
 from mlflow_export_import.common import utils, io_utils
 from mlflow_export_import.common import MlflowExportImportException
-from mlflow_export_import.common.http_client import DatabricksHttpClient
+from mlflow_export_import.client.http_client import DatabricksHttpClient
 
 
 def download_notebook(output_dir, notebook_workspace_path, revision_id, notebook_formats, dbx_client):
