@@ -6,7 +6,7 @@ from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.client import USER_AGENT
 from mlflow_export_import.client import mlflow_auth_utils
 
-TIMEOUT = 15
+_TIMEOUT = 15
 
 class HttpClient():
     """ Wrapper for GET and POST methods for Databricks REST APIs  - standard Databricks API and MLflow API. """
@@ -20,7 +20,9 @@ class HttpClient():
         if host is None:
             (host, token) = mlflow_auth_utils.get_mlflow_host_token()
             if host is None:
-                raise MlflowExportImportException("MLflow host or token is not configured correctly")
+                raise MlflowExportImportException(
+                    "MLflow tracking URI (MLFLOW_TRACKING_URI environment variable) is not configured correctly",
+                    http_status_code=401)
         self.api_uri = os.path.join(host, api_name)
         self.token = token
 
@@ -30,7 +32,7 @@ class HttpClient():
         :param params: Dict of query parameters 
         """
         uri = self._mk_uri(resource)
-        rsp = requests.get(uri, headers=self._mk_headers(), json=params, timeout=TIMEOUT)
+        rsp = requests.get(uri, headers=self._mk_headers(), json=params, timeout=_TIMEOUT)
         self._check_response(rsp, uri, params)
         return rsp
 
@@ -44,7 +46,7 @@ class HttpClient():
         """
         uri = self._mk_uri(resource)
         data = json.dumps(data) if data else None
-        rsp = requests.post(uri, headers=self._mk_headers(), data=data, timeout=TIMEOUT)
+        rsp = requests.post(uri, headers=self._mk_headers(), data=data, timeout=_TIMEOUT)
         self._check_response(rsp, uri, data)
         return rsp
 
@@ -59,7 +61,7 @@ class HttpClient():
         """
         uri = self._mk_uri(resource)
         data = json.dumps(data) if data else None
-        rsp = requests.delete(uri, headers=self._mk_headers(), data=data, timeout=TIMEOUT)
+        rsp = requests.delete(uri, headers=self._mk_headers(), data=data, timeout=_TIMEOUT)
         self._check_response(rsp, uri, data)
         return rsp
 
