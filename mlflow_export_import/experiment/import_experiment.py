@@ -6,8 +6,9 @@ import os
 import click
 import mlflow
 
+from mlflow_export_import.common.click_options import opt_experiment_name, opt_input_dir, opt_import_source_tags, \
+    opt_use_src_user_id, opt_dst_notebook_dir
 from mlflow_export_import.common import utils
-from mlflow_export_import.common.click_options import *
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.client.http_client import DatabricksHttpClient
@@ -85,13 +86,12 @@ def main(input_dir, experiment_name, import_source_tags, use_src_user_id, dst_no
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    else:
-        client = mlflow.tracking.MlflowClient()
-        importer = ExperimentImporter(
-            client,
-            import_source_tags=import_source_tags,
-            use_src_user_id=use_src_user_id)
-        importer.import_experiment(experiment_name, input_dir, dst_notebook_dir)
+    client = mlflow.tracking.MlflowClient()
+    importer = ExperimentImporter(
+        client,
+        import_source_tags=import_source_tags,
+        use_src_user_id=use_src_user_id)
+    importer.import_experiment(experiment_name, input_dir, dst_notebook_dir)
 
 
 if __name__ == "__main__":
