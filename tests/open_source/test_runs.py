@@ -48,8 +48,9 @@ def test_run_basic_use_metric_steps(mlflow_context):
 
 # == Test for source and exported model prediction equivalence
 
-from sklearn.model_selection import train_test_split
-from sklearn import datasets
+import sklearn_utils
+#from sklearn.model_selection import train_test_split
+#from sklearn import datasets
 import cloudpickle as pickle
 import numpy as np
 
@@ -76,8 +77,9 @@ def test_model_predictions(mlflow_context):
     with open(path2, "rb") as f:
         model2 = pickle.load(f)
 
-    dataset = datasets.load_iris()
-    _,X_test, _, _ = train_test_split(dataset.data, dataset.target, test_size=0.3)
+    ##dataset = datasets.load_iris()
+    ##_,X_test, _, _ = train_test_split(dataset.data, dataset.target, test_size=0.3)
+    X_test = sklearn_utils.get_prediction_data() # XX
     predictions1 = model1.predict(X_test)
     predictions2 = model2.predict(X_test)
     assert np.array_equal(predictions1, predictions2)
