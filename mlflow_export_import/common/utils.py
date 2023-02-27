@@ -67,3 +67,8 @@ def show_table(title, lst, columns):
     print(title)
     df = pd.DataFrame(lst, columns = columns)
     print(tabulate(df, headers="keys", tablefmt="psql", showindex=False))
+
+
+def get_user():
+    import getpass
+    return getpass.getuser()
