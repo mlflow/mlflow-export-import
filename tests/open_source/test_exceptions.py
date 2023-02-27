@@ -83,6 +83,14 @@ def test_kwargs():
     _assert_message(ex, "reason", "Ouch")
     _assert_message(ex, "year", 2023)
 
+# == Test misc
+
+def test_default_http_status_code():
+    ex = MlflowExportImportException(_msg_base, reason="Ouch")
+    assert ex.http_status_code == MlflowExportImportException.DEFAULT_HTTP_STATUS_CODE
+    assert ex.http_status_code == -1
+
+
 # == Helper
 
 def _assert_ex(ex1, ex2, msg, src_msg, mlflow_error_code=INTERNAL_ERROR):

@@ -2,7 +2,7 @@ from mlflow.exceptions import MlflowException
 import json
 
 class MlflowExportImportException(Exception):
-    DEFAULT_HTTP_STATUS_CODE = 500
+    DEFAULT_HTTP_STATUS_CODE = -1
 
     def __init__(self, ex, message=None, http_status_code=DEFAULT_HTTP_STATUS_CODE, **kwargs):
         self.message = str(ex) # if arg 'message' is not None else is src_exception's message
