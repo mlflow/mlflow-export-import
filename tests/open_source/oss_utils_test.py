@@ -1,7 +1,7 @@
 import shortuuid
 import mlflow
-import mlflow.sklearn
-from sklearn_utils import create_sklearn_model
+##import mlflow.sklearn
+import sklearn_utils
 from mlflow_export_import.common import model_utils
 from mlflow.utils.mlflow_tags import MLFLOW_RUN_NOTE # NOTE: ""mlflow.note.content" - used for Experiment Description too!
 from init_tests import mlflow_context
@@ -38,7 +38,7 @@ def create_experiment(client, mk_test_object_name=mk_test_object_name_default):
 def create_simple_run(client, run_name=None, use_metric_steps=False):
     exp = create_experiment(client)
     max_depth = 4
-    model = create_sklearn_model(max_depth)
+    model = sklearn_utils.create_sklearn_model(max_depth)
     with mlflow.start_run(run_name=run_name) as run:
         mlflow.log_param("max_depth",max_depth)
         if use_metric_steps:
@@ -101,6 +101,7 @@ def dump_tags(tags, msg=""):
 
 
 def create_dst_experiment_name(experiment_name):
+    # NOTE: OK as is if running two tracking servers. If running on one tracking server, will need to adjust by adding random prefix."
     return experiment_name
 
 
