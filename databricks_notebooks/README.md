@@ -1,61 +1,42 @@
-# Databricks Notebooks for MLflow Export and Import
+# mlflow-export-import - Databricks Notebooks 
 
 
 ## Overview
 
 * Set of Databricks notebooks to perform MLflow export and import operations.
-* Use these notebooks when you want to migrate MLflow objects from one Databricks workspace (tracking server) to another.
+* Use these notebooks when you want to copy MLflow objects from one Databricks workspace (tracking server) to another.
+* In order to copy MLflow objects between workspaces, you will need to set up a shared cloud bucket mounted on each workspace's DBFS.
 * The notebooks are generated with the Databricks [GitHub version control](https://docs.databricks.com/notebooks/github-version-control.html) feature.
-* You will need to set up a shared cloud bucket mounted on DBFS in your source and destination workspaces.
 
 ## Import notebooks into Databricks workspace
 
-To import the notebooks into your Databricks workspace you can either import an individual notebook or a directory of notebooks.
-
-**Import a directory**
-
-Use the [workspace import_dir](https://docs.databricks.com/dev-tools/cli/workspace-cli.html#import-a-directory-from-your-local-filesystem-into-a-workspace) Databricks CLI command.
+Use the Databricks REST API command [databricks workspace import_dir](https://docs.databricks.com/dev-tools/cli/workspace-cli.html#import-a-directory-from-your-local-filesystem-into-a-workspace) to import the notebooks into a workspace.
 ```
-databricks workspace import_dir individual/git /Users/me@mycompany.com/mlflow-export-import
-```
-
-**Import a notebook**
-
-Use the [workspace import](https://docs.databricks.com/dev-tools/cli/workspace-cli.html#import-a-file-from-your-local-filesystem-into-a-workspace) Databricks CLI command.
-```
-databricks workspace import --language PYTHON individual/git/ImportRun.py  /Users/me@mycompany.com/mlflow-export-import/_README 
+git clone https://github.com/mlflow/mlflow-export-import
+databricks workspace import_dir \
+  databricks_notebooks \
+  /Users/me@mycompany.com/tools
 ```
 
-**Note**
+## Databricks notebooks
 
-A separate _README import is needed since there is apparently a glitch in that when the _README file is checked into git, a `.py` extension is not added.
+**Single Notebooks**
 
+Copy one MLflow object and control its destination object name.
 
-## Individual Databricks notebooks
-
-**Columns**
-* Notebook - name of notebook.
-* git import - Databricks github sync format.
-* HTML - Viewable convenience format. Note that the widgets are not displayed.
-
-**Notebooks**
-
-| Notebook | git code | HTML | 
-|----------|----------|---------|
-| Export_Run | [link](individual/git/Export_Run.py) | [link](individual/html/Export_Run.html) |
-| Import_Run | [link](individual/git/Import_Run.py) | [link](individual/html/Import_Run.html) | 
-| Export_Experiment | [link](individual/git/Export_Experiment.py) | [link](individual/html/Export_Experiment.html) 
-| Import_Experiment | [link](individual/git/Import_Experiment.py) | [link](individual/html/Import_Experiment.html) |
-| Export_Model | [link](individual/git/Export_Model.py) | [link](individual/html/Export_Model.html) | 
-| Import_Model | [link](individual/git/Import_Model.py) | [link](individual/html/Import_Model.html) |
-| Common | [link](individual/git/Common.py) | [link](html/Common.individual/html) | 
-| _README | [link](individual/git/_README) | [link](individual/html/_README.html) |
+| Export | Import |
+|----------|----------|
+| [Export_Run](single/Export_Run.py) | [Import_Run](single/Import_Run.py) |
+| [Export_Experiment](single/Export_Experiment.py) | [Import_Experiment.py](single/Import_Experiment.py) |
+| [Export_Model](single/Export_Model.py) | [Import_Model.py](single/Import_Model.py) |
 
 
-## Collection Databricks notebooks
+**Bulk notebooks**
+
+Copy multiple MLflow objects. The target object name will be the same as the source object.
 
 | Export | Import |
 | ---- | ---- |
-| [Export_Experiments](collection/Export_Experiments.py) | [Import_Experiments](collection/Import_Experiments.py) |
-| Export Model | Import Model |
-| Export All | Import All |
+| [Export_Experiments](bulk/Export_Experiments.py) | [Import_Experiments](bulk/Import_Experiments.py) |
+| [Export_Models](bulk/Export_Models.py) | [Import_Models](bulk/Import_Models.py) |
+| [Export_All](bulk/Export_All.py) | Use [Import_Models](bulk/Import_Models.py) |

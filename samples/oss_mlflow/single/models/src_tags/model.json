@@ -1,0 +1,100 @@
+{
+  "system": {
+    "package_version": "1.1.2",
+    "script": "export_model.py",
+    "export_time": 1673372804,
+    "_export_time": "2023-01-10 17:46:44",
+    "mlflow_version": "2.1.1",
+    "mlflow_tracking_uri": "http://localhost:5005",
+    "user": "andre",
+    "platform": {
+      "python_version": "3.8.15",
+      "system": "Darwin"
+    }
+  },
+  "info": {
+    "num_target_stages": 0,
+    "num_target_versions": 0,
+    "num_src_versions": 1,
+    "num_dst_versions": 1
+  },
+  "mlflow": {
+    "registered_model": {
+      "name": "sklearn_wine",
+      "creation_timestamp": 1673372793134,
+      "last_updated_timestamp": 1673372793397,
+      "description": "Skearn Wine Quality model",
+      "latest_versions": [
+        {
+          "creation_timestamp": 1673372793360,
+          "current_stage": "Production",
+          "description": "v1 Production - wine",
+          "last_updated_timestamp": 1673372793397,
+          "name": "sklearn_wine",
+          "run_id": "bc16d2024a7644339d19e64d9aa8cb4d",
+          "run_link": "",
+          "source": "/opt/mlflow/server_02_imported/mlruns/1/bc16d2024a7644339d19e64d9aa8cb4d/artifacts/sklearn-model",
+          "status": "READY",
+          "status_message": "",
+          "tags": {
+            "registered_version_info": "v1 Production - wine",
+            "mlflow_exim.field.creation_timestamp": "1672601487749",
+            "mlflow_exim.field.current_stage": "Production",
+            "mlflow_exim.field.description": "v1 Production - wine",
+            "mlflow_exim.field.last_updated_timestamp": "1672601487775",
+            "mlflow_exim.field.name": "sklearn_wine",
+            "mlflow_exim.field.run_id": "939157dfaaf24244adafcb72acdfc4a6",
+            "mlflow_exim.field.run_link": "",
+            "mlflow_exim.field.source": "/opt/mlflow/server/mlruns/1/939157dfaaf24244adafcb72acdfc4a6/artifacts/sklearn-model",
+            "mlflow_exim.field.status": "READY",
+            "mlflow_exim.field.status_message": "",
+            "mlflow_exim.field.user_id": "",
+            "mlflow_exim.field.version": "1",
+            "mlflow_exim.field._run_artifact_uri": "/opt/mlflow/server/mlruns/1/939157dfaaf24244adafcb72acdfc4a6/artifacts",
+            "mlflow_exim.field._experiment_name": "sklearn_wine",
+            "mlflow_exim.field._creation_timestamp": "2023-01-01 19:31:28",
+            "mlflow_exim.field._last_updated_timestamp": "2023-01-01 19:31:28"
+          },
+          "user_id": "",
+          "version": "1",
+          "_run_artifact_uri": "/opt/mlflow/server_02_imported/mlruns/1/bc16d2024a7644339d19e64d9aa8cb4d/artifacts",
+          "_experiment_name": "sklearn_wine"
+        }
+      ],
+      "tags": [
+        {
+          "key": "info",
+          "value": "Skearn Wine Quality model"
+        },
+        {
+          "key": "mlflow_exim.field.name",
+          "value": "sklearn_wine"
+        },
+        {
+          "key": "mlflow_exim.field.creation_timestamp",
+          "value": "1672601487738"
+        },
+        {
+          "key": "mlflow_exim.field.last_updated_timestamp",
+          "value": "1672601487764"
+        },
+        {
+          "key": "mlflow_exim.field.description",
+          "value": "Skearn Wine Quality model"
+        },
+        {
+          "key": "mlflow_exim.field.latest_versions",
+          "value": "[{'creation_timestamp': 1672601487749, 'current_stage': 'Production', 'description': 'v1 Production - wine', 'last_updated_timestamp': 1672601487775, 'name': 'sklearn_wine', 'run_id': '939157dfaaf24244adafcb72acdfc4a6', 'run_link': '', 'source': '/opt/mlflow/server/mlruns/1/939157dfaaf24244adafcb72acdfc4a6/artifacts/sklearn-model', 'status': 'READY', 'status_message': '', 'tags': {'registered_version_info': 'v1 Production - wine'}, 'user_id': '', 'version': '1', '_run_artifact_uri': '/Users/andre/work/mlflow_server/local_mlrun/mlruns/1/939157dfaaf24244adafcb72acdfc4a6/artifacts', '_experiment_name': 'sklearn_wine'}]"
+        },
+        {
+          "key": "mlflow_exim.field._creation_timestamp",
+          "value": "2023-01-01 19:31:28"
+        },
+        {
+          "key": "mlflow_exim.field._last_updated_timestamp",
+          "value": "2023-01-01 19:31:28"
+        }
+      ]
+    }
+  }
+}

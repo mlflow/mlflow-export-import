@@ -1,5 +1,5 @@
-from mlflow_export_import.common.iterators import ListRegisteredModelsIterator
-from mlflow_export_import.common.iterators import ListExperimentsIterator
+from mlflow_export_import.common.iterators import SearchRegisteredModelsIterator
+from mlflow_export_import.common.iterators import SearchExperimentsIterator
 
 
 def _get_list(names, func_list):
@@ -23,11 +23,11 @@ def _get_list(names, func_list):
 
 def get_experiment_ids(mlflow_client, experiment_ids):
     def list_entities():
-        return [ exp.experiment_id for exp in ListExperimentsIterator(mlflow_client) ]
+        return [ exp.experiment_id for exp in SearchExperimentsIterator(mlflow_client) ]
     return _get_list(experiment_ids, list_entities)
 
 
 def get_model_names(mlflow_client, model_names):
     def list_entities():
-        return [ model.name for model in ListRegisteredModelsIterator(mlflow_client) ]
+        return [ model.name for model in SearchRegisteredModelsIterator(mlflow_client) ]
     return _get_list(model_names, list_entities)

@@ -8,7 +8,7 @@ Open source MLflow Export Import tests use two MLflow tracking servers:
 
 ## Setup
 
-See the [common test setup](../README.md#Setup) section.
+See the [Setup](../../README.md#Setup) section.
 
 ## Test Configuration
 
@@ -38,4 +38,9 @@ run_tests.sh 5005 5006
 ```
 ```
 ======================== 43 passed in 295.36s (0:04:55) ========================
+
+LOG_FILE    : run_tests.log
+JUNIT REPORT: run_tests_junit.xml
+HTML REPORT : run_tests_report.html
 ```
+

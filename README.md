@@ -3,9 +3,12 @@ You need to restore backend DB before using this script.
 
 # MLflow Export Import
 
-This package provides tools to copy MLflow objects (runs, experiments or registered models) from one MLflow tracking server (Databricks workspace) to another.
+The MLflow Export Import package provides tools to copy MLflow objects (runs, experiments or registered models) from one MLflow tracking server (Databricks workspace) to another.
+Using the MLflow REST API, the tools export MLflow objects to an intermediate directory and then import them into the target tracking server.
 
-For more details on MLflow objects (Databricks MLflow) see the [Databricks MLflow Object Relationships](https://github.com/amesar/mlflow-resources/blob/master/slides/Databricks_MLflow_Object_Relationships.pdf) slide deck.
+For more details:
+* [JSON export file format](README_export_format.md).
+* [MLflow Object Relationships](https://github.com/amesar/mlflow-resources/blob/master/slides/Databricks_MLflow_Object_Relationships.pdf) slide deck.
 
 ## Architecture
 
@@ -14,13 +17,11 @@ For more details on MLflow objects (Databricks MLflow) see the [Databricks MLflo
 ## Overview
 
 ### Why use MLflow Export Import?
-  * Share and collaborate with other data scientists in the same tracking server (Databricks workspace).
-    * For example, clone an experiment from another user.
-  * Share and collaborate with other data scientists in different tracking servers.
-    * For example, clone an experiment from a different user in another tracking server.
-  * MLOps CI/CD. Migrate runs (or registered models)  to another tracking server.
+  * MLOps CI/CD. Migrate runs (or registered models) to another tracking server.
     * Promote a run from the development to the test tracking server.
     * After it passes tests, then promote it to the production tracking server.
+  * Share and collaborate with other data scientists in the same or other tracking server (Databricks workspace).
+    * For example, copy an experiment from one user to another.
   * Backup your MLflow objects to external storage so they can be restored if needed.
   * Disaster recovery. Save your MLflow objects to external storage so they can be replicated to another tracking server.
 
@@ -33,85 +34,74 @@ For more details on MLflow objects (Databricks MLflow) see the [Databricks MLflo
 | Databricks | Databricks |common |
 | Databricks | Open source | rare |
 
-### Two sets of tools
+### MLflow Objects
 
-* Open source MLflow Python scripts.
-* [Databricks notebooks](databricks_notebooks/README.md) that invoke the Python scripts.
+These are the MLflow objects and their attributes that can be exported.
+
+| Object | REST | Python | SQL |
+|----|---|---|--|
+| Run | [link]( https://mlflow.org/docs/latest/rest-api.html#run) | [link](https://mlflow.org/docs/latest/python_api/mlflow.entities.html#mlflow.entities.Run) | [link](https://github.com/amesar/mlflow-resources/blob/master/database_schemas/schema_mlflow_2.0.1.sql#L166) |
+| Experiment | [link](https://mlflow.org/docs/latest/rest-api.html#mlflowexperiment) | [link](https://mlflow.org/docs/latest/python_api/mlflow.entities.html#mlflow.entities.Experiment) | [link](https://github.com/amesar/mlflow-resources/blob/master/database_schemas/schema_mlflow_2.0.1.sql#L37) |
+| Registered Model | [link](https://mlflow.org/docs/latest/rest-api.html#registeredmodel) | [link](https://mlflow.org/docs/latest/python_api/mlflow.entities.html#mlflow.entities.model_registry.RegisteredModel) | [link](https://github.com/amesar/mlflow-resources/blob/master/database_schemas/schema_mlflow_2.0.1.sql#L152) |
+| Registered Model Version | [link](https://mlflow.org/docs/latest/rest-api.html#modelversion) | [link](https://mlflow.org/docs/latest/python_api/mlflow.entities.html#mlflow.entities.model_registry.ModelVersion) | [link](https://github.com/amesar/mlflow-resources/blob/master/database_schemas/schema_mlflow_2.0.1.sql#L102) |
+
+MLflow provides rudimentary capabilities for tracking lineage regarding the original source objects.
+See [README_governance](README_governance.md).
 
 ## Tools Overview
 
-###  Python Scripts
+There are two dimensions to the MLflow Export Import tools:
+* Export of MLflow objects in single or bulk mode.
+* Regular Python scripts or Databricks notebooks.
 
-There are two sets of Python scripts:
+**Single and Bulk Tools**
 
-* [Individual tools](README_individual.md). Use these tools to copy individual MLflow objects between tracking servers. 
-They allow you to specify a different destination object name.
+The two export modes are:
+
+* [Single tools](README_single.md). Copy a single MLflow object between tracking servers. 
+These tools allow you to specify a different destination object name.
 For example, if you want to clone the experiment `/Mary/Experiments/Iris` under a new name, you can specify the target experiment name as `/John/Experiments/Iris`.
 
-* [Collection tools](README_collection.md). High-level tools to copy an entire tracking server or a collection of MLflow objects.
-Full object referential integrity is maintained as well as the original MLflow object names.
+* [Bulk tools](README_bulk.md). High-level tools to copy an entire tracking server or a collection of MLflow objects.
+There is no option to change destination object names.
+Full object referential integrity is maintained (e.g. an imported registered model version will point to the imported run that it refers to.
 
-### Databricks notebooks
+[Databricks notebooks](databricks_notebooks/README.md)
+simply invoke the corresponding Python classes.
 
-Databricks notebooks simply invoke their corresponding Python scripts.
-Note that only `Individual` notebooks are currently available.
-
-See [README](databricks_notebooks/individual/README.md).
-
-### Other
-* [Miscellanous tools](README_tools.md) 
 
 ## Limitations
 
-### General Limitations
+See [README_limitations.md](README_limitations.md).
 
-* Nested runs are only supported when you import an experiment. For a run, it is still a TODO.
-* If the run linked to a registered model version does not exist (has been deleted) the version is not exported 
-  since when importing [MLflowClient.create_model_version](https://mlflow.org/docs/latest/python_api/mlflow.client.html#mlflow.client.MlflowClient.create_model_version) requires a run ID.
+## Quick Start
 
-### Databricks Limitations
+Setup
+```
+pip install mlflow-export-import
+```
 
-#### Exporting Notebook Revisions
-* The notebook revision associated with the run can be exported. It is stored as an an artifact in the run's `notebooks` artifact directory.
-*  You can save the notebook in the suppported SOURCE, HTML, JUPYTER and DBC formats. 
-*  Examples: `notebooks/notebook.dbc` or `notebooks/notebook.source`.
+Export experiment
+```
+export MLFLOW_TRACKING_URI=http://localhost:5000
 
-#### Importing Notebooks
+export-experiment \
+  --experiment sklearn-wine \
+  --output-dir /tmp/export
+```
 
-* Partial functionality due to Databricks REST API limitations.
-* The Databricks REST API does not support:
-  * Importing a notebook with its revision history.
-  * Linking an imported run with the imported notebook.
-* When you import a run, the link to its source notebook revision ID will be a dead link and you cannot access the notebook from the MLflow UI.
-* As a convenience, the import tools allows you to import the exported notebook into Databricks. For more details, see:
-  *  [README_individual - Import run](README_individual.md#Import-run)
-  *  [README_individual - Import experiment](README_individual.md#Import-experiment)
-* You must export a notebook in the SOURCE format for the notebook to be imported.
+Import experiment
+```
+export MLFLOW_TRACKING_URI=http://localhost:5001
 
-
-#### Used ID
-* When importing a run or experiment, for open source (OSS) MLflow you can specify a different user owner. 
-* OSS MLflow - the destination run `mlflow.user` tag can be the same as the source `mlflow.user` tag since OSS MLflow allows you to set this tag.
-* Databricks MLflow - you cannot set the `mlflow.user` tag.  The `mlflow.user` will be based upon the personal access token (PAT) of the importing user.
-
-## Common options details 
-
-`notebook-formats` - If exporting a Databricks run, the run's notebook revision can be saved in the specified formats (comma-delimited argument). Each format is saved in the notebooks folder of the run's artifact root directory as `notebook.{format}`. Supported formats are  SOURCE, HTML, JUPYTER and DBC. See Databricks [Export Format](https://docs.databricks.com/dev-tools/api/latest/workspace.html#notebookexportformat) documentation.
-
-`use-src-user-id` -  Set the destination user ID to the source user ID. Source user ID is ignored when importing into Databricks since the user is automatically picked up from your Databricks access token.
-
-`export-source-tags` - Exports source information under the `mlflow_export_import` tag prefix. See section below for details.
-
-### MLflow Export Import Source Run Tags 
-
-For ML governance purposes, original source run information is saved under the `mlflow_export_import` tag prefix. 
-
-
-For details see [README_source_tags](README_source_tags.md).
+import-experiment \
+  --experiment-name sklearn-wine \
+  --input-dir /tmp/export
+```
 
 ## Setup
 
-Supports python 3.7 or above.
+Supports python 3.8.
 
 
 ### Local setup
@@ -143,17 +133,17 @@ cd mlflow-export-import
 pip install -e .
 ```
 
-### Databricks setup
+### Databricks notebook setup
 
-There are two different ways to install the package.
+There are two different ways to install the package in a Databricks notebook.
 
 #### 1. Install package in notebook
 
-[Install notebook-scoped libraries with %pip](https://docs.databricks.com/libraries/notebooks-python-libraries.html#install-notebook-scoped-libraries-with-pip).
+See documentation: [Install notebook-scoped libraries with %pip](https://docs.databricks.com/libraries/notebooks-python-libraries.html#install-notebook-scoped-libraries-with-pip).
 
 
 ```
-pip install mlflow-export-import
+%pip install mlflow-export-import
 ```
 
 #### 2. Install package as a wheel on cluster
@@ -167,9 +157,9 @@ python setup.py bdist_wheel
 databricks fs cp dist/mlflow_export_import-1.0.0-py3-none-any.whl {MY_DBFS_PATH}
 ```
 
-### Databricks MLflow usage
+### Laptop to Databricks usage
 
-To run the tools externally (from your laptop) against a Databricks tracking server (workspace) set the following environment variables.
+To run the tools externally (from your laptop) against a Databricks tracking server (workspace) set the following environment variables:
 ```
 export MLFLOW_TRACKING_URI=databricks
 export DATABRICKS_HOST=https://mycompany.cloud.databricks.com
@@ -193,14 +183,28 @@ instead of:
 python -u -m mlflow_export_import.experiment.export_experiment --help
 ```
 
+## Other
+
+* [README_options.md](README_options.md) advanced options.
+* [Miscellanous tools](README_tools.md).
+
 ## Testing
 
-Two types of tests exist: open source and Databricks tests.
-See [tests/README](tests/README.md).
+There are two types of tests : open source and Databricks tests.
+See [tests/README](tests/README.md) for details.
 
-### Workflow API
+## README files
 
-* [README.md](mlflow_export_import/workflow_api/README.md)
-* The `WorkflowApiClient` is a Python wrapper around the Databricks REST API to execute job runs in a synchronous polling manner.
-* Although a generic tool, in terms of mlflow-export-import, its main use is for testing Databricks notebook jobs.
-
+* [README.md](README.md)
+* [README_single.md](README_single.md)
+* [README_bulk.md](README_bulk.md)
+* [README_tools.md](README_tools.md)
+* [README_limitations.md](README_limitations.md)
+* [README_options.md](README_options.md)
+* [README_export_format.md](README_export_format.md)
+* [README_governance.md](README_governance.md)
+* [tests/README.md](tests/README.md)
+  * [tests/open_source/README.md](tests/open_source/README.md)
+  * [tests/databricks/README.md](tests/databricks/README.md)
+* [mlflow_export_import/workflow_api/README.md](mlflow_export_import/workflow_api/README.md)
+* [databricks_notebooks/README.md](databricks_notebooks/README.md)

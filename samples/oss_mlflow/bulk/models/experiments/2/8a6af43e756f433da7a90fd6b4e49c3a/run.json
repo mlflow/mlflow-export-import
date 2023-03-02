@@ -1,0 +1,59 @@
+{
+  "system": {
+    "package_version": "1.1.2",
+    "script": "export_run.py",
+    "export_time": 1672601766,
+    "_export_time": "2023-01-01 19:36:06",
+    "mlflow_version": "2.1.1",
+    "mlflow_tracking_uri": "http://127.0.0.1:5020",
+    "user": "andre",
+    "platform": {
+      "python_version": "3.8.15",
+      "system": "Darwin"
+    }
+  },
+  "mlflow": {
+    "info": {
+      "run_uuid": "5397ae67ee0c49139bf64834b4d27fab",
+      "run_id": "5397ae67ee0c49139bf64834b4d27fab",
+      "experiment_id": "2",
+      "user_id": "andre",
+      "status": "FINISHED",
+      "start_time": 1672601579550,
+      "end_time": 1672601583143,
+      "lifecycle_stage": "active",
+      "artifact_uri": "/opt/mlflow/server/mlruns/2/5397ae67ee0c49139bf64834b4d27fab/artifacts",
+      "run_name": "sklearn_iris"
+    },
+    "params": {
+      "max_depth": "5"
+    },
+    "metrics": {
+      "accuracy_score": [
+        {
+          "value": 0.9555555555555556,
+          "timestamp": 1672601579593,
+          "step": 0
+        }
+      ],
+      "zero_one_loss": [
+        {
+          "value": 0.0444444444444444,
+          "timestamp": 1672601579602,
+          "step": 0
+        }
+      ]
+    },
+    "tags": {
+      "dataset": "sklearn-iris",
+      "int": "123",
+      "mlflow.log-model.history": "[{\"run_id\": \"5397ae67ee0c49139bf64834b4d27fab\", \"artifact_path\": \"sklearn-model\", \"utc_time_created\": \"2023-01-01 19:32:59.612140\", \"flavors\": {\"python_function\": {\"model_path\": \"model.pkl\", \"predict_fn\": \"predict\", \"loader_module\": \"mlflow.sklearn\", \"python_version\": \"3.8.15\", \"env\": {\"conda\": \"conda.yaml\", \"virtualenv\": \"python_env.yaml\"}}, \"sklearn\": {\"pickled_model\": \"model.pkl\", \"sklearn_version\": \"1.1.1\", \"serialization_format\": \"cloudpickle\", \"code\": null}}, \"model_uuid\": \"3bd3c618169546189858df68e9610e0a\", \"mlflow_version\": \"2.1.1\"}]",
+      "mlflow.runName": "sklearn_iris",
+      "mlflow.source.git.commit": "d38984e536ac5102ccd495fdafe487a418378009",
+      "mlflow.source.name": "train.py",
+      "mlflow.source.type": "LOCAL",
+      "mlflow.user": "andre",
+      "mlflow_version": "2.1.1"
+    }
+  }
+}

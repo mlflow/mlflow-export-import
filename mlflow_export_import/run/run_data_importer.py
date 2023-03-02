@@ -1,12 +1,16 @@
 """
-Module to account for importing MLflow run data (params, metrics and tags) that exceed API limits.
+Module to account for importing MLflow run data (params, metrics and tags) 
+Focus is on data that exceed API limits.
 See: https://www.mlflow.org/docs/latest/rest-api.html#request-limits.
 """
 
 import mlflow
 import math 
 from mlflow.entities import Metric, Param, RunTag
-from mlflow_export_import import utils
+from mlflow_export_import.common import utils
+from mlflow_export_import.common.source_tags import ExportTags
+from mlflow_export_import.common.source_tags import mk_source_tags_mlflow_tag, mk_source_tags
+
 
 def _log_data(run_dct, run_id, batch_size, get_data, log_data, args_get_data=None):
     metadata = get_data(run_dct, args_get_data)
@@ -19,6 +23,7 @@ def _log_data(run_dct, run_id, batch_size, get_data, log_data, args_get_data=Non
         log_data(run_id, batch)
         res = res + batch
     
+
 def log_params(client, run_dct, run_id, batch_size):
     def get_data(run_dct, args):
         return [ Param(k,v) for k,v in run_dct["params"].items() ]
@@ -26,20 +31,31 @@ def log_params(client, run_dct, run_id, batch_size):
         client.log_batch(run_id, params=params)
     _log_data(run_dct, run_id, batch_size, get_data, log_data)
 
+
 def log_metrics(client, run_dct, run_id, batch_size):
+
     def get_data(run_dct, args=None):
         metrics = []
         for metric,steps in  run_dct["metrics"].items():
             for step in steps:
                 metrics.append(Metric(metric,step["value"],step["timestamp"],step["step"]))
         return metrics
+
     def log_data(run_id, metrics):
         client.log_batch(run_id, metrics=metrics)
+
     _log_data(run_dct, run_id, batch_size, get_data, log_data)
 
-def log_tags(client, run_dct, run_id, batch_size, in_databricks, src_user_id, use_src_user_id):
+
+def log_tags(client, run_dct, run_id, batch_size, import_source_tags, in_databricks, src_user_id, use_src_user_id):
+
     def get_data(run_dct, args):
         tags = run_dct["tags"]
+        if import_source_tags:
+            source_mlflow_tags = mk_source_tags_mlflow_tag(tags)
+            info =  run_dct["info"]
+            source_info_tags = mk_source_tags(info, f"{ExportTags.PREFIX_RUN_INFO}")
+            tags = { **tags, **source_mlflow_tags, **source_info_tags }
         tags = utils.create_mlflow_tags_for_databricks_import(tags) # remove "mlflow" tags that cannot be imported into Databricks
         tags = [ RunTag(k,v) for k,v in tags.items() ]
         if not in_databricks:
@@ -56,6 +72,7 @@ def log_tags(client, run_dct, run_id, batch_size, in_databricks, src_user_id, us
     }
 
     _log_data(run_dct, run_id, batch_size, get_data, log_data, args_get)
+
 
 if __name__ == "__main__":
     import sys

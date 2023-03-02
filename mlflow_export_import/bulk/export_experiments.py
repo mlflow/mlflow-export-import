@@ -4,15 +4,16 @@ Exports experiments to a directory.
 
 import os
 import time
-import json
 from concurrent.futures import ThreadPoolExecutor
 import click
 import mlflow
-from mlflow_export_import.common import mlflow_utils
-from mlflow_export_import import utils, click_doc
+
+from mlflow_export_import.common.click_options import opt_experiments, opt_output_dir, \
+    opt_notebook_formats, opt_use_threads
+from mlflow_export_import.common import utils, io_utils, mlflow_utils
 from mlflow_export_import.bulk import bulk_utils
 from mlflow_export_import.experiment.export_experiment import ExperimentExporter
-from mlflow_export_import.common import filesystem as _filesystem
+
 
 def _export_experiment(client, exp_id_or_name, output_dir, exporter, export_results, run_ids):
     exp = mlflow_utils.get_experiment(client, exp_id_or_name)
@@ -36,7 +37,8 @@ def _export_experiment(client, exp_id_or_name, output_dir, exporter, export_resu
         traceback.print_exc()
     return ok_runs, failed_runs
 
-def export_experiments(client, experiments, output_dir, export_source_tags=False, notebook_formats=None, use_threads=False):
+
+def export_experiments(client, experiments, output_dir, notebook_formats=None, use_threads=False):
     """
     :param: experiments: Can be either:
       - List of experiment names 
@@ -67,7 +69,7 @@ def export_experiments(client, experiments, output_dir, export_source_tags=False
     failed_runs = 0
     export_results = []
     futures = []
-    exporter = ExperimentExporter(client, export_source_tags, utils.string_to_list(notebook_formats))
+    exporter = ExperimentExporter(client, notebook_formats=utils.string_to_list(notebook_formats))
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for exp_id_or_name in experiments:
             run_ids = experiments_dct.get(exp_id_or_name, None)
@@ -83,23 +85,16 @@ def export_experiments(client, experiments, output_dir, export_source_tags=False
     
     total_runs = ok_runs + failed_runs
     duration = round(time.time() - start_time, 1)
-    dct = { 
-        "info": {
-            "mlflow_version": mlflow.__version__,
-            "mlflow_tracking_uri": mlflow.get_tracking_uri(),
-            "export_time": utils.get_now_nice(),
-            "duration": duration,
-            "experiments": len(experiments),
-            "total_runs": total_runs,
-            "ok_runs": ok_runs,
-            "failed_runs": failed_runs
-        },
-        "experiments": export_results 
+
+    info_attr = {
+      "duration": duration,
+      "experiments": len(experiments),
+      "total_runs": total_runs,
+      "ok_runs": ok_runs,
+      "failed_runs": failed_runs
     }
-    fs = _filesystem.get_filesystem(output_dir)
-    fs.mkdirs(output_dir)
-    with open(os.path.join(output_dir, "manifest.json"), "w", encoding="utf-8") as f:
-        f.write(json.dumps(dct,indent=2)+"\n")
+    mlflow_attr = { "experiments": export_results }
+    io_utils.write_export_file(output_dir, "experiments.json", __file__, mlflow_attr, info_attr)
 
     print(f"{len(experiments)} experiments exported")
     print(f"{ok_runs}/{total_runs} runs succesfully exported")
@@ -107,38 +102,15 @@ def export_experiments(client, experiments, output_dir, export_source_tags=False
         print(f"{failed_runs}/{total_runs} runs failed")
     print(f"Duration for experiments export: {duration} seconds")
 
+    return info_attr
+
 
 @click.command()
-@click.option("--output-dir", 
-    help="Output directory.", 
-    required=True
-)
-@click.option("--experiments", 
-    help="Experiment names or IDs (comma delimited).  \
-        For example, 'sklearn_wine,sklearn_iris' or '1,2'. 'all' will export all experiments.",
-    type=str,
-    required=True
-)
-@click.option("--export-source-tags", 
-    help=click_doc.export_source_tags, 
-    type=bool, 
-    default=False, 
-    show_default=True
-)
-@click.option("--notebook-formats", 
-    help=click_doc.notebook_formats, 
-    type=str, 
-    default="", 
-    show_default=True
-)
-@click.option("--use-threads",
-    help=click_doc.use_threads,
-    type=bool,
-    default=False,
-    show_default=True
-)
-
-def main(experiments, output_dir, export_source_tags, notebook_formats, use_threads): 
+@opt_experiments
+@opt_output_dir
+@opt_notebook_formats
+@opt_use_threads
+def main(experiments, output_dir, notebook_formats, use_threads): 
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
@@ -146,9 +118,9 @@ def main(experiments, output_dir, export_source_tags, notebook_formats, use_thre
     export_experiments(client, 
         experiments=experiments,
         output_dir=output_dir,
-        export_source_tags=export_source_tags,
         notebook_formats=notebook_formats,
         use_threads=use_threads)
+
 
 if __name__ == "__main__":
     main()

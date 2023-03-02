@@ -1,0 +1,50 @@
+{
+  "system": {
+    "package_version": "1.1.2",
+    "script": "export_models.py",
+    "export_time": 1676530201,
+    "_export_time": "2023-02-16 06:50:01",
+    "mlflow_version": "2.1.1",
+    "mlflow_tracking_uri": "http://127.0.0.1:5020",
+    "platform": {
+      "python_version": "3.8.15",
+      "system": "Darwin",
+      "processor": "i386"
+    },
+    "user": "andre"
+  },
+  "info": {
+    "model_names": "sklearn*",
+    "stages": "production,staging",
+    "export_all_runs": true,
+    "export_latest_versions": false,
+    "notebook_formats": "",
+    "use_threads": false,
+    "output_dir": "out",
+    "models": {
+      "model_names": [
+        "sklearn_iris",
+        "sklearn_wine"
+      ],
+      "stages": "production,staging",
+      "export_run": false,
+      "export_latest_versions": false,
+      "notebook_formats": "",
+      "use_threads": false,
+      "output_dir": "out/models",
+      "num_total_models": 2,
+      "num_ok_models": 2,
+      "num_failed_models": 0,
+      "duration": 0.1,
+      "failed_models": []
+    },
+    "experiments": {
+      "duration": 0.3,
+      "experiments": 2,
+      "total_runs": 5,
+      "ok_runs": 5,
+      "failed_runs": 0
+    }
+  },
+  "mlflow": {}
+}

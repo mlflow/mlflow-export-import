@@ -1,0 +1,40 @@
+{
+  "system": {
+    "package_version": "1.1.2",
+    "script": "export_experiments.py",
+    "export_time": 1672601766,
+    "_export_time": "2023-01-01 19:36:06",
+    "mlflow_version": "2.1.1",
+    "mlflow_tracking_uri": "http://127.0.0.1:5020",
+    "user": "andre",
+    "platform": {
+      "python_version": "3.8.15",
+      "system": "Darwin"
+    }
+  },
+  "info": {
+    "duration": 0.1,
+    "experiments": 2,
+    "total_runs": 2,
+    "ok_runs": 2,
+    "failed_runs": 0
+  },
+  "mlflow": {
+    "experiments": [
+      {
+        "id": "2",
+        "name": "sklearn_iris",
+        "ok_runs": 1,
+        "failed_runs": 0,
+        "duration": 0.1
+      },
+      {
+        "id": "1",
+        "name": "sklearn_wine",
+        "ok_runs": 1,
+        "failed_runs": 0,
+        "duration": 0.1
+      }
+    ]
+  }
+}

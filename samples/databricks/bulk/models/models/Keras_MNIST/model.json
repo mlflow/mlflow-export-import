@@ -1,0 +1,48 @@
+{
+  "system": {
+    "package_version": "1.1.2",
+    "script": "export_model.py",
+    "export_time": 1672632808,
+    "_export_time": "2023-01-02 04:13:28",
+    "mlflow_version": "2.1.1",
+    "mlflow_tracking_uri": "databricks",
+    "user": "andre",
+    "platform": {
+      "python_version": "3.8.15",
+      "system": "Darwin"
+    }
+  },
+  "info": {
+    "num_target_stages": 1,
+    "num_target_versions": 0,
+    "num_src_versions": 4,
+    "num_dst_versions": 1
+  },
+  "mlflow": {
+    "registered_model": {
+      "name": "Keras_MNIST",
+      "creation_timestamp": 1647885388373,
+      "last_updated_timestamp": 1672632789449,
+      "user_id": "andre@mycompany.com",
+      "latest_versions": [
+        {
+          "creation_timestamp": 1671030163254,
+          "current_stage": "Production",
+          "description": "",
+          "last_updated_timestamp": 1672632789449,
+          "name": "Keras_MNIST",
+          "run_id": "00823dcf475e4466aa71dd6f96799185",
+          "run_link": "",
+          "source": "dbfs:/databricks/mlflow/6499427/00823dcf475e4466aa71dd6f96799185/artifacts/model",
+          "status": "READY",
+          "status_message": "",
+          "tags": {},
+          "user_id": "andre@mycompany.com",
+          "version": "4",
+          "_run_artifact_uri": "dbfs:/databricks/mlflow/6499427/00823dcf475e4466aa71dd6f96799185/artifacts",
+          "_experiment_name": "/Users/andre@mycompany.com/mlflow/mlflow_galleries/models_basic/python/05a_Keras_Train_Predict"
+        }
+      ]
+    }
+  }
+}

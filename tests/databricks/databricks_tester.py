@@ -20,7 +20,7 @@ _export_src_tags = "yes"
 _experiment_nb = "Iris_Train"
 _experiment_name = "Iris_Train_exp"
 
-_fs_nb_base_dir = "../../databricks_notebooks/individual/git"
+_fs_nb_base_dir = "../../databricks_notebooks/single"
 _fs_experiment_nb_name = "Iris_Train.py" 
 _fs_experiment_nb_path = os.path.join("experiment", _fs_experiment_nb_name)
 print("_fs_experiment_nb_path:",_fs_experiment_nb_path)
@@ -70,8 +70,7 @@ class DatabricksTester():
             "notebook_path": nb_path,
             "base_parameters": {
               "1. Run ID": run.info.run_id,
-              "2. Output base directory": self.output_run_base_dir,
-              "3. Export source tags": _export_src_tags
+              "2. Output base directory": self.output_run_base_dir
             }
         }
         return self._run_job(nb_name, notebook_task)
@@ -84,8 +83,7 @@ class DatabricksTester():
             "notebook_path": nb_path,
             "base_parameters": {
               "1. Experiment ID or Name": self.ml_exp_path,
-              "2. Output base directory": self.output_exp_base_dir,
-              "3. Export source tags": _export_src_tags
+              "2. Output base directory": self.output_exp_base_dir
             }
         }
         return self._run_job(nb_name, notebook_task)
@@ -98,8 +96,7 @@ class DatabricksTester():
             "notebook_path": nb_path,
             "base_parameters": {
               "1. Model": self.model_name,
-              "2. Output base directory": self.output_model_base_dir,
-              "3. Export source tags": _export_src_tags,
+              "2. Output base directory": self.output_model_base_dir
             }
         }
         return self._run_job(nb_name, notebook_task)
@@ -252,7 +249,7 @@ class DatabricksTester():
 
     def _delete_cluster(self):
         if isinstance(self.cluster_spec, dict):
-            print(f"Deleting cluster self.cluster_id")
+            print(f"Deleting cluster {self.cluster_id}")
             self.cluster_api.permanent_delete(self.cluster_id)
 
 
@@ -268,7 +265,7 @@ class DatabricksTester():
             cluster = self.cluster_api.create_cluster(self.cluster_spec)
             cluster_id = cluster["cluster_id"]
         else:
-            raise Exception(f"Unknown cluster type: {type(self.cluster_spec)}. Muar be a string or dict.")
+            raise Exception(f"Unknown cluster type: {type(self.cluster_spec)}. Must be a string or dict.")
         cluster = self.cluster_api.get_cluster(cluster_id)
         print(f"Using cluster: id={cluster_id} name={cluster['cluster_name']}")
         return cluster_id

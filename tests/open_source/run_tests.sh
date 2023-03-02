@@ -26,6 +26,10 @@ export MLFLOW_TRACKING_URI=http://localhost:$PORT_SRC
 export MLFLOW_TRACKING_URI_SRC=http://localhost:${PORT_SRC}
 export MLFLOW_TRACKING_URI_DST=http://localhost:${PORT_DST}
 
+JUNIT_FILE=run_tests_junit.xml
+HTML_FILE=run_tests_report.html
+LOG_FILE=run_tests.log
+
 message() {
   echo 
   echo "******************************************************"
@@ -39,7 +43,11 @@ message() {
 run_tests() {
   message "STAGE 2: RUN TESTS"
   export PYTHONPATH=../..:.
-  py.test -s test_*.py
+  time -p python -u -m pytest -s \
+    --junitxml=$JUNIT_FILE \
+    --html=$HTML_FILE \
+    --self-contained-html \
+  test_*.py
 }
 
 launch_server() {
@@ -76,6 +84,17 @@ run() {
   kill_server $PORT_DST
 }
 
-run 2>&1 | tee run_tests.log
+run_all() {
+  time -p run 2>&1 | tee run_tests.log
+  echo
+  echo "******************************************************"
+  echo
+  echo "LOG_FILE    : $LOG_FILE"
+  echo "JUNIT REPORT: $JUNIT_FILE"
+  echo "HTML REPORT : $HTML_FILE"
+  echo
+}
+
+time run_all 2>&1 | tee run_tests.log
 
 exit 0

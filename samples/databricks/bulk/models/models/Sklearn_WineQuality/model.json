@@ -1,0 +1,56 @@
+{
+  "system": {
+    "package_version": "1.1.2",
+    "script": "export_model.py",
+    "export_time": 1671263265,
+    "_export_time": "2022-12-17 07:47:45",
+    "mlflow_version": "2.0.1",
+    "mlflow_tracking_uri": "databricks",
+    "user": "andre",
+    "platform": {
+      "python_version": "3.8.15",
+      "system": "Darwin"
+    }
+  },
+  "info": {
+    "num_target_stages": 1,
+    "num_target_versions": 0,
+    "num_src_versions": 6,
+    "num_dst_versions": 1
+  },
+  "mlflow": {
+    "registered_model": {
+      "name": "Sklearn_WineQuality",
+      "creation_timestamp": 1670474748916,
+      "last_updated_timestamp": 1670836055687,
+      "user_id": "andre@mycompany.com",
+      "latest_versions": [
+        {
+          "creation_timestamp": 1670836049446,
+          "current_stage": "Production",
+          "description": "",
+          "last_updated_timestamp": 1670836055687,
+          "name": "Sklearn_WineQuality",
+          "run_id": "fb5ad45332b241a89d73da6e7aff8b36",
+          "run_link": "",
+          "source": "dbfs:/databricks/mlflow-tracking/13368311/fb5ad45332b241a89d73da6e7aff8b36/artifacts/sklearn-model",
+          "status": "READY",
+          "status_message": "",
+          "tags": {
+            "ver_tag": "hello"
+          },
+          "user_id": "andre@mycompany.com",
+          "version": "6",
+          "_run_artifact_uri": "dbfs:/databricks/mlflow-tracking/13368311/fb5ad45332b241a89d73da6e7aff8b36/artifacts",
+          "_experiment_name": "/Users/andre@mycompany.com/mlflow/mlflow-export-import/export_samples/Sklearn_WineQuality"
+        }
+      ],
+      "tags": [
+        {
+          "key": "sample_tag",
+          "value": "hi"
+        }
+      ]
+    }
+  }
+}

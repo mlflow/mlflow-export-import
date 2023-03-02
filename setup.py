@@ -1,8 +1,19 @@
 from setuptools import setup, find_packages
+
+CORE_REQUIREMENTS = [
+    "mlflow>=1.28.0",
+    "wheel"
+]
+
+TEST_REQUIREMENTS = [
+    "pytest>=7.2.0",
+    "pytest-html",
+    "shortuuid"
+]
   
 setup(
     name="mlflow_export_import",
-    version = "1.0.7",
+    version = "1.2.0",
     author = "Andre Mesarovic",
     description = "Copy MLflow objects (experiments, runs or registered models) to another tracking server",
     long_description=open("README.md").read(),
@@ -13,18 +24,15 @@ setup(
         "Documentation": "https://github.com/mlflow/mlflow-export-import/blob/master/README.md", 
         "Source Code": "https://github.com/mlflow/mlflow-export-import/"
     },
-    python_requires = ">=3.7",
+    python_requires = ">=3.8",
     packages = find_packages(),
     zip_safe = False,
-    install_requires = [
-          "mlflow>=1.26.0",
-          "wheel"
-    ],
+    install_requires = CORE_REQUIREMENTS + TEST_REQUIREMENTS,
     license = "Apache License 2.0",
     keywords = "mlflow ml ai",
     classifiers = [
         "Intended Audience :: Developers",
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         "Operating System :: OS Independent"
     ],
     entry_points = {
@@ -43,7 +51,8 @@ setup(
             "export-model-list = mlflow_export_import.model.export_model_list:main",
             "import-model = mlflow_export_import.model.import_model:main",
             "list-models = mlflow_export_import.model.list_registered_models:main",
-            "http-client = mlflow_export_import.common.http_client:main"
+            "download-notebook = mlflow_export_import.notebook.download_notebook:main",
+            "http-client = mlflow_export_import.client.http_client:main"
          ]
       }
 )

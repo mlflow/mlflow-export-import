@@ -1,0 +1,76 @@
+{
+  "system": {
+    "package_version": "1.1.2",
+    "script": "export_run.py",
+    "export_time": 1672601766,
+    "_export_time": "2023-01-01 19:36:06",
+    "mlflow_version": "2.1.1",
+    "mlflow_tracking_uri": "http://127.0.0.1:5020",
+    "user": "andre",
+    "platform": {
+      "python_version": "3.8.15",
+      "system": "Darwin"
+    }
+  },
+  "mlflow": {
+    "info": {
+      "run_uuid": "d057cae15f27465988e72c6212e1f226",
+      "run_id": "d057cae15f27465988e72c6212e1f226",
+      "experiment_id": "1",
+      "user_id": "andre",
+      "status": "FINISHED",
+      "start_time": 1672601484918,
+      "end_time": 1672601487986,
+      "lifecycle_stage": "active",
+      "artifact_uri": "/opt/mlflow/server/mlruns/1/d057cae15f27465988e72c6212e1f226/artifacts",
+      "run_name": "2023-01-01 19:31:23 train.sh 2.1.1"
+    },
+    "params": {
+      "max_depth": "4",
+      "max_leaf_nodes": "32"
+    },
+    "metrics": {
+      "rmse": [
+        {
+          "value": 0.7367947360663162,
+          "timestamp": 1672601485655,
+          "step": 0
+        }
+      ],
+      "r2": [
+        {
+          "value": 0.28100217442439346,
+          "timestamp": 1672601485668,
+          "step": 0
+        }
+      ],
+      "mae": [
+        {
+          "value": 0.5877424565761121,
+          "timestamp": 1672601485675,
+          "step": 0
+        }
+      ]
+    },
+    "tags": {
+      "data_path": "https://raw.githubusercontent.com/amesar/mlflow-examples/master/data/train/wine-quality-white.csv",
+      "dataset": "wine-quality",
+      "mlflow.log-model.history": "[{\"run_id\": \"d057cae15f27465988e72c6212e1f226\", \"artifact_path\": \"sklearn-model\", \"utc_time_created\": \"2023-01-01 19:31:25.684661\", \"flavors\": {\"python_function\": {\"model_path\": \"model.pkl\", \"predict_fn\": \"predict\", \"loader_module\": \"mlflow.sklearn\", \"python_version\": \"3.8.15\", \"env\": {\"conda\": \"conda.yaml\", \"virtualenv\": \"python_env.yaml\"}}, \"sklearn\": {\"pickled_model\": \"model.pkl\", \"sklearn_version\": \"1.1.1\", \"serialization_format\": \"cloudpickle\", \"code\": null}}, \"model_uuid\": \"46d75d52dc604c5bb49a0c4fae32c1b3\", \"mlflow_version\": \"2.1.1\"}]",
+      "mlflow.runName": "2023-01-01 19:31:23 train.sh 2.1.1",
+      "mlflow.source.git.commit": "d38984e536ac5102ccd495fdafe487a418378009",
+      "mlflow.source.name": "/Users/andre/git/andre/mlflow-examples/python/sklearn/wine_quality/train.py",
+      "mlflow.source.type": "LOCAL",
+      "mlflow.user": "andre",
+      "output_path": "None",
+      "registered_model_name": "sklearn_wine",
+      "registered_model_version_stage": "Production",
+      "run_origin": "train.sh",
+      "save_signature": "False",
+      "uuid": "feX2hCEDYwCJRgypBKDpJZ",
+      "version.mlflow": "2.1.1",
+      "version.platform": "macOS-10.16-x86_64-i386-64bit",
+      "version.python": "3.8.15",
+      "version.sklearn": "1.1.1"
+    }
+  }
+}

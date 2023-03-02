@@ -1,0 +1,47 @@
+{
+  "system": {
+    "package_version": "1.1.2",
+    "script": "export_model.py",
+    "export_time": 1672601766,
+    "_export_time": "2023-01-01 19:36:06",
+    "mlflow_version": "2.1.1",
+    "mlflow_tracking_uri": "http://127.0.0.1:5020",
+    "user": "andre",
+    "platform": {
+      "python_version": "3.8.15",
+      "system": "Darwin"
+    }
+  },
+  "info": {
+    "num_target_stages": 2,
+    "num_target_versions": 0,
+    "num_src_versions": 1,
+    "num_dst_versions": 1
+  },
+  "mlflow": {
+    "registered_model": {
+      "name": "sklearn_iris",
+      "creation_timestamp": 1672601581580,
+      "last_updated_timestamp": 1672601581600,
+      "latest_versions": [
+        {
+          "creation_timestamp": 1672601581587,
+          "current_stage": "Staging",
+          "description": "",
+          "last_updated_timestamp": 1672601581600,
+          "name": "sklearn_iris",
+          "run_id": "dee04cd7f0054008a3c8fe0260feb814",
+          "run_link": "",
+          "source": "/opt/mlflow/server/mlruns/2/dee04cd7f0054008a3c8fe0260feb814/artifacts/artifacts/sklearn-model",
+          "status": "READY",
+          "status_message": "",
+          "tags": {},
+          "user_id": "",
+          "version": "1",
+          "_run_artifact_uri": "/opt/mlflow/server/mlruns/2/dee04cd7f0054008a3c8fe0260feb814/artifacts",
+          "_experiment_name": "sklearn_iris"
+        }
+      ]
+    }
+  }
+}

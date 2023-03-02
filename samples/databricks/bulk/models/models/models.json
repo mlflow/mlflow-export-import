@@ -1,0 +1,39 @@
+{
+  "system": {
+    "package_version": "1.1.2",
+    "script": "export_models.py",
+    "export_time": 1676433314,
+    "_export_time": "2023-02-15 03:55:14",
+    "mlflow_version": "2.1.1",
+    "mlflow_tracking_uri": "databricks://e2_demo",
+    "platform": {
+      "python_version": "3.8.15",
+      "system": "Darwin",
+      "processor": "i386"
+    },
+    "user": "andre.mesarovic"
+  },
+  "info": {
+    "model_names": [
+      "Sklearn_WineQuality",
+      "Keras_MNIST"
+    ],
+    "stages": "Production,Staging,Archived,None",
+    "export_run": false,
+    "export_latest_versions": false,
+    "notebook_formats": "SOURCE,DBC",
+    "use_threads": false,
+    "output_dir": "out/models",
+    "num_total_models": 2,
+    "num_ok_models": 2,
+    "num_failed_models": 0,
+    "duration": 4.2,
+    "failed_models": []
+  },
+  "mlflow": {
+    "models": [
+      "Sklearn_WineQuality",
+      "Keras_MNIST"
+    ]
+  }
+}
