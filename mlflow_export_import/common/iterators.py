@@ -1,4 +1,5 @@
 from mlflow.entities import ViewType
+import mlflow
 
 MAX_RESULTS = 500
 
@@ -9,7 +10,10 @@ class BaseIterator():
     """
 
     def _call_iter(self):
-        return self.method(self.filter, max_results=self.max_results)
+        if mlflow.__version__ < "2.2.1": 
+            return self.method(self.filter)  #7623 - https://mlflow.org/docs/2.1.1/python_api/mlflow.client.html
+        else:
+            return self.method(self.filter, max_results=self.max_results) # https://mlflow.org/docs/latest/python_api/mlflow.client.html
 
     def _call_next(self):
         return self.method(self.filter, max_results=self.max_results, page_token=self.paged_list.token)
@@ -71,8 +75,8 @@ class SearchModelVersionsIterator(BaseIterator):
         for vr in versions:
             print(vr)
     """
-    def __init__(self, client, filter=None):
-        super().__init__(client.search_model_versions, filter=filter)
+    def __init__(self, client, max_results=MAX_RESULTS, filter=None):
+        super().__init__(client.search_model_versions, max_results=max_results, filter=filter)
 
 
 class SearchRunsIterator(BaseIterator):
