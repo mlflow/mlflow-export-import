@@ -40,11 +40,16 @@ Source: [export_all.py](mlflow_export_import/bulk/export_all.py).
 export-all --help
 
 Options:
-  --output-dir TEXT        Output directory.  [required]
-  --notebook-formats TEXT  Databricks notebook formats. Values are SOURCE,
-                           HTML, JUPYTER or DBC (comma seperated).
-  --use-threads BOOLEAN    Process in parallel using threads. Experimental:
-                           needs improved logging.  [default: False]
+  --output-dir TEXT               Output directory.  [required]
+  --export-latest-versions BOOLEAN
+                                  Export latest registered model versions
+                                  instead of all versions.  [default: False]
+  --notebook-formats TEXT         Databricks notebook formats. Values are
+                                  SOURCE, HTML, JUPYTER or DBC (comma
+                                  seperated).
+  --use-threads BOOLEAN           Process in parallel using threads.
+                                  Experimental: needs improved logging.
+                                  [default: False]
 ```
 #### Example
 
