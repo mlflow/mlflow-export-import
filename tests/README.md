@@ -29,4 +29,11 @@ Failed Databricks Tests:
 
 ## Setup
 
-See [Setup](../README.md#Setup) section.
+Since the testing environment requires the tracking server (unlike the root setup.py which uses the `mlflow-skinny` package),
+we need a separate environment which installs the `mlflow` package.
+
+```
+conda env create conda.yaml
+conda activate mlflow-export-import-test
+```
+
