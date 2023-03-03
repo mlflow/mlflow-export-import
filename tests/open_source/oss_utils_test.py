@@ -1,6 +1,6 @@
 import shortuuid
+import time
 import mlflow
-##import mlflow.sklearn
 import sklearn_utils
 from mlflow_export_import.common import model_utils
 from mlflow.utils.mlflow_tags import MLFLOW_RUN_NOTE # NOTE: ""mlflow.note.content" - used for Experiment Description too!
@@ -12,6 +12,10 @@ print("MLflow version:", mlflow.__version__)
 def init_output_dirs(output_dir):
     utils_test.create_output_dir(output_dir)
     return utils_test.create_run_artifact_dirs(output_dir)
+
+
+def now():
+    return round(time.time())
 
 
 def mk_uuid():
@@ -107,3 +111,17 @@ def create_dst_experiment_name(experiment_name):
 
 def create_dst_model_name(model_name):
     return model_name
+
+# == Simple create experiment
+
+_exp_count = 0
+
+def create_simple_experiment(client):
+    global _exp_count
+    exp_name = f"test_exp_{now()}_{_exp_count}"
+    _exp_count += 1
+    mlflow.set_experiment(exp_name)
+    exp = client.get_experiment_by_name(exp_name)
+    for run in client.search_runs(exp.experiment_id):
+        client.delete_run(run.info.run_id)
+    return exp

@@ -5,7 +5,7 @@ See: https://www.mlflow.org/docs/latest/rest-api.html#request-limits.
 
 import mlflow
 from mlflow.utils.validation import MAX_PARAMS_TAGS_PER_BATCH, MAX_METRICS_PER_BATCH
-from oss_utils_test import create_experiment, create_dst_experiment_name
+from oss_utils_test import create_experiment, create_dst_experiment_name, now
 from compare_utils import compare_runs
 from mlflow.entities import Metric, Param, RunTag
 from mlflow_export_import.run.export_run import RunExporter
@@ -71,10 +71,8 @@ def _create_run(client, num_params=None, num_metrics=None, num_tags=None):
         client.log_batch(run.info.run_id, params=params0)
         client.log_batch(run.info.run_id, params=params1)
     if num_metrics:
-        import time
-        now = round(time.time())
-        metrics0 = [ Metric(f"m0_{j:>04d}", 0.87, now, 0) for j in range(0,MAX_METRICS_PER_BATCH) ]
-        metrics1 = [ Metric(f"m1_{j:>04d}", 0.87, now, 0) for j in range(0,num_metrics) ]
+        metrics0 = [ Metric(f"m0_{j:>04d}", 0.87, now(), 0) for j in range(0,MAX_METRICS_PER_BATCH) ]
+        metrics1 = [ Metric(f"m1_{j:>04d}", 0.87, now(), 0) for j in range(0,num_metrics) ]
         client.log_batch(run.info.run_id, metrics=metrics0)
         client.log_batch(run.info.run_id, metrics=metrics1)
     if num_tags:

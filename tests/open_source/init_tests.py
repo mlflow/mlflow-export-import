@@ -9,7 +9,7 @@ print("mlflow.tracking_uri:",mlflow.tracking.get_tracking_uri())
 
 uri_src = os.environ.get("MLFLOW_TRACKING_URI_SRC",None)
 print("MLFLOW_TRACKING_URI_SRC:",uri_src)
-assert uri_src
+assert uri_src,"Environment variable MLFLOW_TRACKING_URI_SRC must be set"
 client_src = mlflow.tracking.MlflowClient(uri_src)
 print("client_src:",client_src)
 
