@@ -1,6 +1,7 @@
 import os
 from mlflow.exceptions import RestException
 from mlflow_export_import.common import MlflowExportImportException
+from mlflow_export_import.common.iterators import SearchModelVersionsIterator
 
 
 def get_mlflow_host():
@@ -15,7 +16,7 @@ def get_mlflow_host_token():
     if uri is not None and not uri.startswith("databricks"):
         return (uri, None)
     try:
-        from mlflow_export_import.common import databricks_cli_utils
+        from mlflow_export_import.client import databricks_cli_utils
         toks = uri.split("//")
         profile = uri.split("//")[1] if len(toks) > 1 else None
         return databricks_cli_utils.get_host_token(profile)
@@ -72,8 +73,8 @@ def delete_experiment(mlflow_client, exp_id_or_name):
 
 
 def delete_model(mlflow_client, model_name):
-    versions = mlflow_client.search_model_versions(f"name = '{model_name}'")
-    print(f"Deleting {len(versions)} versions of model '{model_name}'")
+    versions = SearchModelVersionsIterator(mlflow_client, filter=f"name='{model_name}'")
+    print(f"Deleting model '{model_name}'")
     for vr in versions:
         if vr.current_stage == "None":
             mlflow_client.delete_model_version(model_name, vr.version)

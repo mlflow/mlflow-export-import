@@ -159,7 +159,7 @@ def test_extract_model_sklearn():
     assert model_path == "model/sklearn"
 
 
-def _test_extract_no_run_id():
+def test_extract_no_run_id():
     source = os.path.join(_local_path_base, "artifacts")
     try:
         _extract_model_path(source, "1215")

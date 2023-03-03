@@ -1,14 +1,15 @@
 import time
 from mlflow.exceptions import RestException
 from mlflow.entities.model_registry.model_version_status import ModelVersionStatus
+from mlflow_export_import.common.iterators import SearchModelVersionsIterator
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
 
 
 def delete_model(client, model_name, sleep_time=5):
     """ Delete a model and all its versions. """
     try:
-        versions = client.search_model_versions(f"name='{model_name}'") # TODO: handle page token
-        print(f"Deleting model '{model_name}' and {len(versions)} versions")
+        versions = SearchModelVersionsIterator(client, filter=f"name='{model_name}'")
+        print(f"Deleting model '{model_name}' and its versions")
         for v in versions:
             print(f"  version={v.version} status={v.status} stage={v.current_stage} run_id={v.run_id}")
             client.transition_model_version_stage (model_name, v.version, "Archived")
@@ -24,7 +25,8 @@ def list_model_versions(client, model_name, get_latest_versions=False):
     if get_latest_versions:
         return client.get_latest_versions(model_name)
     else:
-        return client.search_model_versions(f"name='{model_name}'")
+        return list(SearchModelVersionsIterator(client, filter=f"name='{model_name}'"))
+
 
 
 def wait_until_version_is_ready(client, model_name, model_version, sleep_time=1, iterations=100):
@@ -72,5 +74,5 @@ def dump_model_versions(client, model_name):
     """ Display as table 'latest' and 'all' registered model versions. """
     versions = client.get_latest_versions(model_name)
     show_versions(model_name, versions, "Latest")
-    versions = client.search_model_versions(f"name='{model_name}'")
-    show_versions(model_name, versions, "All")
+    versions = SearchModelVersionsIterator(client, filter=f"name='{model_name}'")
+    show_versions(model_name, list(versions), "All")

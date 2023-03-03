@@ -1,6 +1,7 @@
 import mlflow
 
 from mlflow_export_import.bulk import bulk_utils
+from mlflow_export_import.common.iterators import SearchModelVersionsIterator
 
 
 def get_experiments_runs_of_models(client, model_names, show_experiments=False, show_runs=False):
@@ -11,7 +12,7 @@ def get_experiments_runs_of_models(client, model_names, show_experiments=False, 
         print(f"  {model_name}")
     exps_and_runs = {}
     for model_name in model_names:
-        versions = client.search_model_versions(f"name='{model_name}'")
+        versions = SearchModelVersionsIterator(client, filter=f"name='{model_name}'")
         for vr in versions:
             try:
                 run = client.get_run(vr.run_id)
