@@ -48,7 +48,7 @@ def opt_export_latest_versions(function):
 
 def opt_input_dir(function):
     function = click.option("--input-dir",
-        help="Input path - directory",
+        help="Input directory",
         type=str,
         required=True
     )(function)
