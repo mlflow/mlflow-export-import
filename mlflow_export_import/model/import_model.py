@@ -189,9 +189,14 @@ class AllModelImporter(BaseModelImporter):
         print("Importing versions:")
         for vr in model_dct["versions"]:
             src_run_id = vr["run_id"]
-            dst_run_id = self.run_info_map[src_run_id].run_id
-            mlflow.set_experiment(vr["_experiment_name"])
-            self.import_version(model_name, vr, dst_run_id, sleep_time)
+            dst_run = self.run_info_map.get(src_run_id, None)
+            if not dst_run:
+                msg = { "model": model_name, "version": vr["version"], "stage": vr["current_stage"], "run_id": src_run_id }
+                print(f"ERROR: Cannot import model version {msg} since the source run_id was probably deleted.")
+            else:
+                dst_run_id = dst_run.run_id
+                mlflow.set_experiment(vr["_experiment_name"])
+                self.import_version(model_name, vr, dst_run_id, sleep_time)
         if verbose:
             model_utils.dump_model_versions(self.mlflow_client, model_name)
 
