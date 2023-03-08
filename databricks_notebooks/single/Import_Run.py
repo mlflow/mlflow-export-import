@@ -42,8 +42,14 @@ assert_widget(input_dir, "2. Input base directory")
 
 import mlflow
 from mlflow_export_import.run.import_run import RunImporter
-importer = RunImporter(mlflow.client.MlflowClient())
-run, _ = importer.import_run(experiment_name, input_dir)
+
+importer = RunImporter(
+    mlflow.client.MlflowClient()
+)
+run, _ = importer.import_run(
+    experiment_name, 
+    input_dir
+)
 run.info.run_id
 
 # COMMAND ----------
