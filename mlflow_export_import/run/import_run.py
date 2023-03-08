@@ -12,11 +12,14 @@ from mlflow.entities import RunStatus
 from mlflow.utils.validation import MAX_PARAMS_TAGS_PER_BATCH, MAX_METRICS_PER_BATCH
 from mlflow.utils.mlflow_tags import MLFLOW_PARENT_RUN_ID
 
+from mlflow_export_import.common.click_options import (
+    opt_input_dir,
+    opt_import_source_tags,
+    opt_experiment_name,
+    opt_use_src_user_id,
+    opt_dst_notebook_dir
+)
 from mlflow_export_import.common import utils
-
-from mlflow_export_import.common.click_options import opt_input_dir, opt_import_source_tags,\
-  opt_experiment_name, opt_use_src_user_id, opt_dst_notebook_dir
-
 from mlflow_export_import.common.filesystem import mk_local_path
 from mlflow_export_import.common.find_artifacts import find_artifacts
 from mlflow_export_import.client.http_client import DatabricksHttpClient
@@ -29,11 +32,12 @@ from mlflow_export_import.run import run_data_importer
 
 class RunImporter():
     def __init__(self, 
-            mlflow_client, 
-            import_source_tags=False,
-            mlmodel_fix=True, 
-            use_src_user_id=False, \
-            dst_notebook_dir_add_run_id=False):
+            mlflow_client,
+            import_source_tags = False,
+            mlmodel_fix = True,
+            use_src_user_id = False,
+            dst_notebook_dir_add_run_id = False
+        ):
         """ 
         :param mlflow_client: MLflow client.
         :param import_source_tags: Import source information for MLFlow objects and create tags in destination object.
@@ -57,17 +61,21 @@ class RunImporter():
         print(f"importing_into_databricks: {utils.importing_into_databricks()}")
 
 
-    def import_run(self, exp_name, input_dir, dst_notebook_dir=None):
+    def import_run(self, 
+            experiment_name,
+            input_dir,
+            dst_notebook_dir = None
+        ):
         """ 
         Imports a run into the specified experiment.
-        :param exp_name: Experiment name.
+        :param experiment_name: Experiment name.
         :param input_dir: Source input directory that contains the exported run.
         :param dst_notebook_dir: Databricks destination workpsace directory for notebook.
         :return: The run and its parent run ID if the run is a nested run.
         """
         print(f"Importing run from '{input_dir}'")
-        res = self._import_run(exp_name, input_dir, dst_notebook_dir)
-        print(f"Imported run into '{exp_name}/{res[0].info.run_id}'")
+        res = self._import_run(experiment_name, input_dir, dst_notebook_dir)
+        print(f"Imported run into '{experiment_name}/{res[0].info.run_id}'")
         return res
 
 
@@ -97,7 +105,7 @@ class RunImporter():
             ndir = os.path.join(dst_notebook_dir, run_id) if self.dst_notebook_dir_add_run_id else dst_notebook_dir
             self._upload_databricks_notebook(input_dir, src_run_dct, ndir)
 
-        return (run, src_run_dct["tags"].get(MLFLOW_PARENT_RUN_ID,None))
+        return (run, src_run_dct["tags"].get(MLFLOW_PARENT_RUN_ID, None))
 
 
     def _update_mlmodel_run_id(self, run_id):
@@ -190,6 +198,7 @@ class RunImporter():
     required=False,
     show_default=True
 )
+
 def main(input_dir, 
         experiment_name, 
         import_source_tags,
@@ -200,14 +209,19 @@ def main(input_dir,
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    client = mlflow.tracking.MlflowClient()
+    client = mlflow.client.MlflowClient()
     importer = RunImporter(
         client,
-        import_source_tags=import_source_tags,
-        mlmodel_fix=mlmodel_fix, 
-        use_src_user_id=use_src_user_id, 
-        dst_notebook_dir_add_run_id=dst_notebook_dir_add_run_id)
-    importer.import_run(experiment_name, input_dir, dst_notebook_dir)
+        import_source_tags = import_source_tags,
+        mlmodel_fix = mlmodel_fix, 
+        use_src_user_id = use_src_user_id, 
+        dst_notebook_dir_add_run_id = dst_notebook_dir_add_run_id
+    )
+    importer.import_run(
+        experiment_name = experiment_name, 
+        input_dir = input_dir, 
+        dst_notebook_dir = dst_notebook_dir
+    )
 
 
 if __name__ == "__main__":

@@ -76,5 +76,5 @@ def log_tags(client, run_dct, run_id, batch_size, import_source_tags, in_databri
 
 if __name__ == "__main__":
     import sys
-    client = mlflow.tracking.MlflowClient()
+    client = mlflow.client.MlflowClient()
     log_metrics(client, sys.argv[1],100)

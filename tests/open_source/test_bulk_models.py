@@ -1,18 +1,22 @@
 import os
-from oss_utils_test import mk_test_object_name_default, list_experiments, delete_experiments_and_models
-from compare_utils import compare_runs
-
 from mlflow_export_import.bulk.export_models import export_models
 from mlflow_export_import.bulk.import_models import import_all
 from mlflow_export_import.bulk import bulk_utils
-from test_bulk_experiments import create_test_experiment
+
 from init_tests import mlflow_context
+from compare_utils import compare_runs
+from test_bulk_experiments import create_test_experiment
+from oss_utils_test import (
+    mk_test_object_name_default,
+    list_experiments,
+    delete_experiments_and_models
+)
 
 # == Setup
 
-notebook_formats = "SOURCE,DBC"
-num_models = 2
-num_runs = 2
+_notebook_formats = "SOURCE,DBC"
+_num_models = 2
+_num_runs = 2
 
 # == Compare
 
@@ -37,7 +41,7 @@ def compare_models_with_versions(mlflow_context, compare_func):
 # == Helper methods
 
 def create_model(client):
-    exp = create_test_experiment(client, num_runs)
+    exp = create_test_experiment(client, _num_runs)
     model_name = mk_test_object_name_default()
     model = client.create_registered_model(model_name)
     for run in client.search_runs([exp.experiment_id]):
@@ -47,14 +51,15 @@ def create_model(client):
 
 def _run_test(mlflow_context, compare_func, use_threads=False):
     delete_experiments_and_models(mlflow_context)
-    model_names = [ create_model(mlflow_context.client_src) for j in range(0,num_models) ]
-    export_models(mlflow_context.client_src,
-        model_names, 
-        mlflow_context.output_dir, 
-        notebook_formats, 
-        stages="None", 
-        export_all_runs=False, 
-        use_threads=False)
+    model_names = [ create_model(mlflow_context.client_src) for j in range(0, _num_models) ]
+    export_models(
+        mlflow_client = mlflow_context.client_src,
+        model_names = model_names, 
+        output_dir = mlflow_context.output_dir, 
+        notebook_formats = _notebook_formats, 
+        stages = "None", 
+        export_all_runs = False, 
+        use_threads = False)
 
     import_all(mlflow_context.client_dst,
         mlflow_context.output_dir,

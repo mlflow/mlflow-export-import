@@ -7,7 +7,7 @@ import time
 import click
 import mlflow
 
-from mlflow_export_import.common.click_options import(
+from mlflow_export_import.common.click_options import (
     opt_output_dir, 
     opt_notebook_formats, 
     opt_use_threads, 
@@ -20,23 +20,30 @@ from mlflow_export_import.bulk.export_experiments import export_experiments
 ALL_STAGES = "Production,Staging,Archived,None" 
 
 
-def export_all(output_dir, export_latest_versions=False, notebook_formats=None, use_threads=False):
+def export_all(
+        mlflow_client, 
+        output_dir, 
+        export_latest_versions = False, 
+        notebook_formats = None, 
+        use_threads = False
+    ):
     start_time = time.time()
-    client = mlflow.tracking.MlflowClient()
     res_models = export_models(
-        client,
-        model_names="all", 
-        output_dir=output_dir,
-        notebook_formats=notebook_formats, 
-        stages=ALL_STAGES, 
-        export_latest_versions=export_latest_versions,
-        use_threads=use_threads)
+        mlflow_client = mlflow_client,
+        model_names = "all", 
+        output_dir = output_dir,
+        notebook_formats = notebook_formats, 
+        stages = ALL_STAGES, 
+        export_latest_versions = export_latest_versions,
+        use_threads = use_threads
+    )
     res_exps = export_experiments(
-        client,
-        experiments="all",
-        output_dir=os.path.join(output_dir,"experiments"),
-        notebook_formats=notebook_formats,
-        use_threads=use_threads)
+        mlflow_client = mlflow_client,
+        experiments = "all",
+        output_dir = os.path.join(output_dir,"experiments"),
+        notebook_formats = notebook_formats,
+        use_threads = use_threads
+    )
     duration = round(time.time() - start_time, 1)
 
     info_attr = {
@@ -57,11 +64,17 @@ def export_all(output_dir, export_latest_versions=False, notebook_formats=None, 
 @opt_export_latest_versions
 @opt_notebook_formats
 @opt_use_threads
+
 def main(output_dir, export_latest_versions, notebook_formats, use_threads):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    export_all(output_dir, export_latest_versions, notebook_formats, use_threads)
+    export_all(
+        mlflow_client = mlflow.client.MlflowClient(),
+        output_dir = output_dir, 
+        export_latest_versions = export_latest_versions, 
+        notebook_formats = notebook_formats, 
+        use_threads = use_threads)
 
 
 if __name__ == "__main__":

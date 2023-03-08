@@ -17,7 +17,10 @@ from mlflow_export_import.run.export_run import RunExporter
 
 class ExperimentExporter():
 
-    def __init__(self, mlflow_client, notebook_formats=None):
+    def __init__(self, 
+            mlflow_client, 
+            notebook_formats = None
+        ):
         """
         :param mlflow_client: MLflow client.
         :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
@@ -26,14 +29,18 @@ class ExperimentExporter():
         self.run_exporter = RunExporter(self.mlflow_client, notebook_formats=notebook_formats)
 
 
-    def export_experiment(self, exp_id_or_name, output_dir, run_ids=None):
+    def export_experiment(self, 
+            experiment_id_or_name, 
+            output_dir, 
+            run_ids = None
+        ):
         """
-        :param exp_id_or_name: Experiment ID or name.
+        :param experiment_id_or_name: Experiment ID or name.
         :param output_dir: Output directory.
         :param run_ids: List of run IDs to export. If None export all run IDs.
         :return: Number of successful and number of failed runs.
         """
-        exp = mlflow_utils.get_experiment(self.mlflow_client, exp_id_or_name)
+        exp = mlflow_utils.get_experiment(self.mlflow_client, experiment_id_or_name)
         print(f"Exporting experiment '{exp.name}' (ID {exp.experiment_id}) to '{output_dir}'")
         ok_run_ids = []
         failed_run_ids = []
@@ -83,15 +90,20 @@ class ExperimentExporter():
 @opt_experiment
 @opt_output_dir
 @opt_notebook_formats
+
 def main(experiment, output_dir, notebook_formats):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    client = mlflow.tracking.MlflowClient()
+    client = mlflow.client.MlflowClient()
     exporter = ExperimentExporter(
-        client,
-        notebook_formats=utils.string_to_list(notebook_formats))
-    exporter.export_experiment(experiment, output_dir)
+        mlflow_client = client,
+        notebook_formats = utils.string_to_list(notebook_formats)
+    )
+    exporter.export_experiment(
+        experiment_id_or_name = experiment, 
+        output_dir = output_dir
+    )
 
 
 if __name__ == "__main__":

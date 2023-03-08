@@ -9,8 +9,9 @@ import mlflow
 INDENT = "  "
 MAX_LEVEL = 1
 TS_FORMAT = "%Y-%m-%d_%H:%M:%S"
-client = mlflow.tracking.MlflowClient()
+client = mlflow.client.MlflowClient()
 print("MLflow Tracking URI:", mlflow.get_tracking_uri())
+
 
 def dump_run(run, max_level=1, indent=""):
     dump_run_info(run.info,indent)
@@ -27,10 +28,12 @@ def dump_run(run, max_level=1, indent=""):
     num_bytes, num_artifacts = dump_artifacts(run.info.run_id, "", 0, max_level, indent+INDENT)
     print(f"{indent}Total: bytes: {num_bytes} artifacts: {num_artifacts}")
     return run, num_bytes, num_artifacts
+
         
 def dump_run_id(run_id, max_level=1, indent=""):
     run = client.get_run(run_id)
     return dump_run(run,max_level,indent)
+
 
 def dump_run_info(info, indent=""):
     print("{}RunInfo:".format(indent))
@@ -48,6 +51,7 @@ def dump_run_info(info, indent=""):
         dur = float(end - start)/1000
         print("{}  _duration:  {} seconds".format(indent,dur))
 
+
 def _dump_time(info, k, indent=""):
     v = info.__dict__.get(k,None)
     if v is None:
@@ -56,6 +60,7 @@ def _dump_time(info, k, indent=""):
         stime = time.strftime(TS_FORMAT,time.gmtime(v/1000))
         print("{}  {:<11} {}   {}".format(indent,k[1:]+":",stime,v))
     return v
+
 
 def dump_artifacts(run_id, path, level, max_level, indent):
     if level+1 > max_level: 
@@ -75,6 +80,7 @@ def dump_artifacts(run_id, path, level, max_level, indent):
             num_artifacts += 1
     return num_bytes,num_artifacts
 
+
 @click.command()
 @click.option("--run-id", help="Run ID.", required=True)
 @click.option("--artifact-max-level", help="Number of artifact levels to recurse.", default=1, type=int)
@@ -83,6 +89,7 @@ def main(run_id, artifact_max_level):
     print("Options:")
     for k,v in locals().items(): print(f"  {k}: {v}")
     dump_run_id(run_id, artifact_max_level)
+
 
 if __name__ == "__main__":
     main()

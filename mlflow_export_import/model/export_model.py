@@ -6,19 +6,34 @@ import os
 import click
 import mlflow
 
-from mlflow_export_import.common import utils
-from mlflow_export_import.common import io_utils
-from mlflow_export_import.common.click_options import opt_model, opt_output_dir, \
-    opt_notebook_formats, opt_stages, opt_versions, opt_export_latest_versions
+from mlflow_export_import.common.click_options import (
+    opt_model,
+    opt_output_dir,
+    opt_notebook_formats,
+    opt_stages,
+    opt_versions,
+    opt_export_latest_versions
+)
+from mlflow_export_import.common import (
+    utils,
+    io_utils,
+    model_utils 
+)
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.client.http_client import MlflowHttpClient
-from mlflow_export_import.common import model_utils 
 from mlflow_export_import.run.export_run import RunExporter
 
 
 class ModelExporter():
 
-    def __init__(self,  mlflow_client, notebook_formats=None, stages=None, versions=None, export_run=True, export_latest_versions=False):
+    def __init__(self, 
+            mlflow_client, 
+            notebook_formats = None, 
+            stages = None, 
+            versions = None, 
+            export_run = True, 
+            export_latest_versions = False
+        ):
         """
         :param mlflow_client: MlflowClient
         :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
@@ -38,7 +53,10 @@ class ModelExporter():
                 f"Both stages {self.stages} and versions {self.versions} cannot be set", http_status_code=400)
 
 
-    def export_model(self, model_name, output_dir):
+    def export_model(self, 
+            model_name, 
+            output_dir
+        ):
         """
         :param model_name: Registered model name.
         :param output_dir: Output directory.
@@ -133,19 +151,24 @@ class ModelExporter():
 @opt_stages
 @opt_versions
 @opt_export_latest_versions
+
 def main(model, output_dir, notebook_formats, stages, versions, export_latest_versions):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    mlflow_client = mlflow.client.MlflowClient()
     versions = versions.split(",") if versions else []
-    exporter = ModelExporter(mlflow_client, 
-       notebook_formats=utils.string_to_list(notebook_formats), 
-       stages=stages, 
-       versions=versions, 
-       export_latest_versions=export_latest_versions
+
+    exporter = ModelExporter(
+       mlflow_client = mlflow.client.MlflowClient(),
+       notebook_formats = utils.string_to_list(notebook_formats), 
+       stages = stages, 
+       versions = versions, 
+       export_latest_versions = export_latest_versions
     )
-    exporter.export_model(model, output_dir)
+    exporter.export_model(
+        model_name = model, 
+        output_dir = output_dir
+    )
 
 
 if __name__ == "__main__":
