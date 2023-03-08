@@ -32,8 +32,13 @@ assert_widget(input_dir, "2. Input directory")
 
 from mlflow_export_import.experiment.import_experiment import ExperimentImporter
 
-importer = ExperimentImporter(mlflow.client.MlflowClient())
-importer.import_experiment(experiment_name, input_dir)
+importer = ExperimentImporter(
+    mlflow_client = mlflow.client.MlflowClient()
+)
+importer.import_experiment(
+    experiment_name = experiment_name, 
+    input_dir = input_dir
+)
 
 # COMMAND ----------
 
