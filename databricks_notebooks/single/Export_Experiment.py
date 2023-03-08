@@ -14,7 +14,6 @@
 # MAGIC +-d2309e6c74dc4679b576a37abf6b6af8/
 # MAGIC | +-run.json
 # MAGIC | +-artifacts/
-# MAGIC |   +-plot.png
 # MAGIC |   +-sklearn-model/
 # MAGIC |   | +-model.pkl
 # MAGIC |   | +-conda.yaml
@@ -60,8 +59,8 @@ assert_widget(output_dir, "2. Output base directory")
 import mlflow
 from mlflow_export_import.common import mlflow_utils 
 
-client = mlflow.client.MlflowClient()
-experiment = mlflow_utils.get_experiment(client, experiment_id_or_name)
+mlflow_client = mlflow.client.MlflowClient()
+experiment = mlflow_utils.get_experiment(mlflow_client, experiment_id_or_name)
 output_dir = f"{output_dir}/{experiment.experiment_id}"
 print("experiment_id:", experiment.experiment_id)
 print("experiment_name:", experiment.name)       
@@ -95,11 +94,11 @@ dbutils.fs.rm(output_dir, False)
 from mlflow_export_import.experiment.export_experiment import ExperimentExporter
 
 exporter = ExperimentExporter(
-    client, 
+    mlflow_client = mlflow_client,
     notebook_formats = notebook_formats)
 
 exporter.export_experiment(
-    exp_id_or_name = experiment.experiment_id, 
+    experiment_id_or_name = experiment.experiment_id, 
     output_dir = output_dir)
 
 # COMMAND ----------
