@@ -1,9 +1,7 @@
 # Databricks notebook source
 # MAGIC %md ## MLflow Export Import - Single Notebooks
 # MAGIC 
-# MAGIC * Transitively export an MLflow object and specify its destination object name.
-# MAGIC * By transitively we mean export other linked objects to maintain referential integrity and reproducibility. 
-# MAGIC * For example, when we export a registered model we also export the runs its versions are linked to and also the experiment that the runs belong to.
+# MAGIC * Export and import one MLflow object and specify its destination name.
 # MAGIC 
 # MAGIC **Notebooks**
 # MAGIC * Run
@@ -23,4 +21,4 @@
 
 # COMMAND ----------
 
-# MAGIC %md Last updated: 2023-03-08
+# MAGIC %md Last updated: 2023-03-09
