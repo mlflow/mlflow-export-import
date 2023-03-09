@@ -1,7 +1,9 @@
 # Databricks notebook source
 # MAGIC %sh 
 # MAGIC #pip install mlflow-export-import
-# MAGIC pip install git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
+# MAGIC #pip install git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
+# MAGIC 
+# MAGIC pip install /dbfs/home/andre.mesarovic@databricks.com/lib/wheels/mlflow_export_import-1.2.0-py3-none-any.whl
 
 # COMMAND ----------
 

@@ -98,8 +98,9 @@ exporter = ExperimentExporter(
     notebook_formats = notebook_formats)
 
 exporter.export_experiment(
-    experiment_id_or_name = experiment.experiment_id, 
-    output_dir = output_dir)
+    experiment_id_or_name = experiment.experiment_id,  
+    output_dir = output_dir
+  )
 
 # COMMAND ----------
 
@@ -122,7 +123,7 @@ output_dir
 
 # COMMAND ----------
 
-# MAGIC %sh cat $OUTPUT_DIR/manifest.json
+# MAGIC %sh cat $OUTPUT_DIR/experiment.json
 
 # COMMAND ----------
 

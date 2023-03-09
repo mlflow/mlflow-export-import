@@ -7,10 +7,10 @@
 # MAGIC * See notebook [Export_Model]($Export_Model).
 # MAGIC 
 # MAGIC ##### Widgets
-# MAGIC * Model - new registered model name.
-# MAGIC * Experiment name - contains runs created for model versions.
-# MAGIC * Input directory - Input directory containing the exported model.
-# MAGIC * Delete model - delete model and its versions before importing.
+# MAGIC * `1. Model name` - new registered model name.
+# MAGIC * `2. Destination experiment name` - contains runs created for model versions.
+# MAGIC * `3. Input directory` - Input directory containing the exported model.
+# MAGIC * `4. Delete model` - delete model and its versions before importing.
 # MAGIC 
 # MAGIC #### Limitations
 # MAGIC * There is a bug where you cannot create a model with the same name as a deleted model.
@@ -56,11 +56,11 @@ assert_widget(input_dir, "3. Input directory")
 
 # COMMAND ----------
 
-# MAGIC %sh ls -l $INPUT_DIR
+# MAGIC %sh cat $INPUT_DIR/model.json
 
 # COMMAND ----------
 
-# MAGIC %sh cat $INPUT_DIR/model.json
+# MAGIC %sh ls -l $INPUT_DIR
 
 # COMMAND ----------
 
@@ -69,8 +69,9 @@ assert_widget(input_dir, "3. Input directory")
 # COMMAND ----------
 
 from mlflow_export_import.model.import_model import ModelImporter
+
 importer = ModelImporter(
-    mlflow.client.MlflowClient()
+  mlflow_client = mlflow.client.MlflowClient()
 )
 importer.import_model(
     model_name =model_name, 

@@ -21,10 +21,10 @@
 # MAGIC ```
 # MAGIC 
 # MAGIC ##### Widgets
-# MAGIC * Model - Registered model name.
-# MAGIC * Output base directory - Base output directory to which the model name will be appended to.
-# MAGIC * Notebook formats to export.
-# MAGIC * Stages to export.
+# MAGIC * `1. Model` - Registered model name to export.
+# MAGIC * `2. Output base directory` - Base output directory to which the model name will be appended to.
+# MAGIC * `3. Notebook formats` - Notebook formats to export.
+# MAGIC * `4. Stages` - Model version stages to export.
 # MAGIC 
 # MAGIC #### Setup
 # MAGIC * See Setup in [README]($./_README).
@@ -86,11 +86,16 @@ display_registered_model_uri(model_name)
 # COMMAND ----------
 
 from mlflow_export_import.model.export_model import ModelExporter
+
 exporter = ModelExporter(
-    mlflow.client.MlflowClient(),
+    mlflow_client = mlflow.client.MlflowClient(),
     notebook_formats = notebook_formats, 
-    stages = stages)
-exporter.export_model(model_name, output_dir)
+    stages = stages
+)
+exporter.export_model(
+    model_name = model_name, 
+    output_dir = output_dir
+)
 
 # COMMAND ----------
 
