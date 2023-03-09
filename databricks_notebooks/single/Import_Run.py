@@ -1,22 +1,23 @@
 # Databricks notebook source
 # MAGIC %md ## Import Run
 # MAGIC 
-# MAGIC Import run from folder that was created by [Export_Run]($Export_Run) notebook.
+# MAGIC Import run from the folder that was created by the [Export_Run]($Export_Run) notebook.
 # MAGIC 
 # MAGIC #### Widgets
-# MAGIC * Destination experiment name - Import run into this experiment. Will create if it doesn't exist.
-# MAGIC * Input directory - DBFS nput directory containing an exported run.
-# MAGIC 
-# MAGIC #### Setup
-# MAGIC * See Setup in [README]($./_README).
+# MAGIC * `1. Destination experiment name` - Import run into this experiment. Will create if it doesn't exist.
+# MAGIC * `2. Input directory` - Input directory containing an exported run.
 
 # COMMAND ----------
 
-# MAGIC %md ### Setup
+# MAGIC %md ### Include setup
 
 # COMMAND ----------
 
 # MAGIC %run ./Common
+
+# COMMAND ----------
+
+# MAGIC %md ### Widget setup
 
 # COMMAND ----------
 
@@ -44,17 +45,17 @@ import mlflow
 from mlflow_export_import.run.import_run import RunImporter
 
 importer = RunImporter(
-    mlflow.client.MlflowClient()
+    mlflow_client = mlflow.client.MlflowClient()
 )
 run, _ = importer.import_run(
-    experiment_name, 
-    input_dir
+    experiment_name = experiment_name, 
+    input_dir = input_dir
 )
 run.info.run_id
 
 # COMMAND ----------
 
-# MAGIC %md ### Display MLflow UI URIs
+# MAGIC %md ### Display run link in MLflow UI
 
 # COMMAND ----------
 

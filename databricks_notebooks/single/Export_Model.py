@@ -25,17 +25,18 @@
 # MAGIC * `2. Output base directory` - Base output directory to which the model name will be appended to.
 # MAGIC * `3. Notebook formats` - Notebook formats to export.
 # MAGIC * `4. Stages` - Model version stages to export.
-# MAGIC 
-# MAGIC #### Setup
-# MAGIC * See Setup in [README]($./_README).
 
 # COMMAND ----------
 
-# MAGIC %md ### Setup
+# MAGIC %md ### Include setup
 
 # COMMAND ----------
 
 # MAGIC %run ./Common
+
+# COMMAND ----------
+
+# MAGIC %md ### Widget setup
 
 # COMMAND ----------
 

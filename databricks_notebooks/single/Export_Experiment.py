@@ -2,7 +2,7 @@
 # MAGIC %md ### Export Experiment
 # MAGIC 
 # MAGIC #### Overview
-# MAGIC * Exports an experiment and its runs (artifacts too) to a DBFS directory.
+# MAGIC * Exports an experiment and its runs (artifacts too) to a directory.
 # MAGIC * Output file `experiment.json` contains top-level experiment metadata.
 # MAGIC * Each run and its artifacts are stored as a sub-directory whose name is that of the run_id.
 # MAGIC * Notebooks can be exported in several formats.
@@ -31,11 +31,15 @@
 
 # COMMAND ----------
 
-# MAGIC %md ### Setup
+# MAGIC %md ### Include setup
 
 # COMMAND ----------
 
 # MAGIC %run ./Common
+
+# COMMAND ----------
+
+# MAGIC %md ### Widget setup
 
 # COMMAND ----------
 
@@ -59,7 +63,6 @@ assert_widget(output_dir, "2. Output base directory")
 import mlflow
 from mlflow_export_import.common import mlflow_utils 
 
-mlflow_client = mlflow.client.MlflowClient()
 experiment = mlflow_utils.get_experiment(mlflow_client, experiment_id_or_name)
 output_dir = f"{output_dir}/{experiment.experiment_id}"
 print("experiment_id:", experiment.experiment_id)
@@ -68,22 +71,11 @@ print("output_dir:", output_dir)
 
 # COMMAND ----------
 
-# MAGIC %md ### Display MLflow UI URI of Experiment
+# MAGIC %md ### Display the Experiment link in MLflow UI
 
 # COMMAND ----------
 
 display_experiment_uri(experiment.name)
-
-# COMMAND ----------
-
-# MAGIC %md ### Remove any previous exported experiment data
-# MAGIC 
-# MAGIC Note: may be a bit finicky (S3 eventual consistency). Just try the remove again if subsequent export fails.
-
-# COMMAND ----------
-
-dbutils.fs.rm(output_dir, True)
-dbutils.fs.rm(output_dir, False)
 
 # COMMAND ----------
 
@@ -131,12 +123,12 @@ output_dir
 
 # COMMAND ----------
 
-find_run_dir(output_dir, "RUN_DIR", "manifest.json")
+# find_run_dir(output_dir, "RUN_DIR", "experiment.json")
 
 # COMMAND ----------
 
 import glob
-files = [f for f in glob.glob(f"{output_dir}/*") if not f.endswith("manifest.json")]
+files = [f for f in glob.glob(f"{output_dir}/*") if not f.endswith("experiment.json")]
 os.environ['RUN_DIR'] = files[0]
 files[0]
 

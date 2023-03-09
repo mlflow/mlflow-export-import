@@ -2,15 +2,23 @@
 # MAGIC %md ### Import Experiment
 # MAGIC 
 # MAGIC **Widgets**
-# MAGIC * Input directory - DBFS input directory containing an exported experiment.
-# MAGIC * Destination experiment name - Will create if it doesn't exist.
+# MAGIC * Input directory - Input directory containing an exported experiment.
+# MAGIC * Destination experiment name - will create if it doesn't exist.
 # MAGIC 
 # MAGIC #### Setup
 # MAGIC * See the Setup section in [README]($./_README).
 
 # COMMAND ----------
 
+# MAGIC %md ### Include setup
+
+# COMMAND ----------
+
 # MAGIC %run ./Common
+
+# COMMAND ----------
+
+# MAGIC %md ### Widget setup
 
 # COMMAND ----------
 
@@ -31,6 +39,10 @@ assert_widget(input_dir, "2. Input directory")
 
 # COMMAND ----------
 
+# MAGIC %md ### Export experiment
+
+# COMMAND ----------
+
 from mlflow_export_import.experiment.import_experiment import ExperimentImporter
 
 importer = ExperimentImporter(
@@ -40,6 +52,10 @@ importer.import_experiment(
     experiment_name = experiment_name, 
     input_dir = input_dir
 )
+
+# COMMAND ----------
+
+# MAGIC %md ### Display the Experiment link in MLflow UI
 
 # COMMAND ----------
 

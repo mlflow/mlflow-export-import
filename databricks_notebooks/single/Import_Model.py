@@ -14,13 +14,18 @@
 # MAGIC 
 # MAGIC #### Limitations
 # MAGIC * There is a bug where you cannot create a model with the same name as a deleted model.
-# MAGIC 
-# MAGIC #### Setup
-# MAGIC * See Setup in [README]($./_README).
+
+# COMMAND ----------
+
+# MAGIC %md ### Include setup
 
 # COMMAND ----------
 
 # MAGIC %run ./Common
+
+# COMMAND ----------
+
+# MAGIC %md ### Widget setup
 
 # COMMAND ----------
 
@@ -82,7 +87,7 @@ importer.import_model(
 
 # COMMAND ----------
 
-# MAGIC %md ### Display MLflow UI URIs
+# MAGIC %md ### Display object links in MLflow UI
 
 # COMMAND ----------
 
