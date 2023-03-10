@@ -21,13 +21,9 @@
 # MAGIC ```
 # MAGIC 
 # MAGIC ##### Widgets
-# MAGIC * Experiment ID or name - Either the experiment ID or experiment name.
-# MAGIC * Output base directory - Base output folder of the exported experiment. All the experiment data will be saved here under the experiment ID folder.	
-# MAGIC * Notebook formats:
-# MAGIC   * Standard Databricks notebook formats such as SOURCE, HTML, JUPYTER, DBC. See [Databricks Export Format](https://docs.databricks.com/dev-tools/api/latest/workspace.html#notebookexportformat) documentation.
-# MAGIC 
-# MAGIC #### Setup
-# MAGIC * See Setup in [README]($./_README).
+# MAGIC * `1. Experiment ID or name` - Either the experiment ID or experiment name.
+# MAGIC * `2. Output base directory` - Base output directory of the exported experiment. All the experiment data will be saved here under the experiment ID sub-directory.	
+# MAGIC * `3. Notebook formats` - Standard Databricks notebook formats such as SOURCE, HTML, JUPYTER, DBC. See [Databricks Export Format](https://docs.databricks.com/dev-tools/api/latest/workspace.html#notebookexportformat) documentation.
 
 # COMMAND ----------
 
@@ -59,12 +55,14 @@ print("notebook_formats:", notebook_formats)
 
 assert_widget(experiment_id_or_name, "1. Experiment ID or Name")
 assert_widget(output_dir, "2. Output base directory")
-  
-import mlflow
+
+# COMMAND ----------
+
 from mlflow_export_import.common import mlflow_utils 
 
 experiment = mlflow_utils.get_experiment(mlflow_client, experiment_id_or_name)
 output_dir = f"{output_dir}/{experiment.experiment_id}"
+
 print("experiment_id:", experiment.experiment_id)
 print("experiment_name:", experiment.name)       
 print("output_dir:", output_dir)
@@ -87,16 +85,16 @@ from mlflow_export_import.experiment.export_experiment import ExperimentExporter
 
 exporter = ExperimentExporter(
     mlflow_client = mlflow_client,
-    notebook_formats = notebook_formats)
-
+    notebook_formats = notebook_formats
+  )
 exporter.export_experiment(
     experiment_id_or_name = experiment.experiment_id,  
     output_dir = output_dir
-  )
+)
 
 # COMMAND ----------
 
-# MAGIC %md ### Display  exported experiment files
+# MAGIC %md ### Display exported experiment files
 
 # COMMAND ----------
 

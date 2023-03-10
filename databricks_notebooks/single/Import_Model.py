@@ -41,6 +41,9 @@ input_dir = dbutils.widgets.get("3. Input directory")
 dbutils.widgets.dropdown("4. Delete model","no",["yes","no"])
 delete_model = dbutils.widgets.get("4. Delete model") == "yes"
 
+dbutils.widgets.dropdown("5. Import source tags","no",["yes","no"])
+import_source_tags = dbutils.widgets.get("5. Import source tags") == "yes"
+
 import os
 os.environ["INPUT_DIR"] = input_dir.replace("dbfs:","/dbfs")
 
@@ -48,6 +51,7 @@ print("model_name:", model_name)
 print("input_dir:", input_dir)
 print("experiment_name:", experiment_name)
 print("delete_model:", delete_model)
+print("import_source_tags:", import_source_tags)
 
 # COMMAND ----------
 
@@ -76,7 +80,8 @@ assert_widget(input_dir, "3. Input directory")
 from mlflow_export_import.model.import_model import ModelImporter
 
 importer = ModelImporter(
-  mlflow_client = mlflow.client.MlflowClient()
+  mlflow_client = mlflow_client,
+  import_source_tags = import_source_tags
 )
 importer.import_model(
     model_name =model_name, 

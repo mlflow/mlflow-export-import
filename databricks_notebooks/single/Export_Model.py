@@ -6,25 +6,12 @@
 # MAGIC * Output file `model.json` contains model metadata.
 # MAGIC * Each run and its artifacts are stored as a sub-directory.
 # MAGIC 
-# MAGIC #### Output folder structure
-# MAGIC 
-# MAGIC ```
-# MAGIC +-model.json
-# MAGIC +-d2309e6c74dc4679b576a37abf6b6af8/
-# MAGIC | +-run.json
-# MAGIC | +-artifacts/
-# MAGIC |   +-plot.png
-# MAGIC |   +-sklearn-model/
-# MAGIC |   | +-model.pkl
-# MAGIC |   | +-conda.yaml
-# MAGIC |   | +-MLmodel
-# MAGIC ```
-# MAGIC 
 # MAGIC ##### Widgets
 # MAGIC * `1. Model` - Registered model name to export.
 # MAGIC * `2. Output base directory` - Base output directory to which the model name will be appended to.
 # MAGIC * `3. Notebook formats` - Notebook formats to export.
 # MAGIC * `4. Stages` - Model version stages to export.
+# MAGIC * `5. Export latest versions`
 
 # COMMAND ----------
 
@@ -46,7 +33,7 @@ model_name = dbutils.widgets.get("1. Model")
 dbutils.widgets.text("2. Output base directory", "") 
 output_dir = dbutils.widgets.get("2. Output base directory")
 
-notebook_formats = get_notebook_formats(3)
+notebook_formats = get_notebook_formats(3) # widget "3.Notebook formats"
 
 all_stages = [ "All", "Production", "Staging", "Archived", "None" ]
 dbutils.widgets.multiselect("4. Stages", all_stages[0], all_stages)
@@ -57,10 +44,14 @@ else:
     stages = stages.split(",")
     if "" in stages: stages.remove("")
 
+dbutils.widgets.dropdown("5. Export latest versions","no",["yes","no"])
+export_latest_versions = dbutils.widgets.get("5. Export latest versions") == "yes"
+
 print("model_name:", model_name)
 print("output_dir:", output_dir)
 print("notebook_formats:", notebook_formats)
 print("stages:", stages)
+print("export_latest_versions:", export_latest_versions)
 
 # COMMAND ----------
 
@@ -89,9 +80,11 @@ display_registered_model_uri(model_name)
 from mlflow_export_import.model.export_model import ModelExporter
 
 exporter = ModelExporter(
-    mlflow_client = mlflow.client.MlflowClient(),
+    mlflow_client = mlflow_client,
+    stages = stages,
+    #versions = versions, # TODO
+    export_latest_versions = export_latest_versions,
     notebook_formats = notebook_formats, 
-    stages = stages
 )
 exporter.export_model(
     model_name = model_name, 

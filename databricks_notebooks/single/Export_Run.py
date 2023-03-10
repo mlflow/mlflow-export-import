@@ -18,9 +18,8 @@
 # MAGIC 
 # MAGIC ##### Widgets
 # MAGIC * `1. Run ID` 
-# MAGIC * `2. Output base directory` - Base output folder of the exported run.
-# MAGIC * `3. Notebook formats`:
-# MAGIC   * Standard Databricks notebook formats such as SOURCE, HTML, JUPYTER, DBC. 
+# MAGIC * `2. Output base directory` - Base output directory of the exported run.
+# MAGIC * `3. Notebook formats` - Standard Databricks notebook formats such as SOURCE, HTML, JUPYTER, DBC. 
 # MAGIC   * See [Databricks Export Format](https://docs.databricks.com/dev-tools/api/latest/workspace.html#notebookexportformat)  documentation.
 
 # COMMAND ----------
