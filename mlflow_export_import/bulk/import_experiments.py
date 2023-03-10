@@ -9,6 +9,7 @@ import mlflow
 
 from mlflow_export_import.common.click_options import (
     opt_input_dir, 
+    opt_import_source_tags,
     opt_use_src_user_id, 
     opt_use_threads
 )
@@ -27,6 +28,7 @@ def _import_experiment(importer, exp_name, exp_input_dir):
 def import_experiments(
         mlflow_client, 
         input_dir, 
+        import_source_tags = False,
         use_src_user_id = False, 
         use_threads = False
     ): 
@@ -37,7 +39,9 @@ def import_experiments(
 
     importer = ExperimentImporter(
         mlflow_client = mlflow_client,
-        use_src_user_id = use_src_user_id)
+        import_source_tags = import_source_tags,
+        use_src_user_id = use_src_user_id
+    )
     max_workers = os.cpu_count() or 4 if use_threads else 1
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for exp in exps:
@@ -48,16 +52,18 @@ def import_experiments(
 
 @click.command()
 @opt_input_dir
+@opt_import_source_tags
 @opt_use_src_user_id
 @opt_use_threads
 
-def main(input_dir, use_src_user_id, use_threads): 
+def main(input_dir, import_source_tags, use_src_user_id, use_threads): 
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
     import_experiments(
         mlflow_client = mlflow.client.MlflowClient(),
         input_dir = input_dir, 
+        import_source_tags = import_source_tags,
         use_src_user_id = use_src_user_id,
         use_threads = use_threads)
 

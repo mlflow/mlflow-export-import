@@ -98,8 +98,8 @@ def import_all(
         mlflow_client, 
         input_dir, 
         delete_model, 
-        use_src_user_id = False, 
         import_source_tags = False, 
+        use_src_user_id = False, 
         verbose = False, 
         use_threads = False
     ):
@@ -128,12 +128,12 @@ def import_all(
 @click.command()
 @opt_input_dir
 @opt_delete_model
+@opt_import_source_tags
 @opt_use_src_user_id
 @opt_verbose
-@opt_import_source_tags
 @opt_use_threads
 
-def main(input_dir, delete_model, use_src_user_id, import_source_tags, verbose, use_threads):
+def main(input_dir, delete_model, import_source_tags, use_src_user_id, verbose, use_threads):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
@@ -141,8 +141,8 @@ def main(input_dir, delete_model, use_src_user_id, import_source_tags, verbose, 
         mlflow_client = mlflow.client.MlflowClient(),
         input_dir = input_dir,
         delete_model = delete_model, 
-        use_src_user_id = use_src_user_id, 
         import_source_tags = import_source_tags,
+        use_src_user_id = use_src_user_id, 
         verbose = verbose, 
         use_threads = use_threads)
 
