@@ -4,12 +4,12 @@
 # MAGIC Export specified models, their version runs and the experiments that the runs belong to.
 # MAGIC 
 # MAGIC Widgets
-# MAGIC * Models - comma seperated registered model names to be exported. `all` will export all models.
-# MAGIC * Output base directory.
-# MAGIC * Stages - stages to be exported.
-# MAGIC * Export all runs - export all runs of experiment that is linked to a registered model.
-# MAGIC * Notebook formats.
-# MAGIC * Use threads.
+# MAGIC * `1. Models` - comma seperated registered model names to be exported. `all` will export all models.
+# MAGIC * `2. Output base directory`
+# MAGIC * `3. Stages` - stages to be exported.
+# MAGIC * `4. Export all runs` - export all runs of experiment that is linked to a registered model.
+# MAGIC * `5. Notebook formats`
+# MAGIC * `6. Use threads`
 # MAGIC 
 # MAGIC See: https://github.com/mlflow/mlflow-export-import/blob/master/README_bulk.md#registered-models.
 
@@ -45,12 +45,12 @@ export_all_runs = False
 import os
 os.environ["OUTPUT_DIR"] = output_dir
 
-print("models:",models)
-print("output_dir:",output_dir)
-print("stages:",stages)
-print("notebook_formats:",notebook_formats)
-print("export_all_runs:",export_all_runs)
-print("use_threads:",use_threads)
+print("models:", models)
+print("output_dir:", output_dir)
+print("stages:", stages)
+print("notebook_formats:", notebook_formats)
+print("export_all_runs:", export_all_runs)
+print("use_threads:", use_threads)
 
 # COMMAND ----------
 
@@ -65,13 +65,16 @@ assert_widget(output_dir, "2. Output base directory")
 
 from mlflow_export_import.bulk.export_models import export_models
 import mlflow
-export_models(mlflow.client.MlflowClient(), 
-              model_names=models, 
-              output_dir=output_dir,
-              notebook_formats=notebook_formats,
-              stages=stages, 
-              export_all_runs=export_all_runs,
-              use_threads=use_threads)
+
+export_models(
+    mlflow_client = mlflow.client.MlflowClient(), 
+    model_names = models, 
+    output_dir = output_dir,
+    notebook_formats = notebook_formats,
+    stages = stages, 
+    export_all_runs = export_all_runs,
+    use_threads = use_threads
+)
 
 # COMMAND ----------
 
@@ -82,6 +85,10 @@ export_models(mlflow.client.MlflowClient(),
 # MAGIC %sh 
 # MAGIC echo $OUTPUT_DIR
 # MAGIC ls -l $OUTPUT_DIR
+
+# COMMAND ----------
+
+# MAGIC %sh cat $OUTPUT_DIR/manifest.json
 
 # COMMAND ----------
 
