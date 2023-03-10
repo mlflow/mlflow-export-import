@@ -211,7 +211,7 @@ def main(input_dir,
         print(f"  {k}: {v}")
     client = mlflow.client.MlflowClient()
     importer = RunImporter(
-        client,
+        mlflow_client = client,
         import_source_tags = import_source_tags,
         mlmodel_fix = mlmodel_fix, 
         use_src_user_id = use_src_user_id, 
