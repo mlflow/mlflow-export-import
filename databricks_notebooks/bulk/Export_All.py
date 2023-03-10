@@ -3,13 +3,12 @@
 # MAGIC 
 # MAGIC Export all the MLflow registered models and all experiments of a tracking server.
 # MAGIC 
-# MAGIC Widgets
-# MAGIC * Models - comma seperated registered model names to be exported. 'all' will export all models.
-# MAGIC * Output directory
-# MAGIC * Stages - comma seperated stages to be exported
-# MAGIC * Export all runs 
-# MAGIC * Notebook formats
-# MAGIC * Use threads
+# MAGIC **Widgets**
+# MAGIC * `1. Output directory`
+# MAGIC * `2. Stages` - comma seperated stages to be exported
+# MAGIC * `3. Use threads`
+# MAGIC * Export all runs - TODO
+# MAGIC * Notebook formats - TODO
 
 # COMMAND ----------
 
@@ -38,11 +37,11 @@ assert_widget(output_dir, "1. Output directory")
 
 # COMMAND ----------
 
-import mlflow
 from mlflow_export_import.bulk.export_all import export_all
 
-# COMMAND ----------
-
-export_all(output_dir=output_dir, 
-           notebook_formats=notebook_formats, 
-           use_threads=use_threads)
+export_all(
+    mlflow_client = mlflow_client,
+    output_dir = output_dir, 
+    notebook_formats = notebook_formats, 
+    use_threads = use_threads
+)

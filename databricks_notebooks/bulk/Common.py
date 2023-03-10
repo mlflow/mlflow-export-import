@@ -10,3 +10,8 @@
 def assert_widget(value, name):
     if len(value.rstrip())==0: 
         raise Exception(f"ERROR: '{name}' widget is required")
+
+# COMMAND ----------
+
+import mlflow
+mlflow_client = mlflow.client.MlflowClient()
