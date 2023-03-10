@@ -134,6 +134,15 @@ def opt_experiments(function):
     )(function)
     return function
 
+def opt_export_all_runs(function):
+    function = click.option("--export-all-runs",
+        help="Export all runs of experiment or just runs associated with registered model versions.",
+        type=bool,
+        default=False,
+        show_default=True
+    )(function)
+    return function
+
 # == other
 
 def opt_model(function):

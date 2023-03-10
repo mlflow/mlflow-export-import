@@ -11,10 +11,11 @@ import mlflow
 
 from mlflow_export_import.common.click_options import (
     opt_output_dir,
-    opt_notebook_formats,
     opt_stages,
-    opt_use_threads,
-    opt_export_latest_versions
+    opt_export_latest_versions,
+    opt_export_all_runs,
+    opt_notebook_formats,
+    opt_use_threads
 )
 from mlflow_export_import.common import utils, io_utils
 from mlflow_export_import.model.export_model import ModelExporter
@@ -90,8 +91,8 @@ def export_models(
         model_names, 
         output_dir, 
         stages="", 
-        export_all_runs=False, 
         export_latest_versions=False,
+        export_all_runs=False, 
         notebook_formats=None, 
         use_threads=False
     ):
@@ -136,17 +137,12 @@ def export_models(
     required=True
 )
 @opt_export_latest_versions
+@opt_export_all_runs
 @opt_stages
-@click.option("--export-all-runs", 
-    help="Export all runs of experiment or just runs associated with registered model versions.", 
-    type=bool, 
-    default=False, 
-    show_default=True
-)
 @opt_notebook_formats
 @opt_use_threads
 
-def main(models, output_dir, stages, notebook_formats, export_all_runs, use_threads, export_latest_versions):
+def main(models, output_dir, stages, export_latest_versions, export_all_runs, notebook_formats, use_threads):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
@@ -154,11 +150,12 @@ def main(models, output_dir, stages, notebook_formats, export_all_runs, use_thre
         mlflow_client = mlflow.client.MlflowClient(),
         model_names = models, 
         output_dir = output_dir, 
-        notebook_formats = notebook_formats, 
         stages = stages, 
-        export_all_runs = export_all_runs, 
         export_latest_versions = export_latest_versions, 
-        use_threads=use_threads)
+        export_all_runs = export_all_runs, 
+        notebook_formats = notebook_formats, 
+        use_threads=use_threads
+    )
 
 
 if __name__ == "__main__":

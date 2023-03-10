@@ -9,8 +9,14 @@ import click
 from concurrent.futures import ThreadPoolExecutor
 
 import mlflow
-from mlflow_export_import.common.click_options import opt_input_dir, opt_delete_model, \
-    opt_use_src_user_id, opt_verbose, opt_import_source_tags, opt_use_threads
+from mlflow_export_import.common.click_options import (
+    opt_input_dir,
+    opt_delete_model,
+    opt_use_src_user_id,
+    opt_verbose, 
+    opt_import_source_tags, 
+    opt_use_threads
+)
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.experiment.import_experiment import ExperimentImporter
 from mlflow_export_import.model.import_model import AllModelImporter
@@ -71,7 +77,8 @@ def _import_models(mlflow_client, input_dir, run_info_map, delete_model, import_
     importer = AllModelImporter(
         mlflow_client = mlflow_client, 
         run_info_map = run_info_map, 
-        import_source_tags = import_source_tags)
+        import_source_tags = import_source_tags
+    )
 
     if use_threads:
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
@@ -87,7 +94,8 @@ def _import_models(mlflow_client, input_dir, run_info_map, delete_model, import_
     return { "models": len(models), "duration": duration }
 
 
-def import_all(mlflow_client, 
+def import_all(
+        mlflow_client, 
         input_dir, 
         delete_model, 
         use_src_user_id = False, 
@@ -96,9 +104,21 @@ def import_all(mlflow_client,
         use_threads = False
     ):
     start_time = time.time()
-    exp_res = _import_experiments(mlflow_client, input_dir, use_src_user_id)
+    exp_res = _import_experiments(
+        mlflow_client, 
+        input_dir, 
+        use_src_user_id
+    )
     run_info_map = _remap(exp_res[0])
-    model_res = _import_models(mlflow_client, input_dir, run_info_map, delete_model, import_source_tags, verbose, use_threads)
+    model_res = _import_models(
+        mlflow_client, 
+        input_dir, 
+        run_info_map, 
+        delete_model, 
+        import_source_tags, 
+        verbose, 
+        use_threads
+    )
     duration = round(time.time()-start_time, 1)
     dct = { "duration": duration, "experiment_import": exp_res[1], "model_import": model_res }
     print("\nImport report:")

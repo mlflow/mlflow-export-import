@@ -9,9 +9,10 @@ import mlflow
 
 from mlflow_export_import.common.click_options import (
     opt_output_dir, 
+    opt_export_latest_versions,
+    opt_stages,
     opt_notebook_formats, 
-    opt_use_threads, 
-    opt_export_latest_versions
+    opt_use_threads,
 )
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.bulk.export_models import export_models
@@ -21,20 +22,22 @@ ALL_STAGES = "Production,Staging,Archived,None"
 
 
 def export_all(
-        mlflow_client, 
-        output_dir, 
-        export_latest_versions = False, 
-        notebook_formats = None, 
-        use_threads = False
+        mlflow_client,
+        output_dir,
+        stages="",
+        export_latest_versions=False,
+        notebook_formats=None,
+        use_threads=False
     ):
     start_time = time.time()
     res_models = export_models(
         mlflow_client = mlflow_client,
         model_names = "all", 
         output_dir = output_dir,
-        notebook_formats = notebook_formats, 
-        stages = ALL_STAGES, 
+        stages = stages,
         export_latest_versions = export_latest_versions,
+        export_all_runs = True,
+        notebook_formats = notebook_formats, 
         use_threads = use_threads
     )
     res_exps = export_experiments(
@@ -62,17 +65,19 @@ def export_all(
 @click.command()
 @opt_output_dir
 @opt_export_latest_versions
+@opt_stages
 @opt_notebook_formats
 @opt_use_threads
 
-def main(output_dir, export_latest_versions, notebook_formats, use_threads):
+def main(output_dir, stages, export_latest_versions, notebook_formats, use_threads):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
     export_all(
         mlflow_client = mlflow.client.MlflowClient(),
         output_dir = output_dir, 
-        export_latest_versions = export_latest_versions, 
+        stages = stages,
+        export_latest_versions = export_latest_versions,
         notebook_formats = notebook_formats, 
         use_threads = use_threads)
 
