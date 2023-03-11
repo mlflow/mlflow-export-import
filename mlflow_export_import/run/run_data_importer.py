@@ -24,7 +24,7 @@ def _log_data(run_dct, run_id, batch_size, get_data, log_data, args_get_data=Non
         res = res + batch
     
 
-def log_params(client, run_dct, run_id, batch_size):
+def _log_params(client, run_dct, run_id, batch_size):
     def get_data(run_dct, args):
         return [ Param(k,v) for k,v in run_dct["params"].items() ]
     def log_data(run_id, params):
@@ -32,7 +32,7 @@ def log_params(client, run_dct, run_id, batch_size):
     _log_data(run_dct, run_id, batch_size, get_data, log_data)
 
 
-def log_metrics(client, run_dct, run_id, batch_size):
+def _log_metrics(client, run_dct, run_id, batch_size):
 
     def get_data(run_dct, args=None):
         metrics = []
@@ -47,7 +47,7 @@ def log_metrics(client, run_dct, run_id, batch_size):
     _log_data(run_dct, run_id, batch_size, get_data, log_data)
 
 
-def log_tags(client, run_dct, run_id, batch_size, import_source_tags, in_databricks, src_user_id, use_src_user_id):
+def _log_tags(client, run_dct, run_id, batch_size, import_source_tags, in_databricks, src_user_id, use_src_user_id):
 
     def get_data(run_dct, args):
         tags = run_dct["tags"]
@@ -74,7 +74,23 @@ def log_tags(client, run_dct, run_id, batch_size, import_source_tags, in_databri
     _log_data(run_dct, run_id, batch_size, get_data, log_data, args_get)
 
 
+def import_run_data(mlflow_client, run_dct, run_id, import_source_tags, src_user_id, use_src_user_id, in_databricks):
+    from mlflow.utils.validation import MAX_PARAMS_TAGS_PER_BATCH, MAX_METRICS_PER_BATCH
+    _log_params(mlflow_client, run_dct, run_id, MAX_PARAMS_TAGS_PER_BATCH)
+    _log_metrics(mlflow_client, run_dct, run_id, MAX_METRICS_PER_BATCH)
+    _log_tags(
+        mlflow_client,
+        run_dct,
+        run_id,
+        MAX_PARAMS_TAGS_PER_BATCH,
+        import_source_tags,
+        in_databricks,
+        src_user_id,
+        use_src_user_id
+)
+
+
 if __name__ == "__main__":
     import sys
     client = mlflow.client.MlflowClient()
-    log_metrics(client, sys.argv[1],100)
+    _log_metrics(client, sys.argv[1],100)

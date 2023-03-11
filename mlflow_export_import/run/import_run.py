@@ -9,7 +9,6 @@ import base64
 
 import mlflow
 from mlflow.entities import RunStatus
-from mlflow.utils.validation import MAX_PARAMS_TAGS_PER_BATCH, MAX_METRICS_PER_BATCH
 from mlflow.utils.mlflow_tags import MLFLOW_PARENT_RUN_ID
 
 from mlflow_export_import.common.click_options import (
@@ -22,11 +21,11 @@ from mlflow_export_import.common.click_options import (
 from mlflow_export_import.common import utils
 from mlflow_export_import.common.filesystem import mk_local_path
 from mlflow_export_import.common.find_artifacts import find_artifacts
-from mlflow_export_import.client.http_client import DatabricksHttpClient
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import MlflowExportImportException
+from mlflow_export_import.client.http_client import DatabricksHttpClient
 from mlflow_export_import.run import run_data_importer
 
 
@@ -88,7 +87,15 @@ class RunImporter():
         run = self.mlflow_client.create_run(exp.experiment_id)
         run_id = run.info.run_id
         try:
-            self._import_run_data(src_run_dct, run_id, src_run_dct["info"]["user_id"])
+            run_data_importer.import_run_data(
+                self.mlflow_client,
+                src_run_dct,
+                run_id, 
+                self.import_source_tags, 
+                src_run_dct["info"]["user_id"],
+                self.use_src_user_id, 
+                self.in_databricks
+            )
             path = os.path.join(input_dir, "artifacts")
             if os.path.exists(_filesystem.mk_local_path(path)):
                 self.mlflow_client.log_artifacts(run_id, mk_local_path(path))
@@ -129,21 +136,6 @@ class RunImporter():
                 if model_path == "MLmodel":
                     model_path = ""
                 self.mlflow_client.log_artifact(run_id, output_path, model_path)
-
-
-    def _import_run_data(self, run_dct, run_id, src_user_id):
-        run_data_importer.log_params(self.mlflow_client, run_dct, run_id, MAX_PARAMS_TAGS_PER_BATCH)
-        run_data_importer.log_metrics(self.mlflow_client, run_dct, run_id, MAX_METRICS_PER_BATCH)
-        run_data_importer.log_tags(
-            self.mlflow_client, 
-            run_dct, 
-            run_id, 
-            MAX_PARAMS_TAGS_PER_BATCH, 
-            self.import_source_tags,
-            self.in_databricks, 
-            src_user_id, 
-            self.use_src_user_id
-    )
 
 
     def _upload_databricks_notebook(self, input_dir, src_run_dct, dst_notebook_dir):
