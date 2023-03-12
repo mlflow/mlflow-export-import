@@ -29,9 +29,49 @@ from mlflow_export_import.client.http_client import DatabricksHttpClient
 from mlflow_export_import.run import run_data_importer
 
 
+def import_run(
+        experiment_name,
+        input_dir,
+        dst_notebook_dir = None,
+        import_source_tags = False,
+        use_src_user_id = False,
+        dst_notebook_dir_add_run_id = False,
+        mlmodel_fix = True,
+        mlflow_client = None
+    ):
+    """
+    Imports a run into the specified experiment.
+    :param experiment_name: Experiment name.
+    :param input_dir: Source input directory that contains the exported run.
+    :param dst_notebook_dir: Databricks destination workpsace directory for notebook.
+    :param import_source_tags: Import source information for MLFlow objects and create tags in destination object.
+    :param mlmodel_fix: Add correct run ID in destination MLmodel artifact.
+                        Can be expensive for deeply nested artifacts.
+    :param use_src_user_id: Set the destination user ID to the source user ID.
+                            Source user ID is ignored when importing into
+                            Databricks since setting it is not allowed.
+    :param dst_notebook_dir: Databricks destination workspace directory for notebook import.
+    :param dst_notebook_dir_add_run_id: Add the run ID to the destination notebook directory.
+    :param mlflow_client: MLflow client.
+    :return: The run and its parent run ID if the run is a nested run.
+    """
+    importer = RunImporter(
+        import_source_tags = import_source_tags,
+        use_src_user_id = use_src_user_id,
+        dst_notebook_dir_add_run_id = dst_notebook_dir_add_run_id,
+        mlmodel_fix = mlmodel_fix,
+        mlflow_client = mlflow_client
+    )
+    return importer.import_run(
+        experiment_name = experiment_name,
+        input_dir = input_dir,
+        dst_notebook_dir = dst_notebook_dir
+    )
+
+
 class RunImporter():
     def __init__(self, 
-            mlflow_client,
+            mlflow_client = None,
             import_source_tags = False,
             mlmodel_fix = True,
             use_src_user_id = False,
@@ -49,7 +89,7 @@ class RunImporter():
         :param dst_notebook_dir_add_run_id: Add the run ID to the destination notebook directory.
         """
 
-        self.mlflow_client = mlflow_client
+        self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
         self.mlmodel_fix = mlmodel_fix
         self.use_src_user_id = use_src_user_id
         self.in_databricks = "DATABRICKS_RUNTIME_VERSION" in os.environ
@@ -201,18 +241,14 @@ def main(input_dir,
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    client = mlflow.client.MlflowClient()
-    importer = RunImporter(
-        mlflow_client = client,
+    import_run(
+        experiment_name = experiment_name,
+        input_dir = input_dir,
+        dst_notebook_dir = dst_notebook_dir,
         import_source_tags = import_source_tags,
-        mlmodel_fix = mlmodel_fix, 
-        use_src_user_id = use_src_user_id, 
+        mlmodel_fix = mlmodel_fix,
+        use_src_user_id = use_src_user_id,
         dst_notebook_dir_add_run_id = dst_notebook_dir_add_run_id
-    )
-    importer.import_run(
-        experiment_name = experiment_name, 
-        input_dir = input_dir, 
-        dst_notebook_dir = dst_notebook_dir
     )
 
 

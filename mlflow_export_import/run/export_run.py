@@ -26,6 +26,30 @@ MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID = "mlflow.databricks.notebookRevisionID" 
 print("MLflow Version:", mlflow.__version__)
 print("MLflow Tracking URI:", mlflow.get_tracking_uri())
 
+
+def export_run(
+        run_id,
+        output_dir,
+        notebook_formats = None,
+        mlflow_client = None
+    ):
+    """
+    :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
+    :param run_id: Run ID.
+    :param output_dir: Output directory.
+    :param mlflow_client: MLflow client.
+    :return: Whether export succeeded.
+    """
+    exporter = RunExporter(
+        mlflow_client = mlflow_client,
+        notebook_formats = notebook_formats
+    )
+    return exporter.export_run(
+        run_id = run_id,
+        output_dir = output_dir
+    )
+
+
 class RunExporter:
 
     def __init__(self, 
@@ -38,7 +62,8 @@ class RunExporter:
         """
         if notebook_formats is None:
             notebook_formats = []
-        self.mlflow_client = mlflow_client
+        self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
+
         self.dbx_client = DatabricksHttpClient()
         print("Databricks REST client:", self.dbx_client)
         self.notebook_formats = notebook_formats
@@ -127,13 +152,10 @@ def main(run_id, output_dir, notebook_formats):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    exporter = RunExporter(
-        mlflow_client = mlflow.client.MlflowClient(),
+    export_run(
+        run_id = run_id,
+        output_dir = output_dir,
         notebook_formats = utils.string_to_list(notebook_formats)
-    )
-    exporter.export_run(
-        run_id = run_id, 
-        output_dir = output_dir
     )
 
 
