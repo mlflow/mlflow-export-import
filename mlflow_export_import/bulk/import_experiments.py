@@ -5,7 +5,6 @@ Import a list of experiment from a directory.
 import os
 from concurrent.futures import ThreadPoolExecutor
 import click
-import mlflow
 
 from mlflow_export_import.common.click_options import (
     opt_input_dir, 
@@ -14,12 +13,18 @@ from mlflow_export_import.common.click_options import (
     opt_use_threads
 )
 from mlflow_export_import.common import io_utils
-from mlflow_export_import.experiment.import_experiment import ExperimentImporter
+from mlflow_export_import.experiment.import_experiment import import_experiment
 
 
-def _import_experiment(importer, exp_name, exp_input_dir):
+def _import_experiment(mlflow_client, exp_name, input_dir, import_source_tags, use_src_user_id):
     try:
-        importer.import_experiment(exp_name, exp_input_dir)
+        import_experiment(
+            mlflow_client = mlflow_client,
+            experiment_name = exp_name,
+            input_dir = input_dir,
+            import_source_tags = import_source_tags,
+            use_src_user_id = use_src_user_id
+        )
     except Exception:
         import traceback
         traceback.print_exc()
@@ -37,17 +42,13 @@ def import_experiments(
     for exp in exps:
         print("  ",exp)
 
-    importer = ExperimentImporter(
-        mlflow_client = mlflow_client,
-        import_source_tags = import_source_tags,
-        use_src_user_id = use_src_user_id
-    )
     max_workers = os.cpu_count() or 4 if use_threads else 1
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for exp in exps:
             exp_input_dir = os.path.join(input_dir,exp["id"])
             exp_name = exp["name"]
-            executor.submit(_import_experiment, importer, exp_name, exp_input_dir)
+            executor.submit(_import_experiment, mlflow_client, 
+                exp_name, exp_input_dir, import_source_tags, use_src_user_id)
 
 
 @click.command()
@@ -61,11 +62,11 @@ def main(input_dir, import_source_tags, use_src_user_id, use_threads):
     for k,v in locals().items():
         print(f"  {k}: {v}")
     import_experiments(
-        mlflow_client = mlflow.client.MlflowClient(),
         input_dir = input_dir, 
         import_source_tags = import_source_tags,
         use_src_user_id = use_src_user_id,
-        use_threads = use_threads)
+        use_threads = use_threads
+    )
 
 
 if __name__ == "__main__":
