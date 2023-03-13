@@ -3,8 +3,8 @@ Tests for 'archive_existing_versions' in transition_model_version_stage()
 See: https://mlflow.org/docs/latest/python_api/mlflow.client.html#mlflow.client.MlflowClient.transition_model_version_stage
 """
 
-from mlflow_export_import.model.export_model import ModelExporter
-from mlflow_export_import.model.import_model import ModelImporter
+from mlflow_export_import.model.export_model import export_model
+from mlflow_export_import.model.import_model import import_model
 from mlflow_export_import.common.model_utils import list_model_versions
 
 import oss_utils_test 
@@ -103,25 +103,26 @@ def _run_test(mlflow_context, stage, num_stages, archive_existing_versions=False
 
 
 def _run_export_import(mlflow_context, stages, archive_existing_versions=False):
-    exporter = ModelExporter(mlflow_context.client_src)
     model_name_src = oss_utils_test.mk_test_object_name_default()
     model_src = mlflow_context.client_src.create_registered_model(model_name_src)
-
     for stage in stages:
         _create_version(mlflow_context.client_src, model_name_src, stage, archive_existing_versions)
-
     model_src = mlflow_context.client_src.get_registered_model(model_name_src)
-    exporter.export_model(model_name_src, mlflow_context.output_dir)
+    export_model(
+        model_name = model_name_src, 
+        output_dir = mlflow_context.output_dir,
+        mlflow_client = mlflow_context.client_src
+    )
 
     model_name_dst = oss_utils_test.create_dst_model_name(model_name_src)
-    experiment_name =  model_name_dst
-    importer = ModelImporter(mlflow_context.client_dst, import_source_tags=True)
-    importer.import_model(model_name_dst,
-        mlflow_context.output_dir,
-        experiment_name,
-        delete_model=True,
-        verbose=False,
-        sleep_time=10)
+    import_model(
+        model_name = model_name_dst,
+        experiment_name = model_name_dst,
+        input_dir = mlflow_context.output_dir,
+        delete_model = True,
+        import_source_tags = True,
+        mlflow_client = mlflow_context.client_dst
+    )
 
     model_dst = mlflow_context.client_dst.get_registered_model(model_name_dst)
     return model_src, model_dst
