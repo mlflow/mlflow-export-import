@@ -49,11 +49,11 @@ def _export_experiment(mlflow_client, exp_id_or_name, output_dir, notebook_forma
 
 
 def export_experiments(
-        mlflow_client,
         experiments,
         output_dir,
         notebook_formats = None,
-        use_threads = False
+        use_threads = False,
+        mlflow_client = None
     ):
     """
     :param: experiments: Can be either:
@@ -62,6 +62,7 @@ def export_experiments(
       - Dictionary whose key is an experiment and the value is a list of run IDs 
       - String with comma-delimited experiment names or IDs such as 'sklearn_wine,sklearn_iris' or '1,2'
     """
+    mlflow_client = mlflow_client or mlflow.client.MlflowClient()
     start_time = time.time()
     max_workers = os.cpu_count() or 4 if use_threads else 1
 
@@ -133,7 +134,6 @@ def main(experiments, output_dir, notebook_formats, use_threads):
     for k,v in locals().items():
         print(f"  {k}: {v}")
     export_experiments(
-        mlflow_client = mlflow.client.MlflowClient(),
         experiments = experiments,
         output_dir = output_dir,
         notebook_formats = notebook_formats,

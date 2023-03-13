@@ -104,12 +104,13 @@ def export_models(
     out_dir = os.path.join(output_dir, "experiments")
     exps_to_export = exp_ids if export_all_runs else exps_and_runs
     res_exps = export_experiments.export_experiments(
-        mlflow_client, 
-        exps_to_export, 
-        out_dir, 
-        notebook_formats, 
-        use_threads)
-    res_models =_export_models(
+        mlflow_client = mlflow_client, 
+        experiments = exps_to_export, 
+        output_dir = out_dir, 
+        notebook_formats = notebook_formats, 
+        use_threads = use_threads
+    )
+    res_models = _export_models(
         mlflow_client, 
         model_names, 
         os.path.join(output_dir,"models"), 
@@ -163,7 +164,7 @@ def main(models, output_dir, stages, export_latest_versions, export_all_runs, no
         export_latest_versions = export_latest_versions, 
         export_all_runs = export_all_runs, 
         notebook_formats = notebook_formats, 
-        use_threads=use_threads,
+        use_threads = use_threads,
     )
 
 

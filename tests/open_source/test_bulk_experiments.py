@@ -69,7 +69,8 @@ def _run_test(mlflow_context, compare_func, use_threads=False):
     delete_experiments_and_models(mlflow_context)
     exps = [ create_test_experiment(mlflow_context.client_src, 3), create_test_experiment(mlflow_context.client_src, 4) ]
     exp_names = [ exp.name for exp in exps ]
-    export_experiments(mlflow_context.client_src,
+    export_experiments(
+        mlflow_client = mlflow_context.client_src,
         experiments = exp_names,
         output_dir = mlflow_context.output_dir,
         notebook_formats = _notebook_formats,

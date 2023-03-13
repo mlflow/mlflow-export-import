@@ -6,6 +6,7 @@ import os
 from concurrent.futures import ThreadPoolExecutor
 import click
 
+import mlflow
 from mlflow_export_import.common.click_options import (
     opt_input_dir, 
     opt_import_source_tags,
@@ -31,12 +32,13 @@ def _import_experiment(mlflow_client, exp_name, input_dir, import_source_tags, u
 
 
 def import_experiments(
-        mlflow_client, 
         input_dir, 
         import_source_tags = False,
         use_src_user_id = False, 
-        use_threads = False
+        use_threads = False,
+        mlflow_client = None
     ): 
+    mlflow_client = mlflow_client or mlflow.client.MlflowClient()
     dct = io_utils.read_file_mlflow(os.path.join(input_dir, "experiments.json"))
     exps = dct["experiments"]
     for exp in exps:
