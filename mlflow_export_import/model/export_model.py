@@ -6,6 +6,7 @@ import os
 import click
 import mlflow
 
+from mlflow_export_import.client.http_client import MlflowHttpClient
 from mlflow_export_import.common.click_options import (
     opt_model,
     opt_output_dir,
@@ -14,25 +15,50 @@ from mlflow_export_import.common.click_options import (
     opt_versions,
     opt_export_latest_versions
 )
-from mlflow_export_import.common import (
-    utils,
-    io_utils,
-    model_utils 
-)
+from mlflow_export_import.common import io_utils, model_utils 
 from mlflow_export_import.common import MlflowExportImportException
-from mlflow_export_import.client.http_client import MlflowHttpClient
 from mlflow_export_import.run.export_run import RunExporter
+
+
+def export_model(
+        model_name,
+        output_dir,
+        stages = None,
+        versions = None,
+        export_latest_versions = False,
+        notebook_formats = None,
+        mlflow_client = None
+    ):
+    """
+    :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
+    :param stages: Stages to export. Default is all stages. Values are Production, Staging, Archived and None.
+    :param export_run: Export the run that generated a registered model's version.
+    :param export_latest_versions: Export latest registered model versions instead of all versions.
+    :param mlflow_client: MlflowClient
+    """
+
+    exporter = ModelExporter(
+       notebook_formats = notebook_formats,
+       stages = stages,
+       versions = versions,
+       export_latest_versions = export_latest_versions,
+       mlflow_client = mlflow_client
+    )
+    return exporter.export_model(
+        model_name = model_name,
+        output_dir = output_dir
+    )
 
 
 class ModelExporter():
 
-    def __init__(self, 
-            mlflow_client, 
-            notebook_formats = None, 
-            stages = None, 
-            versions = None, 
-            export_run = True, 
-            export_latest_versions = False
+    def __init__(self,
+            stages = None,
+            versions = None,
+            export_latest_versions = False,
+            export_run = True,
+            notebook_formats = None,
+            mlflow_client = None
         ):
         """
         :param mlflow_client: MlflowClient
@@ -41,7 +67,7 @@ class ModelExporter():
         :param export_run: Export the run that generated a registered model's version.
         :param export_latest_versions: Export latest registered model versions instead of all versions.
         """
-        self.mlflow_client = mlflow_client
+        self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
         self.http_client = MlflowHttpClient()
         self.run_exporter = RunExporter(self.mlflow_client, notebook_formats=notebook_formats)
         self.export_run = export_run
@@ -53,8 +79,8 @@ class ModelExporter():
                 f"Both stages {self.stages} and versions {self.versions} cannot be set", http_status_code=400)
 
 
-    def export_model(self, 
-            model_name, 
+    def export_model(self,
+            model_name,
             output_dir
         ):
         """
@@ -81,10 +107,10 @@ class ModelExporter():
                 continue
             opath = os.path.join(output_dir, vr.run_id)
             opath = opath.replace("dbfs:", "/dbfs")
-            dct = { "version": vr.version, 
-                    "stage": vr.current_stage, 
+            dct = { "version": vr.version,
+                    "stage": vr.current_stage,
                     "run_id": vr.run_id,
-                    "description": vr.description, 
+                    "description": vr.description,
                     "tags": vr.tags 
             }
             print(f"Exporting model '{model_name}' version {vr.version} stage '{vr.current_stage}' to '{opath}'")
@@ -157,19 +183,14 @@ def main(model, output_dir, notebook_formats, stages, versions, export_latest_ve
     for k,v in locals().items():
         print(f"  {k}: {v}")
     versions = versions.split(",") if versions else []
-
-    exporter = ModelExporter(
-       mlflow_client = mlflow.client.MlflowClient(),
-       notebook_formats = utils.string_to_list(notebook_formats), 
-       stages = stages, 
-       versions = versions, 
-       export_latest_versions = export_latest_versions
+    export_model(
+        model_name = model,
+        output_dir = output_dir,
+        stages = stages,
+        versions = versions,
+        export_latest_versions = export_latest_versions,
+        notebook_formats = notebook_formats
     )
-    exporter.export_model(
-        model_name = model, 
-        output_dir = output_dir
-    )
-
 
 if __name__ == "__main__":
     main()
