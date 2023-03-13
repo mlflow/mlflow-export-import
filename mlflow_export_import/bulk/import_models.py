@@ -18,7 +18,7 @@ from mlflow_export_import.common.click_options import (
     opt_use_threads
 )
 from mlflow_export_import.common import io_utils
-from mlflow_export_import.experiment.import_experiment import ExperimentImporter
+from mlflow_export_import.experiment.import_experiment import import_experiment
 from mlflow_export_import.model.import_model import AllModelImporter
 
 
@@ -36,10 +36,6 @@ def _import_experiments(mlflow_client, input_dir, use_src_user_id):
     dct = io_utils.read_file_mlflow(os.path.join(os.path.join(input_dir,"experiments","experiments.json")))
     exps = dct["experiments"]
 
-    importer = ExperimentImporter(
-        mlflow_client = mlflow_client, 
-        use_src_user_id = use_src_user_id
-    )
     print("Experiments:")
     for exp in exps: 
         print(" ",exp)
@@ -49,9 +45,11 @@ def _import_experiments(mlflow_client, input_dir, use_src_user_id):
     for exp in exps: 
         exp_input_dir = os.path.join(input_dir, "experiments", exp["id"])
         try:
-            _run_info_map = importer.import_experiment(
+            _run_info_map = import_experiment(
                 experiment_name = exp["name"], 
-                input_dir = exp_input_dir
+                input_dir = exp_input_dir,
+                use_src_user_id = use_src_user_id,
+                mlflow_client = mlflow_client
             )
             run_info_map[exp["id"]] = _run_info_map
         except Exception as e:
@@ -74,7 +72,7 @@ def _import_models(mlflow_client, input_dir, run_info_map, delete_model, import_
     models_dir = os.path.join(input_dir, "models")
     models = io_utils.read_file_mlflow(os.path.join(os.path.join(models_dir,"models.json")))
     models = models["models"]
-    importer = AllModelImporter(
+    all_importer = AllModelImporter(
         mlflow_client = mlflow_client, 
         run_info_map = run_info_map, 
         import_source_tags = import_source_tags
@@ -84,25 +82,36 @@ def _import_models(mlflow_client, input_dir, run_info_map, delete_model, import_
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             for model in models:
                 dir = os.path.join(models_dir, model)
-                executor.submit(importer.import_model, model, dir, delete_model, verbose)
+                executor.submit(all_importer.import_model, 
+                   model_name = model, 
+                   input_dir = dir, 
+                   delete_model = delete_model, 
+                   verbose = verbose
+                )
     else:
         for model in models:
             dir = os.path.join(models_dir, model)
-            importer.import_model(model, dir, delete_model, verbose)
+            all_importer.import_model(
+                model_name = model, 
+                input_dir = dir, 
+                delete_model = delete_model, 
+                verbose = verbose
+            )
 
     duration = round(time.time()-start_time, 1)
     return { "models": len(models), "duration": duration }
 
 
 def import_all(
-        mlflow_client, 
         input_dir, 
         delete_model, 
         import_source_tags = False, 
         use_src_user_id = False, 
         verbose = False, 
-        use_threads = False
+        use_threads = False,
+        mlflow_client = None
     ):
+    mlflow_client = mlflow_client or mlflow.client.MlflowClient()
     start_time = time.time()
     exp_res = _import_experiments(
         mlflow_client, 
@@ -138,13 +147,13 @@ def main(input_dir, delete_model, import_source_tags, use_src_user_id, verbose, 
     for k,v in locals().items():
         print(f"  {k}: {v}")
     import_all(
-        mlflow_client = mlflow.client.MlflowClient(),
         input_dir = input_dir,
         delete_model = delete_model, 
         import_source_tags = import_source_tags,
         use_src_user_id = use_src_user_id, 
         verbose = verbose, 
-        use_threads = use_threads)
+        use_threads = use_threads
+    )
 
 
 if __name__ == "__main__":

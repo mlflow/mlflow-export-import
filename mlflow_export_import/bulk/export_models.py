@@ -8,7 +8,6 @@ import click
 from concurrent.futures import ThreadPoolExecutor
 
 import mlflow
-
 from mlflow_export_import.common.click_options import (
     opt_output_dir,
     opt_stages,
@@ -18,7 +17,7 @@ from mlflow_export_import.common.click_options import (
     opt_use_threads
 )
 from mlflow_export_import.common import utils, io_utils
-from mlflow_export_import.model.export_model import ModelExporter
+from mlflow_export_import.model.export_model import export_model
 from mlflow_export_import.bulk import export_experiments
 from mlflow_export_import.bulk.model_utils import get_experiments_runs_of_models
 from mlflow_export_import.bulk import bulk_utils
@@ -41,18 +40,20 @@ def _export_models(
     for model_name in model_names:
         print(f"  {model_name}")
 
-    exporter = ModelExporter(
-        mlflow_client = mlflow_client, 
-        notebook_formats = utils.string_to_list(notebook_formats), 
-        stages = stages, 
-        export_run = export_run,
-        export_latest_versions = export_latest_versions
-    )
+    notebook_formats = utils.string_to_list(notebook_formats),
     futures = []
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for model_name in model_names:
             dir = os.path.join(output_dir, model_name)
-            future = executor.submit(exporter.export_model, model_name, dir)
+            future = executor.submit(export_model,
+                model_name = model_name, 
+                output_dir = dir,
+                notebook_formats = notebook_formats,
+                stages = stages, 
+                export_run = export_run,
+                export_latest_versions = export_latest_versions,
+                mlflow_client = mlflow_client, 
+            )
             futures.append(future)
     ok_models = [] ; failed_models = []
     for future in futures:
@@ -87,15 +88,16 @@ def _export_models(
 
 
 def export_models(
-        mlflow_client, 
         model_names, 
         output_dir, 
-        stages="", 
-        export_latest_versions=False,
-        export_all_runs=False, 
-        notebook_formats=None, 
-        use_threads=False
+        stages = "", 
+        export_latest_versions = False,
+        export_all_runs = False, 
+        notebook_formats = None, 
+        use_threads = False,
+        mlflow_client = None
     ):
+    mlflow_client = mlflow_client or mlflow.client.MlflowClient()
     exps_and_runs = get_experiments_runs_of_models(mlflow_client, model_names)
     exp_ids = exps_and_runs.keys()
     start_time = time.time()
@@ -107,8 +109,16 @@ def export_models(
         out_dir, 
         notebook_formats, 
         use_threads)
-    res_models =_export_models(mlflow_client, model_names, os.path.join(output_dir,"models"), notebook_formats, stages,
-        export_run=False, use_threads=use_threads, export_latest_versions=export_latest_versions)
+    res_models =_export_models(
+        mlflow_client, 
+        model_names, 
+        os.path.join(output_dir,"models"), 
+        notebook_formats, 
+        stages,
+        export_run = False, 
+        use_threads = use_threads, 
+        export_latest_versions = export_latest_versions
+    )
     duration = round(time.time()-start_time, 1)
     print(f"Duration for total registered models and versions' runs export: {duration} seconds")
 
@@ -147,14 +157,13 @@ def main(models, output_dir, stages, export_latest_versions, export_all_runs, no
     for k,v in locals().items():
         print(f"  {k}: {v}")
     export_models(
-        mlflow_client = mlflow.client.MlflowClient(),
         model_names = models, 
         output_dir = output_dir, 
         stages = stages, 
         export_latest_versions = export_latest_versions, 
         export_all_runs = export_all_runs, 
         notebook_formats = notebook_formats, 
-        use_threads=use_threads
+        use_threads=use_threads,
     )
 
 

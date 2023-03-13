@@ -26,6 +26,7 @@ def export_model(
         stages = None,
         versions = None,
         export_latest_versions = False,
+        export_run = True,
         notebook_formats = None,
         mlflow_client = None
     ):
@@ -42,6 +43,7 @@ def export_model(
        stages = stages,
        versions = versions,
        export_latest_versions = export_latest_versions,
+       export_run = export_run,
        mlflow_client = mlflow_client
     )
     return exporter.export_model(

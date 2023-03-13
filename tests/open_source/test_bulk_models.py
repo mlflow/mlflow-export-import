@@ -59,14 +59,17 @@ def _run_test(mlflow_context, compare_func, use_threads=False):
         notebook_formats = _notebook_formats, 
         stages = "None", 
         export_all_runs = False, 
-        use_threads = False)
+        use_threads = False
+    )
 
-    import_all(mlflow_context.client_dst,
-        mlflow_context.output_dir,
-        delete_model=False,
-        use_src_user_id=False,
-        verbose=False,
-        use_threads=use_threads)
+    import_all(
+        mlflow_client = mlflow_context.client_dst,
+        input_dir = mlflow_context.output_dir,
+        delete_model = False,
+        use_src_user_id = False,
+        verbose = False,
+        use_threads = use_threads
+    )
 
     compare_models_with_versions(mlflow_context, compare_func)
 
@@ -89,10 +92,12 @@ def _add_version(client, model_name, run, stage):
     client.transition_model_version_stage(model_name, vr.version, stage)
 
 def _export_models(client, model_name, output_dir, export_all_runs):
-    export_models(client, [ model_name ],
-        output_dir, 
-        stages="production,staging",
-        export_all_runs=export_all_runs
+    export_models(
+        mlflow_client = client,
+        model_names = [ model_name ],
+        output_dir = output_dir, 
+        stages = "production,staging",
+        export_all_runs = export_all_runs
     )
 
 _num_runs1, _num_runs2 = (2, 3)
@@ -114,7 +119,11 @@ def _run_test_export_runs(mlflow_context, export_all_runs):
     _export_models(client1, model_name, mlflow_context.output_dir, export_all_runs)
     
     client2 = mlflow_context.client_dst
-    import_all(client2, mlflow_context.output_dir, delete_model=False)
+    import_all(
+        mlflow_client = client2, 
+        input_dir = mlflow_context.output_dir, 
+        delete_model = False
+    )
     exps2 = client2.search_experiments()
     runs2 = client2.search_runs([exp.experiment_id for exp in exps2])
     return len(runs2)

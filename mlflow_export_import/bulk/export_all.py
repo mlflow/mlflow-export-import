@@ -22,13 +22,14 @@ ALL_STAGES = "Production,Staging,Archived,None"
 
 
 def export_all(
-        mlflow_client,
         output_dir,
         stages="",
         export_latest_versions=False,
-        notebook_formats=None,
-        use_threads=False
+        notebook_formats = None,
+        use_threads  =  False,
+        mlflow_client = None
     ):
+    mlflow_client = mlflow_client or mlflow.client.MlflowClient()
     start_time = time.time()
     res_models = export_models(
         mlflow_client = mlflow_client,
@@ -74,12 +75,12 @@ def main(output_dir, stages, export_latest_versions, notebook_formats, use_threa
     for k,v in locals().items():
         print(f"  {k}: {v}")
     export_all(
-        mlflow_client = mlflow.client.MlflowClient(),
         output_dir = output_dir, 
         stages = stages,
         export_latest_versions = export_latest_versions,
         notebook_formats = notebook_formats, 
-        use_threads = use_threads)
+        use_threads = use_threads
+    )
 
 
 if __name__ == "__main__":

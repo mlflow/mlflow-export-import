@@ -230,11 +230,11 @@ class AllModelImporter(BaseModelImporter):
     """ High-level 'bulk' model importer.  """
 
     def __init__(self,
-            mlflow_client,
             run_info_map,
             run_importer = None,
             import_source_tags = False,
-            await_creation_for = None
+            await_creation_for = None,
+            mlflow_client = None,
         ):
         super().__init__(
             mlflow_client = mlflow_client,
