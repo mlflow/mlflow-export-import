@@ -77,17 +77,14 @@ assert_widget(input_dir, "3. Input directory")
 
 # COMMAND ----------
 
-from mlflow_export_import.model.import_model import ModelImporter
+from mlflow_export_import.model.import_model import import_model
 
-importer = ModelImporter(
-  mlflow_client = mlflow_client,
+import_model(
+  model_name =model_name, 
+  experiment_name = experiment_name, 
+  input_dir = input_dir, 
+  delete_model = delete_model,
   import_source_tags = import_source_tags
-)
-importer.import_model(
-    model_name =model_name, 
-    input_dir = input_dir, 
-    experiment_name = experiment_name, 
-    delete_model = delete_model
 )
 
 # COMMAND ----------

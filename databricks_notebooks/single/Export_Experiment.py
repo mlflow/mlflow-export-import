@@ -81,15 +81,12 @@ display_experiment_uri(experiment.name)
 
 # COMMAND ----------
 
-from mlflow_export_import.experiment.export_experiment import ExperimentExporter
+from mlflow_export_import.experiment.export_experiment import export_experiment
 
-exporter = ExperimentExporter(
-    mlflow_client = mlflow_client,
+export_experiment(
+    experiment_id_or_name = experiment.experiment_id,
+    output_dir = output_dir,
     notebook_formats = notebook_formats
-  )
-exporter.export_experiment(
-    experiment_id_or_name = experiment.experiment_id,  
-    output_dir = output_dir
 )
 
 # COMMAND ----------

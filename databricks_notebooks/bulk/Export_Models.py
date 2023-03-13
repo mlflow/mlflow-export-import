@@ -5,9 +5,9 @@
 # MAGIC 
 # MAGIC Widgets
 # MAGIC * `1. Models` - comma seperated registered model names to be exported. `all` will export all models.
-# MAGIC * `2. Output base directory`
+# MAGIC * `2. Output base directory` - shared directory between source and destination workspaces.
 # MAGIC * `3. Stages` - stages to be exported.
-# MAGIC * `4. Export all runs` - export all runs of experiment that is linked to a registered model.
+# MAGIC * `4. Export all runs` - export all runs of an experiment that are linked to a registered model.
 # MAGIC * `5. Notebook formats`
 # MAGIC * `6. Use threads`
 # MAGIC 
@@ -64,15 +64,13 @@ assert_widget(output_dir, "2. Output base directory")
 # COMMAND ----------
 
 from mlflow_export_import.bulk.export_models import export_models
-import mlflow
 
 export_models(
-    mlflow_client = mlflow.client.MlflowClient(), 
     model_names = models, 
     output_dir = output_dir,
-    notebook_formats = notebook_formats,
     stages = stages, 
     export_all_runs = export_all_runs,
+    notebook_formats = notebook_formats,
     use_threads = use_threads
 )
 

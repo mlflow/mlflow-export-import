@@ -45,15 +45,12 @@ assert_widget(input_dir, "2. Input directory")
 
 # COMMAND ----------
 
-from mlflow_export_import.experiment.import_experiment import ExperimentImporter
+from mlflow_export_import.experiment.import_experiment import import_experiment
 
-importer = ExperimentImporter(
-    mlflow_client = mlflow.client.MlflowClient(),
-    import_source_tags = import_source_tags
-)
-importer.import_experiment(
+import_experiment(
     experiment_name = experiment_name, 
     input_dir = input_dir,
+    import_source_tags = import_source_tags
 )
 
 # COMMAND ----------

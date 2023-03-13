@@ -40,7 +40,6 @@ assert_widget(output_dir, "1. Output directory")
 from mlflow_export_import.bulk.export_all import export_all
 
 export_all(
-    mlflow_client = mlflow_client,
     output_dir = output_dir, 
     notebook_formats = notebook_formats, 
     use_threads = use_threads

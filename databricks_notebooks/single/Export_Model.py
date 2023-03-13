@@ -77,18 +77,15 @@ display_registered_model_uri(model_name)
 
 # COMMAND ----------
 
-from mlflow_export_import.model.export_model import ModelExporter
+from mlflow_export_import.model.export_model import export_model
 
-exporter = ModelExporter(
-    mlflow_client = mlflow_client,
+export_model(
+    model_name = model_name, 
+    output_dir = output_dir,
     stages = stages,
     #versions = versions, # TODO
     export_latest_versions = export_latest_versions,
     notebook_formats = notebook_formats, 
-)
-exporter.export_model(
-    model_name = model_name, 
-    output_dir = output_dir
 )
 
 # COMMAND ----------

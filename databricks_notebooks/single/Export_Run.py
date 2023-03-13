@@ -74,15 +74,12 @@ dbutils.fs.rm(output_dir, True)
 
 # COMMAND ----------
 
-from mlflow_export_import.run.export_run import RunExporter
+from mlflow_export_import.run.export_run import export_run
 
-exporter = RunExporter(
-    mlflow_client = mlflow.client.MlflowClient(), 
-    notebook_formats = notebook_formats=notebook_formats
-)
-exporter.export_run(
+export_run(
     run_id = run_id, 
-    output_dir = output_dir
+    output_dir = output_dir,
+    notebook_formats = notebook_formats
 )
 
 # COMMAND ----------

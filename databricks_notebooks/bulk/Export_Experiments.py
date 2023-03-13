@@ -5,7 +5,7 @@
 # MAGIC 
 # MAGIC Widgets
 # MAGIC * `1. Experiments` - comma delimited list of either experiment IDs or experiment names. `all` will export all experiments.
-# MAGIC * `2. Output base directory` - Shared directory between source and destination workspaces.
+# MAGIC * `2. Output base directory` - shared directory between source and destination workspaces.
 # MAGIC * `3. Notebook formats`
 # MAGIC * `4. Use threads`
 
@@ -41,14 +41,12 @@ assert_widget(output_dir, "2. Output base directory")
 
 # COMMAND ----------
 
-import mlflow
 from mlflow_export_import.bulk.export_experiments import export_experiments
 
 export_experiments(
-    mlflow_client = mlflow.client.MlflowClient(), 
     experiments = experiments, 
     output_dir = output_dir, 
-    notebook_formats=notebook_formats, 
+    notebook_formats = notebook_formats, 
     use_threads = use_threads
 )
 
