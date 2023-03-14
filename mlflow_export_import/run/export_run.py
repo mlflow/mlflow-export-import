@@ -15,6 +15,8 @@ from mlflow_export_import.common import io_utils
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
 from mlflow_export_import.client.http_client import DatabricksHttpClient
 from mlflow_export_import.notebook.download_notebook import download_notebook
+from mlflow_export_import.common import MlflowExportImportException
+
 
 from mlflow.utils.mlflow_tags import MLFLOW_DATABRICKS_NOTEBOOK_PATH
 MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID = "mlflow.databricks.notebookRevisionID" # NOTE: not in mlflow/utils/mlflow_tags.py
@@ -32,8 +34,13 @@ class RunExporter:
         if notebook_formats is None:
             notebook_formats = []
         self.mlflow_client = mlflow_client
-        self.dbx_client = DatabricksHttpClient()
-        print("Databricks REST client:", self.dbx_client)
+        try:
+            self.dbx_client = DatabricksHttpClient()
+        except MlflowExportImportException as e:
+            print("WARNING: Databricks REST Client could not be initialized "
+                  "Notebook export functionality will be unavailable")
+        else:
+            print("Databricks REST client:", self.dbx_client)
         self.notebook_formats = notebook_formats
 
 
@@ -92,6 +99,8 @@ class RunExporter:
 
 
     def _export_notebook(self, output_dir, notebook, run, fs):
+        if self.dbx_client is None:
+            raise MlflowExportImportException("Cannot export notebooks without an HTTP connection")
         notebook_dir = os.path.join(output_dir, "artifacts", "notebooks")
         fs.mkdirs(notebook_dir)
         revision_id = run.data.tags.get(MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID, None)
