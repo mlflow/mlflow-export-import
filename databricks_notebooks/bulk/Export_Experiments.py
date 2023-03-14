@@ -5,7 +5,7 @@
 # MAGIC 
 # MAGIC Widgets
 # MAGIC * `1. Experiments` - comma delimited list of either experiment IDs or experiment names. `all` will export all experiments.
-# MAGIC * `2. Output base directory` - shared directory between source and destination workspaces.
+# MAGIC * `2. Output directory` - shared directory between source and destination workspaces.
 # MAGIC * `3. Notebook formats`
 # MAGIC * `4. Use threads`
 
@@ -18,8 +18,8 @@
 dbutils.widgets.text("1. Experiments", "") 
 experiments = dbutils.widgets.get("1. Experiments")
 
-dbutils.widgets.text("2. Output base directory", "") 
-output_dir = dbutils.widgets.get("2. Output base directory")
+dbutils.widgets.text("2. Output directory", "") 
+output_dir = dbutils.widgets.get("2. Output directory")
 output_dir = output_dir.replace("dbfs:","/dbfs")
 
 all_formats = [ "SOURCE", "DBC", "HTML", "JUPYTER" ]
@@ -37,7 +37,7 @@ print("use_threads:", use_threads)
 # COMMAND ----------
 
 assert_widget(experiments, "1. Experiments")
-assert_widget(output_dir, "2. Output base directory")
+assert_widget(output_dir, "2. Output directory")
 
 # COMMAND ----------
 
