@@ -33,8 +33,9 @@ def export_model(
     """
     :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
     :param stages: Stages to export. Default is all stages. Values are Production, Staging, Archived and None.
-    :param export_run: Export the run that generated a registered model's version.
     :param export_latest_versions: Export latest registered model versions instead of all versions.
+    :param versions: List of versions to export.
+    :param export_run: Export the run that generated a registered model's version.
     :param mlflow_client: MlflowClient
     """
 
@@ -64,10 +65,11 @@ class ModelExporter():
         ):
         """
         :param mlflow_client: MlflowClient
-        :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
         :param stages: Stages to export. Default is all stages. Values are Production, Staging, Archived and None.
-        :param export_run: Export the run that generated a registered model's version.
+        :param versions: List of versions to export.
         :param export_latest_versions: Export latest registered model versions instead of all versions.
+        :param export_run: Export the run that generated a registered model's version.
+        :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
         """
         self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
         self.http_client = MlflowHttpClient()
