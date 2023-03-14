@@ -6,9 +6,9 @@
 # MAGIC **Widgets**
 # MAGIC * `1. Output directory` - shared directory between source and destination workspaces.
 # MAGIC * `2. Stages` - comma seperated stages to be exported.
-# MAGIC * `3. Use threads`
-# MAGIC * Export all runs - TODO
-# MAGIC * Notebook formats - TODO
+# MAGIC * `3. Export latest versions` - expor all or just the "latest" versions.
+# MAGIC * `4. Notebook formats`
+# MAGIC * `5. Use threads`
 
 # COMMAND ----------
 

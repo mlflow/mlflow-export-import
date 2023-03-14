@@ -7,9 +7,10 @@
 # MAGIC * `1. Models` - comma seperated registered model names to be exported. `all` will export all models.
 # MAGIC * `2. Output directory` - shared directory between source and destination workspaces.
 # MAGIC * `3. Stages` - stages to be exported.
-# MAGIC * `4. Export all runs` - export all runs of an experiment that are linked to a registered model.
-# MAGIC * `5. Notebook formats`
-# MAGIC * `6. Use threads`
+# MAGIC * `4. Export latest versions` - expor all or just the "latest" versions.
+# MAGIC * `5. Export all runs` - export all runs of an experiment that are linked to a registered model.
+# MAGIC * `6. Notebook formats`
+# MAGIC * `7. Use threads`
 # MAGIC 
 # MAGIC See: https://github.com/mlflow/mlflow-export-import/blob/master/README_bulk.md#registered-models.
 
