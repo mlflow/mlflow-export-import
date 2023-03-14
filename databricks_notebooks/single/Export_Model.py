@@ -47,11 +47,16 @@ else:
 dbutils.widgets.dropdown("5. Export latest versions","no",["yes","no"])
 export_latest_versions = dbutils.widgets.get("5. Export latest versions") == "yes"
 
+dbutils.widgets.text("6. Versions", "") 
+versions = dbutils.widgets.get("6. Versions")
+versions = versions.split(",") if versions else []
+
 print("model_name:", model_name)
 print("output_dir:", output_dir)
 print("notebook_formats:", notebook_formats)
 print("stages:", stages)
 print("export_latest_versions:", export_latest_versions)
+print("versions:", versions)
 
 # COMMAND ----------
 
@@ -83,9 +88,9 @@ export_model(
     model_name = model_name, 
     output_dir = output_dir,
     stages = stages,
-    #versions = versions, # TODO
+    versions = versions,
     export_latest_versions = export_latest_versions,
-    notebook_formats = notebook_formats, 
+    notebook_formats = notebook_formats
 )
 
 # COMMAND ----------
