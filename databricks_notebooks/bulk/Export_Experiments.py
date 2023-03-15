@@ -4,10 +4,10 @@
 # MAGIC Export multiple experiments and all their runs.
 # MAGIC 
 # MAGIC Widgets
-# MAGIC * Experiments - comma delimited list of either experiment ID or experiment name. `all` will export all experiments.
-# MAGIC * Output base directory - cloud mounted shared directory between source and destination workspaces.
-# MAGIC * Notebook formats
-# MAGIC * Use threads
+# MAGIC * `1. Experiments` - comma delimited list of either experiment IDs or experiment names. `all` will export all experiments.
+# MAGIC * `2. Output directory` - shared directory between source and destination workspaces.
+# MAGIC * `3. Notebook formats`
+# MAGIC * `4. Use threads`
 
 # COMMAND ----------
 
@@ -18,8 +18,8 @@
 dbutils.widgets.text("1. Experiments", "") 
 experiments = dbutils.widgets.get("1. Experiments")
 
-dbutils.widgets.text("2. Output base directory", "") 
-output_dir = dbutils.widgets.get("2. Output base directory")
+dbutils.widgets.text("2. Output directory", "") 
+output_dir = dbutils.widgets.get("2. Output directory")
 output_dir = output_dir.replace("dbfs:","/dbfs")
 
 all_formats = [ "SOURCE", "DBC", "HTML", "JUPYTER" ]
@@ -29,25 +29,26 @@ notebook_formats = dbutils.widgets.get("3. Notebook formats")
 dbutils.widgets.dropdown("4. Use threads","False",["True","False"])
 use_threads = dbutils.widgets.get("4. Use threads") == "True"
 
-print("experiments:",experiments)
-print("output_dir:",output_dir)
-print("notebook_formats:",notebook_formats)
-print("use_threads:",use_threads)
+print("experiments:", experiments)
+print("output_dir:", output_dir)
+print("notebook_formats:", notebook_formats)
+print("use_threads:", use_threads)
 
 # COMMAND ----------
 
 assert_widget(experiments, "1. Experiments")
-assert_widget(output_dir, "2. Output base directory")
+assert_widget(output_dir, "2. Output directory")
 
 # COMMAND ----------
 
-import mlflow
 from mlflow_export_import.bulk.export_experiments import export_experiments
-export_experiments(mlflow.client.MlflowClient(), 
-                   experiments=experiments, 
-                   output_dir=output_dir, 
-                   notebook_formats=notebook_formats, 
-                   use_threads=use_threads)
+
+export_experiments(
+    experiments = experiments, 
+    output_dir = output_dir, 
+    notebook_formats = notebook_formats, 
+    use_threads = use_threads
+)
 
 # COMMAND ----------
 
@@ -56,7 +57,7 @@ export_experiments(mlflow.client.MlflowClient(),
 # COMMAND ----------
 
 import os
-output_dir = output_dir.replace("dbfs:","/dbfs")
+output_dir = output_dir.replace("dbfs:", "/dbfs")
 os.environ['OUTPUT_DIR'] = output_dir
 output_dir
 

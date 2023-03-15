@@ -1,24 +1,15 @@
 # Databricks notebook source
-# MAGIC %md ## MLflow Export Import - Bulk Notebooks
+# MAGIC %md ## MLflow Export Import bulk notebooks
 # MAGIC 
-# MAGIC Copy multiple MLflow objects. The target object name will be the same as the source object.
-# MAGIC 
-# MAGIC **Notebooks**
-# MAGIC 
-# MAGIC * Experiments
-# MAGIC   * [Export_Experiments]($Export_Experiments) - export experiments and all their runs.
+# MAGIC * Experiments 
+# MAGIC   * [Export_Experiments]($Export_Experiments)
 # MAGIC   * [Import_Experiments]($Import_Experiments)
-# MAGIC * Registered Models
-# MAGIC   * [Export_Models]($Export_Models) - export models, their version runs and the experiments that the runs belong to.
+# MAGIC * Models
+# MAGIC   * [Export_Models]($Export_Models)
 # MAGIC   * [Import_Models]($Import_Models)
-# MAGIC * All
-# MAGIC   * [Export_All]($Export_All) - export all MLflow objects. Note this can be expensive as there can be many MLflow API calls.
-# MAGIC   * Import_All - use [Import_Models]($Import_Models).
+# MAGIC * All - entire workspace of MLflow objects
+# MAGIC   * [Export_All]($Export_All) 
+# MAGIC   * Import - Use [Import_Models]($Import_Models) to import all objects
+# MAGIC * [Common]($Common) - Helper functions
 # MAGIC 
-# MAGIC * [Common]($./Common)
-# MAGIC 
-# MAGIC Core code: https://github.com/mlflow/mlflow-export-import/blob/master/README_bulk.md.
-
-# COMMAND ----------
-
-# MAGIC %md Last updated: 2023-03-07
+# MAGIC Last update: 2023-03-13
