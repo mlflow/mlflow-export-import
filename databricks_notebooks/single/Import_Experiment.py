@@ -2,11 +2,13 @@
 # MAGIC %md ### Import Experiment
 # MAGIC 
 # MAGIC **Widgets**
-# MAGIC * Input directory - DBFS input directory containing an exported experiment.
-# MAGIC * Destination experiment name - Will create if it doesn't exist.
-# MAGIC 
-# MAGIC #### Setup
-# MAGIC * See the Setup section in [README]($./_README).
+# MAGIC * `1. Input directory` - Input directory containing an exported experiment.
+# MAGIC * `2. Destination experiment name` - will create it if it doesn't exist.
+# MAGIC * `3. Import source tags` 
+
+# COMMAND ----------
+
+# MAGIC %md ### Include setup
 
 # COMMAND ----------
 
@@ -14,14 +16,23 @@
 
 # COMMAND ----------
 
+# MAGIC %md ### Widget setup
+
+# COMMAND ----------
+
+
 dbutils.widgets.text("1. Destination experiment name", "") 
 experiment_name = dbutils.widgets.get("1. Destination experiment name")
 
 dbutils.widgets.text("2. Input directory", "") 
 input_dir = dbutils.widgets.get("2. Input directory")
 
-print("input_dir:",input_dir)
-print("experiment_name:",experiment_name)
+dbutils.widgets.dropdown("3. Import source tags","no",["yes","no"])
+import_source_tags = dbutils.widgets.get("3. Import source tags") == "yes"
+
+print("input_dir:", input_dir)
+print("experiment_name:", experiment_name)
+print("import_source_tags:", import_source_tags)
 
 # COMMAND ----------
 
@@ -30,10 +41,21 @@ assert_widget(input_dir, "2. Input directory")
 
 # COMMAND ----------
 
-from mlflow_export_import.experiment.import_experiment import ExperimentImporter
+# MAGIC %md ### Export experiment
 
-importer = ExperimentImporter(mlflow.client.MlflowClient())
-importer.import_experiment(experiment_name, input_dir)
+# COMMAND ----------
+
+from mlflow_export_import.experiment.import_experiment import import_experiment
+
+import_experiment(
+    experiment_name = experiment_name, 
+    input_dir = input_dir,
+    import_source_tags = import_source_tags
+)
+
+# COMMAND ----------
+
+# MAGIC %md ### Display the Experiment link in MLflow UI
 
 # COMMAND ----------
 

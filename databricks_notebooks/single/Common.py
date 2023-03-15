@@ -1,12 +1,14 @@
 # Databricks notebook source
 # MAGIC %sh 
 # MAGIC #pip install mlflow-export-import
-# MAGIC pip install git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
+# MAGIC #pip install git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
+# MAGIC 
+# MAGIC pip install git+https:///github.com/mlflow/mlflow-export-import@issue-90-named-args#egg=mlflow-export-import
 
 # COMMAND ----------
 
 import mlflow
-client = mlflow.client.MlflowClient()
+mlflow_client = mlflow.client.MlflowClient()
 
 # COMMAND ----------
 
@@ -35,7 +37,7 @@ def display_registered_model_uri(model_name):
 
 def display_experiment_uri(experiment_name):
     if host_name:
-        experiment_id = client.get_experiment_by_name(experiment_name).experiment_id
+        experiment_id = mlflow_client.get_experiment_by_name(experiment_name).experiment_id
         uri = "https://{}/#mlflow/experiments/{}".format(host_name, experiment_id)
         displayHTML("""<b>Experiment URI:</b> <a href="{}">{}</a>""".format(uri,uri))
 

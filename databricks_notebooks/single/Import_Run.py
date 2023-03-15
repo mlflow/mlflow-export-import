@@ -1,22 +1,23 @@
 # Databricks notebook source
 # MAGIC %md ## Import Run
 # MAGIC 
-# MAGIC Import run from folder that was created by [Export_Run]($Export_Run) notebook.
+# MAGIC Import run from the folder that was created by the [Export_Run]($Export_Run) notebook.
 # MAGIC 
 # MAGIC #### Widgets
-# MAGIC * Destination experiment name - Import run into this experiment. Will create if it doesn't exist.
-# MAGIC * Input directory - DBFS nput directory containing an exported run.
-# MAGIC 
-# MAGIC #### Setup
-# MAGIC * See Setup in [README]($./_README).
+# MAGIC * `1. Destination experiment name` - Import run into this experiment. Will create if it doesn't exist.
+# MAGIC * `2. Input directory` - Input directory containing an exported run.
 
 # COMMAND ----------
 
-# MAGIC %md ### Setup
+# MAGIC %md ### Include setup
 
 # COMMAND ----------
 
 # MAGIC %run ./Common
+
+# COMMAND ----------
+
+# MAGIC %md ### Widget setup
 
 # COMMAND ----------
 
@@ -26,8 +27,12 @@ experiment_name = dbutils.widgets.get("1. Destination experiment name")
 dbutils.widgets.text("2. Input directory", "") 
 input_dir = dbutils.widgets.get("2. Input directory")
 
-print("input_dir:",input_dir)
-print("experiment_name:",experiment_name)
+dbutils.widgets.dropdown("3. Import source tags","no",["yes","no"])
+import_source_tags = dbutils.widgets.get("3. Import source tags") == "yes"
+
+print("input_dir:", input_dir)
+print("experiment_name:", experiment_name)
+print("import_source_tags:", import_source_tags)
 
 # COMMAND ----------
 
@@ -40,16 +45,32 @@ assert_widget(input_dir, "2. Input base directory")
 
 # COMMAND ----------
 
-import mlflow
-from mlflow_export_import.run.import_run import RunImporter
-importer = RunImporter(mlflow.client.MlflowClient())
-run, _ = importer.import_run(experiment_name, input_dir)
-run.info.run_id
+from mlflow_export_import.run.import_run import import_run
+
+run, _ = import_run(
+    experiment_name = experiment_name, 
+    input_dir = input_dir,
+    import_source_tags = import_source_tags
+)
+print("Run ID:", run.info.run_id)
 
 # COMMAND ----------
 
-# MAGIC %md ### Display MLflow UI URIs
+# MAGIC %md ### Display run link in MLflow UI
 
 # COMMAND ----------
 
 display_run_uri(run.info.run_id)
+
+# COMMAND ----------
+
+# MAGIC %md ### Check imported source tags
+
+# COMMAND ----------
+
+if import_source_tags:
+    import pandas as pd
+    run = mlflow_client.get_run(run.info.run_id)
+    data = [ (k, v) for k,v in run.data.tags.items() if k.startswith("mlflow_exim") ]
+    df = pd.DataFrame(data, columns = ["Key","Value"])
+    display(df)

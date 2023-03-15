@@ -1,14 +1,20 @@
 import os
 import mlflow
 from mlflow_export_import.bulk import bulk_utils
-from oss_utils_test import create_experiment, mk_uuid, delete_experiments_and_models, mk_test_object_name_default
-import sklearn_utils
-from compare_utils import compare_runs
 from mlflow_export_import.bulk.export_experiments import export_experiments
 from mlflow_export_import.bulk.import_experiments import import_experiments
-from init_tests import mlflow_context
 
-notebook_formats = "SOURCE,DBC"
+from init_tests import mlflow_context
+from compare_utils import compare_runs
+import sklearn_utils
+from oss_utils_test import (
+    create_experiment,
+    mk_uuid,
+    delete_experiments_and_models,
+    mk_test_object_name_default
+)
+
+_notebook_formats = "SOURCE,DBC"
 
 # == Setup
 
@@ -63,13 +69,17 @@ def _run_test(mlflow_context, compare_func, use_threads=False):
     delete_experiments_and_models(mlflow_context)
     exps = [ create_test_experiment(mlflow_context.client_src, 3), create_test_experiment(mlflow_context.client_src, 4) ]
     exp_names = [ exp.name for exp in exps ]
-    export_experiments(mlflow_context.client_src,
+    export_experiments(
+        mlflow_client = mlflow_context.client_src,
         experiments = exp_names,
         output_dir = mlflow_context.output_dir,
-        notebook_formats = notebook_formats,
+        notebook_formats = _notebook_formats,
         use_threads = use_threads)
-
-    import_experiments(mlflow_context.client_dst, mlflow_context.output_dir, use_src_user_id=False, use_threads=False)
+    import_experiments(
+        mlflow_client = mlflow_context.client_dst, 
+        input_dir = mlflow_context.output_dir, 
+        use_src_user_id = False, 
+        use_threads = False)
     compare_experiments(mlflow_context, compare_func)
 
 

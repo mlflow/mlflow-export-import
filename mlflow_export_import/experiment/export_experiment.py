@@ -8,32 +8,63 @@ import mlflow
 
 from mlflow_export_import.common.click_options import opt_experiment, opt_output_dir, opt_notebook_formats
 from mlflow_export_import.common.iterators import SearchRunsIterator
-from mlflow_export_import.common import io_utils
-from mlflow_export_import.common import utils
-from mlflow_export_import.common import mlflow_utils
+from mlflow_export_import.common import utils, io_utils, mlflow_utils
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
-from mlflow_export_import.run.export_run import RunExporter
+from mlflow_export_import.run.export_run import export_run
+
+
+def export_experiment(
+        experiment_id_or_name,
+        output_dir,
+        run_ids = None,
+        notebook_formats = None,
+        mlflow_client = None
+    ):
+    """
+    :param experiment_id_or_name: Experiment ID or name.
+    :param output_dir: Output directory.
+    :param run_ids: List of run IDs to export. If None export then all run IDs.
+    :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
+    :param mlflow_client: MLflow client.
+    :return: Number of successful and number of failed runs.
+    """
+    exporter = ExperimentExporter(
+        mlflow_client = mlflow_client,
+        notebook_formats = notebook_formats
+    )
+    return exporter.export_experiment(
+        experiment_id_or_name = experiment_id_or_name,
+        output_dir = output_dir,
+        run_ids = run_ids
+    )
 
 
 class ExperimentExporter():
 
-    def __init__(self, mlflow_client, notebook_formats=None):
+    def __init__(self, 
+            mlflow_client = None,
+            notebook_formats = None
+        ):
         """
         :param mlflow_client: MLflow client.
         :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
         """
-        self.mlflow_client = mlflow_client
-        self.run_exporter = RunExporter(self.mlflow_client, notebook_formats=notebook_formats)
+        self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
+        self.notebook_formats = notebook_formats
 
 
-    def export_experiment(self, exp_id_or_name, output_dir, run_ids=None):
+    def export_experiment(self, 
+            experiment_id_or_name, 
+            output_dir, 
+            run_ids = None
+        ):
         """
-        :param exp_id_or_name: Experiment ID or name.
+        :param experiment_id_or_name: Experiment ID or name.
         :param output_dir: Output directory.
         :param run_ids: List of run IDs to export. If None export all run IDs.
         :return: Number of successful and number of failed runs.
         """
-        exp = mlflow_utils.get_experiment(self.mlflow_client, exp_id_or_name)
+        exp = mlflow_utils.get_experiment(self.mlflow_client, experiment_id_or_name)
         print(f"Exporting experiment '{exp.name}' (ID {exp.experiment_id}) to '{output_dir}'")
         ok_run_ids = []
         failed_run_ids = []
@@ -61,7 +92,9 @@ class ExperimentExporter():
         io_utils.write_export_file(output_dir, "experiment.json", __file__, mlflow_attr, info_attr)
 
         msg = f"for experiment '{exp.name}' (ID: {exp.experiment_id})"
-        if len(failed_run_ids) == 0:
+        if j==0:
+            print(f"WARNING: No runs exported {msg}")
+        elif len(failed_run_ids) == 0:
             print(f"All {len(ok_run_ids)} runs succesfully exported {msg}")
         else:
             print(f"{len(ok_run_ids)/j} runs succesfully exported {msg}")
@@ -72,8 +105,13 @@ class ExperimentExporter():
     def _export_run(self, idx, run, output_dir, ok_run_ids, failed_run_ids):
         run_dir = os.path.join(output_dir, run.info.run_id)
         print(f"Exporting run {idx+1}: {run.info.run_id} of experiment {run.info.experiment_id}")
-        res = self.run_exporter.export_run(run.info.run_id, run_dir)
-        if res:
+        is_success = export_run(
+            run_id = run.info.run_id, 
+            output_dir = run_dir,
+            notebook_formats = self.notebook_formats,
+            mlflow_client = self.mlflow_client
+        )
+        if is_success:
             ok_run_ids.append(run.info.run_id)
         else:
             failed_run_ids.append(run.info.run_id)
@@ -83,15 +121,16 @@ class ExperimentExporter():
 @opt_experiment
 @opt_output_dir
 @opt_notebook_formats
+
 def main(experiment, output_dir, notebook_formats):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    client = mlflow.tracking.MlflowClient()
-    exporter = ExperimentExporter(
-        client,
-        notebook_formats=utils.string_to_list(notebook_formats))
-    exporter.export_experiment(experiment, output_dir)
+    export_experiment(
+        experiment_id_or_name = experiment,
+        output_dir = output_dir,
+        notebook_formats = utils.string_to_list(notebook_formats)
+    )
 
 
 if __name__ == "__main__":

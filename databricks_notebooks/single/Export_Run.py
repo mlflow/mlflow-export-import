@@ -2,15 +2,13 @@
 # MAGIC %md ### Export Run
 # MAGIC 
 # MAGIC ##### Overview
-# MAGIC * Exports an run and its artifacts to a folder.
-# MAGIC * Output file `run.json` contains top-level run metadata.
+# MAGIC * Exports a run and its artifacts to a folder.
+# MAGIC * Output file `run.json` contains run metadata to be able to rehydrate the run.
 # MAGIC * Notebooks are also exported in several formats.
 # MAGIC 
 # MAGIC #### Output folder
 # MAGIC ```
-# MAGIC 
 # MAGIC +-artifacts/
-# MAGIC | +-plot.png
 # MAGIC | +-sklearn-model/
 # MAGIC | | +-model.pkl
 # MAGIC | | +-conda.yaml
@@ -19,14 +17,10 @@
 # MAGIC ```
 # MAGIC 
 # MAGIC ##### Widgets
-# MAGIC * Run ID 
-# MAGIC * Output base directory - Base output folder of the exported run.
-# MAGIC * Notebook formats:
-# MAGIC   * Standard Databricks notebook formats such as SOURCE, HTML, JUPYTER, DBC. 
+# MAGIC * `1. Run ID` 
+# MAGIC * `2. Output base directory` - Base output directory of the exported run.
+# MAGIC * `3. Notebook formats` - Standard Databricks notebook formats such as SOURCE, HTML, JUPYTER, DBC. 
 # MAGIC   * See [Databricks Export Format](https://docs.databricks.com/dev-tools/api/latest/workspace.html#notebookexportformat)  documentation.
-# MAGIC   
-# MAGIC #### Setup
-# MAGIC * See Setup in [README]($./_README).
 
 # COMMAND ----------
 
@@ -60,7 +54,7 @@ import mlflow
 
 # COMMAND ----------
 
-# MAGIC %md ### Display MLflow UI URI of Run
+# MAGIC %md ### Display the Run link in MLflow UI
 
 # COMMAND ----------
 
@@ -80,10 +74,13 @@ dbutils.fs.rm(output_dir, True)
 
 # COMMAND ----------
 
-from mlflow_export_import.run.export_run import RunExporter
-exporter = RunExporter(mlflow.client.MlflowClient(), 
-                       notebook_formats=notebook_formats)
-exporter.export_run(run_id, output_dir)
+from mlflow_export_import.run.export_run import export_run
+
+export_run(
+    run_id = run_id, 
+    output_dir = output_dir,
+    notebook_formats = notebook_formats
+)
 
 # COMMAND ----------
 

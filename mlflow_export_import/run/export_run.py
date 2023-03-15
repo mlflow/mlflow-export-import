@@ -9,7 +9,11 @@ import click
 import mlflow
 
 from mlflow_export_import.common import utils
-from mlflow_export_import.common.click_options import opt_run_id, opt_output_dir, opt_notebook_formats
+from mlflow_export_import.common.click_options import (
+    opt_run_id,
+    opt_output_dir,
+    opt_notebook_formats
+)
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
@@ -22,33 +26,53 @@ MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID = "mlflow.databricks.notebookRevisionID" 
 print("MLflow Version:", mlflow.__version__)
 print("MLflow Tracking URI:", mlflow.get_tracking_uri())
 
+
+def export_run(
+        run_id,
+        output_dir,
+        notebook_formats = None,
+        mlflow_client = None
+    ):
+    """
+    :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
+    :param run_id: Run ID.
+    :param output_dir: Output directory.
+    :param mlflow_client: MLflow client.
+    :return: Whether export succeeded.
+    """
+    exporter = RunExporter(
+        mlflow_client = mlflow_client,
+        notebook_formats = notebook_formats
+    )
+    return exporter.export_run(
+        run_id = run_id,
+        output_dir = output_dir
+    )
+
+
 class RunExporter:
 
-    def __init__(self, mlflow_client, notebook_formats=None):
+    def __init__(self, 
+            mlflow_client, 
+            notebook_formats = None
+        ):
         """
         :param mlflow_client: MLflow client.
         :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
         """
         if notebook_formats is None:
             notebook_formats = []
-        self.mlflow_client = mlflow_client
+        self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
+
         self.dbx_client = DatabricksHttpClient()
         print("Databricks REST client:", self.dbx_client)
         self.notebook_formats = notebook_formats
 
 
-    def _get_metrics_with_steps(self, run):
-        metrics_with_steps = {}
-        for metric in run.data.metrics.keys():
-            metric_history = self.mlflow_client.get_metric_history(run.info.run_id,metric)
-            lst = [utils.strip_underscores(m) for m in metric_history]
-            for x in lst:
-                del x["key"] 
-            metrics_with_steps[metric] = lst
-        return metrics_with_steps
-
-
-    def export_run(self, run_id, output_dir):
+    def export_run(self, 
+            run_id, 
+            output_dir
+        ):
         """
         :param run_id: Run ID.
         :param output_dir: Output directory.
@@ -91,6 +115,17 @@ class RunExporter:
             return False
 
 
+    def _get_metrics_with_steps(self, run):
+        metrics_with_steps = {}
+        for metric in run.data.metrics.keys():
+            metric_history = self.mlflow_client.get_metric_history(run.info.run_id,metric)
+            lst = [utils.strip_underscores(m) for m in metric_history]
+            for x in lst:
+                del x["key"] 
+            metrics_with_steps[metric] = lst
+        return metrics_with_steps
+
+
     def _export_notebook(self, output_dir, notebook, run, fs):
         notebook_dir = os.path.join(output_dir, "artifacts", "notebooks")
         fs.mkdirs(notebook_dir)
@@ -112,15 +147,16 @@ class RunExporter:
 @opt_run_id
 @opt_output_dir
 @opt_notebook_formats
+
 def main(run_id, output_dir, notebook_formats):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    client = mlflow.tracking.MlflowClient()
-    exporter = RunExporter(
-      client,
-      notebook_formats=utils.string_to_list(notebook_formats))
-    exporter.export_run(run_id, output_dir)
+    export_run(
+        run_id = run_id,
+        output_dir = output_dir,
+        notebook_formats = utils.string_to_list(notebook_formats)
+    )
 
 
 if __name__ == "__main__":

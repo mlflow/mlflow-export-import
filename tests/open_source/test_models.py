@@ -1,8 +1,8 @@
 import os
 from mlflow_export_import.common.source_tags import ExportTags
 from mlflow_export_import.common import MlflowExportImportException
-from mlflow_export_import.model.export_model import ModelExporter
-from mlflow_export_import.model.import_model import ModelImporter
+from mlflow_export_import.model.export_model import export_model
+from mlflow_export_import.model.import_model import import_model
 from mlflow_export_import.model.import_model import _extract_model_path, _path_join
 
 import oss_utils_test 
@@ -80,7 +80,6 @@ def test_export_import_model_two_from_middle_versions(mlflow_context):
 # Internal
 
 def _run_test_export_import_model_stages(mlflow_context, stages=None, versions=None):
-    exporter = ModelExporter(mlflow_context.client_src, stages=stages, versions=versions)
     model_name_src = oss_utils_test.mk_test_object_name_default()
     desc = "Hello decription"
     tags = { "city": "franconia" }
@@ -90,17 +89,26 @@ def _run_test_export_import_model_stages(mlflow_context, stages=None, versions=N
     _create_version(mlflow_context.client_src, model_name_src, "Staging")
     _create_version(mlflow_context.client_src, model_name_src, "Archived")
     _create_version(mlflow_context.client_src, model_name_src, "None")
+
     model_src = mlflow_context.client_src.get_registered_model(model_name_src)
-    exporter.export_model(model_name_src, mlflow_context.output_dir)
+    export_model(
+        model_name = model_name_src,
+        output_dir = mlflow_context.output_dir,
+        stages = stages,
+        versions = versions,
+        mlflow_client = mlflow_context.client_src
+    )
 
     model_name_dst = oss_utils_test.create_dst_model_name(model_name_src)
-    experiment_name =  model_name_dst
-    importer = ModelImporter(mlflow_context.client_dst, import_source_tags=True)
-    importer.import_model(model_name_dst, 
-        mlflow_context.output_dir, 
-        experiment_name, delete_model=True, 
-        verbose=False, 
-        sleep_time=10)
+    import_model(
+        model_name = model_name_dst,
+        experiment_name = model_name_dst,
+        input_dir = mlflow_context.output_dir, 
+        import_source_tags = True,
+        delete_model = True, 
+        sleep_time = 10,
+        mlflow_client = mlflow_context.client_dst
+    )
 
     model_dst = mlflow_context.client_dst.get_registered_model(model_name_dst)
     return model_src, model_dst

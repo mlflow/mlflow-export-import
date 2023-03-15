@@ -23,23 +23,59 @@ def _set_source_tags_for_field(dct, tags):
     fmt_timestamps("last_updated_timestamp", dct, tags)
 
 
+def import_model(
+        model_name,
+        experiment_name,
+        input_dir,
+        delete_model = False,
+        import_source_tags = False,
+        verbose=False,
+        await_creation_for = None,
+        sleep_time = 30,
+        mlflow_client = None,
+    ):
+    importer = ModelImporter(
+        import_source_tags = import_source_tags,
+        await_creation_for = await_creation_for,
+        mlflow_client = mlflow_client
+    )
+    return importer.import_model(
+        model_name = model_name,
+        input_dir = input_dir,
+        experiment_name = experiment_name,
+        delete_model = delete_model,
+        verbose = verbose,
+        sleep_time = sleep_time
+    )
+
+
 class BaseModelImporter():
     """ Base class of ModelImporter subclasses. """
 
-    def __init__(self, mlflow_client, run_importer=None, import_source_tags=False, await_creation_for=None):
+    def __init__(self,
+            mlflow_client,
+            run_importer = None,
+            import_source_tags = False,
+            await_creation_for = None):
         """
         :param mlflow_client: MLflow client or if None create default client.
         :param run_importer: RunImporter instance.
         :param import_source_tags: Import source information for MLFlow objects and create tags in destination object.
         :param await_creation_for: Seconds to wait for model version crreation.
         """
-        self.mlflow_client = mlflow_client 
+        self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
         self.run_importer = run_importer if run_importer else RunImporter(self.mlflow_client, import_source_tags=import_source_tags, mlmodel_fix=True)
         self.import_source_tags = import_source_tags 
         self.await_creation_for = await_creation_for 
 
 
-    def _import_version(self, model_name, src_vr, dst_run_id, dst_source, sleep_time):
+    def _import_version(self,
+            model_name,
+            src_vr,
+            dst_run_id,
+            dst_source,
+            sleep_time
+        ):
         """
         :param model_name: Model name.
         :param src_vr: Source model version.
@@ -56,9 +92,9 @@ class BaseModelImporter():
             _set_source_tags_for_field(src_vr, tags)
 
         dst_vr = self.mlflow_client.create_model_version(
-            model_name, 
+            model_name,
             dst_source, dst_run_id, \
-            description=src_vr["description"], 
+            description=src_vr["description"],
             tags=tags, **kwargs
         )
 
@@ -69,7 +105,11 @@ class BaseModelImporter():
             self.mlflow_client.transition_model_version_stage(model_name, dst_vr.version, src_current_stage)
 
 
-    def _import_model(self, model_name, input_dir, delete_model=False):
+    def _import_model(self,
+            model_name,
+            input_dir,
+            delete_model = False
+        ):
         """
         :param model_name: Model name.
         :param input_dir: Input directory.
@@ -109,13 +149,28 @@ class BaseModelImporter():
 class ModelImporter(BaseModelImporter):
     """ Low-level 'point' model importer.  """
 
-    def __init__(self, mlflow_client, run_importer=None, import_source_tags=False, await_creation_for=None):
-        super().__init__(mlflow_client, 
-            run_importer, import_source_tags=import_source_tags, 
-            await_creation_for=await_creation_for)
+    def __init__(self,
+            mlflow_client,
+            run_importer = None,
+            import_source_tags = False,
+            await_creation_for = None
+        ):
+        super().__init__(
+            mlflow_client = mlflow_client,
+            run_importer = run_importer,
+            import_source_tags = import_source_tags,
+            await_creation_for = await_creation_for
+        )
 
 
-    def import_model(self, model_name, input_dir, experiment_name, delete_model=False, verbose=False, sleep_time=30):
+    def import_model(self,
+            model_name,
+            input_dir,
+            experiment_name,
+            delete_model = False,
+            verbose = False,
+            sleep_time = 30
+        ):
         """
         :param model_name: Model name.
         :param input_dir: Input directory.
@@ -150,7 +205,10 @@ class ModelImporter(BaseModelImporter):
         print(f"      source:           {source}")
         model_path = _extract_model_path(source, run_id)
         print(f"      model_path:   {model_path}")
-        dst_run,_ = self.run_importer.import_run(experiment_name, run_dir)
+        dst_run,_ = self.run_importer.import_run(
+            experiment_name = experiment_name,
+            input_dir = run_dir
+        )
         dst_run_id = dst_run.info.run_id
         run = self.mlflow_client.get_run(dst_run_id)
         print(f"    Destination run - imported run:")
@@ -171,12 +229,29 @@ class ModelImporter(BaseModelImporter):
 class AllModelImporter(BaseModelImporter):
     """ High-level 'bulk' model importer.  """
 
-    def __init__(self, mlflow_client, run_info_map, run_importer=None, import_source_tags=False, await_creation_for=None):
-        super().__init__(mlflow_client, run_importer, import_source_tags=import_source_tags, await_creation_for=await_creation_for)
+    def __init__(self,
+            run_info_map,
+            run_importer = None,
+            import_source_tags = False,
+            await_creation_for = None,
+            mlflow_client = None,
+        ):
+        super().__init__(
+            mlflow_client = mlflow_client,
+            run_importer = run_importer,
+            import_source_tags = import_source_tags,
+            await_creation_for = await_creation_for
+         )
         self.run_info_map = run_info_map
 
 
-    def import_model(self, model_name, input_dir, delete_model=False, verbose=False, sleep_time=30):
+    def import_model(self,
+            model_name,
+            input_dir,
+            delete_model = False,
+            verbose = False,
+            sleep_time = 30
+        ):
         """
         :param model_name: Model name.
         :param input_dir: Input directory.
@@ -256,13 +331,21 @@ def _path_join(x, y):
     default=5,
 )
 @opt_verbose
+
 def main(input_dir, model, experiment_name, delete_model, await_creation_for, import_source_tags, verbose, sleep_time):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    client = mlflow.client.MlflowClient()
-    importer = ModelImporter(client, import_source_tags=import_source_tags, await_creation_for=await_creation_for)
-    importer.import_model(model, input_dir, experiment_name, delete_model, verbose, sleep_time)
+    import_model(
+        model_name = model,
+        experiment_name = experiment_name,
+        input_dir = input_dir,
+        delete_model = delete_model,
+        import_source_tags = import_source_tags,
+        await_creation_for = await_creation_for,
+        sleep_time = sleep_time,
+        verbose = verbose
+    )
 
 
 if __name__ == "__main__":
