@@ -9,9 +9,10 @@
 # MAGIC ##### Widgets
 # MAGIC * `1. Model` - Registered model name to export.
 # MAGIC * `2. Output base directory` - Base output directory to which the model name will be appended to.
-# MAGIC * `3. Notebook formats` - Notebook formats to export.
-# MAGIC * `4. Stages` - Model version stages to export.
-# MAGIC * `5. Export latest versions`
+# MAGIC * `3. Stages` - Model version stages to export.
+# MAGIC * `4. Export latest versions`
+# MAGIC * `5. Versions` - comma delimited version numbers to export.
+# MAGIC * `6. Notebook formats` - Notebook formats to export.
 
 # COMMAND ----------
 
@@ -33,25 +34,30 @@ model_name = dbutils.widgets.get("1. Model")
 dbutils.widgets.text("2. Output base directory", "") 
 output_dir = dbutils.widgets.get("2. Output base directory")
 
-notebook_formats = get_notebook_formats(3) # widget "3.Notebook formats"
-
 all_stages = [ "All", "Production", "Staging", "Archived", "None" ]
-dbutils.widgets.multiselect("4. Stages", all_stages[0], all_stages)
-stages = dbutils.widgets.get("4. Stages")
+dbutils.widgets.multiselect("3. Stages", all_stages[0], all_stages)
+stages = dbutils.widgets.get("3. Stages")
 if stages == "All": 
     stages = None
 else:
     stages = stages.split(",")
     if "" in stages: stages.remove("")
 
-dbutils.widgets.dropdown("5. Export latest versions","no",["yes","no"])
-export_latest_versions = dbutils.widgets.get("5. Export latest versions") == "yes"
+dbutils.widgets.dropdown("4. Export latest versions","no",["yes","no"])
+export_latest_versions = dbutils.widgets.get("4. Export latest versions") == "yes"
+
+dbutils.widgets.text("5. Versions", "") 
+versions = dbutils.widgets.get("5. Versions")
+versions = versions.split(",") if versions else []
+
+notebook_formats = get_notebook_formats(6) # widget "6. Notebook formats"
 
 print("model_name:", model_name)
 print("output_dir:", output_dir)
 print("notebook_formats:", notebook_formats)
 print("stages:", stages)
 print("export_latest_versions:", export_latest_versions)
+print("versions:", versions)
 
 # COMMAND ----------
 
@@ -83,9 +89,9 @@ export_model(
     model_name = model_name, 
     output_dir = output_dir,
     stages = stages,
-    #versions = versions, # TODO
+    versions = versions,
     export_latest_versions = export_latest_versions,
-    notebook_formats = notebook_formats, 
+    notebook_formats = notebook_formats
 )
 
 # COMMAND ----------
