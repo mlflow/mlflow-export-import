@@ -5,11 +5,7 @@
 # MAGIC 
 # MAGIC Widgets
 # MAGIC * `1. Experiments` - comma delimited list of either experiment IDs or experiment names. `all` will export all experiments.
-<<<<<<< HEAD
 # MAGIC * `2. Output directory` - shared directory between source and destination workspaces.
-=======
-# MAGIC * `2. Output base directory` - shared directory between source and destination workspaces.
->>>>>>> origin/issue-90-named-args
 # MAGIC * `3. Notebook formats`
 # MAGIC * `4. Use threads`
 

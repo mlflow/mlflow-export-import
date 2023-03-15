@@ -5,20 +5,12 @@
 # MAGIC 
 # MAGIC Widgets
 # MAGIC * `1. Models` - comma seperated registered model names to be exported. `all` will export all models.
-<<<<<<< HEAD
 # MAGIC * `2. Output directory` - shared directory between source and destination workspaces.
 # MAGIC * `3. Stages` - stages to be exported.
 # MAGIC * `4. Export latest versions` - expor all or just the "latest" versions.
 # MAGIC * `5. Export all runs` - export all runs of an experiment that are linked to a registered model.
 # MAGIC * `6. Notebook formats`
 # MAGIC * `7. Use threads`
-=======
-# MAGIC * `2. Output base directory` - shared directory between source and destination workspaces.
-# MAGIC * `3. Stages` - stages to be exported.
-# MAGIC * `4. Export all runs` - export all runs of an experiment that are linked to a registered model.
-# MAGIC * `5. Notebook formats`
-# MAGIC * `6. Use threads`
->>>>>>> origin/issue-90-named-args
 # MAGIC 
 # MAGIC See: https://github.com/mlflow/mlflow-export-import/blob/master/README_bulk.md#registered-models.
 
@@ -64,14 +56,9 @@ os.environ["OUTPUT_DIR"] = output_dir
 print("models:", models)
 print("output_dir:", output_dir)
 print("stages:", stages)
-<<<<<<< HEAD
 print("export_latest_versions:", export_latest_versions)
 print("export_all_runs:", export_all_runs)
 print("notebook_formats:", notebook_formats)
-=======
-print("notebook_formats:", notebook_formats)
-print("export_all_runs:", export_all_runs)
->>>>>>> origin/issue-90-named-args
 print("use_threads:", use_threads)
 
 # COMMAND ----------
@@ -91,10 +78,7 @@ export_models(
     model_names = models, 
     output_dir = output_dir,
     stages = stages, 
-<<<<<<< HEAD
     export_latest_versions = export_latest_versions,
-=======
->>>>>>> origin/issue-90-named-args
     export_all_runs = export_all_runs,
     notebook_formats = notebook_formats,
     use_threads = use_threads
