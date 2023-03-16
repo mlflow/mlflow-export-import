@@ -33,15 +33,13 @@ Accepts either an experiment ID or name.
 export-experiment --help
 
 Options:
-  --experiment TEXT              Experiment name or ID.  [required]
-  --output-dir TEXT              Output directory.  [required]
-  --export-source-tagss BOOLEAN  Export source run information (RunInfo,
-                                 MLflow system tags starting with 'mlflow' and
-                                 metadata) under the 'mlflow_export_import'
-                                 tag prefix. See README.md for more details.
-                                 [default: False]
-  --notebook-formats TEXT         Notebook formats. Values are SOURCE, HTML,
-                                  JUPYTER or DBC (comma seperated).  [default: ]
+  --experiment TEXT             Experiment name or ID.  [required]
+  --output-dir TEXT             Output directory.  [required]
+  --export-permissions BOOLEAN  Export Databricks permissions.  [default:
+                                False]
+  --notebook-formats TEXT       Databricks notebook formats. Values are
+                                SOURCE, HTML, JUPYTER or DBC (comma
+                                seperated).
 ```
 
 #### Examples
@@ -256,20 +254,25 @@ Source: [export_model.py](mlflow_export_import/model/export_model.py).
 
 #### Usage
 ```
+export-model --help
+
 Options:
-  --model TEXT                   Registered model name.  [required]
-  --output-dir TEXT              Output directory.  [required]
-  --notebook-formats TEXT        Databricks notebook formats. Values are
-                                 SOURCE, HTML, JUPYTER or DBC (comma
-                                 seperated).
-  --stages TEXT                  Stages to export (comma seperated). Default
-                                 is all stages and all versions. Stages are
-                                 Production, Staging, Archived and None.
-                                 Mututally exclusive with option --versions.
-  --versions TEXT                Export specified versions (comma separated).
-                                 Mututally exclusive with option --stages.
-  --export-all-versions BOOLEAN  Export latest registered model versions
-                                 instead of all versions.  [default: False]
+  --model TEXT                    Registered model name.  [required]
+  --output-dir TEXT               Output directory.  [required]
+  --notebook-formats TEXT         Databricks notebook formats. Values are
+                                  SOURCE, HTML, JUPYTER or DBC (comma
+                                  seperated).
+  --stages TEXT                   Stages to export (comma seperated). Default
+                                  is all stages and all versions. Stages are
+                                  Production, Staging, Archived and None.
+                                  Mututally exclusive with option --versions.
+  --versions TEXT                 Export specified versions (comma separated).
+                                  Mututally exclusive with option --stages.
+  --export-latest-versions BOOLEAN
+                                  Export latest registered model versions
+                                  instead of all versions.  [default: False]
+  --export-permissions BOOLEAN    Export Databricks permissions.  [default:
+                                  False]
 ```
 
 #### Example
@@ -292,7 +295,6 @@ Output export directory example.
 ```
 +-749930c36dee49b8aeb45ee9cdfe1abb/
 | +-artifacts/
-|   +-plot.png
 |   +-sklearn-model/
 |   | +-model.pkl
 |   | +-conda.yaml

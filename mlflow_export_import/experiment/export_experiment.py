@@ -6,9 +6,15 @@ import os
 import click
 import mlflow
 
-from mlflow_export_import.common.click_options import opt_experiment, opt_output_dir, opt_notebook_formats
+from mlflow_export_import.common.click_options import (
+    opt_experiment,
+    opt_output_dir,  
+    opt_notebook_formats,
+    opt_export_permissions
+)
 from mlflow_export_import.common.iterators import SearchRunsIterator
 from mlflow_export_import.common import utils, io_utils, mlflow_utils
+from mlflow_export_import.common import permissions_utils
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
 from mlflow_export_import.run.export_run import export_run
 
@@ -17,6 +23,7 @@ def export_experiment(
         experiment_id_or_name,
         output_dir,
         run_ids = None,
+        export_permissions = False,
         notebook_formats = None,
         mlflow_client = None
     ):
@@ -30,6 +37,7 @@ def export_experiment(
     """
     exporter = ExperimentExporter(
         mlflow_client = mlflow_client,
+        export_permissions = export_permissions,
         notebook_formats = notebook_formats
     )
     return exporter.export_experiment(
@@ -41,8 +49,9 @@ def export_experiment(
 
 class ExperimentExporter():
 
-    def __init__(self, 
+    def __init__(self,
             mlflow_client = None,
+            export_permissions = False,
             notebook_formats = None
         ):
         """
@@ -50,12 +59,13 @@ class ExperimentExporter():
         :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
         """
         self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
+        self.export_permissions = export_permissions
         self.notebook_formats = notebook_formats
 
 
-    def export_experiment(self, 
-            experiment_id_or_name, 
-            output_dir, 
+    def export_experiment(self,
+            experiment_id_or_name,
+            output_dir,
             run_ids = None
         ):
         """
@@ -89,6 +99,8 @@ class ExperimentExporter():
         exp_dct["tags"] = dict(sorted(exp_dct["tags"].items()))
 
         mlflow_attr = { "experiment": exp_dct , "runs": ok_run_ids }
+        if utils.importing_into_databricks() and self.export_permissions:
+            permissions_utils.add_experiment_permissions(exp.experiment_id, mlflow_attr)
         io_utils.write_export_file(output_dir, "experiment.json", __file__, mlflow_attr, info_attr)
 
         msg = f"for experiment '{exp.name}' (ID: {exp.experiment_id})"
@@ -106,7 +118,7 @@ class ExperimentExporter():
         run_dir = os.path.join(output_dir, run.info.run_id)
         print(f"Exporting run {idx+1}: {run.info.run_id} of experiment {run.info.experiment_id}")
         is_success = export_run(
-            run_id = run.info.run_id, 
+            run_id = run.info.run_id,
             output_dir = run_dir,
             notebook_formats = self.notebook_formats,
             mlflow_client = self.mlflow_client
@@ -120,15 +132,17 @@ class ExperimentExporter():
 @click.command()
 @opt_experiment
 @opt_output_dir
+@opt_export_permissions
 @opt_notebook_formats
 
-def main(experiment, output_dir, notebook_formats):
+def main(experiment, output_dir, export_permissions, notebook_formats):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
     export_experiment(
         experiment_id_or_name = experiment,
         output_dir = output_dir,
+        export_permissions = export_permissions,
         notebook_formats = utils.string_to_list(notebook_formats)
     )
 

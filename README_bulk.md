@@ -44,6 +44,12 @@ Options:
   --export-latest-versions BOOLEAN
                                   Export latest registered model versions
                                   instead of all versions.  [default: False]
+  --stages TEXT                   Stages to export (comma seperated). Default
+                                  is all stages and all versions. Stages are
+                                  Production, Staging, Archived and None.
+                                  Mututally exclusive with option --versions.
+  --export-permissions BOOLEAN    Export Databricks permissions.  [default:
+                                  False]
   --notebook-formats TEXT         Databricks notebook formats. Values are
                                   SOURCE, HTML, JUPYTER or DBC (comma
                                   seperated).
@@ -130,18 +136,21 @@ Options:
   --export-latest-versions BOOLEAN
                                   Export latest registered model versions
                                   instead of all versions.  [default: False]
+  --export-all-runs BOOLEAN       Export all runs of experiment or just runs
+                                  associated with registered model versions.
+                                  [default: False]
   --stages TEXT                   Stages to export (comma seperated). Default
                                   is all stages and all versions. Stages are
                                   Production, Staging, Archived and None.
                                   Mututally exclusive with option --versions.
-  --export-all-runs BOOLEAN       Export all runs of experiment or just runs
-                                  associated with registered model versions.
-                                  [default: False]
+  --export-permissions BOOLEAN    Export Databricks permissions.  [default:
+                                  False]
   --notebook-formats TEXT         Databricks notebook formats. Values are
                                   SOURCE, HTML, JUPYTER or DBC (comma
                                   seperated).
   --use-threads BOOLEAN           Process in parallel using threads.
                                   Experimental: needs improved logging.
+                                  [default: False]
 ```
 
 #### Examples
@@ -226,14 +235,19 @@ Export several (or all) experiments to a directory.
 export-experiments --help
 
 Options:
-  --experiments TEXT       Experiment names or IDs (comma delimited).
-                           For example, 'sklearn_wine,sklearn_iris' or '1,2'.
-                           'all' will export all experiments.  [required]
-  --output-dir TEXT        Output directory.  [required]
-  --notebook-formats TEXT  Databricks notebook formats. Values are SOURCE,
-                           HTML, JUPYTER or DBC (comma seperated).
-  --use-threads BOOLEAN    Process in parallel using threads. Experimental:
-                           needs improved logging.  [default: False]
+  --experiments TEXT            Experiment names or IDs (comma delimited).
+                                For example, 'sklearn_wine,sklearn_iris' or
+                                '1,2'. 'all' will export all experiments.
+                                [required]
+  --output-dir TEXT             Output directory.  [required]
+  --export-permissions BOOLEAN  Export Databricks permissions.  [default:
+                                False]
+  --notebook-formats TEXT       Databricks notebook formats. Values are
+                                SOURCE, HTML, JUPYTER or DBC (comma
+                                seperated).
+  --use-threads BOOLEAN         Process in parallel using threads.
+                                Experimental: needs improved logging.
+                                [default: False]
 ```
 
 #### Examples

@@ -11,6 +11,7 @@ from mlflow_export_import.common.click_options import (
     opt_output_dir, 
     opt_export_latest_versions,
     opt_stages,
+    opt_export_permissions,
     opt_notebook_formats, 
     opt_use_threads,
 )
@@ -23,8 +24,9 @@ ALL_STAGES = "Production,Staging,Archived,None"
 
 def export_all(
         output_dir,
-        stages="",
-        export_latest_versions=False,
+        stages = "",
+        export_latest_versions = False,
+        export_permissions = False,
         notebook_formats = None,
         use_threads  =  False,
         mlflow_client = None
@@ -38,6 +40,7 @@ def export_all(
         stages = stages,
         export_latest_versions = export_latest_versions,
         export_all_runs = True,
+        export_permissions = export_permissions,
         notebook_formats = notebook_formats, 
         use_threads = use_threads
     )
@@ -45,6 +48,7 @@ def export_all(
         mlflow_client = mlflow_client,
         experiments = "all",
         output_dir = os.path.join(output_dir,"experiments"),
+        export_permissions = export_permissions,
         notebook_formats = notebook_formats,
         use_threads = use_threads
     )
@@ -52,6 +56,8 @@ def export_all(
 
     info_attr = {
         "stages": ALL_STAGES,
+        "export_latest_versions": export_latest_versions,
+        "export_permissions": export_permissions,
         "notebook_formats": notebook_formats,
         "use_threads": use_threads,
         "output_dir": output_dir,
@@ -67,10 +73,11 @@ def export_all(
 @opt_output_dir
 @opt_export_latest_versions
 @opt_stages
+@opt_export_permissions
 @opt_notebook_formats
 @opt_use_threads
 
-def main(output_dir, stages, export_latest_versions, notebook_formats, use_threads):
+def main(output_dir, stages, export_latest_versions, export_permissions, notebook_formats, use_threads):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
@@ -78,6 +85,7 @@ def main(output_dir, stages, export_latest_versions, notebook_formats, use_threa
         output_dir = output_dir, 
         stages = stages,
         export_latest_versions = export_latest_versions,
+        export_permissions = export_permissions, 
         notebook_formats = notebook_formats, 
         use_threads = use_threads
     )

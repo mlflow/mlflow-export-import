@@ -44,6 +44,15 @@ def opt_export_latest_versions(function):
     )(function)
     return function
 
+def opt_export_permissions(function):
+    function = click.option("--export-permissions",
+        help="Export Databricks permissions.",
+        type=bool,
+        default=False,
+        show_default=True
+    )(function)
+    return function
+
 # == import
 
 def opt_input_dir(function):

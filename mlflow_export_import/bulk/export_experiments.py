@@ -11,6 +11,7 @@ import mlflow
 from mlflow_export_import.common.click_options import (
     opt_experiments,
     opt_output_dir,
+    opt_export_permissions,
     opt_notebook_formats,
     opt_use_threads
 )
@@ -19,7 +20,7 @@ from mlflow_export_import.bulk import bulk_utils
 from mlflow_export_import.experiment.export_experiment import export_experiment
 
 
-def _export_experiment(mlflow_client, exp_id_or_name, output_dir, notebook_formats, export_results, run_ids):
+def _export_experiment(mlflow_client, exp_id_or_name, output_dir, export_permissions, notebook_formats, export_results, run_ids):
     exp = mlflow_utils.get_experiment(mlflow_client, exp_id_or_name)
     exp_output_dir = os.path.join(output_dir, exp.experiment_id)
     ok_runs = -1; failed_runs = -1
@@ -29,6 +30,7 @@ def _export_experiment(mlflow_client, exp_id_or_name, output_dir, notebook_forma
             experiment_id_or_name = exp.experiment_id,
             output_dir = exp_output_dir,
             run_ids = run_ids,
+            export_permissions = export_permissions,
             notebook_formats = notebook_formats,
             mlflow_client = mlflow_client
         )
@@ -51,6 +53,7 @@ def _export_experiment(mlflow_client, exp_id_or_name, output_dir, notebook_forma
 def export_experiments(
         experiments,
         output_dir,
+        export_permissions = False,
         notebook_formats = None,
         use_threads = False,
         mlflow_client = None
@@ -91,7 +94,10 @@ def export_experiments(
         for exp_id_or_name in experiments:
             run_ids = experiments_dct.get(exp_id_or_name, None)
             future = executor.submit(_export_experiment,
-                mlflow_client, exp_id_or_name, output_dir, notebook_formats, export_results, run_ids)
+                mlflow_client, exp_id_or_name, output_dir, 
+                export_permissions, notebook_formats, 
+                export_results, run_ids
+            )
             futures.append(future)
     duration = round(time.time() - start_time, 1)
     ok_runs = 0
@@ -126,16 +132,18 @@ def export_experiments(
 @click.command()
 @opt_experiments
 @opt_output_dir
+@opt_export_permissions
 @opt_notebook_formats
 @opt_use_threads
 
-def main(experiments, output_dir, notebook_formats, use_threads): 
+def main(experiments, output_dir, export_permissions, notebook_formats, use_threads): 
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
     export_experiments(
         experiments = experiments,
         output_dir = output_dir,
+        export_permissions = export_permissions,
         notebook_formats = notebook_formats,
         use_threads = use_threads
     )

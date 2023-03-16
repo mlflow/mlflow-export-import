@@ -13,9 +13,11 @@ from mlflow_export_import.common.click_options import (
     opt_notebook_formats,
     opt_stages,
     opt_versions,
-    opt_export_latest_versions
+    opt_export_latest_versions,
+    opt_export_permissions
 )
-from mlflow_export_import.common import io_utils, model_utils 
+from mlflow_export_import.common import utils, io_utils, model_utils 
+from mlflow_export_import.common import permissions_utils
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.run.export_run import RunExporter
 
@@ -27,14 +29,16 @@ def export_model(
         versions = None,
         export_latest_versions = False,
         export_run = True,
+        export_permissions = False,
         notebook_formats = None,
         mlflow_client = None
     ):
     """
     :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
     :param stages: Stages to export. Default is all stages. Values are Production, Staging, Archived and None.
-    :param export_run: Export the run that generated a registered model's version.
     :param export_latest_versions: Export latest registered model versions instead of all versions.
+    :param versions: List of versions to export.
+    :param export_run: Export the run that generated a registered model's version.
     :param mlflow_client: MlflowClient
     """
 
@@ -44,6 +48,7 @@ def export_model(
        versions = versions,
        export_latest_versions = export_latest_versions,
        export_run = export_run,
+       export_permissions = export_permissions,
        mlflow_client = mlflow_client
     )
     return exporter.export_model(
@@ -59,15 +64,17 @@ class ModelExporter():
             versions = None,
             export_latest_versions = False,
             export_run = True,
+            export_permissions = False,
             notebook_formats = None,
             mlflow_client = None
         ):
         """
         :param mlflow_client: MlflowClient
-        :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
         :param stages: Stages to export. Default is all stages. Values are Production, Staging, Archived and None.
-        :param export_run: Export the run that generated a registered model's version.
+        :param versions: List of versions to export.
         :param export_latest_versions: Export latest registered model versions instead of all versions.
+        :param export_run: Export the run that generated a registered model's version.
+        :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
         """
         self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
         self.http_client = MlflowHttpClient()
@@ -76,6 +83,7 @@ class ModelExporter():
         self.stages = self._normalize_stages(stages)
         self.versions = versions if versions else []
         self.export_latest_versions = export_latest_versions
+        self.export_permissions = export_permissions
         if len(self.stages) > 0 and len(self.versions) > 0:
             raise MlflowExportImportException(
                 f"Both stages {self.stages} and versions {self.versions} cannot be set", http_status_code=400)
@@ -143,20 +151,32 @@ class ModelExporter():
         print(f"Found {len(ori_versions)} '{msg}' versions for model '{model_name}'")
         versions, failed_versions = self._export_versions(model_name, ori_versions, output_dir)
 
-        model = self.http_client.get(f"registered-models/get", {"name": model_name})
-        model["registered_model"]["versions"] = versions
-        model["registered_model"].pop("latest_versions",None)
+        if utils.importing_into_databricks() and self.export_permissions:
+            model = self.http_client.get("databricks/registered-models/get", { "name": model_name })
+            model2 = model.pop("registered_model_databricks", None)
+            model["registered_model"] = model2
+            self._adjust_versions(model2, versions)
+            permissions_utils.add_model_permissions(model2)
+        else:
+            model = self.http_client.get(f"registered-models/get", {"name": model_name})
+            self._adjust_versions(model["registered_model"], versions)
 
         info_attr = {
             "num_target_stages": len(self.stages),
             "num_target_versions": len(self.versions),
             "num_src_versions": len(versions),
             "num_dst_versions": len(versions),
-            "failed_versions": failed_versions
+            "failed_versions": failed_versions,
+            "export_latest_versions": self.export_latest_versions,
+            "export_permissions": self.export_permissions
         }
         io_utils.write_export_file(output_dir, "model.json", __file__, model, info_attr)
 
         print(f"Exported {len(versions)}/{len(ori_versions)} '{msg}' versions for model '{model_name}'")
+
+    def _adjust_versions(self, model, versions):
+        model["versions"] = versions
+        model.pop("latest_versions",None)
 
 
     def _normalize_stages(self, stages):
@@ -179,8 +199,9 @@ class ModelExporter():
 @opt_stages
 @opt_versions
 @opt_export_latest_versions
+@opt_export_permissions
 
-def main(model, output_dir, notebook_formats, stages, versions, export_latest_versions):
+def main(model, output_dir, notebook_formats, stages, versions, export_latest_versions, export_permissions):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
@@ -191,6 +212,7 @@ def main(model, output_dir, notebook_formats, stages, versions, export_latest_ve
         stages = stages,
         versions = versions,
         export_latest_versions = export_latest_versions,
+        export_permissions = export_permissions,
         notebook_formats = notebook_formats
     )
 
