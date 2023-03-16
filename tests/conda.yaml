@@ -4,9 +4,7 @@ channels:
 dependencies:
   - python=3.8
   - pip:
-      # Per breaking change in mlflow 2.2.1 we need to pin to 2.1.1
-      # See https://github.com/mlflow/mlflow/pull/7908
-    - mlflow==2.1.1 
+    - mlflow>=2.2.2
     - pytest>=7.2.0
     - pytest-html>=3.2.0
     - shortuuid>=1.0.11
