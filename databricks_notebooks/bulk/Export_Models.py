@@ -9,18 +9,15 @@
 # MAGIC * `3. Stages` - stages to be exported.
 # MAGIC * `4. Export latest versions` - expor all or just the "latest" versions.
 # MAGIC * `5. Export all runs` - export all runs of an experiment that are linked to a registered model.
-# MAGIC * `6. Notebook formats`
-# MAGIC * `7. Use threads`
+# MAGIC * `6. Export permissions` - export Databricks permissions.
+# MAGIC * `7. Notebook formats`
+# MAGIC * `8. Use threads`
 # MAGIC 
 # MAGIC See: https://github.com/mlflow/mlflow-export-import/blob/master/README_bulk.md#registered-models.
 
 # COMMAND ----------
 
 # MAGIC %run ./Common
-
-# COMMAND ----------
-
-dbutils.widgets.remove("2. Output base directory")
 
 # COMMAND ----------
 
@@ -40,12 +37,15 @@ export_latest_versions = dbutils.widgets.get("4. Export latest versions") == "ye
 dbutils.widgets.dropdown("5. Export all runs","no",["yes","no"])
 export_all_runs = dbutils.widgets.get("5. Export all runs") == "yes"
 
-all_formats = [ "SOURCE", "DBC", "HTML", "JUPYTER" ]
-dbutils.widgets.multiselect("6. Notebook formats",all_formats[0],all_formats)
-notebook_formats = dbutils.widgets.get("6. Notebook formats")
+dbutils.widgets.dropdown("6. Export permissions","no",["yes","no"])
+export_permissions = dbutils.widgets.get("6. Export permissions") == "yes"
 
-dbutils.widgets.dropdown("7. Use threads","no",["yes","no"])
-use_threads = dbutils.widgets.get("7. Use threads") == "yes"
+all_formats = [ "SOURCE", "DBC", "HTML", "JUPYTER" ]
+dbutils.widgets.multiselect("7. Notebook formats",all_formats[0],all_formats)
+notebook_formats = dbutils.widgets.get("7. Notebook formats")
+
+dbutils.widgets.dropdown("8. Use threads","no",["yes","no"])
+use_threads = dbutils.widgets.get("8. Use threads") == "yes"
 
 export_notebook_revision = False
 export_all_runs = False
@@ -58,6 +58,7 @@ print("output_dir:", output_dir)
 print("stages:", stages)
 print("export_latest_versions:", export_latest_versions)
 print("export_all_runs:", export_all_runs)
+print("export_permissions:", export_permissions)
 print("notebook_formats:", notebook_formats)
 print("use_threads:", use_threads)
 
@@ -80,6 +81,7 @@ export_models(
     stages = stages, 
     export_latest_versions = export_latest_versions,
     export_all_runs = export_all_runs,
+    export_permissions = export_permissions,
     notebook_formats = notebook_formats,
     use_threads = use_threads
 )

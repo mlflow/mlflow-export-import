@@ -6,8 +6,9 @@
 # MAGIC Widgets
 # MAGIC * `1. Experiments` - comma delimited list of either experiment IDs or experiment names. `all` will export all experiments.
 # MAGIC * `2. Output directory` - shared directory between source and destination workspaces.
-# MAGIC * `3. Notebook formats`
-# MAGIC * `4. Use threads`
+# MAGIC * `3. Export permissions` - export Databricks permissions.
+# MAGIC * `4. Notebook formats`
+# MAGIC * `5. Use threads`
 
 # COMMAND ----------
 
@@ -22,15 +23,19 @@ dbutils.widgets.text("2. Output directory", "")
 output_dir = dbutils.widgets.get("2. Output directory")
 output_dir = output_dir.replace("dbfs:","/dbfs")
 
-all_formats = [ "SOURCE", "DBC", "HTML", "JUPYTER" ]
-dbutils.widgets.multiselect("3. Notebook formats",all_formats[0],all_formats)
-notebook_formats = dbutils.widgets.get("3. Notebook formats")
+dbutils.widgets.dropdown("3. Export permissions","no",["yes","no"])
+export_permissions = dbutils.widgets.get("3. Export permissions") == "yes"
 
-dbutils.widgets.dropdown("4. Use threads","False",["True","False"])
-use_threads = dbutils.widgets.get("4. Use threads") == "True"
+all_formats = [ "SOURCE", "DBC", "HTML", "JUPYTER" ]
+dbutils.widgets.multiselect("4. Notebook formats",all_formats[0],all_formats)
+notebook_formats = dbutils.widgets.get("4. Notebook formats")
+
+dbutils.widgets.dropdown("5. Use threads","False",["True","False"])
+use_threads = dbutils.widgets.get("5. Use threads") == "True"
 
 print("experiments:", experiments)
 print("output_dir:", output_dir)
+print("export_permissions:", export_permissions)
 print("notebook_formats:", notebook_formats)
 print("use_threads:", use_threads)
 
@@ -46,6 +51,7 @@ from mlflow_export_import.bulk.export_experiments import export_experiments
 export_experiments(
     experiments = experiments, 
     output_dir = output_dir, 
+    export_permissions = export_permissions,
     notebook_formats = notebook_formats, 
     use_threads = use_threads
 )
