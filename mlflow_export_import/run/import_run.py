@@ -18,15 +18,15 @@ from mlflow_export_import.common.click_options import (
     opt_use_src_user_id,
     opt_dst_notebook_dir
 )
-from mlflow_export_import.common import utils
+from mlflow_export_import.common import utils, mlflow_utils, io_utils
 from mlflow_export_import.common.filesystem import mk_local_path
 from mlflow_export_import.common.find_artifacts import find_artifacts
-from mlflow_export_import.common import mlflow_utils
-from mlflow_export_import.common import io_utils
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.client.http_client import DatabricksHttpClient
 from mlflow_export_import.run import run_data_importer
+
+_logger = utils.getLogger(__name__)
 
 
 def import_run(
@@ -96,8 +96,8 @@ class RunImporter():
         self.dst_notebook_dir_add_run_id = dst_notebook_dir_add_run_id
         self.dbx_client = DatabricksHttpClient()
         self.import_source_tags = import_source_tags
-        print(f"in_databricks: {self.in_databricks}")
-        print(f"importing_into_databricks: {utils.importing_into_databricks()}")
+        _logger.debug(f"in_databricks: {self.in_databricks}")
+        _logger.debug(f"importing_into_databricks: {utils.importing_into_databricks()}")
 
 
     def import_run(self, 
@@ -112,9 +112,9 @@ class RunImporter():
         :param dst_notebook_dir: Databricks destination workpsace directory for notebook.
         :return: The run and its parent run ID if the run is a nested run.
         """
-        print(f"Importing run from '{input_dir}'")
+        _logger.info(f"Importing run from '{input_dir}'")
         res = self._import_run(experiment_name, input_dir, dst_notebook_dir)
-        print(f"Imported run into '{experiment_name}/{res[0].info.run_id}'")
+        _logger.info(f"Imported run into '{experiment_name}/{res[0].info.run_id}'")
         return res
 
 
@@ -183,14 +183,14 @@ class RunImporter():
         tag_key = "mlflow.databricks.notebookPath"
         src_notebook_path = src_run_dct["tags"].get(tag_key,None)
         if not src_notebook_path:
-            print(f"WARNING: No tag '{tag_key}' for run_id '{run_id}'")
+            _logger.warning(f"No tag '{tag_key}' for run_id '{run_id}'")
             return
         notebook_name = os.path.basename(src_notebook_path)
 
         format = "source" 
         notebook_path = os.path.join(input_dir,"artifacts","notebooks",f"{notebook_name}.{format}")
         if not os.path.exists(notebook_path): 
-            print(f"WARNING: Source '{notebook_path}' does not exist for run_id '{run_id}'")
+            _logger.warning(f"Source '{notebook_path}' does not exist for run_id '{run_id}'")
             return
 
         with open(notebook_path, "r", encoding="utf-8") as f:
@@ -206,10 +206,10 @@ class RunImporter():
             }
         mlflow_utils.create_workspace_dir(self.dbx_client, dst_notebook_dir)
         try:
-            print(f"Importing notebook '{dst_notebook_path}' for run {run_id}")
+            _logger.info(f"Importing notebook '{dst_notebook_path}' for run {run_id}")
             self.dbx_client._post("workspace/import", data)
         except MlflowExportImportException as e:
-            print(f"WARNING: Cannot save notebook '{dst_notebook_path}'. {e}")
+            _logger.warning(f"Cannot save notebook '{dst_notebook_path}'. {e}")
 
 
 @click.command()
@@ -238,9 +238,9 @@ def main(input_dir,
         use_src_user_id,
         dst_notebook_dir, 
         dst_notebook_dir_add_run_id):
-    print("Options:")
+    _logger.info("Options:")
     for k,v in locals().items():
-        print(f"  {k}: {v}")
+        _logger.info(f"  {k}: {v}")
     import_run(
         experiment_name = experiment_name,
         input_dir = input_dir,

@@ -23,8 +23,7 @@ from mlflow_export_import.notebook.download_notebook import download_notebook
 from mlflow.utils.mlflow_tags import MLFLOW_DATABRICKS_NOTEBOOK_PATH
 MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID = "mlflow.databricks.notebookRevisionID" # NOTE: not in mlflow/utils/mlflow_tags.py
 
-print("MLflow Version:", mlflow.__version__)
-print("MLflow Tracking URI:", mlflow.get_tracking_uri())
+_logger = utils.getLogger(__name__)
 
 
 def export_run(
@@ -65,7 +64,7 @@ class RunExporter:
         self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
 
         self.dbx_client = DatabricksHttpClient()
-        print("Databricks REST client:", self.dbx_client)
+        _logger.info(f"Databricks REST client: {self.dbx_client}")
         self.notebook_formats = notebook_formats
 
 
@@ -106,11 +105,11 @@ class RunExporter:
                 if len(self.notebook_formats) > 0:
                     self._export_notebook(output_dir, notebook, run, fs)
             elif len(self.notebook_formats) > 0:
-                print(f"WARNING: Cannot export notebook for run '{run_id}' since tag '{MLFLOW_DATABRICKS_NOTEBOOK_PATH}' is not set.")
+                _logger.warning(f"Cannot export notebook for run '{run_id}' since tag '{MLFLOW_DATABRICKS_NOTEBOOK_PATH}' is not set.")
             return True
 
         except Exception as e:
-            print("ERROR: run_id:", run.info.run_id, "Exception:", e)
+            _logger.error(f"run_id: {run.info.run_id}, Exception: {e}")
             traceback.print_exc()
             return False
 
@@ -131,7 +130,7 @@ class RunExporter:
         fs.mkdirs(notebook_dir)
         revision_id = run.data.tags.get(MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID, None)
         if not revision_id:
-            print(f"NOTE: Cannot download notebook '{notebook}' for run '{run.info.run_id}' since tag '{MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID}' does not exist. Notebook is probably a Git Repo notebook")
+            _logger.info(f"NOTE: Cannot download notebook '{notebook}' for run '{run.info.run_id}' since tag '{MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID}' does not exist. Notebook is probably a Git Repo notebook")
             return 
         manifest = { 
            MLFLOW_DATABRICKS_NOTEBOOK_PATH: run.data.tags[MLFLOW_DATABRICKS_NOTEBOOK_PATH],
@@ -149,9 +148,9 @@ class RunExporter:
 @opt_notebook_formats
 
 def main(run_id, output_dir, notebook_formats):
-    print("Options:")
+    _logger.info("Options:")
     for k,v in locals().items():
-        print(f"  {k}: {v}")
+        _logger.info(f"  {k}: {v}")
     export_run(
         run_id = run_id,
         output_dir = output_dir,

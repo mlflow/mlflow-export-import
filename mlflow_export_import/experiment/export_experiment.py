@@ -18,6 +18,8 @@ from mlflow_export_import.common import permissions_utils
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
 from mlflow_export_import.run.export_run import export_run
 
+_logger = utils.getLogger(__name__)
+
 
 def export_experiment(
         experiment_id_or_name,
@@ -75,7 +77,7 @@ class ExperimentExporter():
         :return: Number of successful and number of failed runs.
         """
         exp = mlflow_utils.get_experiment(self.mlflow_client, experiment_id_or_name)
-        print(f"Exporting experiment '{exp.name}' (ID {exp.experiment_id}) to '{output_dir}'")
+        _logger.info(f"Exporting experiment '{exp.name}' (ID {exp.experiment_id}) to '{output_dir}'")
         ok_run_ids = []
         failed_run_ids = []
         j = -1
@@ -105,18 +107,18 @@ class ExperimentExporter():
 
         msg = f"for experiment '{exp.name}' (ID: {exp.experiment_id})"
         if j==0:
-            print(f"WARNING: No runs exported {msg}")
+            _logger.info(f"WARNING: No runs exported {msg}")
         elif len(failed_run_ids) == 0:
-            print(f"All {len(ok_run_ids)} runs succesfully exported {msg}")
+            _logger.info(f"All {len(ok_run_ids)} runs succesfully exported {msg}")
         else:
-            print(f"{len(ok_run_ids)/j} runs succesfully exported {msg}")
-            print(f"{len(failed_run_ids)/j} runs failed {msg}")
+            _logger.info(f"{len(ok_run_ids)/j} runs succesfully exported {msg}")
+            _logger.info(f"{len(failed_run_ids)/j} runs failed {msg}")
         return len(ok_run_ids), len(failed_run_ids) 
 
 
     def _export_run(self, idx, run, output_dir, ok_run_ids, failed_run_ids):
         run_dir = os.path.join(output_dir, run.info.run_id)
-        print(f"Exporting run {idx+1}: {run.info.run_id} of experiment {run.info.experiment_id}")
+        _logger.info(f"Exporting run {idx+1}: {run.info.run_id} of experiment {run.info.experiment_id}")
         is_success = export_run(
             run_id = run.info.run_id,
             output_dir = run_dir,
@@ -136,9 +138,9 @@ class ExperimentExporter():
 @opt_notebook_formats
 
 def main(experiment, output_dir, export_permissions, notebook_formats):
-    print("Options:")
+    _logger.info("Options:")
     for k,v in locals().items():
-        print(f"  {k}: {v}")
+        _logger.info(f"  {k}: {v}")
     export_experiment(
         experiment_id_or_name = experiment,
         output_dir = output_dir,

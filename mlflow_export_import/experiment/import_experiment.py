@@ -14,11 +14,15 @@ from mlflow_export_import.common.click_options import (
     opt_dst_notebook_dir
 )
 from mlflow_export_import.client.http_client import DatabricksHttpClient
-from mlflow_export_import.common import utils
-from mlflow_export_import.common import io_utils
-from mlflow_export_import.common import mlflow_utils
+from mlflow_export_import.common import utils, mlflow_utils, io_utils
+from mlflow_export_import.common.source_tags import (
+    set_source_tags_for_field,
+    mk_source_tags_mlflow_tag,
+    fmt_timestamps
+)
 from mlflow_export_import.run.import_run import import_run
-from mlflow_export_import.common.source_tags import set_source_tags_for_field, mk_source_tags_mlflow_tag, fmt_timestamps
+
+_logger = utils.getLogger(__name__)
 
 
 def import_experiment(
@@ -52,10 +56,10 @@ def import_experiment(
 
 class ExperimentImporter():
 
-    def __init__(self, 
-            import_source_tags = False, 
+    def __init__(self,
+            import_source_tags = False,
             use_src_user_id = False,
-            mlflow_client = None, 
+            mlflow_client = None,
         ):
         """
         :param mlflow_client: MLflow client.
@@ -69,9 +73,9 @@ class ExperimentImporter():
         self.use_src_user_id = use_src_user_id
 
 
-    def import_experiment(self, 
-            experiment_name, 
-            input_dir, 
+    def import_experiment(self,
+            experiment_name,
+            input_dir,
             dst_notebook_dir = None
         ):
         """
@@ -98,14 +102,14 @@ class ExperimentImporter():
         run_ids = exp_dct["runs"]
         failed_run_ids = info["failed_runs"]
 
-        print(f"Importing {len(run_ids)} runs into experiment '{experiment_name}' from '{input_dir}'")
+        _logger.info(f"Importing {len(run_ids)} runs into experiment '{experiment_name}' from '{input_dir}'")
         run_ids_map = {}
         run_info_map = {}
         for src_run_id in run_ids:
             dst_run, src_parent_run_id = import_run(
                 mlflow_client = self.mlflow_client,
-                experiment_name = experiment_name, 
-                input_dir = os.path.join(input_dir, src_run_id), 
+                experiment_name = experiment_name,
+                input_dir = os.path.join(input_dir, src_run_id),
                 dst_notebook_dir = dst_notebook_dir,
                 import_source_tags = self.import_source_tags,
                 use_src_user_id = self.use_src_user_id
@@ -113,9 +117,9 @@ class ExperimentImporter():
             dst_run_id = dst_run.info.run_id
             run_ids_map[src_run_id] = { "dst_run_id": dst_run_id, "src_parent_run_id": src_parent_run_id }
             run_info_map[src_run_id] = dst_run.info
-        print(f"Imported {len(run_ids)} runs into experiment '{experiment_name}' from '{input_dir}'")
+        _logger.info(f"Imported {len(run_ids)} runs into experiment '{experiment_name}' from '{input_dir}'")
         if len(failed_run_ids) > 0:
-            print(f"Warning: {len(failed_run_ids)} failed runs were not imported - see '{path}'")
+            _logger.warning(f"{len(failed_run_ids)} failed runs were not imported - see '{path}'")
         utils.nested_tags(self.mlflow_client, run_ids_map)
 
         return run_info_map
@@ -129,9 +133,9 @@ class ExperimentImporter():
 @opt_dst_notebook_dir
 
 def main(input_dir, experiment_name, import_source_tags, use_src_user_id, dst_notebook_dir):
-    print("Options:")
+    _logger.info("Options:")
     for k,v in locals().items():
-        print(f"  {k}: {v}")
+        _logger.info(f"  {k}: {v}")
     import_experiment(
         experiment_name = experiment_name,
         input_dir = input_dir,

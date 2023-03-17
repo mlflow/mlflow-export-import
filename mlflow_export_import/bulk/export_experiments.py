@@ -19,6 +19,8 @@ from mlflow_export_import.common import utils, io_utils, mlflow_utils
 from mlflow_export_import.bulk import bulk_utils
 from mlflow_export_import.experiment.export_experiment import export_experiment
 
+_logger = utils.getLogger(__name__)
+
 
 def _export_experiment(mlflow_client, exp_id_or_name, output_dir, export_permissions, notebook_formats, export_results, run_ids):
     exp = mlflow_utils.get_experiment(mlflow_client, exp_id_or_name)
@@ -43,7 +45,7 @@ def _export_experiment(mlflow_client, exp_id_or_name, output_dir, export_permiss
             "duration": duration
         }
         export_results.append(result)
-        print(f"Done exporting experiment {result}")
+        _logger.info(f"Done exporting experiment {result}")
     except Exception:
         import traceback
         traceback.print_exc()
@@ -83,7 +85,7 @@ def export_experiments(
         table_data.append(["Total",num_runs])
         columns = ["Experiment ID", "# Runs"]
     utils.show_table("Experiments",table_data,columns)
-    print("")
+    _logger.info("")
 
     ok_runs = 0
     failed_runs = 0
@@ -120,11 +122,11 @@ def export_experiments(
     mlflow_attr = { "experiments": export_results }
     io_utils.write_export_file(output_dir, "experiments.json", __file__, mlflow_attr, info_attr)
 
-    print(f"{len(experiments)} experiments exported")
-    print(f"{ok_runs}/{total_runs} runs succesfully exported")
+    _logger.info(f"{len(experiments)} experiments exported")
+    _logger.info(f"{ok_runs}/{total_runs} runs succesfully exported")
     if failed_runs > 0:
-        print(f"{failed_runs}/{total_runs} runs failed")
-    print(f"Duration for experiments export: {duration} seconds")
+        _logger.info(f"{failed_runs}/{total_runs} runs failed")
+    _logger.info(f"Duration for experiments export: {duration} seconds")
 
     return info_attr
 
@@ -137,9 +139,9 @@ def export_experiments(
 @opt_use_threads
 
 def main(experiments, output_dir, export_permissions, notebook_formats, use_threads): 
-    print("Options:")
+    _logger.info("Options:")
     for k,v in locals().items():
-        print(f"  {k}: {v}")
+        _logger.info(f"  {k}: {v}")
     export_experiments(
         experiments = experiments,
         output_dir = output_dir,

@@ -2,12 +2,13 @@ import shortuuid
 import time
 import mlflow
 import sklearn_utils
-from mlflow_export_import.common import model_utils
+from mlflow_export_import.common import utils, model_utils
 from mlflow.utils.mlflow_tags import MLFLOW_RUN_NOTE # NOTE: ""mlflow.note.content" - used for Experiment Description too!
-from init_tests import mlflow_context
 import utils_test
 
-print("MLflow version:", mlflow.__version__)
+_logger = utils.getLogger(__name__)
+
+_logger.info(f"MLflow version: {mlflow.__version__}")
 
 def init_output_dirs(output_dir):
     utils_test.create_output_dir(output_dir)

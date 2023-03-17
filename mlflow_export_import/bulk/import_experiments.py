@@ -13,8 +13,10 @@ from mlflow_export_import.common.click_options import (
     opt_use_src_user_id, 
     opt_use_threads
 )
-from mlflow_export_import.common import io_utils
+from mlflow_export_import.common import utils, io_utils
 from mlflow_export_import.experiment.import_experiment import import_experiment
+
+_logger = utils.getLogger(__name__)
 
 
 def _import_experiment(mlflow_client, exp_name, input_dir, import_source_tags, use_src_user_id):
@@ -41,8 +43,9 @@ def import_experiments(
     mlflow_client = mlflow_client or mlflow.client.MlflowClient()
     dct = io_utils.read_file_mlflow(os.path.join(input_dir, "experiments.json"))
     exps = dct["experiments"]
+    _logger.info("Experiments:")
     for exp in exps:
-        print("  ",exp)
+        _logger.info(f"  {exp}")
 
     max_workers = os.cpu_count() or 4 if use_threads else 1
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
@@ -60,9 +63,9 @@ def import_experiments(
 @opt_use_threads
 
 def main(input_dir, import_source_tags, use_src_user_id, use_threads): 
-    print("Options:")
+    _logger.info("Options:")
     for k,v in locals().items():
-        print(f"  {k}: {v}")
+        _logger.info(f"  {k}: {v}")
     import_experiments(
         input_dir = input_dir, 
         import_source_tags = import_source_tags,

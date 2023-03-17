@@ -2,11 +2,14 @@ import os
 import json
 import requests
 import click
+from mlflow_export_import.common import utils
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.client import USER_AGENT
 from mlflow_export_import.client import mlflow_auth_utils
 
+_logger = utils.getLogger(__name__)
 _TIMEOUT = 15
+
 
 class HttpClient():
     """ Wrapper for GET and POST methods for Databricks REST APIs  - standard Databricks API and MLflow API. """
@@ -80,7 +83,6 @@ class HttpClient():
 
     def _check_response(self, rsp, uri, params=None):
         if rsp.status_code < 200 or rsp.status_code > 299:
-            #print("rsp.text:",rsp.text)
             raise MlflowExportImportException(rsp.reason,
                http_status_code=rsp.status_code,
                http_reason=rsp.reason,
@@ -112,16 +114,16 @@ class MlflowHttpClient(HttpClient):
 def main(api, resource, method, params, data, output_file, verbose):
     def write_output(rsp, output_file):
         if output_file:
-            print(f"Output file: {output_file}")
+            _logger.info(f"Output file: {output_file}")
             with open(output_file, "w", encoding="utf-8") as f:
                 f.write(rsp.text)
         else:
-            print(rsp.text)
+            _logger.info(rsp.text)
 
     if verbose:
-        print("Options:")
+        _logger.info("Options:")
         for k,v in locals().items():
-            print(f"  {k}: {v}")
+            _logger.info(f"  {k}: {v}")
 
     client = DatabricksHttpClient() if api == "databricks" else MlflowHttpClient()
     method = method.upper() 
@@ -134,7 +136,7 @@ def main(api, resource, method, params, data, output_file, verbose):
         rsp = client._post(resource, data)
         write_output(rsp, output_file)
     else:
-        print(f"ERROR: Unsupported HTTP method '{method}'")
+        _logger.error(f"Unsupported HTTP method '{method}'")
 
 
 if __name__ == "__main__":

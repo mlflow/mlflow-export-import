@@ -15,11 +15,13 @@ from mlflow_export_import.common.click_options import (
     opt_notebook_formats, 
     opt_use_threads,
 )
-from mlflow_export_import.common import io_utils
+from mlflow_export_import.common import utils, io_utils
 from mlflow_export_import.bulk.export_models import export_models
 from mlflow_export_import.bulk.export_experiments import export_experiments
 
 ALL_STAGES = "Production,Staging,Archived,None" 
+
+_logger = utils.getLogger(__name__)
 
 
 def export_all(
@@ -66,7 +68,7 @@ def export_all(
         "experiments": res_exps
     }
     io_utils.write_export_file(output_dir, "manifest.json", __file__, {}, info_attr)
-    print(f"Duration for entire tracking server export: {duration} seconds")
+    _logger.info(f"Duration for entire tracking server export: {duration} seconds")
 
 
 @click.command()
@@ -78,9 +80,9 @@ def export_all(
 @opt_use_threads
 
 def main(output_dir, stages, export_latest_versions, export_permissions, notebook_formats, use_threads):
-    print("Options:")
+    _logger.info("Options:")
     for k,v in locals().items():
-        print(f"  {k}: {v}")
+        _logger.info(f"  {k}: {v}")
     export_all(
         output_dir = output_dir, 
         stages = stages,
