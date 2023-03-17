@@ -12,7 +12,8 @@
 # MAGIC * `3. Stages` - Model version stages to export.
 # MAGIC * `4. Export latest versions`
 # MAGIC * `5. Versions` - comma delimited version numbers to export.
-# MAGIC * `6. Notebook formats` - Notebook formats to export.
+# MAGIC * `6. Export permissions` - Export Databricks permissions.
+# MAGIC * `7. Notebook formats` - Notebook formats to export.
 
 # COMMAND ----------
 
@@ -50,13 +51,17 @@ dbutils.widgets.text("5. Versions", "")
 versions = dbutils.widgets.get("5. Versions")
 versions = versions.split(",") if versions else []
 
-notebook_formats = get_notebook_formats(6) # widget "6. Notebook formats"
+dbutils.widgets.dropdown("6. Export permissions","no",["yes","no"])
+export_permissions = dbutils.widgets.get("6. Export permissions") == "yes"
+
+notebook_formats = get_notebook_formats(7) # widget "7. Notebook formats"
 
 print("model_name:", model_name)
 print("output_dir:", output_dir)
-print("notebook_formats:", notebook_formats)
 print("stages:", stages)
 print("export_latest_versions:", export_latest_versions)
+print("export_permissions:", export_permissions)
+print("notebook_formats:", notebook_formats)
 print("versions:", versions)
 
 # COMMAND ----------
@@ -91,6 +96,7 @@ export_model(
     stages = stages,
     versions = versions,
     export_latest_versions = export_latest_versions,
+    export_permissions = export_permissions,
     notebook_formats = notebook_formats
 )
 
