@@ -97,7 +97,7 @@ class RunImporter():
         self.dbx_client = DatabricksHttpClient()
         self.import_source_tags = import_source_tags
         print(f"in_databricks: {self.in_databricks}")
-        print(f"importing_into_databricks: {utils.importing_into_databricks()}")
+        print(f"importing_into_environment: {utils.get_import_target_implementation().name}")
 
 
     def import_run(self, 
@@ -148,7 +148,7 @@ class RunImporter():
             import traceback
             traceback.print_exc()
             raise MlflowExportImportException(e, f"Importing run {run_id} of experiment '{exp.name}' failed")
-        if utils.importing_into_databricks() and dst_notebook_dir:
+        if utils.get_import_target_implementation() == utils.MLFlowImplementation.DATABRICKS and dst_notebook_dir:
             ndir = os.path.join(dst_notebook_dir, run_id) if self.dst_notebook_dir_add_run_id else dst_notebook_dir
             self._upload_databricks_notebook(input_dir, src_run_dct, ndir)
 

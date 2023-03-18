@@ -93,7 +93,7 @@ def compare_versions(mlflow_client_src, mlflow_client_dst, vr_src, vr_dst, outpu
     assert vr_src.status_message == vr_dst.status_message
     if mlflow_client_src != mlflow_client_src:
         assert vr_src.name == vr_dst.name
-    if not utils.importing_into_databricks():
+    if utils.get_import_target_implementation() != utils.MLFlowImplementation.DATABRICKS:
         assert vr_src.user_id == vr_dst.user_id
 
     tags_dst = { k:v for k,v in vr_dst.tags.items() if not k.startswith(ExportTags.PREFIX_ROOT) }
