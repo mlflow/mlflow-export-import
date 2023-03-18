@@ -64,7 +64,6 @@ class RunExporter:
         self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
 
         self.dbx_client = DatabricksHttpClient()
-        _logger.info(f"Databricks REST client: {self.dbx_client}")
         self.notebook_formats = notebook_formats
 
 
