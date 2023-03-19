@@ -4,8 +4,9 @@ Workflow API Client. Wrapping some low-level REST endpoints with workflow logic.
 import sys
 import time
 import logging
-from mlflow_export_import.workflow_api import utils
 from databricks_cli.sdk import service
+from mlflow_export_import.common import MlflowExportImportException
+from mlflow_export_import.workflow_api import utils
 
 logging.info(f"Python version: {sys.version}")
 
@@ -15,7 +16,7 @@ class WorkflowApiClient(object):
     """
 
     def _default_timeout_func(self):
-        raise Exception(f"Timeout of {self.timeout_seconds} seconds exceeded")
+        raise MlflowExportImportException(f"Timeout of {self.timeout_seconds} seconds exceeded")
     
 
     def __init__(self, profile=None, sleep_seconds=2, timeout_seconds=sys.maxsize, timeout_func=_default_timeout_func, verbose=True):
@@ -30,12 +31,14 @@ class WorkflowApiClient(object):
         self.timeout_func = timeout_func
         self.verbose = verbose
 
-        client = utils.get_api_client(profile)
-        self.jobs_service = service.JobsService(client)
-        self.cluster_service = service.ClusterService(client)
+        api_client = utils.get_api_client(profile)
+        self.jobs_service = service.JobsService(api_client)
+        self.cluster_service = service.ClusterService(api_client)
 
         self.cluster_noninit_states = { "RUNNING", "TERMINATED", "ERROR", "UNKNOWN" }
         self.run_terminal_states = { "TERMINATED", "SKIPPED", "INTERNAL_ERROR" }
+
+        self._repr = f'{{ "api_client.url": "{api_client.url}", "profile": "{profile}" }}'
 
         
     def wait_until_cluster_is_created_for_run(self, run_id):
@@ -106,5 +109,9 @@ class WorkflowApiClient(object):
             if res: break
             idx += 1
         num_seconds = time.time() - start_time
-        logging.info("Processing time: {0:.2f} seconds".format(num_seconds)) # TODO
+        logging.info("Processing time: {0:.2f} seconds".format(num_seconds))
         return dct
+
+
+    def __repr__(self):
+        return self._repr

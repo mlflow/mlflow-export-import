@@ -5,16 +5,18 @@ from databricks_cli.sdk import service
 
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.workflow_api.workflow_api_client import WorkflowApiClient
-import utils
+import databricks_utils
 
 from databricks_cli.workspace.api import WorkspaceApi
 from databricks_cli.dbfs.api import DbfsApi, DbfsPath
 from databricks_cli.clusters.api import ClusterApi
 
-workflow_client = WorkflowApiClient()
+print(f"MLflow Tracking URI: {mlflow.get_tracking_uri()}")
 mlflow_client = mlflow.tracking.MlflowClient()
 print(f"mlflow_client: {mlflow_client}")
-print("MLflow Tracking URI:", mlflow.get_tracking_uri())
+
+workflow_client = WorkflowApiClient()
+print(f"workflow_client: {workflow_client}")
 
 _formats = [ "SOURCE" ]
 _export_src_tags = "yes"
@@ -29,15 +31,17 @@ print(f"_fs_experiment_nb_path: {_fs_experiment_nb_path}")
 
 
 class DatabricksTester():
-    def __init__(self, ws_base_dir, 
+    def __init__(self, 
+            ws_base_dir, 
             dbfs_base_export_dir, 
             local_artifacts_compare_dir, 
             cluster_spec, 
             model_name, 
             run_name_prefix, 
             profile=None, 
-            verbose=False):
-        api_client = utils.get_api_client(profile)
+            verbose=False
+        ):
+        api_client = databricks_utils.get_api_client(profile)
         self.ws_api = WorkspaceApi(api_client)
         self.dbfs_api = DbfsApi(api_client)
         self.cluster_api = ClusterApi(api_client)

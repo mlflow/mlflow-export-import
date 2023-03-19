@@ -1,25 +1,25 @@
 from collections import namedtuple
 import pytest
 import tempfile
-import mlflow
 from databricks_tester import DatabricksTester
-import utils
+import databricks_utils
 import utils_test
 
 cfg = utils_test.read_config_file()
-profile = cfg.get("profile", None)
-tester = DatabricksTester(
-    cfg["ws_base_dir"], 
-    cfg["dbfs_base_export_dir"], 
-    cfg.get("local_artifacts_compare_dir", None),
-    cfg["cluster"], cfg["model_name"], 
-    cfg["run_name_prefix"], 
-    profile)
-mlflow_client = mlflow.tracking.MlflowClient()
+_profile = cfg.get("profile", None)
+
+_tester = DatabricksTester(
+    ws_base_dir = cfg["ws_base_dir"], 
+    dbfs_base_export_dir = cfg["dbfs_base_export_dir"], 
+    local_artifacts_compare_dir = cfg.get("local_artifacts_compare_dir", None),
+    cluster_spec = cfg["cluster"], 
+    model_name = cfg["model_name"], 
+    run_name_prefix = cfg["run_name_prefix"], 
+    profile = _profile
+)
 
 from databricks_cli.dbfs.api import DbfsApi
-api_client = utils.get_api_client(profile)
-dbfs_api = DbfsApi(api_client)
+_dbfs_api = DbfsApi(databricks_utils.get_api_client(_profile))
 
 
 TestContext = namedtuple(
@@ -30,10 +30,10 @@ TestContext = namedtuple(
 
 @pytest.fixture(scope="session")
 def test_context():
-    if tester.local_artifacts_compare_dir: # NOTE: for debugging
-        utils_test.create_output_dir(tester.local_artifacts_compare_dir)
+    if _tester.local_artifacts_compare_dir: # NOTE: for debugging
+        utils_test.create_output_dir(_tester.local_artifacts_compare_dir)
     else:
         with tempfile.TemporaryDirectory() as tmpdir:
-            tester.local_artifacts_compare_dir = tmpdir
-    yield TestContext(tester, dbfs_api)
-    tester.teardown()
+            _tester.local_artifacts_compare_dir = tmpdir
+    yield TestContext(_tester, _dbfs_api)
+    _tester.teardown()
