@@ -7,13 +7,15 @@ from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.workflow_api.workflow_api_client import WorkflowApiClient
 import utils
 
-workflow_client = WorkflowApiClient()
-mlflow_client = mlflow.tracking.MlflowClient()
-
 from databricks_cli.workspace.api import WorkspaceApi
 from databricks_cli.dbfs.api import DbfsApi, DbfsPath
 from databricks_cli.clusters.api import ClusterApi
-    
+
+workflow_client = WorkflowApiClient()
+mlflow_client = mlflow.tracking.MlflowClient()
+print(f"mlflow_client: {mlflow_client}")
+print("MLflow Tracking URI:", mlflow.get_tracking_uri())
+
 _formats = [ "SOURCE" ]
 _export_src_tags = "yes"
 
@@ -23,7 +25,7 @@ _experiment_name = "Iris_Train_exp"
 _fs_nb_base_dir = "../../databricks_notebooks/single"
 _fs_experiment_nb_name = "Iris_Train.py" 
 _fs_experiment_nb_path = os.path.join("experiment", _fs_experiment_nb_name)
-print("_fs_experiment_nb_path:",_fs_experiment_nb_path)
+print(f"_fs_experiment_nb_path: {_fs_experiment_nb_path}")
 
 
 class DatabricksTester():
@@ -56,8 +58,8 @@ class DatabricksTester():
 
         self.ml_nb_path = self._mk_ws_path(_experiment_nb)
         self.ml_exp_path = self._mk_ws_path(_experiment_name)
-        print("ML training notebook:", self.ml_nb_path)
-        print("ML training experiment:", self.ml_exp_path)
+        print(f"ML training notebook: {self.ml_nb_path}")
+        print(f"ML training experiment: {self.ml_exp_path}")
 
         self._init_dirs()
 
@@ -231,7 +233,7 @@ class DatabricksTester():
         lst = self.ws_api.list_objects(path)
         print(f"Workspace objects for {path}:")
         for x in lst:
-            print("  ",x.basename)
+            print(f"   {x.basename}")
 
 
     def _ws_delete(self):
