@@ -7,28 +7,6 @@ from mlflow_export_import.common import utils
 _logger = utils.getLogger(__name__)
 
 
-def get_mlflow_host():
-    """ Returns the host (tracking URI) and token """
-    return get_mlflow_host_token()[0]
-
-
-def get_mlflow_host_token():
-    """ Returns the host (tracking URI) and token """
-
-    uri = os.environ.get("MLFLOW_TRACKING_URI", None)
-    if uri is not None and not uri.startswith("databricks"):
-        return (uri, None)
-    try:
-        from mlflow_export_import.client import databricks_cli_utils
-        toks = uri.split("//")
-        profile = uri.split("//")[1] if len(toks) > 1 else None
-        return databricks_cli_utils.get_host_token(profile)
-    #except databricks_cli.utils.InvalidConfigurationError as e:
-    except Exception as e: # TODO: make more specific
-        _logger.warning(e)
-        return (None, None)
-
-
 def get_experiment(mlflow_client, exp_id_or_name):
     """ Gets an experiment either by ID or name.  """
     exp = mlflow_client.get_experiment_by_name(exp_id_or_name)
