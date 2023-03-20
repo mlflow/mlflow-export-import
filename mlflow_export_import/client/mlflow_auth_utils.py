@@ -1,5 +1,9 @@
 from mlflow_export_import.client import databricks_cli_utils
 from mlflow_export_import.common import MlflowExportImportException
+from mlflow_export_import.common import utils
+
+_logger = utils.getLogger(__name__)
+
 
 def get_mlflow_host():
     """ Returns the MLflow tracking URI (host) """
@@ -7,11 +11,13 @@ def get_mlflow_host():
 
 
 def get_mlflow_host_token():
-    """ Returns the MLflow tracking URI (host) and Databricks personal access token (PAT)"""
+    """ 
+    Returns the MLflow tracking URI (host) and Databricks personal access token (PAT).
+    For Databricks, expects the MLflow tracking URI in the form of 'databricks' or 'databricks://MY_PROFILE'.
+    """
 
     import mlflow
     uri = mlflow.tracking.get_tracking_uri()
-    #uri = os.environ.get("MLFLOW_TRACKING_URI", "")
     if uri:
         if not uri.startswith("databricks"):
             if not uri.startswith("http"):
@@ -28,7 +34,7 @@ def get_mlflow_host_token():
     # databricks_cli.utils.InvalidConfigurationError 
     # requests.exceptions.InvalidSchema(f"No connection adapters were found for {url!r}")
     except Exception as e: 
-        print("WARNING:", e)
+        _logger.warning(e)
         return (None, None)
 
 

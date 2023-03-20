@@ -21,6 +21,8 @@ from mlflow_export_import.common import permissions_utils
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.run.export_run import RunExporter
 
+_logger = utils.getLogger(__name__)
+
 
 def export_model(
         model_name,
@@ -102,7 +104,7 @@ class ModelExporter():
             self._export_model(model_name, output_dir)
             return True, model_name
         except Exception as e:
-            print("ERROR:", e)
+            _logger.error(e)
             import traceback
             traceback.print_exc()
             return False, model_name
@@ -123,7 +125,7 @@ class ModelExporter():
                     "description": vr.description,
                     "tags": vr.tags 
             }
-            print(f"Exporting model '{model_name}' version {vr.version} stage '{vr.current_stage}' to '{opath}'")
+            _logger.info(f"Exporting model '{model_name}' version {vr.version} stage '{vr.current_stage}' to '{opath}'")
             try:
                 if self.export_run:
                     self.run_exporter.export_run(vr.run_id, opath)
@@ -135,7 +137,7 @@ class ModelExporter():
                 output_versions.append(dct)
             except mlflow.exceptions.RestException as e:
                 if "RESOURCE_DOES_NOT_EXIST: Run" in str(e):
-                    print(f"WARNING: Run for model version {model_name}/{vr.version} does not exist. {e}")
+                    _logger.warning(f"Run for model version {model_name}/{vr.version} does not exist. {e}")
                 else:
                     import traceback
                     traceback.print_exc()
@@ -148,7 +150,7 @@ class ModelExporter():
     def _export_model(self, model_name, output_dir):
         ori_versions = model_utils.list_model_versions(self.mlflow_client, model_name, self.export_latest_versions)
         msg = "latest" if self.export_latest_versions else "all"
-        print(f"Found {len(ori_versions)} '{msg}' versions for model '{model_name}'")
+        _logger.info(f"Found {len(ori_versions)} '{msg}' versions for model '{model_name}'")
         versions, failed_versions = self._export_versions(model_name, ori_versions, output_dir)
 
         if utils.importing_into_databricks() and self.export_permissions:
@@ -172,7 +174,7 @@ class ModelExporter():
         }
         io_utils.write_export_file(output_dir, "model.json", __file__, model, info_attr)
 
-        print(f"Exported {len(versions)}/{len(ori_versions)} '{msg}' versions for model '{model_name}'")
+        _logger.info(f"Exported {len(versions)}/{len(ori_versions)} '{msg}' versions for model '{model_name}'")
 
     def _adjust_versions(self, model, versions):
         model["versions"] = versions
@@ -188,7 +190,7 @@ class ModelExporter():
         stages = [stage.lower() for stage in stages]
         for stage in stages:
             if stage not in model_version_stages._CANONICAL_MAPPING:
-                print(f"WARNING: stage '{stage}' must be one of: {model_version_stages.ALL_STAGES}")
+                _logger.warning(f"stage '{stage}' must be one of: {model_version_stages.ALL_STAGES}")
         return stages
 
 
@@ -202,9 +204,9 @@ class ModelExporter():
 @opt_export_permissions
 
 def main(model, output_dir, notebook_formats, stages, versions, export_latest_versions, export_permissions):
-    print("Options:")
+    _logger.info("Options:")
     for k,v in locals().items():
-        print(f"  {k}: {v}")
+        _logger.info(f"  {k}: {v}")
     versions = versions.split(",") if versions else []
     export_model(
         model_name = model,

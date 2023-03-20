@@ -10,6 +10,8 @@ from mlflow_export_import.common import utils, io_utils
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.client.http_client import DatabricksHttpClient
 
+_logger = utils.getLogger(__name__)
+
 
 def download_notebook(output_dir, notebook_workspace_path, revision_id, notebook_formats, dbx_client):
     notebook_dir = os.path.join(output_dir)
@@ -32,7 +34,7 @@ def _download_notebook(notebook_workspace_path, output_dir, format, extension, r
         notebook_path = os.path.join(output_dir, f"{notebook_name}.{extension}")
         io_utils.write_file(notebook_path, rsp.content)
     except MlflowExportImportException as e:
-        print(f"WARNING: Cannot download notebook '{notebook_workspace_path}'. {e}")
+        _logger.warning(f"Cannot download notebook '{notebook_workspace_path}'. {e}")
 
 
 @click.command()
@@ -54,9 +56,9 @@ def _download_notebook(notebook_workspace_path, output_dir, format, extension, r
     show_default=True
 )
 def main(output_dir, notebook, revision, notebook_formats):
-    print("Options:")
+    _logger.info("Options:")
     for k,v in locals().items():
-        print(f"  {k}: {v}")
+        _logger.info(f"  {k}: {v}")
     dbx_client = DatabricksHttpClient()
     notebook_formats = utils.string_to_list(notebook_formats)
     download_notebook(output_dir, notebook, revision, notebook_formats, dbx_client)

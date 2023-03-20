@@ -5,11 +5,11 @@ import mlflow
 
 # Databricks tags that cannot or should not be set
 _DATABRICKS_SKIP_TAGS = set([
-  "mlflow.user",
-  "mlflow.log-model.history",
-  "mlflow.rootRunId",
-  "mlflow.experiment.sourceType", "mlflow.experiment.sourceId"
-  ])
+    "mlflow.user",
+    "mlflow.log-model.history",
+    "mlflow.rootRunId",
+    "mlflow.experiment.sourceType", "mlflow.experiment.sourceId"
+])
 
 
 def create_mlflow_tags_for_databricks_import(tags):
@@ -72,3 +72,10 @@ def show_table(title, lst, columns):
 def get_user():
     import getpass
     return getpass.getuser()
+
+
+def getLogger(name):
+    import logging
+    logging.basicConfig(format="%(asctime)s - %(levelname)s: %(message)s", datefmt="%d-%b-%y %H:%M:%S", level=logging.INFO)
+    return logging.getLogger(name)
+

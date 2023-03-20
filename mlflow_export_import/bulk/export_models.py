@@ -23,6 +23,8 @@ from mlflow_export_import.bulk import export_experiments
 from mlflow_export_import.bulk.model_utils import get_experiments_runs_of_models
 from mlflow_export_import.bulk import bulk_utils
 
+_logger = utils.getLogger(__name__)
+
 
 def _export_models(
         mlflow_client,
@@ -38,9 +40,9 @@ def _export_models(
     max_workers = os.cpu_count() or 4 if use_threads else 1
     start_time = time.time()
     model_names = bulk_utils.get_model_names(mlflow_client, model_names)
-    print("Models to export:")
+    _logger.info("Models to export:")
     for model_name in model_names:
-        print(f"  {model_name}")
+        _logger.info(f"  {model_name}")
 
     notebook_formats = utils.string_to_list(notebook_formats),
     futures = []
@@ -84,8 +86,8 @@ def _export_models(
     }
     io_utils.write_export_file(output_dir, "models.json", __file__, mlflow_attr, info_attr)
 
-    print(f"{len(model_names)} models exported")
-    print(f"Duration for registered models export: {duration} seconds")
+    _logger.info(f"{len(model_names)} models exported")
+    _logger.info(f"Duration for registered models export: {duration} seconds")
 
     return info_attr
 
@@ -127,7 +129,7 @@ def export_models(
         export_permissions = export_permissions
     )
     duration = round(time.time()-start_time, 1)
-    print(f"Duration for total registered models and versions' runs export: {duration} seconds")
+    _logger.info(f"Duration for total registered models and versions' runs export: {duration} seconds")
 
     info_attr = {
         "model_names": model_names,
@@ -162,9 +164,9 @@ def export_models(
 @opt_use_threads
 
 def main(models, output_dir, stages, export_latest_versions, export_all_runs, export_permissions, notebook_formats, use_threads):
-    print("Options:")
+    _logger.info("Options:")
     for k,v in locals().items():
-        print(f"  {k}: {v}")
+        _logger.info(f"  {k}: {v}")
     export_models(
         model_names = models,
         output_dir = output_dir,

@@ -17,9 +17,11 @@ from mlflow_export_import.common.click_options import (
     opt_import_source_tags, 
     opt_use_threads
 )
-from mlflow_export_import.common import io_utils
+from mlflow_export_import.common import utils, io_utils
 from mlflow_export_import.experiment.import_experiment import import_experiment
 from mlflow_export_import.model.import_model import AllModelImporter
+
+_logger = utils.getLogger(__name__)
 
 
 def _remap(run_info_map):
@@ -36,9 +38,9 @@ def _import_experiments(mlflow_client, input_dir, use_src_user_id):
     dct = io_utils.read_file_mlflow(os.path.join(os.path.join(input_dir,"experiments","experiments.json")))
     exps = dct["experiments"]
 
-    print("Experiments:")
+    _logger.info("Experiments:")
     for exp in exps: 
-        print(" ",exp)
+        _logger.info(f"  {exp}")
     run_info_map = {}
     exceptions = []
 
@@ -59,8 +61,8 @@ def _import_experiments(mlflow_client, input_dir, use_src_user_id):
 
     duration = round(time.time()-start_time, 1)
     if len(exceptions) > 0:
-        print(f"Errors: {len(exceptions)}")
-    print(f"Duration: {duration} seconds")
+        _logger.info(f"Errors: {len(exceptions)}")
+    _logger.info(f"Duration: {duration} seconds")
 
     return run_info_map, { "experiments": len(exps), "exceptions": exceptions, "duration": duration }
 
@@ -130,8 +132,9 @@ def import_all(
     )
     duration = round(time.time()-start_time, 1)
     dct = { "duration": duration, "experiment_import": exp_res[1], "model_import": model_res }
-    print("\nImport report:")
-    print(json.dumps(dct,indent=2)+"\n")
+    _logger.info("\nImport report:")
+    #_logger.info(json.dumps(dct,indent=2)+"\n")
+    _logger.info(f"{json.dumps(dct,indent=2)}\n")
 
 
 @click.command()
@@ -143,9 +146,9 @@ def import_all(
 @opt_use_threads
 
 def main(input_dir, delete_model, import_source_tags, use_src_user_id, verbose, use_threads):
-    print("Options:")
+    _logger.info("Options:")
     for k,v in locals().items():
-        print(f"  {k}: {v}")
+        _logger.info(f"  {k}: {v}")
     import_all(
         input_dir = input_dir,
         delete_model = delete_model, 

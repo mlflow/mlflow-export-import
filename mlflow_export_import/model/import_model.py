@@ -8,13 +8,20 @@ import click
 import mlflow
 from mlflow.exceptions import RestException
 
-from mlflow_export_import.common.click_options import opt_input_dir, opt_model, \
-    opt_experiment_name, opt_delete_model, opt_import_source_tags, opt_verbose
-from mlflow_export_import.common import io_utils
-from mlflow_export_import.common import model_utils
+from mlflow_export_import.common.click_options import (
+    opt_input_dir,
+    opt_model,
+    opt_experiment_name,
+    opt_delete_model,
+    opt_import_source_tags,
+    opt_verbose
+)
+from mlflow_export_import.common import utils, io_utils, model_utils
 from mlflow_export_import.common.source_tags import set_source_tags_for_field, fmt_timestamps
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.run.import_run import RunImporter
+
+_logger = utils.getLogger(__name__)
 
 
 def _set_source_tags_for_field(dct, tags):
@@ -100,7 +107,7 @@ class BaseModelImporter():
 
         model_utils.wait_until_version_is_ready(self.mlflow_client, model_name, dst_vr, sleep_time=sleep_time)
         src_current_stage = src_vr["current_stage"]
-        print(f"Importing model '{model_name}' version {dst_vr.version} stage '{src_current_stage}'")
+        _logger.info(f"Importing model '{model_name}' version {dst_vr.version} stage '{src_current_stage}'")
         if src_current_stage != "None": # fails for Databricks but no OSS
             self.mlflow_client.transition_model_version_stage(model_name, dst_vr.version, src_current_stage)
 
@@ -121,12 +128,12 @@ class BaseModelImporter():
         path = os.path.join(input_dir, "model.json")
         model_dct = io_utils.read_file_mlflow(path)["registered_model"]
 
-        print("Model to import:")
-        print(f"  Name: {model_dct['name']}")
-        print(f"  Description: {model_dct.get('description','')}")
-        print(f"  Tags: {model_dct.get('tags','')}")
-        print(f"  {len(model_dct['versions'])} versions")
-        print(f"  path: {path}")
+        _logger.info("Model to import:")
+        _logger.info(f"  Name: {model_dct['name']}")
+        _logger.info(f"  Description: {model_dct.get('description','')}")
+        _logger.info(f"  Tags: {model_dct.get('tags','')}")
+        _logger.info(f"  {len(model_dct['versions'])} versions")
+        _logger.info(f"  path: {path}")
 
         if not model_name:
             model_name = model_dct["name"]
@@ -138,11 +145,11 @@ class BaseModelImporter():
             if self.import_source_tags:
                 _set_source_tags_for_field(model_dct, tags)
             self.mlflow_client.create_registered_model(model_name, tags, model_dct.get("description"))
-            print(f"Created new registered model '{model_name}'")
+            _logger.info(f"Created new registered model '{model_name}'")
         except RestException as e:
             if not "RESOURCE_ALREADY_EXISTS: Registered Model" in str(e):
                 raise e
-            print(f"Registered model '{model_name}' already exists")
+            _logger.info(f"Registered model '{model_name}' already exists")
         return model_dct
 
 
@@ -183,7 +190,7 @@ class ModelImporter(BaseModelImporter):
         """
         model_dct = self._import_model(model_name, input_dir, delete_model)
         mlflow.set_experiment(experiment_name)
-        print("Importing versions:")
+        _logger.info("Importing versions:")
         for vr in model_dct["versions"]:
             run_id = self._import_run(input_dir, experiment_name, vr)
             self.import_version(model_name, vr, run_id, sleep_time)
@@ -197,25 +204,25 @@ class ModelImporter(BaseModelImporter):
         current_stage = vr["current_stage"]
         run_artifact_uri = vr.get("_run_artifact_uri",None)
         run_dir = os.path.join(input_dir,run_id)
-        print(f"  Version {vr['version']}:")
-        print(f"    current_stage: {current_stage}:")
-        print(f"    Source run - run to import:")
-        print(f"      run_id: {run_id}")
-        print(f"      run_artifact_uri: {run_artifact_uri}")
-        print(f"      source:           {source}")
+        _logger.info(f"  Version {vr['version']}:")
+        _logger.info(f"    current_stage: {current_stage}:")
+        _logger.info(f"    Source run - run to import:")
+        _logger.info(f"      run_id: {run_id}")
+        _logger.info(f"      run_artifact_uri: {run_artifact_uri}")
+        _logger.info(f"      source:           {source}")
         model_path = _extract_model_path(source, run_id)
-        print(f"      model_path:   {model_path}")
+        _logger.info(f"      model_path:   {model_path}")
         dst_run,_ = self.run_importer.import_run(
             experiment_name = experiment_name,
             input_dir = run_dir
         )
         dst_run_id = dst_run.info.run_id
         run = self.mlflow_client.get_run(dst_run_id)
-        print(f"    Destination run - imported run:")
-        print(f"      run_id: {dst_run_id}")
-        print(f"      run_artifact_uri: {run.info.artifact_uri}")
+        _logger.info(f"    Destination run - imported run:")
+        _logger.info(f"      run_id: {dst_run_id}")
+        _logger.info(f"      run_artifact_uri: {run.info.artifact_uri}")
         source = _path_join(run.info.artifact_uri, model_path)
-        print(f"      source:           {source}")
+        _logger.info(f"      source:           {source}")
         return dst_run_id
 
 
@@ -261,13 +268,13 @@ class AllModelImporter(BaseModelImporter):
         :return: Model import manifest.
         """
         model_dct = self._import_model(model_name, input_dir, delete_model)
-        print("Importing versions:")
+        _logger.info("Importing versions:")
         for vr in model_dct["versions"]:
             src_run_id = vr["run_id"]
             dst_run = self.run_info_map.get(src_run_id, None)
             if not dst_run:
                 msg = { "model": model_name, "version": vr["version"], "stage": vr["current_stage"], "run_id": src_run_id }
-                print(f"ERROR: Cannot import model version {msg} since the source run_id was probably deleted.")
+                _logger.error(f"Cannot import model version {msg} since the source run_id was probably deleted.")
             else:
                 dst_run_id = dst_run.run_id
                 mlflow.set_experiment(vr["_experiment_name"])
@@ -333,9 +340,9 @@ def _path_join(x, y):
 @opt_verbose
 
 def main(input_dir, model, experiment_name, delete_model, await_creation_for, import_source_tags, verbose, sleep_time):
-    print("Options:")
+    _logger.info("Options:")
     for k,v in locals().items():
-        print(f"  {k}: {v}")
+        _logger.info(f"  {k}: {v}")
     import_model(
         model_name = model,
         experiment_name = experiment_name,

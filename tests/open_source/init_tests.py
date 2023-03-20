@@ -5,19 +5,22 @@ from collections import namedtuple
 import mlflow
 import utils_test
 
-print("mlflow.tracking_uri:",mlflow.tracking.get_tracking_uri())
+from mlflow_export_import.common import utils
+_logger = utils.getLogger(__name__)
+
+_logger.info(f"mlflow.tracking_uri {mlflow.tracking.get_tracking_uri()}")
 
 uri_src = os.environ.get("MLFLOW_TRACKING_URI_SRC",None)
-print("MLFLOW_TRACKING_URI_SRC:",uri_src)
+_logger.info(f"MLFLOW_TRACKING_URI_SRC: {uri_src}")
 assert uri_src,"Environment variable MLFLOW_TRACKING_URI_SRC must be set"
 client_src = mlflow.tracking.MlflowClient(uri_src)
-print("client_src:",client_src)
+_logger.info(f"client_src: {client_src}")
 
 uri_dst = os.environ.get("MLFLOW_TRACKING_URI_DST",None)
-print("MLFLOW_TRACKING_URI_DST:",uri_dst)
+_logger.info(f"MLFLOW_TRACKING_URI_DST: {uri_dst}")
 assert uri_dst
 client_dst = mlflow.tracking.MlflowClient(uri_dst)
-print("client_dst:",client_dst)
+_logger.info(f"client_dst: {client_dst}")
 
 MlflowContext = namedtuple(
     "MlflowContext",

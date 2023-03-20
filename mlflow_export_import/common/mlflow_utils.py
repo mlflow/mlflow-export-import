@@ -2,28 +2,9 @@ import os
 from mlflow.exceptions import RestException
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common.iterators import SearchModelVersionsIterator
+from mlflow_export_import.common import utils
 
-
-def get_mlflow_host():
-    """ Returns the host (tracking URI) and token """
-    return get_mlflow_host_token()[0]
-
-
-def get_mlflow_host_token():
-    """ Returns the host (tracking URI) and token """
-
-    uri = os.environ.get("MLFLOW_TRACKING_URI", None)
-    if uri is not None and not uri.startswith("databricks"):
-        return (uri, None)
-    try:
-        from mlflow_export_import.client import databricks_cli_utils
-        toks = uri.split("//")
-        profile = uri.split("//")[1] if len(toks) > 1 else None
-        return databricks_cli_utils.get_host_token(profile)
-    #except databricks_cli.utils.InvalidConfigurationError as e:
-    except Exception as e: # TODO: make more specific
-        print("WARNING:", e)
-        return (None, None)
+_logger = utils.getLogger(__name__)
 
 
 def get_experiment(mlflow_client, exp_id_or_name):
@@ -43,7 +24,6 @@ def set_experiment(mlflow_client, dbx_client, exp_name, tags=None):
     For Databricks, create the workspace directory if it doesn't exist.
     :return: Experiment ID
     """
-    from mlflow_export_import.common import utils
     if utils.importing_into_databricks():
         create_workspace_dir(dbx_client, os.path.dirname(exp_name))
     try:
@@ -51,12 +31,12 @@ def set_experiment(mlflow_client, dbx_client, exp_name, tags=None):
         tags = utils.create_mlflow_tags_for_databricks_import(tags)
         exp_id = mlflow_client.create_experiment(exp_name, tags=tags)
         exp = mlflow_client.get_experiment(exp_id)
-        print(f"Created experiment '{exp.name}' with location '{exp.artifact_location}'")
+        _logger.info(f"Created experiment '{exp.name}' with location '{exp.artifact_location}'")
     except RestException as ex:
         if ex.error_code != "RESOURCE_ALREADY_EXISTS":
             raise MlflowExportImportException(ex, f"Cannot create experiment '{exp_name}'")
         exp = mlflow_client.get_experiment_by_name(exp_name)
-        print(f"Using existing experiment '{exp.name}' with location '{exp.artifact_location}'")
+        _logger.info(f"Using existing experiment '{exp.name}' with location '{exp.artifact_location}'")
     return exp.experiment_id
 
 
@@ -68,13 +48,13 @@ def get_first_run(mlflow_client, exp_id_or_name):
 
 def delete_experiment(mlflow_client, exp_id_or_name):
     exp = get_experiment(mlflow_client, exp_id_or_name)
-    print(f"Deleting experiment: name={exp.name} experiment_id={exp.experiment_id}")
+    _logger.info(f"Deleting experiment: name={exp.name} experiment_id={exp.experiment_id}")
     mlflow_client.delete_experiment(exp.experiment_id)
 
 
 def delete_model(mlflow_client, model_name):
     versions = SearchModelVersionsIterator(mlflow_client, filter=f"name='{model_name}'")
-    print(f"Deleting model '{model_name}'")
+    _logger.info(f"Deleting model '{model_name}'")
     for vr in versions:
         if vr.current_stage == "None":
             mlflow_client.delete_model_version(model_name, vr.version)
@@ -91,7 +71,7 @@ def create_workspace_dir(dbx_client, workspace_dir):
     """
     Create Databricks workspace directory.
     """
-    print(f"Creating Databricks workspace directory '{workspace_dir}'")
+    _logger.info(f"Creating Databricks workspace directory '{workspace_dir}'")
     dbx_client.post("workspace/mkdirs", { "path": workspace_dir })
 
 
@@ -106,15 +86,15 @@ def dump_exception(ex, msg=""):
         _dump_exception(ex, msg)
 
 def _dump_exception(ex, msg=""):
-    print(f"==== {ex.__class__.__name__}: {msg} =====")
-    print(f"  type: {type(ex)}")
-    print(f"  ex:   '{ex}'")
-    print(f"  attrs:")
+    _logger.info(f"==== {ex.__class__.__name__}: {msg} =====")
+    _logger.info(f"  type: {type(ex)}")
+    _logger.info(f"  ex:   '{ex}'")
+    _logger.info(f"  attrs:")
     for k,v in ex.__dict__.items():
-        print(f"    {k}: {v}")
+        _logger.info(f"    {k}: {v}")
 
 
 def _dump_MlflowException(ex, msg=""):
     _dump_exception(ex, msg)
-    print(f"  get_http_status_code(): {ex.get_http_status_code()}")
-    print(f"  serialize_as_json():    {ex.serialize_as_json()}") 
+    _logger.info(f"  get_http_status_code(): {ex.get_http_status_code()}")
+    _logger.info(f"  serialize_as_json():    {ex.serialize_as_json()}") 

@@ -12,6 +12,8 @@ import utils_test
 import init_tests
 
 mlflow_client = mlflow.tracking.MlflowClient()
+print(f"mlflow_client: {mlflow_client}")
+print("MLflow Tracking URI:", mlflow.get_tracking_uri())
 
 _use_source_tags = init_tests.cfg.get("use_source_tags",False)
 print("use_source_tags:",_use_source_tags)
