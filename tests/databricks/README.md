@@ -1,17 +1,34 @@
-# mlflow-export-import - Databricks Tests 
+# Mlflow Export Import - Databricks Tests 
 
 ## Overview
 
-* Databricks tests that check that [Databricks export-import notebooks](../../databricks_notebooks/README.md) execute properly.
-* For each test launches a Databricks job that invoke a Databricks notebook.
-* Currently these tests are a subset of the fine-grained OSS tests. The main purpose is to ensure that the notebooks run without errors. i
-* Unlike the OSS tests which use two source and destination tracking servers, the Databricks tests use one tracking server (workspace). Imported object have `_imported` added to the end of their name. Using a source and destination workspaces is a TODO.
+* Databricks tests that ensure that [Databricks export-import notebooks](../../databricks_notebooks/README.md) execute properly.
+* For each test launches a Databricks job that invokes a Databricks notebook.
+  * For know only single notebooks are tested. Bulk notebooks tests are a TODO.
+* Currently these tests are a subset of the fine-grained OSS tests. Their main purpose is to ensure that the notebooks run without errors.
+* Unlike the OSS tests which use two source and destination tracking servers, the Databricks tests use one tracking server (workspace). 
+Imported object have `_imported_` added to the end of their name. Using a source and destination workspaces is a TODO.
+*  XX
 
 ## Setup
 
 See [Setup](../../README.md#Setup) section.
 
 ## Test Configuration
+
+### Target workspace
+
+The testing framework select the workspace from the MLFLOW_TRACKING_URI environment variable.
+The simplest way to run against a Databricks MLflow tracking server is to set it to `databricks`.
+The default profile from the ~/.databrickscfg file will be used.
+
+In order to specify a non-default profile, MLFLOW_TRACKING_URI looks like `databricks://my-profile`.
+You can easily run the tests by passing the profile as an argument to run_tests.sh.
+```
+run_test.sh my-profile
+```
+
+### config.yaml 
 
 The tests use `config.yaml` for environment configuration.
 Copy [config.yaml.template](config.yaml.template) to `config.yaml` and adjust the properties for your workspace.
@@ -26,7 +43,6 @@ Copy [config.yaml.template](config.yaml.template) to `config.yaml` and adjust th
 | use_source_tags | no | Whether to test using source tags or not. Default is False. |
 | run_name_prefix | yes | Prefix of the job run name. |
 | cluster | yes | Either an existing cluster ID or cluster spec for new cluster. See below. |
-| profile | no | Databricks profile. If not set, the DEFAULT profile from `~/.databrickscfg` will be used. |
 
 
 ### Cluster
@@ -41,6 +57,7 @@ The `cluster` attribute is a polymorphic attribute that has two possible values:
 At the end of the test suite, the cluster will be deleted.
 In the `cluster` attribute specify a new cluster spec per the standard Databricks JSON format for [new_cluster](https://docs.databricks.com/dev-tools/api/latest/clusters.html#create) attribute.
 * **Existing cluster**. Use an existing cluster. In the `cluster` attribute specify an existing cluster ID.
+
 
 ### Sample `config.yaml` files
 
