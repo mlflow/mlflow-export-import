@@ -6,7 +6,7 @@ import time
 import logging
 from databricks_cli.sdk import service
 from mlflow_export_import.common import MlflowExportImportException
-from mlflow_export_import.workflow_api import utils
+from mlflow_export_import.client import databricks_utils
 
 logging.info(f"Python version: {sys.version}")
 
@@ -21,7 +21,6 @@ class WorkflowApiClient(object):
 
     def __init__(self, profile=None, sleep_seconds=2, timeout_seconds=sys.maxsize, timeout_func=_default_timeout_func, verbose=True):
         """
-        :param profile: Databricks profile
         :param sleep_seconds: Seconds to sleep when polling for cluster readiness
         :param timeout_seconds: Timeout in seconds
         :param verbose: To be verbose or not?
@@ -31,7 +30,8 @@ class WorkflowApiClient(object):
         self.timeout_func = timeout_func
         self.verbose = verbose
 
-        api_client = utils.get_api_client(profile)
+        api_client = databricks_utils.get_api_client()
+        #api_client = utils.get_api_client(profile) # TODO eventually
         self.jobs_service = service.JobsService(api_client)
         self.cluster_service = service.ClusterService(api_client)
 

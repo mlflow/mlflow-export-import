@@ -5,7 +5,7 @@ from databricks_cli.sdk import service
 
 from mlflow_export_import.common import mlflow_utils
 from mlflow_export_import.workflow_api.workflow_api_client import WorkflowApiClient
-import databricks_utils
+from mlflow_export_import.client import databricks_utils
 
 from databricks_cli.workspace.api import WorkspaceApi
 from databricks_cli.dbfs.api import DbfsApi, DbfsPath
@@ -38,10 +38,9 @@ class DatabricksTester():
             cluster_spec, 
             model_name, 
             run_name_prefix, 
-            profile=None, 
             verbose=False
         ):
-        api_client = databricks_utils.get_api_client(profile)
+        api_client = databricks_utils.get_api_client()
         self.ws_api = WorkspaceApi(api_client)
         self.dbfs_api = DbfsApi(api_client)
         self.cluster_api = ClusterApi(api_client)

@@ -1,12 +1,11 @@
 from collections import namedtuple
 import pytest
 import tempfile
+from mlflow_export_import.client import databricks_utils
 from databricks_tester import DatabricksTester
-import databricks_utils
 import utils_test
 
 cfg = utils_test.read_config_file()
-_profile = cfg.get("profile", None)
 
 _tester = DatabricksTester(
     ws_base_dir = cfg["ws_base_dir"], 
@@ -14,12 +13,11 @@ _tester = DatabricksTester(
     local_artifacts_compare_dir = cfg.get("local_artifacts_compare_dir", None),
     cluster_spec = cfg["cluster"], 
     model_name = cfg["model_name"], 
-    run_name_prefix = cfg["run_name_prefix"], 
-    profile = _profile
+    run_name_prefix = cfg["run_name_prefix"]
 )
 
 from databricks_cli.dbfs.api import DbfsApi
-_dbfs_api = DbfsApi(databricks_utils.get_api_client(_profile))
+_dbfs_api = DbfsApi(databricks_utils.get_api_client())
 
 
 TestContext = namedtuple(

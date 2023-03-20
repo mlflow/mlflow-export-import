@@ -11,7 +11,10 @@ def get_mlflow_host():
 
 
 def get_mlflow_host_token():
-    """ Returns the MLflow tracking URI (host) and Databricks personal access token (PAT)"""
+    """ 
+    Returns the MLflow tracking URI (host) and Databricks personal access token (PAT).
+    For Databricks, expects the MLflow tracking URI in the form of 'databricks' or 'databricks://MY_PROFILE'.
+    """
 
     import mlflow
     uri = mlflow.tracking.get_tracking_uri()
