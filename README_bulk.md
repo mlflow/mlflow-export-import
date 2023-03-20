@@ -1,4 +1,4 @@
-# MLflow Export Import - Bulk Tools
+# MLflow Export Import - Bulk Object Tools
 
 ## Overview
 
@@ -413,16 +413,22 @@ If the experiment already exists, the source runs will be added to it.
 import-experiments --help
 
 Options:
-  --input-dir TEXT           Input path - directory  [required]
-  --use-src-user-id BOOLEAN  Set the destination user field to the source user
-                             field.  Only valid for open source MLflow.  When
-                             importing into Databricks, the source user field
-                             is ignored since it is automatically picked up
-                             from your Databricks access token.  There is no
-                             MLflow API endpoint to explicity set the user_id
-                             for Run and Registered Model.
-  --use-threads BOOLEAN      Process in parallel using threads. Experimental:
-                             needs improved logging.  [default: False]
+  --experiment-name TEXT        Destination experiment name  [required]
+  --input-dir TEXT              Input directory  [required]
+  --import-source-tags BOOLEAN  Import source information for registered model
+                                and its versions ad tags in destination
+                                object.  [default: False]
+  --use-src-user-id BOOLEAN     Set the destination user field to the source
+                                user field.  Only valid for open source
+                                MLflow.  When importing into Databricks, the
+                                source user field is ignored since it is
+                                automatically picked up from your Databricks
+                                access token.  There is no MLflow API endpoint
+                                to explicity set the user_id for Run and
+                                Registered Model.
+  --dst-notebook-dir TEXT       Databricks destination workpsace base
+                                directory for notebook. A run ID will be added
+                                to contain the run's notebook.
 ```
 
 

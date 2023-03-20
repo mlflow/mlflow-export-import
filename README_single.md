@@ -335,19 +335,20 @@ Source: [import_model.py](mlflow_export_import/model/import_model.py).
 import-model --help
 
 Options:
-  --input-dir TEXT              Input directory that contains the exported
-                                registered model.  [required]
-  --model TEXT                  New registered model name.  [required]
-  --experiment-name TEXT        Destination experiment name  - will be created
-                                if it does not exist.  [required]
+```
+  --input-dir TEXT              Input directory  [required]
+  --model TEXT                  Registered model name.  [required]
+  --experiment-name TEXT        Destination experiment name  [required]
   --delete-model BOOLEAN        If the model exists, first delete the model
                                 and all its versions.  [default: False]
+  --import-source-tags BOOLEAN  Import source information for registered model
+                                and its versions ad tags in destination
+                                object.  [default: False]
   --await-creation-for INTEGER  Await creation for specified seconds.
   --sleep-time INTEGER          Sleep time for polling until
                                 version.status==READY.
   --verbose BOOLEAN             Verbose.  [default: False]
 ```
-
 
 #### Example
 
