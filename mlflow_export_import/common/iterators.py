@@ -77,13 +77,14 @@ class SearchModelVersionsIterator(BaseIterator):
 
 
 class SearchRunsIterator(BaseIterator):
-    def __init__(self, client, experiment_ids, max_results=None, filter=None):
+    def __init__(self, client, experiment_ids, max_results=None, filter=None, view_type=None):
         super().__init__(None, max_results, filter)
         self.experiment_ids = experiment_ids
         self.client = client
+        self._kwargs = { "run_view_type": view_type } if view_type else {}
 
     def _call_iter(self):
-        return self.client.search_runs(self.experiment_ids, filter_string=self.filter, max_results=self.max_results)
+        return self.client.search_runs(self.experiment_ids, **self._kwargs, filter_string=self.filter, max_results=self.max_results)
 
     def _call_next(self):
-        return self.client.search_runs(self.experiment_ids, filter_string=self.filter, max_results=self.max_results, page_token=self.paged_list.token)
+        return self.client.search_runs(self.experiment_ids, **self._kwargs, filter_string=self.filter, max_results=self.max_results, page_token=self.paged_list.token)
