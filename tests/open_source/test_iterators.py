@@ -35,8 +35,7 @@ def _create_experiments(num_experiments):
     delete_experiments(client)
     experiments = list_experiments(client)
     assert len(experiments) == 0
-    for _ in range(0,num_experiments):
-        _create_experiment()
+    return [ _create_experiment().experiment_id for _ in range(0,num_experiments) ]
 
 def _run_test_search_experiments(num_experiments, max_results):
     _create_experiments(num_experiments)
@@ -44,6 +43,7 @@ def _run_test_search_experiments(num_experiments, max_results):
     experiments2 = SearchExperimentsIterator(client, max_results=max_results)
     assert len(experiments1) == len(list(experiments2))
 
+# == basic tests
 
 def test_search_experiments_max_results_LT_num_experiments():
     _run_test_search_experiments(10, 5)
@@ -62,6 +62,45 @@ def test_search_experiments_max_results_custom():
     assert len(experiments1) == num_experiments
     experiments2 = SearchExperimentsIterator(client, max_results=max_results)
     assert len(experiments1) == len(list(experiments2))
+
+# == search_experiments view_type tests ZZZ
+#
+# Since experiments are tombstoned and not physically, 
+# we have to write some non-obvious logic to account for deleted experiments.
+#
+
+_num_exps = 5
+_num_exps_deleted = 2
+
+def _run_test_deleted_experiments():
+    exp_ids = _create_experiments(_num_exps)
+    exps_del_01 = list(SearchExperimentsIterator(client, view_type=ViewType.DELETED_ONLY))
+    for j in range(0,_num_exps_deleted):
+        client.delete_experiment(exp_ids[j])
+    exps_del_02 = list(SearchExperimentsIterator(client, view_type=ViewType.DELETED_ONLY))
+    return len(exps_del_02) - len(exps_del_01)
+
+
+def test_deleted_experiments_default():
+    _run_test_deleted_experiments()
+    exps = list(SearchExperimentsIterator(client))
+    assert _num_exps - _num_exps_deleted == len(exps)
+
+def test_deleted_experiments_view_active_only():
+    _run_test_deleted_experiments()
+    exps = list(SearchExperimentsIterator(client, view_type=ViewType.ACTIVE_ONLY))
+    assert _num_exps - _num_exps_deleted == len(exps)
+
+def test_deleted_experiments_view_deleted_only():
+    num_deleted = _run_test_deleted_experiments()
+    assert _num_exps_deleted == num_deleted
+
+def test_deleted_experiments_view_deleted_all():
+    exps1 = list(SearchExperimentsIterator(client, view_type=ViewType.ALL))
+    _run_test_deleted_experiments()
+    exps2 = list(SearchExperimentsIterator(client, view_type=ViewType.ALL))
+    assert _num_exps == len(exps2) - len(exps1)
+
 
 # ==== Test SearchRegisteredModelsIterator
 
@@ -137,6 +176,8 @@ def test_search_models_max_results_non_default():
 
 # ==== Test SearchRunsIterator
 
+# == basic tests
+
 def test_search_runs():
     num_runs = 120
     max_results = 22
@@ -157,6 +198,7 @@ def test_runs_search_empty():
     runs = list(iterator)
     assert num_runs == len(runs)
 
+# == search_runs view_type tests
 
 _num_runs = 5
 _num_runs_deleted = 2
@@ -190,6 +232,7 @@ def test_deleted_runs_view_all():
     runs = list(SearchRunsIterator(client, exp.experiment_id, view_type=ViewType.ALL))
     assert _num_runs == len(runs)
 
+# == other tests
 
 # Stress test - fails because of connection timeout 
 def __test_search_runs_too_many():

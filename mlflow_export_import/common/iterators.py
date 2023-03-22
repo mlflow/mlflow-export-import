@@ -1,4 +1,3 @@
-from mlflow.entities import ViewType
 import mlflow
 
 
@@ -18,10 +17,10 @@ class BaseIterator():
         if mlflow.__version__ < "2.2.1":
             return self.search_method(self.filter)  #7623 - https://mlflow.org/docs/2.1.1/python_api/mlflow.client.html
         else:
-            return self.search_method(self.filter, **self.kwargs) # https://mlflow.org/docs/latest/python_api/mlflow.client.html
+            return self.search_method(filter_string=self.filter, **self.kwargs) # https://mlflow.org/docs/latest/python_api/mlflow.client.html
 
     def _call_next(self):
-        return self.search_method(self.filter, page_token=self.paged_list.token, **self.kwargs)
+        return self.search_method(filter_string=self.filter, page_token=self.paged_list.token, **self.kwargs)
 
     def __iter__(self):
         self.paged_list = self._call_iter()
@@ -49,9 +48,10 @@ class SearchExperimentsIterator(BaseIterator):
         for experiment in experiments:
             print(experiment)
     """
-    def __init__(self, client, view_type=ViewType.ACTIVE_ONLY, max_results=None, filter=None):
+    def __init__(self, client, view_type=None, max_results=None, filter=None):
         super().__init__(client.search_experiments, max_results, filter)
-        self.view_type = view_type
+        if view_type:
+            self.kwargs["view_type"] = view_type
 
 
 class SearchRegisteredModelsIterator(BaseIterator):
