@@ -136,13 +136,16 @@ class ModelExporter():
                 dct["_experiment_name"] = experiment.name
                 output_versions.append(dct)
             except mlflow.exceptions.RestException as e:
-                if "RESOURCE_DOES_NOT_EXIST: Run" in str(e):
-                    _logger.warning(f"Run for model version {model_name}/{vr.version} does not exist. {e}")
+                err_dct = { "RestException": e.json , "model": vr.name, "version": vr.version, "run_id": vr.run_id }
+                if e.json.get("error_code",None) == "RESOURCE_DOES_NOT_EXIST":
+                    err_dct = { **{"message": "Run probably does not exist"}, **err_dct}
+                    _logger.error(err_dct)
                 else:
+                    err_dct = { **{"message": "Version cannot be exported"}, **err_dct}
+                    _logger.error(err_dct)
                     import traceback
                     traceback.print_exc()
-                dct = { "version": vr.version, "run_id": vr.run_id, "error": e.message }
-                failed_versions.append(dct)
+                failed_versions.append(err_dct)
         output_versions.sort(key=lambda x: x["version"], reverse=False)
         return output_versions, failed_versions
 
@@ -175,6 +178,7 @@ class ModelExporter():
         io_utils.write_export_file(output_dir, "model.json", __file__, model, info_attr)
 
         _logger.info(f"Exported {len(versions)}/{len(ori_versions)} '{msg}' versions for model '{model_name}'")
+
 
     def _adjust_versions(self, model, versions):
         model["versions"] = versions
@@ -217,6 +221,7 @@ def main(model, output_dir, notebook_formats, stages, versions, export_latest_ve
         export_permissions = export_permissions,
         notebook_formats = notebook_formats
     )
+
 
 if __name__ == "__main__":
     main()
