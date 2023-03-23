@@ -2,6 +2,7 @@
 # MAGIC %md ## MLflow Export Import - Single Notebooks
 # MAGIC 
 # MAGIC * Export and import one MLflow object and specify its destination name.
+# MAGIC * Original "fancy" version that use notebook.contex to display MLflow object UI links.
 # MAGIC 
 # MAGIC **Notebooks**
 # MAGIC * Run
@@ -21,4 +22,4 @@
 
 # COMMAND ----------
 
-# MAGIC %md Last updated: 2023-03-16
+# MAGIC %md Last updated: 2023-03-23
