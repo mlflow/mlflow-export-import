@@ -76,14 +76,6 @@ print("output_dir:", output_dir)
 
 # COMMAND ----------
 
-# MAGIC %md ### Display MLflow UI URI of Registered Model
-
-# COMMAND ----------
-
-display_registered_model_uri(model_name)
-
-# COMMAND ----------
-
 # MAGIC %md ### Export the model
 
 # COMMAND ----------

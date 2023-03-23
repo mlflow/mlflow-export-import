@@ -20,7 +20,6 @@
 # MAGIC * `1. Run ID` 
 # MAGIC * `2. Output base directory` - Base output directory of the exported run.
 # MAGIC * `3. Notebook formats` - Standard Databricks notebook formats such as SOURCE, HTML, JUPYTER, DBC. 
-# MAGIC   * See [Databricks Export Format](https://docs.databricks.com/dev-tools/api/latest/workspace.html#notebookexportformat)  documentation.
 
 # COMMAND ----------
 
@@ -51,22 +50,6 @@ assert_widget(run_id, "1. Run ID")
 assert_widget(output_dir, "2. Output base directory")
   
 import mlflow
-
-# COMMAND ----------
-
-# MAGIC %md ### Display the Run link in MLflow UI
-
-# COMMAND ----------
-
-display_run_uri(run_id)
-
-# COMMAND ----------
-
-# MAGIC %md ### Remove any previous exported run data
-
-# COMMAND ----------
-
-dbutils.fs.rm(output_dir, True)
 
 # COMMAND ----------
 

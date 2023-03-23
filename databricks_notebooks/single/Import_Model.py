@@ -86,15 +86,3 @@ import_model(
   delete_model = delete_model,
   import_source_tags = import_source_tags
 )
-
-# COMMAND ----------
-
-# MAGIC %md ### Display object links in MLflow UI
-
-# COMMAND ----------
-
-display_registered_model_uri(model_name)
-
-# COMMAND ----------
-
-display_experiment_uri(experiment_name)

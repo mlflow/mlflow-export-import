@@ -56,14 +56,6 @@ print("Run ID:", run.info.run_id)
 
 # COMMAND ----------
 
-# MAGIC %md ### Display run link in MLflow UI
-
-# COMMAND ----------
-
-display_run_uri(run.info.run_id)
-
-# COMMAND ----------
-
 # MAGIC %md ### Check imported source tags
 
 # COMMAND ----------

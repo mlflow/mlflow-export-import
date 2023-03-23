@@ -41,7 +41,7 @@ assert_widget(input_dir, "2. Input directory")
 
 # COMMAND ----------
 
-# MAGIC %md ### Export experiment
+# MAGIC %md ### Import experiment
 
 # COMMAND ----------
 
@@ -52,11 +52,3 @@ import_experiment(
     input_dir = input_dir,
     import_source_tags = import_source_tags
 )
-
-# COMMAND ----------
-
-# MAGIC %md ### Display the Experiment link in MLflow UI
-
-# COMMAND ----------
-
-display_experiment_uri(experiment_name)

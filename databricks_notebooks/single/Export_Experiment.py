@@ -74,14 +74,6 @@ print("output_dir:", output_dir)
 
 # COMMAND ----------
 
-# MAGIC %md ### Display the Experiment link in MLflow UI
-
-# COMMAND ----------
-
-display_experiment_uri(experiment.name)
-
-# COMMAND ----------
-
 # MAGIC %md ### Export the experiment
 
 # COMMAND ----------
