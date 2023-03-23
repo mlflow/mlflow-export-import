@@ -26,7 +26,7 @@
 # MAGIC * [Single notebooks]($single/_README) - Copy one MLflow object and control its destination object name.
 # MAGIC * [Bulk notebooks]($bulk/_README) - Copy multiple MLflow objects. The target object name will be the same as the source object name.
 # MAGIC * Other
-# MAGIC   * [Fancy notebooks]($fancy/_README) - fancier version of above Single and Bulk notebooks. Can be ignored unless you're curious.
+# MAGIC   * [Fancy notebooks]($fancy/_README) - Fancier version of above Single notebooks. Can be ignored unless you're curious.
 # MAGIC 
 # MAGIC #### Limitations
 # MAGIC 
