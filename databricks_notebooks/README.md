@@ -6,17 +6,7 @@
 * Set of Databricks notebooks to perform MLflow export and import operations.
 * Use these notebooks when you want to copy MLflow objects from one Databricks workspace (tracking server) to another.
 * In order to copy MLflow objects between workspaces, you will need to set up a shared cloud bucket mounted on each workspace's DBFS.
-* The notebooks are generated with the Databricks [GitHub version control](https://docs.databricks.com/notebooks/github-version-control.html) feature.
-
-## Import notebooks into Databricks workspace
-
-Use the Databricks REST API command [databricks workspace import_dir](https://docs.databricks.com/dev-tools/cli/workspace-cli.html#import-a-directory-from-your-local-filesystem-into-a-workspace) to import the notebooks into a workspace.
-```
-git clone https://github.com/mlflow/mlflow-export-import
-databricks workspace import_dir \
-  databricks_notebooks \
-  /Users/me@mycompany.com/tools
-```
+* The notebooks are generated with [Git integration with Databricks Repos](https://docs.databricks.com/repos/index.html).
 
 ## Databricks notebooks
 
@@ -40,3 +30,46 @@ Copy multiple MLflow objects. The target object name will be the same as the sou
 | [Export_Experiments](bulk/Export_Experiments.py) | [Import_Experiments](bulk/Import_Experiments.py) |
 | [Export_Models](bulk/Export_Models.py) | [Import_Models](bulk/Import_Models.py) |
 | [Export_All](bulk/Export_All.py) | Use [Import_Models](bulk/Import_Models.py) |
+
+## Import notebooks into Databricks workspace
+
+You can load these notebooks into Databricks either as a workspace folder or a Git Repo.
+
+### Load directory as Databricks workspace folder
+
+See the [Workspace CLI](https://docs.databricks.com/dev-tools/cli/workspace-cli.html).
+```
+git clone https://github.com/mlflow/mlflow-export-import
+
+databricks workspace import_dir \
+  databricks_notebooks \
+  /Users/me@mycompany.com/mlflow-export-import
+```
+
+### Clone directory as Databricks Git Repo
+
+You can load a Git Repo either through the Databricks UI or via the command line.
+
+#### 1. Load through Databricks UI
+
+See [Clone a Git Repo & other common Git operations](https://docs.databricks.com/repos/git-operations-with-repos.html).
+
+#### 2. Load from command line with curl
+
+Note it's best to use the curl version since the CLI doesn't appear to support the sparse checkout option.
+
+```
+curl \
+  https://my.company.com/api/2.0/repos \
+  -H "Authorization: Bearer MY_TOKEN" \
+  -X POST \
+  -d ' {
+    "url": "https://github.com/mlflow/mlflow-export-import",
+    "provider": "gitHub",
+    "path": "/Repos/me@my.company.com/mlflow-export-import",
+    "sparse_checkout": {
+      "patterns": [ "databricks_notebooks" ]
+      }
+    }'
+```
+
