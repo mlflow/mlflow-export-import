@@ -74,8 +74,15 @@ def get_user():
     return getpass.getuser()
 
 
-def getLogger(name):
-    import logging
-    logging.basicConfig(format="%(asctime)s - %(levelname)s: %(message)s", datefmt="%d-%b-%y %H:%M:%S", level=logging.INFO)
-    return logging.getLogger(name)
+# == logging
 
+import os
+import logging
+
+_default_logging_format = "%(asctime)s - %(levelname)s - %(message)s"
+_logging_format = os.environ.get("MLFLOW_EXPORT_IMPORT_LOGGING_FORMAT", _default_logging_format)
+
+logging.basicConfig(format=_logging_format, datefmt="%d-%b-%y %H:%M:%S", level=logging.INFO)
+
+def getLogger(name):
+    return logging.getLogger(name)
