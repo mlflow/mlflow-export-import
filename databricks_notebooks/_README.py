@@ -22,9 +22,12 @@
 # MAGIC <img src="https://github.com/amesar/mlflow-export-import/blob/master/architecture.png?raw=true"  width="700" />
 # MAGIC 
 # MAGIC #### Notebooks 
-# MAGIC 
-# MAGIC * [Single notebooks]($single/_README) - Copy one MLflow object and control its destination object name.
-# MAGIC * [Bulk notebooks]($bulk/_README) - Copy multiple MLflow objects. The target object name will be the same as the source object name.
+# MAGIC * Basic notebooks with widgets
+# MAGIC   * [Single notebooks]($single/_README) - Copy one MLflow object and control its destination object name.
+# MAGIC   * [Bulk notebooks]($bulk/_README) - Copy multiple MLflow objects. The target object name will be the same as the source object name.
+# MAGIC * [Console Script]($scripts/_README) notebooks - command-line scripts using the Linux shell (%sh).
+# MAGIC   * [Console_Scripts_Single]($scripts/Console_Scripts_Single) 
+# MAGIC   * [Console_Scripts_Bulk]($scripts/Console_Scripts_Bulk)
 # MAGIC * Other
 # MAGIC   * [Fancy notebooks]($fancy/_README) - Fancier version of above Single notebooks. Can be ignored unless you're curious.
 # MAGIC 
@@ -50,4 +53,4 @@
 
 # COMMAND ----------
 
-# MAGIC %md Last updated: 2023-03-23
+# MAGIC %md Last updated: 2023-03-25

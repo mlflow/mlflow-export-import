@@ -54,13 +54,17 @@ versions = versions.split(",") if versions else []
 dbutils.widgets.dropdown("6. Export permissions","no",["yes","no"])
 export_permissions = dbutils.widgets.get("6. Export permissions") == "yes"
 
-notebook_formats = get_notebook_formats(7) # widget "7. Notebook formats"
+dbutils.widgets.dropdown("7. Export version run","yes",["yes","no"])
+export_permissions = dbutils.widgets.get("6. Export version run") == "yes"
+
+notebook_formats = get_notebook_formats(8) # widget "8. Notebook formats"
 
 print("model_name:", model_name)
 print("output_dir:", output_dir)
 print("stages:", stages)
 print("export_latest_versions:", export_latest_versions)
 print("export_permissions:", export_permissions)
+print("export_version_run:", export_version_run)
 print("notebook_formats:", notebook_formats)
 print("versions:", versions)
 
@@ -80,6 +84,10 @@ print("output_dir:", output_dir)
 
 # COMMAND ----------
 
+#dbutils.widgets.remove("7. Notebook formats")
+
+# COMMAND ----------
+
 from mlflow_export_import.model.export_model import export_model
 
 export_model(
@@ -89,6 +97,7 @@ export_model(
     versions = versions,
     export_latest_versions = export_latest_versions,
     export_permissions = export_permissions,
+    export_run = export_version_run,
     notebook_formats = notebook_formats
 )
 
