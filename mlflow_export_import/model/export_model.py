@@ -17,6 +17,7 @@ from mlflow_export_import.common.click_options import (
     opt_export_permissions
 )
 from mlflow_export_import.common import utils, io_utils, model_utils 
+from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
 from mlflow_export_import.common import permissions_utils
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.run.export_run import RunExporter
@@ -160,11 +161,11 @@ class ModelExporter():
             model = self.http_client.get("databricks/registered-models/get", { "name": model_name })
             model2 = model.pop("registered_model_databricks", None)
             model["registered_model"] = model2
-            self._adjust_versions(model2, versions)
+            self._adjust_model(model2, versions)
             permissions_utils.add_model_permissions(model2)
         else:
             model = self.http_client.get(f"registered-models/get", {"name": model_name})
-            self._adjust_versions(model["registered_model"], versions)
+            self._adjust_model(model["registered_model"], versions)
 
         info_attr = {
             "num_target_stages": len(self.stages),
@@ -180,9 +181,22 @@ class ModelExporter():
         _logger.info(f"Exported {len(versions)}/{len(ori_versions)} '{msg}' versions for model '{model_name}'")
 
 
-    def _adjust_versions(self, model, versions):
+    def _adjust_model(self, model, versions):
+        """ Add nicely formatted timestamps and for aesthetic reasons, line up the dict attributes nicely"""
+        self._adjust_timestamp(model, "creation_timestamp")
+        self._adjust_timestamp(model, "last_updated_timestamp")
+        tags = model.pop("tags", None)
+        if tags:
+            model["tags"] = tags
+        for vr in versions:
+            self._adjust_timestamp(vr, "creation_timestamp")
+            self._adjust_timestamp(vr, "last_updated_timestamp")
         model["versions"] = versions
-        model.pop("latest_versions",None)
+        model.pop("latest_versions", None)
+
+
+    def _adjust_timestamp(self, dct, attr):
+        dct[f"_{attr}"] = fmt_ts_millis(dct.get(attr,None))
 
 
     def _normalize_stages(self, stages):
