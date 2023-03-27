@@ -180,9 +180,34 @@ instead of:
 python -u -m mlflow_export_import.experiment.export_experiment --help
 ```
 
+## Logging
+
+Standard Python logging is used.
+A simple [default logging config](mlflow_export_import/common/default_logging_config.py) is provided.
+By default all output is sent to stdout using the console handler.
+There is an option to use a file handler to send output to a file.
+
+Several environment variables can be set to customize your logging experience.
+
+
+Default logging config:
+* MLFLOW_EXPORT_IMPORT_LOG_OUTPUT_FILE - Specify the output log file. If not set (default), no output log file will be used.
+* MLFLOW_EXPORT_IMPORT_LOG_FORMAT - Convenience to overwrite the default [logging output format](https://github.com/mlflow/mlflow-export-import/blob/master/mlflow_export_import/common/default_logging_config.py#L5).
+
+Custom logging config file:
+* MLFLOW_EXPORT_IMPORT_LOG_CONFIG_FILE - Use your own YAML logging config file instead of the default config.
+
+
+Examples:
+```
+export MLFLOW_EXPORT_IMPORT_LOG_CONFIG_FILE=/dbfs/mlflow_export_import/conf/log_config.yaml
+export MLFLOW_EXPORT_IMPORT_LOG_OUTPUT_FILE=/dbfs/mlflow_export_import/logs/export_models.log
+export MLFLOW_EXPORT_IMPORT_LOG_FORMAT="%(asctime)s-%(levelname)s - %(message)s"
+```
+
 ## Other
 
-* [README_options.md](README_options.md) advanced options.
+* [README_options.md](README_options.md) - advanced options.
 * [Miscellanous tools](README_tools.md).
 
 ## Testing
