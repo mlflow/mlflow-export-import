@@ -205,6 +205,13 @@ export MLFLOW_EXPORT_IMPORT_LOG_OUTPUT_FILE=/dbfs/mlflow_export_import/logs/expo
 export MLFLOW_EXPORT_IMPORT_LOG_FORMAT="%(asctime)s-%(levelname)s - %(message)s"
 ```
 
+Multithreading:
+
+If you use the `use-threads` option on exports, you can use the `threadName` format option:
+```
+export MLFLOW_EXPORT_IMPORT_LOG_FORMAT="%(threadName)s-%(levelname)s-%(message)s"
+```
+
 ## Other
 
 * [README_options.md](README_options.md) - advanced options.
