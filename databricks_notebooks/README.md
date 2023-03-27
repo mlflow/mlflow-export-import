@@ -6,9 +6,16 @@
 * Set of Databricks notebooks to perform MLflow export and import operations.
 * Use these notebooks when you want to copy MLflow objects from one Databricks workspace (tracking server) to another.
 * In order to copy MLflow objects between workspaces, you will need to set up a shared cloud bucket mounted on each workspace's DBFS.
-* The notebooks are generated with [Git integration with Databricks Repos](https://docs.databricks.com/repos/index.html).
+* The notebooks use [Git integration with Databricks Repos](https://docs.databricks.com/repos/index.html) though they can be run as a simple non-Repo workspace folder.
+* See the [_README.py](_README.py) for more details.
 
 ## Databricks notebooks
+
+There are two types of notebooks:
+* Standard widget-based notebooks that call the MLflow Export Import API.
+* Console script notebooks that use the shell to the standard call Python scripts specified [here](https://github.com/mlflow/mlflow-export-import/blob/master/setup.py#L35).
+
+### Standard widget-based notebooks
 
 **Single Notebooks**
 
@@ -30,6 +37,11 @@ Copy multiple MLflow objects. The target object name will be the same as the sou
 | [Export_Experiments](bulk/Export_Experiments.py) | [Import_Experiments](bulk/Import_Experiments.py) |
 | [Export_Models](bulk/Export_Models.py) | [Import_Models](bulk/Import_Models.py) |
 | [Export_All](bulk/Export_All.py) | Use [Import_Models](bulk/Import_Models.py) |
+
+### Console script shell notebooks
+
+Using Databricks `%sh` cell mode, you can execute MLflow Export Import scripts from the Linux shell.
+See the [_README.py](scripts/_README.py) and and [Console_Scripts](scripts/Console_Scripts.py) notebook.
 
 ## Import notebooks into Databricks workspace
 
