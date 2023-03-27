@@ -7,7 +7,7 @@
 
 # COMMAND ----------
 
-# MAGIC %md #### Setup
+# MAGIC %md ### Setup
 
 # COMMAND ----------
 
@@ -20,6 +20,10 @@ secrets_scope, secrets_token_key
 # COMMAND ----------
 
 # MAGIC %run ./Common
+
+# COMMAND ----------
+
+# MAGIC %md ### Single notebooks
 
 # COMMAND ----------
 
@@ -56,3 +60,43 @@ secrets_scope, secrets_token_key
 # COMMAND ----------
 
 # MAGIC %sh import-run --help
+
+# COMMAND ----------
+
+# MAGIC %md ### Bulk notebooks
+
+# COMMAND ----------
+
+# MAGIC %md #### Experiments
+
+# COMMAND ----------
+
+# MAGIC %sh export-experiments --help
+
+# COMMAND ----------
+
+# MAGIC %sh import-experiments --help
+
+# COMMAND ----------
+
+# MAGIC %md #### Models
+
+# COMMAND ----------
+
+# MAGIC %sh export-models --help
+
+# COMMAND ----------
+
+# MAGIC %sh import-models --help
+
+# COMMAND ----------
+
+# MAGIC %md #### All
+
+# COMMAND ----------
+
+# MAGIC %sh export-all --help
+
+# COMMAND ----------
+
+# MAGIC %sh import-all --help
