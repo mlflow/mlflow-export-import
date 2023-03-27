@@ -13,7 +13,7 @@
 
 There are two types of notebooks:
 * Standard widget-based notebooks that call the MLflow Export Import API.
-* Console script notebooks that use the shell to the standard call Python scripts specified [here](https://github.com/mlflow/mlflow-export-import/blob/master/setup.py#L35).
+* Console script notebooks that use the shell to call the standard call Python scripts specified [here](https://github.com/mlflow/mlflow-export-import/blob/master/setup.py#L35).
 
 ### Standard widget-based notebooks
 
@@ -42,6 +42,11 @@ Copy multiple MLflow objects. The target object name will be the same as the sou
 
 Using Databricks `%sh` cell mode, you can execute MLflow Export Import scripts from the Linux shell.
 See the [_README.py](scripts/_README.py) and and [Console_Scripts](scripts/Console_Scripts.py) notebook.
+
+From a notebook you can then call a script such as:
+```
+export-model --help
+```
 
 ## Import notebooks into Databricks workspace
 
