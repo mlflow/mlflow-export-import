@@ -12,9 +12,9 @@ def get_logger(name):
     config_path = os.environ.get("MLFLOW_EXPORT_IMPORT_LOG_CONFIG_FILE", None)
     output_path = os.environ.get("MLFLOW_EXPORT_IMPORT_LOG_OUTPUT_FILE", None)
     log_format = os.environ.get("MLFLOW_EXPORT_IMPORT_LOG_FORMAT", None)
-    print(f"logging_utils.get_logger: config_path: {config_path}")
-    print(f"logging_utils.get_logger: output_path: {output_path}")
-    print(f"logging_utils.get_logger: log_format: {log_format}")
+    #print(f"logging_utils.get_logger: config_path: {config_path}")
+    #print(f"logging_utils.get_logger: output_path: {output_path}")
+    #print(f"logging_utils.get_logger: log_format: {log_format}")
 
     if config_path:
         if not config_path.endswith(".yaml"):
