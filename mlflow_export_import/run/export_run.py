@@ -98,7 +98,11 @@ class RunExporter:
             artifacts = self.mlflow_client.list_artifacts(run.info.run_id)
             if len(artifacts) > 0: # Because of https://github.com/mlflow/mlflow/issues/2839
                 fs.mkdirs(dst_path)
-                self.mlflow_client.download_artifacts(run.info.run_id, "", dst_path=_filesystem.mk_local_path(dst_path))
+                mlflow.artifacts.download_artifacts(
+                   run_id = run.info.run_id, 
+                   artifact_path = "", 
+                   dst_path = _filesystem.mk_local_path(dst_path), 
+                   tracking_uri = self.mlflow_client._tracking_client.tracking_uri)
             notebook = tags.get(MLFLOW_DATABRICKS_NOTEBOOK_PATH, None)
             if notebook is not None:
                 if len(self.notebook_formats) > 0:
@@ -129,7 +133,7 @@ class RunExporter:
         fs.mkdirs(notebook_dir)
         revision_id = run.data.tags.get(MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID, None)
         if not revision_id:
-            _logger.info(f"NOTE: Cannot download notebook '{notebook}' for run '{run.info.run_id}' since tag '{MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID}' does not exist. Notebook is probably a Git Repo notebook")
+            _logger.warning(f"Cannot download notebook '{notebook}' for run '{run.info.run_id}' since tag '{MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID}' does not exist. Notebook is probably a Git Repo notebook")
             return 
         manifest = { 
            MLFLOW_DATABRICKS_NOTEBOOK_PATH: run.data.tags[MLFLOW_DATABRICKS_NOTEBOOK_PATH],
