@@ -75,42 +75,40 @@ import-all --input-dir out
 
 ## Registered Models
 
-Tools that copy registered models and their versions' runs along with the runs' experiment.
+Copy registered models and transitively all the objects that the model versions depend on: runs and their experiments.
 
-When exporting a registered models the following model's associated objects are exported:
+See also [Single tools Registered Model Tools](README_single.md#registered-model-tools).
+
+When exporting a registered models the following model's associated objects are also transitively exported:
 * All the versions of a model.
 * The run associated with each version.
-* The experiment that the run belongs to.
+* The experiment that the run belongs to. 
 
 **Scripts**
 * `export-models` - exports registered models and their versions' backing run along with the experiment that the run belongs to.
 * `import-models` - imports models and their versions' runs and experiments from the above exported directory.
 
+
 **Output directory**
+
+See [sample JSON export](samples/databricks/bulk/models).
 
 ```
 +-manifest.json
+|
++-models/
+| +-models.json
+| +-Sklearn_WineQuality/
+| | +-model.json
+| +-Keras_MNIST/
+| | +-model.json
 |
 +-experiments/
 | +-experiments.json
 | +-1/
 | | +-experiment.json
-| | +-5bd3b8a44faf4803989544af5cb4d66e/
-| | | +-run.json
-| | | +-artifacts/
-| | | | +-sklearn-model/
-| | +-4273c31c45744ec385f3654c63c31360
-| | | +-run.json
-| | | +-artifacts/
 | | | . . .
-| 
-+-models/
-| +-models.json
-| +-sklearn_iris/
-| | +-model.json
 ```
-
-For further directory structure see the `single` tool sections for experiments and models.
 
 
 ### Export registered models 
