@@ -12,6 +12,7 @@ from mlflow_export_import.common.click_options import (
     opt_export_latest_versions,
     opt_stages,
     opt_export_permissions,
+    opt_run_start_time,
     opt_notebook_formats, 
     opt_use_threads,
 )
@@ -29,6 +30,7 @@ def export_all(
         stages = "",
         export_latest_versions = False,
         export_permissions = False,
+        run_start_time = None,
         notebook_formats = None,
         use_threads  =  False,
         mlflow_client = None
@@ -51,6 +53,7 @@ def export_all(
         experiments = "all",
         output_dir = os.path.join(output_dir,"experiments"),
         export_permissions = export_permissions,
+        run_start_time = run_start_time,
         notebook_formats = notebook_formats,
         use_threads = use_threads
     )
@@ -76,10 +79,11 @@ def export_all(
 @opt_export_latest_versions
 @opt_stages
 @opt_export_permissions
+@opt_run_start_time
 @opt_notebook_formats
 @opt_use_threads
 
-def main(output_dir, stages, export_latest_versions, export_permissions, notebook_formats, use_threads):
+def main(output_dir, stages, export_latest_versions, export_permissions, run_start_time, notebook_formats, use_threads):
     _logger.info("Options:")
     for k,v in locals().items():
         _logger.info(f"  {k}: {v}")
@@ -88,6 +92,7 @@ def main(output_dir, stages, export_latest_versions, export_permissions, noteboo
         stages = stages,
         export_latest_versions = export_latest_versions,
         export_permissions = export_permissions, 
+        run_start_time = run_start_time, 
         notebook_formats = notebook_formats, 
         use_threads = use_threads
     )

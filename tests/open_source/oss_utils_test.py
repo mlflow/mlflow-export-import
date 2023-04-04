@@ -39,9 +39,11 @@ def create_experiment(client, mk_test_object_name=mk_test_object_name_default):
         client.delete_run(info.run_id)
     return exp
 
-
 def create_simple_run(client, run_name=None, use_metric_steps=False):
     exp = create_experiment(client)
+    return _create_simple_run(client, exp, run_name=run_name, use_metric_steps=use_metric_steps)
+
+def _create_simple_run(client, exp, run_name=None, use_metric_steps=False):
     max_depth = 4
     model = sklearn_utils.create_sklearn_model(max_depth)
     with mlflow.start_run(run_name=run_name) as run:

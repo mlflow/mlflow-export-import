@@ -62,6 +62,14 @@ def opt_get_model_version_download_uri(function):
     )(function)
     return function
 
+def opt_run_start_time(function):
+    function = click.option("--run-start-time",
+        help="Only export runs started after this time (UTC). Format: YYYY-MM-DD.",
+        type=str,
+        required=False
+    )(function)
+    return function
+
 
 # == import
 

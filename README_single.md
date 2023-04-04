@@ -37,6 +37,8 @@ Options:
   --output-dir TEXT             Output directory.  [required]
   --export-permissions BOOLEAN  Export Databricks permissions.  [default:
                                 False]
+  --run-start-time TEXT         Only export runs started after this time
+                                (UTC). Format: YYYY-MM-DD.
   --notebook-formats TEXT       Databricks notebook formats. Values are
                                 SOURCE, HTML, JUPYTER or DBC (comma
                                 seperated).

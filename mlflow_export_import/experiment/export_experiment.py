@@ -10,12 +10,13 @@ from mlflow_export_import.common.click_options import (
     opt_experiment,
     opt_output_dir,  
     opt_notebook_formats,
-    opt_export_permissions
+    opt_export_permissions,
+    opt_run_start_time
 )
 from mlflow_export_import.common.iterators import SearchRunsIterator
 from mlflow_export_import.common import utils, io_utils, mlflow_utils
 from mlflow_export_import.common import permissions_utils
-from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
+from mlflow_export_import.common.timestamp_utils import fmt_ts_millis, utc_str_to_millis
 from mlflow_export_import.run.export_run import export_run
 
 _logger = utils.getLogger(__name__)
@@ -26,6 +27,7 @@ def export_experiment(
         output_dir,
         run_ids = None,
         export_permissions = False,
+        run_start_time = None,
         notebook_formats = None,
         mlflow_client = None
     ):
@@ -33,6 +35,8 @@ def export_experiment(
     :param experiment_id_or_name: Experiment ID or name.
     :param output_dir: Output directory.
     :param run_ids: List of run IDs to export. If None export then all run IDs.
+    :param export_permissions - Export Databricks permissions.
+    :param run_start_time - Only export runs started after this time (UTC). Format: YYYY-MM-DD.
     :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
     :param mlflow_client: MLflow client.
     :return: Number of successful and number of failed runs.
@@ -40,6 +44,7 @@ def export_experiment(
     exporter = ExperimentExporter(
         mlflow_client = mlflow_client,
         export_permissions = export_permissions,
+        run_start_time = run_start_time,
         notebook_formats = notebook_formats
     )
     return exporter.export_experiment(
@@ -54,15 +59,18 @@ class ExperimentExporter():
     def __init__(self,
             mlflow_client = None,
             export_permissions = False,
+            run_start_time = None,
             notebook_formats = None
         ):
-        """
-        :param mlflow_client: MLflow client.
-        :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
-        """
         self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
         self.export_permissions = export_permissions
         self.notebook_formats = notebook_formats
+
+        self.run_start_time = run_start_time
+        self.run_start_time_str = run_start_time
+        #_logger.debug(f"run_start_time: {run_start_time}")
+        if run_start_time:
+            self.run_start_time = utc_str_to_millis(self.run_start_time)
 
 
     def export_experiment(self,
@@ -86,7 +94,10 @@ class ExperimentExporter():
                 run = self.mlflow_client.get_run(run_id)
                 self._export_run(j, run, output_dir, ok_run_ids, failed_run_ids)
         else:
-            for j,run in enumerate(SearchRunsIterator(self.mlflow_client, exp.experiment_id)):
+            kwargs = {}
+            if self.run_start_time:
+                kwargs = { "filter": f"start_time > {self.run_start_time}" }
+            for j,run in enumerate(SearchRunsIterator(self.mlflow_client, exp.experiment_id, **kwargs)):
                 self._export_run(j, run, output_dir, ok_run_ids, failed_run_ids)
 
         info_attr = {
@@ -109,7 +120,7 @@ class ExperimentExporter():
         if j==0:
             _logger.info(f"WARNING: No runs exported {msg}")
         elif len(failed_run_ids) == 0:
-            _logger.info(f"All {len(ok_run_ids)} runs succesfully exported {msg}")
+            _logger.info(f"{len(ok_run_ids)} runs succesfully exported {msg}")
         else:
             _logger.info(f"{len(ok_run_ids)/j} runs succesfully exported {msg}")
             _logger.info(f"{len(failed_run_ids)/j} runs failed {msg}")
@@ -117,6 +128,14 @@ class ExperimentExporter():
 
 
     def _export_run(self, idx, run, output_dir, ok_run_ids, failed_run_ids):
+        if self.run_start_time and run.info.start_time < self.run_start_time:
+            msg = { "run_id": {run.info.run_id}, 
+                "experiment_id": {run.info.experiment_id},
+                "start_time": fmt_ts_millis(run.info.start_time, True),
+                "run_start_time": self.run_start_time_str }
+            _logger.info(f"Not exporting run: {msg}")
+            return
+
         run_dir = os.path.join(output_dir, run.info.run_id)
         _logger.info(f"Exporting run {idx+1}: {run.info.run_id} of experiment {run.info.experiment_id}")
         is_success = export_run(
@@ -135,9 +154,10 @@ class ExperimentExporter():
 @opt_experiment
 @opt_output_dir
 @opt_export_permissions
+@opt_run_start_time
 @opt_notebook_formats
 
-def main(experiment, output_dir, export_permissions, notebook_formats):
+def main(experiment, output_dir, export_permissions, run_start_time, notebook_formats):
     _logger.info("Options:")
     for k,v in locals().items():
         _logger.info(f"  {k}: {v}")
@@ -145,6 +165,7 @@ def main(experiment, output_dir, export_permissions, notebook_formats):
         experiment_id_or_name = experiment,
         output_dir = output_dir,
         export_permissions = export_permissions,
+        run_start_time = run_start_time,
         notebook_formats = utils.string_to_list(notebook_formats)
     )
 
