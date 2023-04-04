@@ -273,6 +273,9 @@ Options:
                                   instead of all versions.  [default: False]
   --export-permissions BOOLEAN    Export Databricks permissions.  [default:
                                   False]
+  --get-model-version-download-uri BOOLEAN
+                                  Call MLflowClient.get_model_version_download
+                                  _uri() for version export.  [default: False]
 ```
 
 #### Example

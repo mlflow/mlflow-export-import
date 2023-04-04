@@ -53,6 +53,16 @@ def opt_export_permissions(function):
     )(function)
     return function
 
+def opt_get_model_version_download_uri(function):
+    function = click.option("--get-model-version-download-uri",
+        help="Call MLflowClient.get_model_version_download_uri() for version export.",
+        type=bool,
+        default=False,
+        show_default=True
+    )(function)
+    return function
+
+
 # == import
 
 def opt_input_dir(function):

@@ -14,7 +14,8 @@ from mlflow_export_import.common.click_options import (
     opt_stages,
     opt_versions,
     opt_export_latest_versions,
-    opt_export_permissions
+    opt_export_permissions,
+    opt_get_model_version_download_uri
 )
 from mlflow_export_import.common import utils, io_utils, model_utils 
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
@@ -34,6 +35,7 @@ def export_model(
         export_run = True,
         export_permissions = False,
         notebook_formats = None,
+        get_model_version_download_uri = False,
         mlflow_client = None
     ):
     """
@@ -42,6 +44,7 @@ def export_model(
     :param export_latest_versions: Export latest registered model versions instead of all versions.
     :param versions: List of versions to export.
     :param export_run: Export the run that generated a registered model's version.
+    :param get_model_version_download_uri: Call MLflowClient.get_model_version_download_uri for version.
     :param mlflow_client: MlflowClient
     """
 
@@ -52,6 +55,7 @@ def export_model(
        export_latest_versions = export_latest_versions,
        export_run = export_run,
        export_permissions = export_permissions,
+       get_model_version_download_uri = get_model_version_download_uri,
        mlflow_client = mlflow_client
     )
     return exporter.export_model(
@@ -69,6 +73,7 @@ class ModelExporter():
             export_run = True,
             export_permissions = False,
             notebook_formats = None,
+            get_model_version_download_uri = False,
             mlflow_client = None
         ):
         """
@@ -77,6 +82,7 @@ class ModelExporter():
         :param versions: List of versions to export.
         :param export_latest_versions: Export latest registered model versions instead of all versions.
         :param export_run: Export the run that generated a registered model's version.
+        :param get_model_version_download_uri: Call MLflowClient.get_model_version_download_uri for version.
         :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
         """
         self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
@@ -87,6 +93,7 @@ class ModelExporter():
         self.versions = versions if versions else []
         self.export_latest_versions = export_latest_versions
         self.export_permissions = export_permissions
+        self.get_model_version_download_uri = get_model_version_download_uri
         if len(self.stages) > 0 and len(self.versions) > 0:
             raise MlflowExportImportException(
                 f"Both stages {self.stages} and versions {self.versions} cannot be set", http_status_code=400)
@@ -120,22 +127,19 @@ class ModelExporter():
                 continue
             opath = os.path.join(output_dir, vr.run_id)
             opath = opath.replace("dbfs:", "/dbfs")
-            dct = { "version": vr.version,
-                    "stage": vr.current_stage,
-                    "run_id": vr.run_id,
-                    "description": vr.description,
-                    "tags": vr.tags 
-            }
             _logger.info(f"Exporting model '{model_name}' version {vr.version} stage '{vr.current_stage}' to '{opath}'")
             try:
                 if self.export_run:
                     self.run_exporter.export_run(vr.run_id, opath)
                 run = self.mlflow_client.get_run(vr.run_id)
-                dct = dict(vr)
-                dct["_run_artifact_uri"] = run.info.artifact_uri
+                vr_dct = dict(vr)
+                vr_dct["_run_artifact_uri"] = run.info.artifact_uri
                 experiment = mlflow.get_experiment(run.info.experiment_id)
-                dct["_experiment_name"] = experiment.name
-                output_versions.append(dct)
+                vr_dct["_experiment_name"] = experiment.name
+                if self.get_model_version_download_uri:
+                    _download_uri = self.mlflow_client.get_model_version_download_uri(vr.name, vr.version)
+                    vr_dct["_download_uri"] = _download_uri
+                output_versions.append(vr_dct)
             except mlflow.exceptions.RestException as e:
                 err_dct = { "RestException": e.json , "model": vr.name, "version": vr.version, "run_id": vr.run_id }
                 if e.json.get("error_code",None) == "RESOURCE_DOES_NOT_EXIST":
@@ -220,8 +224,10 @@ class ModelExporter():
 @opt_versions
 @opt_export_latest_versions
 @opt_export_permissions
+@opt_get_model_version_download_uri
 
-def main(model, output_dir, notebook_formats, stages, versions, export_latest_versions, export_permissions):
+def main(model, output_dir, notebook_formats, stages, versions, export_latest_versions, export_permissions, 
+        get_model_version_download_uri):
     _logger.info("Options:")
     for k,v in locals().items():
         _logger.info(f"  {k}: {v}")
@@ -233,6 +239,7 @@ def main(model, output_dir, notebook_formats, stages, versions, export_latest_ve
         versions = versions,
         export_latest_versions = export_latest_versions,
         export_permissions = export_permissions,
+        get_model_version_download_uri = get_model_version_download_uri,
         notebook_formats = notebook_formats
     )
 
