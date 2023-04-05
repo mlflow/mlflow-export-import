@@ -131,7 +131,7 @@ class ExperimentExporter():
         if self.run_start_time and run.info.start_time < self.run_start_time:
             msg = { "run_id": {run.info.run_id}, 
                 "experiment_id": {run.info.experiment_id},
-                "start_time": fmt_ts_millis(run.info.start_time, True),
+                "start_time": fmt_ts_millis(run.info.start_time),
                 "run_start_time": self.run_start_time_str }
             _logger.info(f"Not exporting run: {msg}")
             return
