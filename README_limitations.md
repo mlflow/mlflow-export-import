@@ -23,8 +23,6 @@ The imported destination artifact location will be generated as a default by MLf
 This is due to a number of non-trivial reasons especially when importing into Databricks MLflow.
 A solution is possible but with non-trivial effort due to complex semantics.
 
-* Option `use-thread` is "experimental" in that it needs improved logging to account for parallel threads.
-
 * Importing from a file-based `--backend-store-uri` implementation is not supported since it does not have the same semantics as a database-based implementation (e.g. primary key constraints are not respected, model registry is not implemented, etc.).
 This is is not a limitation of mlflow-export-import but rather of the MLflow file-based implementation which is not meant for production.
 

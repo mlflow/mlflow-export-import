@@ -56,7 +56,6 @@ Options:
                                   SOURCE, HTML, JUPYTER or DBC (comma
                                   seperated).
   --use-threads BOOLEAN           Process in parallel using threads.
-                                  Experimental: needs improved logging.
                                   [default: False]
 ```
 #### Example
@@ -149,7 +148,6 @@ Options:
                                   SOURCE, HTML, JUPYTER or DBC (comma
                                   seperated).
   --use-threads BOOLEAN           Process in parallel using threads.
-                                  Experimental: needs improved logging.
                                   [default: False]
 ```
 
@@ -199,9 +197,8 @@ Options:
   --import-source-tags BOOLEAN  Import source information for registered model
                                 and its versions ad tags in destination
                                 object.  [default: False]
-  --use-threads BOOLEAN         Process in parallel using threads.
-                                Experimental: needs improved logging.
-                                [default: False]
+  --use-threads BOOLEAN           Process in parallel using threads.
+                                  [default: False]
 ```
 
 #### Examples
