@@ -137,7 +137,7 @@ def opt_versions(function):
 
 def opt_use_threads(function):
     click.option("--use-threads",
-        help="Process in parallel using threads. Experimental: needs improved logging.",
+        help="Process in parallel using threads.",
         type=bool,
         default=False,
         show_default=True)(function)
