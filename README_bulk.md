@@ -40,6 +40,7 @@ Source: [export_all.py](mlflow_export_import/bulk/export_all.py).
 export-all --help
 
 Options:
+  --output-dir TEXT               Output directory.  [required]
   --export-latest-versions BOOLEAN
                                   Export latest registered model versions
                                   instead of all versions.  [default: False]
@@ -49,8 +50,8 @@ Options:
                                   Mututally exclusive with option --versions.
   --export-permissions BOOLEAN    Export Databricks permissions.  [default:
                                   False]
-  --run-start-time TEXT           Only export runs started after this time
-                                  (UTC). Format: YYYY-MM-DD.
+  --run-start-time TEXT           Only export runs started after this UTC time
+                                  (inclusive). Format: YYYY-MM-DD.
   --notebook-formats TEXT         Databricks notebook formats. Values are
                                   SOURCE, HTML, JUPYTER or DBC (comma
                                   seperated).
@@ -240,8 +241,8 @@ export-experiments --help
   --output-dir TEXT             Output directory.  [required]
   --export-permissions BOOLEAN  Export Databricks permissions.  [default:
                                 False]
-  --run-start-time TEXT         Only export runs started after this time
-                                (UTC). Format: YYYY-MM-DD.
+  --run-start-time TEXT         Only export runs started after this UTC time
+                                (inclusive). Format: YYYY-MM-DD.
   --notebook-formats TEXT       Databricks notebook formats. Values are
                                 SOURCE, HTML, JUPYTER or DBC (comma
                                 seperated).

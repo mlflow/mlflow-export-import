@@ -36,7 +36,7 @@ def export_experiment(
     :param output_dir: Output directory.
     :param run_ids: List of run IDs to export. If None export then all run IDs.
     :param export_permissions - Export Databricks permissions.
-    :param run_start_time - Only export runs started after this time (UTC). Format: YYYY-MM-DD.
+    :param run_start_time - Only export runs started after this UTC time (inclusive). Format: YYYY-MM-DD.
     :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
     :param mlflow_client: MLflow client.
     :return: Number of successful and number of failed runs.
