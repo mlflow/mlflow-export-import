@@ -167,10 +167,12 @@ class RunImporter():
         mlmodel_paths = find_artifacts(run_id, "", "MLmodel")
         for mlmodel_path in mlmodel_paths:
             model_path = mlmodel_path.replace("/MLmodel","")
+            previous_tracking_uri = mlflow.get_tracking_uri()
+            mlflow.set_tracking_uri(self.mlflow_client._tracking_client.tracking_uri)
             local_path = mlflow.artifacts.download_artifacts(
                 run_id = run_id,
-                artifact_path = mlmodel_path,
-                tracking_uri = self.mlflow_client._tracking_client.tracking_uri)
+                artifact_path = mlmodel_path)
+            mlflow.set_tracking_uri(previous_tracking_uri)
             mlmodel = io_utils.read_file(local_path, "yaml")
             mlmodel["run_id"] = run_id
             with tempfile.TemporaryDirectory() as dir:
