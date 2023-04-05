@@ -6,9 +6,10 @@
 # MAGIC Widgets
 # MAGIC * `1. Experiments` - comma delimited list of either experiment IDs or experiment names. `all` will export all experiments.
 # MAGIC * `2. Output directory` - shared directory between source and destination workspaces.
-# MAGIC * `3. Export permissions` - export Databricks permissions.
-# MAGIC * `4. Notebook formats`
-# MAGIC * `5. Use threads`
+# MAGIC * `3. Run start date` - Export runs after this UTC date (inclusive). Example: `2023-04-05`.
+# MAGIC * `4. Export permissions` - export Databricks permissions.
+# MAGIC * `5. Notebook formats`
+# MAGIC * `6. Use threads`
 
 # COMMAND ----------
 
@@ -23,18 +24,24 @@ dbutils.widgets.text("2. Output directory", "")
 output_dir = dbutils.widgets.get("2. Output directory")
 output_dir = output_dir.replace("dbfs:","/dbfs")
 
-dbutils.widgets.dropdown("3. Export permissions","no",["yes","no"])
-export_permissions = dbutils.widgets.get("3. Export permissions") == "yes"
+dbutils.widgets.text("3. Run start date", "") 
+run_start_date = dbutils.widgets.get("3. Run start date")
+
+dbutils.widgets.dropdown("4. Export permissions","no",["yes","no"])
+export_permissions = dbutils.widgets.get("4. Export permissions") == "yes"
 
 all_formats = [ "SOURCE", "DBC", "HTML", "JUPYTER" ]
-dbutils.widgets.multiselect("4. Notebook formats",all_formats[0],all_formats)
-notebook_formats = dbutils.widgets.get("4. Notebook formats")
+dbutils.widgets.multiselect("5. Notebook formats",all_formats[0],all_formats)
+notebook_formats = dbutils.widgets.get("5. Notebook formats")
 
-dbutils.widgets.dropdown("5. Use threads","False",["True","False"])
-use_threads = dbutils.widgets.get("5. Use threads") == "True"
+dbutils.widgets.dropdown("6. Use threads","False",["True","False"])
+use_threads = dbutils.widgets.get("6. Use threads") == "True"
+
+if run_start_date=="": run_start_date = None
 
 print("experiments:", experiments)
 print("output_dir:", output_dir)
+print("run_start_date:", run_start_date)
 print("export_permissions:", export_permissions)
 print("notebook_formats:", notebook_formats)
 print("use_threads:", use_threads)
@@ -51,6 +58,7 @@ from mlflow_export_import.bulk.export_experiments import export_experiments
 export_experiments(
     experiments = experiments, 
     output_dir = output_dir, 
+    run_start_time = run_start_date,
     export_permissions = export_permissions,
     notebook_formats = notebook_formats, 
     use_threads = use_threads
