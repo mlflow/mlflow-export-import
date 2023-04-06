@@ -31,3 +31,21 @@ def get_model_names(mlflow_client, model_names):
     def list_entities():
         return [ model.name for model in SearchRegisteredModelsIterator(mlflow_client) ]
     return _get_list(model_names, list_entities)
+
+
+def read_name_replacements_file(path):
+    with open(path, "r", encoding="utf-8") as f:
+        dct = {} 
+        for line in f:
+            toks = line.rstrip().split(",")
+            dct[toks[0]] = toks[1]
+    return dct
+
+
+def replace_name(name, replacements):
+    if not replacements:
+        return name
+    for k,v in replacements.items():
+        if name.startswith(k):
+            return name.replace(k,v)
+    return name

@@ -411,22 +411,24 @@ If the experiment already exists, the source runs will be added to it.
 import-experiments --help
 
 Options:
-  --experiment-name TEXT        Destination experiment name  [required]
-  --input-dir TEXT              Input directory  [required]
-  --import-source-tags BOOLEAN  Import source information for registered model
-                                and its versions ad tags in destination
-                                object.  [default: False]
-  --use-src-user-id BOOLEAN     Set the destination user field to the source
-                                user field.  Only valid for open source
-                                MLflow.  When importing into Databricks, the
-                                source user field is ignored since it is
-                                automatically picked up from your Databricks
-                                access token.  There is no MLflow API endpoint
-                                to explicity set the user_id for Run and
-                                Registered Model.
-  --dst-notebook-dir TEXT       Databricks destination workpsace base
-                                directory for notebook. A run ID will be added
-                                to contain the run's notebook.
+  --input-dir TEXT                Input directory  [required]
+  --import-source-tags BOOLEAN    Import source information for registered
+                                  model and its versions ad tags in
+                                  destination object.  [default: False]
+  --use-src-user-id BOOLEAN       Set the destination user field to the source
+                                  user field.  Only valid for open source
+                                  MLflow.  When importing into Databricks, the
+                                  source user field is ignored since it is
+                                  automatically picked up from your Databricks
+                                  access token.  There is no MLflow API
+                                  endpoint to explicity set the user_id for
+                                  Run and Registered Model.
+  --experiment-name-replacements-file TEXT
+                                  File with experiment names replacements:
+                                  comma-delimited line such as
+                                  'old_name,new_name'.
+  --use-threads BOOLEAN           Process in parallel using threads.
+                                  [default: False]
 ```
 
 
@@ -434,10 +436,20 @@ Options:
 #### Examples
 
 ```
-import-experiments --input-dir out 
+import-experiments \
+  --input-dir exported_experiments
+```
+
+Replace `/Users/me.com` with `/Users/you.com` in experiment name.
+```
+import-experiments \
+  --input-dir exported_experiments \
+  --experiment-name-replacements-file experiment-names.csv
 ```
 
 ```
-import-experiments \
-  --input-dir out
+cat experiment-names.csv
+
+/Users/me.com,/Users/you.com
+/Users/foo.com,/Users/bar.com
 ```

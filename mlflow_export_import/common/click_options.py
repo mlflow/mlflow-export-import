@@ -133,6 +133,7 @@ def opt_versions(function):
         required=False)(function)
     return function
 
+
 # == bulk
 
 def opt_use_threads(function):
@@ -167,6 +168,14 @@ def opt_export_all_runs(function):
         type=bool,
         default=False,
         show_default=True
+    )(function)
+    return function
+
+def opt_experiment_name_replacements_file(function):
+    function = click.option("--experiment-name-replacements-file",
+        help="File with experiment names replacements: comma-delimited line such as 'old_name,new_name'.",
+        type=str,
+        required=False
     )(function)
     return function
 
