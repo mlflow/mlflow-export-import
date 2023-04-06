@@ -15,11 +15,14 @@ from mlflow_export_import.common.click_options import (
     opt_use_src_user_id,
     opt_verbose, 
     opt_import_source_tags, 
+    opt_experiment_name_replacements_file,
     opt_use_threads
 )
 from mlflow_export_import.common import utils, io_utils
 from mlflow_export_import.experiment.import_experiment import import_experiment
 from mlflow_export_import.model.import_model import AllModelImporter
+from mlflow_export_import.bulk import bulk_utils
+
 
 _logger = utils.getLogger(__name__)
 
@@ -32,7 +35,7 @@ def _remap(run_info_map):
     return res
 
 
-def _import_experiments(mlflow_client, input_dir, use_src_user_id):
+def _import_experiments(mlflow_client, input_dir, use_src_user_id, experiment_name_replacements):
     start_time = time.time()
 
     dct = io_utils.read_file_mlflow(os.path.join(input_dir,"experiments","experiments.json"))
@@ -48,7 +51,7 @@ def _import_experiments(mlflow_client, input_dir, use_src_user_id):
         exp_input_dir = os.path.join(input_dir, "experiments", exp["id"])
         try:
             _run_info_map = import_experiment(
-                experiment_name = exp["name"], 
+                experiment_name = bulk_utils.replace_name(exp["name"], experiment_name_replacements),
                 input_dir = exp_input_dir,
                 use_src_user_id = use_src_user_id,
                 mlflow_client = mlflow_client
@@ -109,6 +112,7 @@ def import_all(
         delete_model, 
         import_source_tags = False, 
         use_src_user_id = False, 
+        experiment_name_replacements = None, 
         verbose = False, 
         use_threads = False,
         mlflow_client = None
@@ -118,7 +122,8 @@ def import_all(
     exp_res = _import_experiments(
         mlflow_client, 
         input_dir, 
-        use_src_user_id
+        use_src_user_id,
+        experiment_name_replacements
     )
     run_info_map = _remap(exp_res[0])
     model_res = _import_models(
@@ -143,17 +148,22 @@ def import_all(
 @opt_import_source_tags
 @opt_use_src_user_id
 @opt_verbose
+@opt_experiment_name_replacements_file
 @opt_use_threads
 
-def main(input_dir, delete_model, import_source_tags, use_src_user_id, verbose, use_threads):
+def main(input_dir, delete_model, import_source_tags, use_src_user_id, verbose, experiment_name_replacements_file, use_threads):
     _logger.info("Options:")
     for k,v in locals().items():
         _logger.info(f"  {k}: {v}")
+    experiment_name_replacements = None
+    if experiment_name_replacements_file:
+        experiment_name_replacements = bulk_utils.read_name_replacements_file(experiment_name_replacements_file)
     import_all(
         input_dir = input_dir,
         delete_model = delete_model, 
         import_source_tags = import_source_tags,
         use_src_user_id = use_src_user_id, 
+        experiment_name_replacements = experiment_name_replacements,
         verbose = verbose, 
         use_threads = use_threads
     )
