@@ -440,7 +440,7 @@ import-experiments \
   --input-dir exported_experiments
 ```
 
-Replace `/Users/me.com` with `/Users/you.com` in experiment name.
+Replace `/Users/me@mycompany.com` with `/Users/you@mycompany.com` in experiment name.
 ```
 import-experiments \
   --input-dir exported_experiments \
@@ -450,6 +450,6 @@ import-experiments \
 ```
 cat experiment-names.csv
 
-/Users/me.com,/Users/you.com
-/Users/foo.com,/Users/bar.com
+/Users/me@mycompany.com,/Users/you@mycompany.com
+/Users/foo@mycompany.com,/Users/bar@mycompany.com
 ```
