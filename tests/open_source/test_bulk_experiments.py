@@ -91,10 +91,6 @@ def test_exp_basic_threads(mlflow_context):
     _run_test(mlflow_context, compare_runs, use_threads=True)
 
 
-#def test_exp_with_source_tags(mlflow_context): # TODO
-    #_run_test(mlflow_context, compare_runs)
-
-
 def test_get_experiment_ids_from_comma_delimited_string(mlflow_context):
     exp_ids = bulk_utils.get_experiment_ids(mlflow_context.client_src, "exp1,exp2,exp3")
     assert len(exp_ids) == 3
@@ -111,3 +107,45 @@ def test_get_experiment_ids_from_list(mlflow_context):
     exp_ids1 = ["exp1","exp2","exp3"]
     exp_ids2 = bulk_utils.get_experiment_ids(mlflow_context.client_src, exp_ids1)
     assert exp_ids1 == exp_ids2
+
+
+# == Test import with experiment replacement tests
+
+def test_replace_names_do_replace(mlflow_context):
+    exp = create_test_experiment(mlflow_context.client_src, 2)
+    export_experiments(
+        mlflow_client = mlflow_context.client_src,
+        experiments = [ exp.name ],
+        output_dir = mlflow_context.output_dir)
+
+    new_name = "foo_bar"
+    import_experiments(
+        mlflow_client = mlflow_context.client_dst, 
+        input_dir = mlflow_context.output_dir, 
+        experiment_name_replacements = { exp.name: new_name } )
+
+    exp2 = mlflow_context.client_dst.get_experiment_by_name(exp.name)
+    assert not exp2
+    exp2 = mlflow_context.client_dst.get_experiment_by_name(new_name)
+    assert exp2
+    assert exp2.name == new_name
+
+
+def test_replace_names_dont_replace(mlflow_context):
+    exp = create_test_experiment(mlflow_context.client_src, 2)
+    export_experiments(
+        mlflow_client = mlflow_context.client_src,
+        experiments = [ exp.name ],
+        output_dir = mlflow_context.output_dir)
+
+    new_name = "bar"
+    import_experiments(
+        mlflow_client = mlflow_context.client_dst, 
+        input_dir = mlflow_context.output_dir, 
+        experiment_name_replacements = { "foo": new_name } )
+
+    exp2 = mlflow_context.client_dst.get_experiment_by_name(exp.name)
+    assert exp2
+    assert exp2.name == exp.name
+    exp2 = mlflow_context.client_dst.get_experiment_by_name(new_name)
+    assert not exp2 
