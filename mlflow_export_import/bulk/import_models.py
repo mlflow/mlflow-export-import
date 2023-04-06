@@ -35,7 +35,7 @@ def _remap(run_info_map):
 def _import_experiments(mlflow_client, input_dir, use_src_user_id):
     start_time = time.time()
 
-    dct = io_utils.read_file_mlflow(os.path.join(os.path.join(input_dir,"experiments","experiments.json")))
+    dct = io_utils.read_file_mlflow(os.path.join(input_dir,"experiments","experiments.json"))
     exps = dct["experiments"]
 
     _logger.info("Experiments:")
@@ -72,7 +72,7 @@ def _import_models(mlflow_client, input_dir, run_info_map, delete_model, import_
     start_time = time.time()
 
     models_dir = os.path.join(input_dir, "models")
-    models = io_utils.read_file_mlflow(os.path.join(os.path.join(models_dir,"models.json")))
+    models = io_utils.read_file_mlflow(os.path.join(models_dir,"models.json"))
     models = models["models"]
     all_importer = AllModelImporter(
         mlflow_client = mlflow_client, 
