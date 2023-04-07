@@ -8,6 +8,7 @@ from compare_utils import compare_runs
 from test_bulk_experiments import create_test_experiment
 from oss_utils_test import (
     mk_test_object_name_default,
+    mk_uuid,
     list_experiments,
     delete_experiments_and_models
 )
@@ -17,6 +18,7 @@ from oss_utils_test import (
 _notebook_formats = "SOURCE,DBC"
 _num_models = 2
 _num_runs = 2
+
 
 # == Compare
 
@@ -38,16 +40,21 @@ def compare_models_with_versions(mlflow_context, compare_func):
             assert run1.info.run_id != run2.info.run_id
             compare_func(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, tdir)
 
+
 # == Helper methods
 
 def create_model(client):
+    model_name, _ = _create_model(client)
+    return model_name
+
+def _create_model(client):
     exp = create_test_experiment(client, _num_runs)
     model_name = mk_test_object_name_default()
     model = client.create_registered_model(model_name)
     for run in client.search_runs([exp.experiment_id]):
         source = f"{run.info.artifact_uri}/model"
         client.create_model_version(model_name, source, run.info.run_id)
-    return model.name
+    return model.name, exp
 
 def _run_test(mlflow_context, compare_func, use_threads=False):
     delete_experiments_and_models(mlflow_context)
@@ -72,6 +79,7 @@ def _run_test(mlflow_context, compare_func, use_threads=False):
     )
 
     compare_models_with_versions(mlflow_context, compare_func)
+
 
 # == Export/import registered model tests
 
@@ -145,7 +153,7 @@ def test_export_only_version_runs(mlflow_context):
     assert num_runs == 2
 
 
-# == Pparsing tests for extracting model names from CLI comma-delimitd string option 
+# == Parsing tests for extracting model names from CLI comma-delimitd string option 
 
 def test_get_model_names_from_comma_delimited_string(mlflow_context):
     delete_experiments_and_models(mlflow_context)
@@ -158,3 +166,49 @@ def test_get_model_names_from_all_string(mlflow_context):
     model_names1 = [ create_model(mlflow_context.client_src) for j in range(0,3) ]
     model_names2 = bulk_utils.get_model_names(mlflow_context.client_src, "*")
     assert set(model_names1) == set(model_names2)
+
+
+# == Test import with experiment replacement tests
+
+def test_replace_experiment_names_do_replace(mlflow_context):
+    model_name, exp = _create_model(mlflow_context.client_src)
+
+    export_models(
+        model_names = [ model_name ],
+        mlflow_client = mlflow_context.client_src,
+        output_dir = mlflow_context.output_dir, 
+    )
+    new_exp_name = mk_uuid()
+    import_all(
+        mlflow_client = mlflow_context.client_dst,
+        input_dir = mlflow_context.output_dir,
+        delete_model = True,
+        experiment_name_replacements = { exp.name: new_exp_name }
+    )
+
+    exp2 = mlflow_context.client_dst.get_experiment_by_name(exp.name)
+    assert not exp2
+    exp2 = mlflow_context.client_dst.get_experiment_by_name(new_exp_name)
+    assert exp2
+    assert exp2.name == new_exp_name
+
+
+def test_replace_experiment_names_do_not_replace(mlflow_context):
+    model_name, exp = _create_model(mlflow_context.client_src)
+    export_models(
+        model_names = [ model_name ],
+        mlflow_client = mlflow_context.client_src,
+        output_dir = mlflow_context.output_dir, 
+    )
+    new_exp_name = mk_uuid()
+    import_all(
+        mlflow_client = mlflow_context.client_dst,
+        input_dir = mlflow_context.output_dir,
+        delete_model = True,
+        experiment_name_replacements = { "foo": new_exp_name } 
+    )
+
+    exp2 = mlflow_context.client_dst.get_experiment_by_name(exp.name)
+    assert exp2
+    exp2 = mlflow_context.client_dst.get_experiment_by_name(new_exp_name)
+    assert not exp2
