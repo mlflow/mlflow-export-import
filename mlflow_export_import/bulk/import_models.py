@@ -16,13 +16,13 @@ from mlflow_export_import.common.click_options import (
     opt_verbose, 
     opt_import_source_tags, 
     opt_experiment_name_replacements_file,
+    opt_model_name_replacements_file,
     opt_use_threads
 )
 from mlflow_export_import.common import utils, io_utils
 from mlflow_export_import.experiment.import_experiment import import_experiment
 from mlflow_export_import.model.import_model import AllModelImporter
 from mlflow_export_import.bulk import bulk_utils
-
 
 _logger = utils.getLogger(__name__)
 
@@ -70,13 +70,15 @@ def _import_experiments(mlflow_client, input_dir, use_src_user_id, experiment_na
     return run_info_map, { "experiments": len(exps), "exceptions": exceptions, "duration": duration }
 
 
-def _import_models(mlflow_client, input_dir, run_info_map, delete_model, import_source_tags, verbose, use_threads):
+def _import_models(mlflow_client, input_dir, run_info_map, delete_model, import_source_tags, 
+        model_name_replacements, verbose, use_threads
+    ):
     max_workers = os.cpu_count() or 4 if use_threads else 1
     start_time = time.time()
 
     models_dir = os.path.join(input_dir, "models")
     models = io_utils.read_file_mlflow(os.path.join(models_dir,"models.json"))
-    models = models["models"]
+    model_names = models["models"]
     all_importer = AllModelImporter(
         mlflow_client = mlflow_client, 
         run_info_map = run_info_map, 
@@ -85,26 +87,26 @@ def _import_models(mlflow_client, input_dir, run_info_map, delete_model, import_
 
     if use_threads:
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            for model in models:
-                dir = os.path.join(models_dir, model)
+            for model_name in model_names:
+                dir = os.path.join(models_dir, model_name)
                 executor.submit(all_importer.import_model, 
-                   model_name = model, 
-                   input_dir = dir, 
-                   delete_model = delete_model, 
+                   model_name = bulk_utils.replace_name(model_name, model_name_replacements),
+                   input_dir = dir,
+                   delete_model = delete_model,
                    verbose = verbose
                 )
     else:
-        for model in models:
-            dir = os.path.join(models_dir, model)
+        for model_name in model_names:
+            dir = os.path.join(models_dir, model_name)
             all_importer.import_model(
-                model_name = model, 
-                input_dir = dir, 
-                delete_model = delete_model, 
+                model_name = bulk_utils.replace_name(model_name, model_name_replacements),
+                input_dir = dir,
+                delete_model = delete_model,
                 verbose = verbose
             )
 
     duration = round(time.time()-start_time, 1)
-    return { "models": len(models), "duration": duration }
+    return { "models": len(model_names), "duration": duration }
 
 
 def import_all(
@@ -113,6 +115,7 @@ def import_all(
         import_source_tags = False, 
         use_src_user_id = False, 
         experiment_name_replacements = None, 
+        model_name_replacements = None, 
         verbose = False, 
         use_threads = False,
         mlflow_client = None
@@ -132,13 +135,13 @@ def import_all(
         run_info_map, 
         delete_model, 
         import_source_tags, 
+        model_name_replacements,
         verbose, 
         use_threads
     )
     duration = round(time.time()-start_time, 1)
     dct = { "duration": duration, "experiment_import": exp_res[1], "model_import": model_res }
     _logger.info("\nImport report:")
-    #_logger.info(json.dumps(dct,indent=2)+"\n")
     _logger.info(f"{json.dumps(dct,indent=2)}\n")
 
 
@@ -149,21 +152,34 @@ def import_all(
 @opt_use_src_user_id
 @opt_verbose
 @opt_experiment_name_replacements_file
+@opt_model_name_replacements_file
 @opt_use_threads
 
-def main(input_dir, delete_model, import_source_tags, use_src_user_id, verbose, experiment_name_replacements_file, use_threads):
+def main(input_dir, delete_model, import_source_tags, use_src_user_id, 
+        experiment_name_replacements_file, 
+        model_name_replacements_file, 
+        use_threads,
+        verbose, 
+    ):
     _logger.info("Options:")
     for k,v in locals().items():
         _logger.info(f"  {k}: {v}")
+
     experiment_name_replacements = None
     if experiment_name_replacements_file:
         experiment_name_replacements = bulk_utils.read_name_replacements_file(experiment_name_replacements_file)
+
+    model_name_replacements = None
+    if model_name_replacements_file:
+        model_name_replacements = bulk_utils.read_name_replacements_file(model_name_replacements_file)
+
     import_all(
         input_dir = input_dir,
         delete_model = delete_model, 
         import_source_tags = import_source_tags,
         use_src_user_id = use_src_user_id, 
         experiment_name_replacements = experiment_name_replacements,
+        model_name_replacements = model_name_replacements,
         verbose = verbose, 
         use_threads = use_threads
     )

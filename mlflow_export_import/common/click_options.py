@@ -179,6 +179,14 @@ def opt_experiment_name_replacements_file(function):
     )(function)
     return function
 
+def opt_model_name_replacements_file(function):
+    function = click.option("--model-name-replacements-file",
+        help="File with registered model names replacements: comma-delimited line such as 'old_name,new_name'.",
+        type=str,
+        required=False
+    )(function)
+    return function
+
 # == other
 
 def opt_model(function):

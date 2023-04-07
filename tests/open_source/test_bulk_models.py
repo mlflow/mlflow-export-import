@@ -1,4 +1,5 @@
 import os
+from mlflow.exceptions import RestException
 from mlflow_export_import.bulk.export_models import export_models
 from mlflow_export_import.bulk.import_models import import_all
 from mlflow_export_import.bulk import bulk_utils
@@ -172,7 +173,6 @@ def test_get_model_names_from_all_string(mlflow_context):
 
 def test_replace_experiment_names_do_replace(mlflow_context):
     model_name, exp = _create_model(mlflow_context.client_src)
-
     export_models(
         model_names = [ model_name ],
         mlflow_client = mlflow_context.client_src,
@@ -207,8 +207,61 @@ def test_replace_experiment_names_do_not_replace(mlflow_context):
         delete_model = True,
         experiment_name_replacements = { "foo": new_exp_name } 
     )
-
     exp2 = mlflow_context.client_dst.get_experiment_by_name(exp.name)
     assert exp2
     exp2 = mlflow_context.client_dst.get_experiment_by_name(new_exp_name)
     assert not exp2
+
+
+# == Test import with model replacement tests
+
+def test_replace_model_names_do_replace(mlflow_context):
+    model_name = create_model(mlflow_context.client_src)
+    export_models(
+        model_names = [ model_name ],
+        mlflow_client = mlflow_context.client_src,
+        output_dir = mlflow_context.output_dir, 
+    )
+    new_model_name = mk_uuid()
+    import_all(
+        mlflow_client = mlflow_context.client_dst,
+        input_dir = mlflow_context.output_dir,
+        delete_model = True,
+        model_name_replacements = { model_name: new_model_name }
+    )
+    model2 = _get_registered_model(mlflow_context.client_dst, model_name)
+    assert not model2
+    model2 = _get_registered_model(mlflow_context.client_dst, new_model_name)
+    assert model2
+    assert model2.name == new_model_name
+
+def test_replace_model_names_do_not_replace(mlflow_context):
+    model_name = create_model(mlflow_context.client_src)
+    export_models(
+        model_names = [ model_name ],
+        mlflow_client = mlflow_context.client_src,
+        output_dir = mlflow_context.output_dir, 
+    )
+    new_model_name = mk_uuid()
+    import_all(
+        mlflow_client = mlflow_context.client_dst,
+        input_dir = mlflow_context.output_dir,
+        delete_model = True,
+        model_name_replacements = { "foo": new_model_name }
+    )
+    model2 = _get_registered_model(mlflow_context.client_dst, model_name)
+    assert model2
+    model2 = _get_registered_model(mlflow_context.client_dst, new_model_name)
+    assert not model2
+
+
+def _get_registered_model(client, model_name):
+    try:
+        return client.get_registered_model(model_name)
+    except RestException as e:
+        #print("ERROR.1: e:",e)
+        #print("ERROR.2: e:",e.__dict__.keys())
+        #print("ERROR.3: e:error_code:",e.error_code)
+        if e.error_code == "RESOURCE_DOES_NOT_EXIST":
+            return None
+        raise e
