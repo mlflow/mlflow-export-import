@@ -21,7 +21,7 @@ from mlflow_export_import.common.click_options import (
 )
 from mlflow_export_import.common import utils, io_utils
 from mlflow_export_import.experiment.import_experiment import import_experiment
-from mlflow_export_import.model.import_model import AllModelImporter
+from mlflow_export_import.model.import_model import BulkModelImporter
 from mlflow_export_import.bulk import bulk_utils
 
 _logger = utils.getLogger(__name__)
@@ -88,7 +88,7 @@ def _import_models(mlflow_client,
     models_dir = os.path.join(input_dir, "models")
     models = io_utils.read_file_mlflow(os.path.join(models_dir,"models.json"))
     model_names = models["models"]
-    all_importer = AllModelImporter(
+    all_importer = BulkModelImporter(
         mlflow_client = mlflow_client, 
         run_info_map = run_info_map, 
         import_source_tags = import_source_tags,

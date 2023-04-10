@@ -234,7 +234,7 @@ class ModelImporter(BaseModelImporter):
         self._import_version(model_name, src_vr, dst_run_id, dst_source, sleep_time)
 
 
-class AllModelImporter(BaseModelImporter):
+class BulkModelImporter(BaseModelImporter):
     """ Bulk model importer. """
 
     def __init__(self,
