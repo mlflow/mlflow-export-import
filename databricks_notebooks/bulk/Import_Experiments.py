@@ -4,9 +4,10 @@
 # MAGIC Widgets
 # MAGIC * `1. Input directory` - directory of exported experiments.
 # MAGIC * `2. Import source tags`
-# MAGIC * `3. Use threads` - use multi-threaded import
+# MAGIC * `3. Experiment rename file` - Experiment rename file.
+# MAGIC * `4. Use threads` - use multi-threaded import.
 # MAGIC 
-# MAGIC See https://github.com/mlflow/mlflow-export-import/blob/master/README_collection.md#Import-experiments.
+# MAGIC See https://github.com/mlflow/mlflow-export-import/blob/master/README_bulk.md#Import-experiments.
 
 # COMMAND ----------
 
@@ -21,11 +22,16 @@ input_dir = input_dir.replace("dbfs:","/dbfs")
 dbutils.widgets.dropdown("2. Import source tags","no",["yes","no"])
 import_source_tags = dbutils.widgets.get("2. Import source tags") == "yes"
 
-dbutils.widgets.dropdown("3. Use threads","no",["yes","no"])
-use_threads = dbutils.widgets.get("3. Use threads") == "yes"
+dbutils.widgets.text("3. Experiment rename file","")
+val = dbutils.widgets.get("3. Experiment rename file") 
+experiment_rename_file = val or None 
+
+dbutils.widgets.dropdown("4. Use threads","no",["yes","no"])
+use_threads = dbutils.widgets.get("4. Use threads") == "yes"
 
 print("input_dir:", input_dir)
 print("import_source_tags:", import_source_tags)
+print("experiment_rename_file:", experiment_rename_file)
 print("use_threads:", use_threads)
 
 # COMMAND ----------
@@ -39,5 +45,6 @@ from mlflow_export_import.bulk.import_experiments import import_experiments
 import_experiments(
     input_dir = input_dir, 
     import_source_tags = import_source_tags,
+    experiment_renames = experiment_rename_file,
     use_threads = use_threads
 )
