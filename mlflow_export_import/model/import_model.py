@@ -241,7 +241,7 @@ class BulkModelImporter(BaseModelImporter):
             run_info_map,
             run_importer = None,
             import_source_tags = False,
-            experiment_name_replacements = None,
+            experiment_renames = None,
             await_creation_for = None,
             mlflow_client = None,
         ):
@@ -252,7 +252,7 @@ class BulkModelImporter(BaseModelImporter):
             await_creation_for = await_creation_for
          )
         self.run_info_map = run_info_map
-        self.experiment_name_replacements = experiment_name_replacements
+        self.experiment_renames = experiment_renames
 
 
     def import_model(self,
@@ -271,7 +271,7 @@ class BulkModelImporter(BaseModelImporter):
         :return: Model import manifest.
         """
         model_dct = self._import_model(model_name, input_dir, delete_model)
-        _logger.info("Importing versions:")
+        _logger.info(f"Importing {len(model_dct['versions'])} versions:")
         for vr in model_dct["versions"]:
             src_run_id = vr["run_id"]
             dst_run = self.run_info_map.get(src_run_id, None)
@@ -280,7 +280,7 @@ class BulkModelImporter(BaseModelImporter):
                 _logger.error(f"Cannot import model version {msg} since the source run_id was probably deleted.")
             else:
                 dst_run_id = dst_run.run_id
-                exp_name = rename_utils.rename(vr["_experiment_name"], self.experiment_name_replacements, "experiment")
+                exp_name = rename_utils.rename(vr["_experiment_name"], self.experiment_renames, "experiment")
                 mlflow.set_experiment(exp_name)
                 self.import_version(model_name, vr, dst_run_id, sleep_time)
         if verbose:

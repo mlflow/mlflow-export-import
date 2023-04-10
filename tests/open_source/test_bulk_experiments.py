@@ -111,7 +111,7 @@ def test_get_experiment_ids_from_list(mlflow_context):
 
 # == Test import with experiment replacement tests
 
-def test_replace_names_do_replace(mlflow_context):
+def test_experiment_renames_do_replace(mlflow_context):
     exp = create_test_experiment(mlflow_context.client_src, 2)
     export_experiments(
         mlflow_client = mlflow_context.client_src,
@@ -122,7 +122,7 @@ def test_replace_names_do_replace(mlflow_context):
     import_experiments(
         mlflow_client = mlflow_context.client_dst, 
         input_dir = mlflow_context.output_dir, 
-        experiment_name_replacements = { exp.name: new_name } )
+        experiment_renames = { exp.name: new_name } )
 
     exp2 = mlflow_context.client_dst.get_experiment_by_name(exp.name)
     assert not exp2
@@ -131,7 +131,7 @@ def test_replace_names_do_replace(mlflow_context):
     assert exp2.name == new_name
 
 
-def test_replace_names_dont_replace(mlflow_context):
+def test_experiment_renames_dont_replace(mlflow_context):
     exp = create_test_experiment(mlflow_context.client_src, 2)
     export_experiments(
         mlflow_client = mlflow_context.client_src,
@@ -142,7 +142,7 @@ def test_replace_names_dont_replace(mlflow_context):
     import_experiments(
         mlflow_client = mlflow_context.client_dst, 
         input_dir = mlflow_context.output_dir, 
-        experiment_name_replacements = { "foo": new_name } )
+        experiment_renames = { "foo": new_name } )
 
     exp2 = mlflow_context.client_dst.get_experiment_by_name(exp.name)
     assert exp2

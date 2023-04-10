@@ -21,9 +21,9 @@ from mlflow_export_import.bulk import rename_utils
 _logger = utils.getLogger(__name__)
 
 
-def _import_experiment(mlflow_client, exp_name, input_dir, import_source_tags, use_src_user_id, experiment_name_replacements):
+def _import_experiment(mlflow_client, exp_name, input_dir, import_source_tags, use_src_user_id, experiment_renames):
     try:
-        exp_name =  rename_utils.rename(exp_name, experiment_name_replacements, "experiment")
+        exp_name =  rename_utils.rename(exp_name, experiment_renames, "experiment")
         import_experiment(
             mlflow_client = mlflow_client,
             experiment_name = exp_name,
@@ -40,11 +40,11 @@ def import_experiments(
         input_dir, 
         import_source_tags = False,
         use_src_user_id = False, 
-        experiment_name_replacements = None,
+        experiment_renames = None,
         use_threads = False,
         mlflow_client = None
     ): 
-    experiment_name_replacements = rename_utils.get_renames(experiment_name_replacements)
+    experiment_renames = rename_utils.get_renames(experiment_renames)
     mlflow_client = mlflow_client or mlflow.client.MlflowClient()
     dct = io_utils.read_file_mlflow(os.path.join(input_dir, "experiments.json"))
     exps = dct["experiments"]
@@ -58,7 +58,7 @@ def import_experiments(
             exp_input_dir = os.path.join(input_dir,exp["id"])
             exp_name = exp["name"]
             executor.submit(_import_experiment, mlflow_client, 
-                exp_name, exp_input_dir, import_source_tags, use_src_user_id, experiment_name_replacements)
+                exp_name, exp_input_dir, import_source_tags, use_src_user_id, experiment_renames)
 
 
 @click.command()
@@ -77,7 +77,7 @@ def main(input_dir, import_source_tags, use_src_user_id, experiment_rename_file,
         input_dir = input_dir, 
         import_source_tags = import_source_tags,
         use_src_user_id = use_src_user_id,
-        experiment_name_replacements = experiment_rename_file,
+        experiment_renames = experiment_rename_file,
         use_threads = use_threads
     )
 

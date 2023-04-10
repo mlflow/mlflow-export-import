@@ -171,7 +171,7 @@ def test_get_model_names_from_all_string(mlflow_context):
 
 # == Test import with experiment rename
 
-def test_replace_experiment_names_do_replace(mlflow_context):
+def test_experiment_rename_do_replace(mlflow_context):
     model_name, exp = _create_model(mlflow_context.client_src)
     export_models(
         model_names = [ model_name ],
@@ -183,7 +183,7 @@ def test_replace_experiment_names_do_replace(mlflow_context):
         mlflow_client = mlflow_context.client_dst,
         input_dir = mlflow_context.output_dir,
         delete_model = True,
-        experiment_name_replacements = { exp.name: new_exp_name }
+        experiment_renames = { exp.name: new_exp_name }
     )
 
     exp2 = mlflow_context.client_dst.get_experiment_by_name(exp.name)
@@ -193,7 +193,7 @@ def test_replace_experiment_names_do_replace(mlflow_context):
     assert exp2.name == new_exp_name
 
 
-def test_replace_experiment_names_do_not_replace(mlflow_context):
+def test_experiment_rename_do_not_replace(mlflow_context):
     model_name, exp = _create_model(mlflow_context.client_src)
     export_models(
         model_names = [ model_name ],
@@ -205,7 +205,7 @@ def test_replace_experiment_names_do_not_replace(mlflow_context):
         mlflow_client = mlflow_context.client_dst,
         input_dir = mlflow_context.output_dir,
         delete_model = True,
-        experiment_name_replacements = { "foo": new_exp_name } 
+        experiment_renames = { "foo": new_exp_name } 
     )
     exp2 = mlflow_context.client_dst.get_experiment_by_name(exp.name)
     assert exp2
@@ -215,7 +215,7 @@ def test_replace_experiment_names_do_not_replace(mlflow_context):
 
 # == Test import with model rename
 
-def test_replace_model_names_do_replace(mlflow_context):
+def test_model_rename_do_replace(mlflow_context):
     model_name = create_model(mlflow_context.client_src) 
     export_models(
         model_names = [ model_name ],
@@ -227,7 +227,7 @@ def test_replace_model_names_do_replace(mlflow_context):
         mlflow_client = mlflow_context.client_dst,
         input_dir = mlflow_context.output_dir,
         delete_model = True,
-        model_name_replacements = { model_name: new_model_name }
+        model_renames = { model_name: new_model_name }
     )
     model2 = _get_registered_model(mlflow_context.client_dst, model_name)
     assert not model2
@@ -235,7 +235,7 @@ def test_replace_model_names_do_replace(mlflow_context):
     assert model2
     assert model2.name == new_model_name
 
-def test_replace_model_names_do_not_replace(mlflow_context):
+def test_model_rename_do_not_replace(mlflow_context):
     model_name = create_model(mlflow_context.client_src)
     export_models(
         model_names = [ model_name ],
@@ -247,7 +247,7 @@ def test_replace_model_names_do_not_replace(mlflow_context):
         mlflow_client = mlflow_context.client_dst,
         input_dir = mlflow_context.output_dir,
         delete_model = True,
-        model_name_replacements = { "foo": new_model_name }
+        model_renames = { "foo": new_model_name }
     )
     model2 = _get_registered_model(mlflow_context.client_dst, model_name)
     assert model2

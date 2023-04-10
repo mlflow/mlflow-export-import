@@ -35,7 +35,7 @@ def _remap(run_info_map):
     return res
 
 
-def _import_experiments(mlflow_client, input_dir, use_src_user_id, experiment_name_replacements):
+def _import_experiments(mlflow_client, input_dir, use_src_user_id, experiment_renames):
     start_time = time.time()
 
     dct = io_utils.read_file_mlflow(os.path.join(input_dir,"experiments","experiments.json"))
@@ -51,7 +51,7 @@ def _import_experiments(mlflow_client, input_dir, use_src_user_id, experiment_na
         exp_input_dir = os.path.join(input_dir, "experiments", exp["id"])
         try:
             exp_name = exp["name"]
-            exp_name = rename_utils.rename(exp_name, experiment_name_replacements, "experiment")
+            exp_name = rename_utils.rename(exp_name, experiment_renames, "experiment")
             _run_info_map = import_experiment(
                 experiment_name = exp_name,
                 input_dir = exp_input_dir,
@@ -77,8 +77,8 @@ def _import_models(mlflow_client,
         run_info_map, 
         delete_model, 
         import_source_tags, 
-        model_name_replacements, 
-        experiment_name_replacements, 
+        model_renames, 
+        experiment_renames, 
         verbose, 
         use_threads
     ):
@@ -92,13 +92,13 @@ def _import_models(mlflow_client,
         mlflow_client = mlflow_client, 
         run_info_map = run_info_map, 
         import_source_tags = import_source_tags,
-        experiment_name_replacements = experiment_name_replacements
+        experiment_renames = experiment_renames
     )
     
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for model_name in model_names:
             dir = os.path.join(models_dir, model_name)
-            model_name = rename_utils.rename(model_name, model_name_replacements, "model")
+            model_name = rename_utils.rename(model_name, model_renames, "model")
             executor.submit(all_importer.import_model, 
                model_name = model_name,
                input_dir = dir,
@@ -115,21 +115,21 @@ def import_all(
         delete_model, 
         import_source_tags = False, 
         use_src_user_id = False, 
-        experiment_name_replacements = None, 
-        model_name_replacements = None, 
+        experiment_renames = None, 
+        model_renames = None, 
         verbose = False, 
         use_threads = False,
         mlflow_client = None
     ):
     mlflow_client = mlflow_client or mlflow.client.MlflowClient()
-    experiment_name_replacements = rename_utils.get_renames(experiment_name_replacements)
-    model_name_replacements = rename_utils.get_renames(model_name_replacements)
+    experiment_renames = rename_utils.get_renames(experiment_renames)
+    model_renames = rename_utils.get_renames(model_renames)
     start_time = time.time()
     exp_res = _import_experiments(
         mlflow_client, 
         input_dir, 
         use_src_user_id,
-        experiment_name_replacements
+        experiment_renames
     )
     run_info_map = _remap(exp_res[0])
     model_res = _import_models(
@@ -138,8 +138,8 @@ def import_all(
         run_info_map, 
         delete_model, 
         import_source_tags, 
-        model_name_replacements,
-        experiment_name_replacements,
+        model_renames,
+        experiment_renames,
         verbose, 
         use_threads
     )
@@ -174,8 +174,8 @@ def main(input_dir, delete_model, import_source_tags, use_src_user_id,
         delete_model = delete_model, 
         import_source_tags = import_source_tags,
         use_src_user_id = use_src_user_id, 
-        experiment_name_replacements = rename_utils.get_renames(experiment_rename_file),
-        model_name_replacements = rename_utils.get_renames(model_rename_file),
+        experiment_renames = rename_utils.get_renames(experiment_rename_file),
+        model_renames = rename_utils.get_renames(model_rename_file),
         verbose = verbose, 
         use_threads = use_threads
     )
