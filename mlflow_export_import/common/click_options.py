@@ -171,16 +171,16 @@ def opt_export_all_runs(function):
     )(function)
     return function
 
-def opt_experiment_name_replacements_file(function):
-    function = click.option("--experiment-name-replacements-file",
+def opt_experiment_rename_file(function):
+    function = click.option("--experiment-rename-file",
         help="File with experiment names replacements: comma-delimited line such as 'old_name,new_name'.",
         type=str,
         required=False
     )(function)
     return function
 
-def opt_model_name_replacements_file(function):
-    function = click.option("--model-name-replacements-file",
+def opt_model_rename_file(function):
+    function = click.option("--model-rename-file",
         help="File with registered model names replacements: comma-delimited line such as 'old_name,new_name'.",
         type=str,
         required=False

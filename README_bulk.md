@@ -182,27 +182,29 @@ Source: [import_models.py](mlflow_export_import/bulk/import_models.py).
 import-models --help
 
 Options:
-  --input-dir TEXT                Input directory  [required]
-  --delete-model BOOLEAN          If the model exists, first delete the model
-                                  and all its versions.  [default: False]
-  --import-source-tags BOOLEAN    Import source information for registered
-                                  model and its versions ad tags in
-                                  destination object.  [default: False]
-  --use-src-user-id BOOLEAN       Set the destination user field to the source
-                                  user field.  Only valid for open source
-                                  MLflow.  When importing into Databricks, the
-                                  source user field is ignored since it is
-                                  automatically picked up from your Databricks
-                                  access token.  There is no MLflow API
-                                  endpoint to explicity set the user_id for
-                                  Run and Registered Model.
-  --verbose BOOLEAN               Verbose.  [default: False]
-  --experiment-name-replacements-file TEXT
-                                  File with experiment names replacements:
-                                  comma-delimited line such as
-                                  'old_name,new_name'.
-  --use-threads BOOLEAN           Process in parallel using threads.
-                                  [default: False]
+  --input-dir TEXT               Input directory  [required]
+  --delete-model BOOLEAN         If the model exists, first delete the model
+                                 and all its versions.  [default: False]
+  --import-source-tags BOOLEAN   Import source information for registered
+                                 model and its versions ad tags in destination
+                                 object.  [default: False]
+  --use-src-user-id BOOLEAN      Set the destination user field to the source
+                                 user field.  Only valid for open source
+                                 MLflow.  When importing into Databricks, the
+                                 source user field is ignored since it is
+                                 automatically picked up from your Databricks
+                                 access token.  There is no MLflow API
+                                 endpoint to explicity set the user_id for Run
+                                 and Registered Model.
+  --verbose BOOLEAN              Verbose.  [default: False]
+  --experiment-rename-file TEXT  File with experiment names replacements:
+                                 comma-delimited line such as
+                                 'old_name,new_name'.
+  --model-rename-file TEXT       File with registered model names
+                                 replacements: comma-delimited line such as
+                                 'old_name,new_name'.
+  --use-threads BOOLEAN          Process in parallel using threads.  [default:
+                                 False]
 ```
 
 #### Examples
@@ -415,24 +417,23 @@ If the experiment already exists, the source runs will be added to it.
 import-experiments --help
 
 Options:
-  --input-dir TEXT                Input directory  [required]
-  --import-source-tags BOOLEAN    Import source information for registered
-                                  model and its versions ad tags in
-                                  destination object.  [default: False]
-  --use-src-user-id BOOLEAN       Set the destination user field to the source
-                                  user field.  Only valid for open source
-                                  MLflow.  When importing into Databricks, the
-                                  source user field is ignored since it is
-                                  automatically picked up from your Databricks
-                                  access token.  There is no MLflow API
-                                  endpoint to explicity set the user_id for
-                                  Run and Registered Model.
-  --experiment-name-replacements-file TEXT
-                                  File with experiment names replacements:
-                                  comma-delimited line such as
-                                  'old_name,new_name'.
-  --use-threads BOOLEAN           Process in parallel using threads.
-                                  [default: False]
+  --input-dir TEXT               Input directory  [required]
+  --import-source-tags BOOLEAN   Import source information for registered
+                                 model and its versions ad tags in destination
+                                 object.  [default: False]
+  --use-src-user-id BOOLEAN      Set the destination user field to the source
+                                 user field.  Only valid for open source
+                                 MLflow.  When importing into Databricks, the
+                                 source user field is ignored since it is
+                                 automatically picked up from your Databricks
+                                 access token.  There is no MLflow API
+                                 endpoint to explicity set the user_id for Run
+                                 and Registered Model.
+  --experiment-rename-file TEXT  File with experiment names replacements:
+                                 comma-delimited line such as
+                                 'old_name,new_name'.
+  --use-threads BOOLEAN          Process in parallel using threads.  [default:
+                                 False]
 ```
 
 

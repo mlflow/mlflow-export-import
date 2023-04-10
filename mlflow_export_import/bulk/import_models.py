@@ -15,14 +15,14 @@ from mlflow_export_import.common.click_options import (
     opt_use_src_user_id,
     opt_verbose, 
     opt_import_source_tags, 
-    opt_experiment_name_replacements_file,
-    opt_model_name_replacements_file,
+    opt_experiment_rename_file,
+    opt_model_rename_file,
     opt_use_threads
 )
 from mlflow_export_import.common import utils, io_utils
 from mlflow_export_import.experiment.import_experiment import import_experiment
 from mlflow_export_import.model.import_model import BulkModelImporter
-from mlflow_export_import.bulk import bulk_utils
+from mlflow_export_import.bulk import rename_utils
 
 _logger = utils.getLogger(__name__)
 
@@ -51,7 +51,7 @@ def _import_experiments(mlflow_client, input_dir, use_src_user_id, experiment_na
         exp_input_dir = os.path.join(input_dir, "experiments", exp["id"])
         try:
             exp_name = exp["name"]
-            exp_name = bulk_utils.replace_name(exp_name, experiment_name_replacements, "experiment")
+            exp_name = rename_utils.rename(exp_name, experiment_name_replacements, "experiment")
             _run_info_map = import_experiment(
                 experiment_name = exp_name,
                 input_dir = exp_input_dir,
@@ -98,7 +98,7 @@ def _import_models(mlflow_client,
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for model_name in model_names:
             dir = os.path.join(models_dir, model_name)
-            model_name = bulk_utils.replace_name(model_name, model_name_replacements, "model")
+            model_name = rename_utils.rename(model_name, model_name_replacements, "model")
             executor.submit(all_importer.import_model, 
                model_name = model_name,
                input_dir = dir,
@@ -122,8 +122,8 @@ def import_all(
         mlflow_client = None
     ):
     mlflow_client = mlflow_client or mlflow.client.MlflowClient()
-    experiment_name_replacements = bulk_utils.get_name_replacements(experiment_name_replacements)
-    model_name_replacements = bulk_utils.get_name_replacements(model_name_replacements)
+    experiment_name_replacements = rename_utils.get_renames(experiment_name_replacements)
+    model_name_replacements = rename_utils.get_renames(model_name_replacements)
     start_time = time.time()
     exp_res = _import_experiments(
         mlflow_client, 
@@ -155,13 +155,13 @@ def import_all(
 @opt_import_source_tags
 @opt_use_src_user_id
 @opt_verbose
-@opt_experiment_name_replacements_file
-@opt_model_name_replacements_file
+@opt_experiment_rename_file
+@opt_model_rename_file
 @opt_use_threads
 
 def main(input_dir, delete_model, import_source_tags, use_src_user_id, 
-        experiment_name_replacements_file, 
-        model_name_replacements_file, 
+        experiment_rename_file, 
+        model_rename_file, 
         use_threads,
         verbose, 
     ):
@@ -174,8 +174,8 @@ def main(input_dir, delete_model, import_source_tags, use_src_user_id,
         delete_model = delete_model, 
         import_source_tags = import_source_tags,
         use_src_user_id = use_src_user_id, 
-        experiment_name_replacements = bulk_utils.get_name_replacements(experiment_name_replacements_file),
-        model_name_replacements = bulk_utils.get_name_replacements(model_name_replacements_file),
+        experiment_name_replacements = rename_utils.get_renames(experiment_rename_file),
+        model_name_replacements = rename_utils.get_renames(model_rename_file),
         verbose = verbose, 
         use_threads = use_threads
     )

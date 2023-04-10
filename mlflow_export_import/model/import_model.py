@@ -20,7 +20,7 @@ from mlflow_export_import.common import utils, io_utils, model_utils
 from mlflow_export_import.common.source_tags import set_source_tags_for_field, fmt_timestamps
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.run.import_run import RunImporter
-from mlflow_export_import.bulk import bulk_utils
+from mlflow_export_import.bulk import rename_utils
 
 _logger = utils.getLogger(__name__)
 
@@ -280,7 +280,7 @@ class BulkModelImporter(BaseModelImporter):
                 _logger.error(f"Cannot import model version {msg} since the source run_id was probably deleted.")
             else:
                 dst_run_id = dst_run.run_id
-                exp_name = bulk_utils.replace_name(vr["_experiment_name"], self.experiment_name_replacements, "experiment")
+                exp_name = rename_utils.rename(vr["_experiment_name"], self.experiment_name_replacements, "experiment")
                 mlflow.set_experiment(exp_name)
                 self.import_version(model_name, vr, dst_run_id, sleep_time)
         if verbose:
