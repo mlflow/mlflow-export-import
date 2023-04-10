@@ -1,11 +1,12 @@
-from mlflow_export_import.common import utils
 from mlflow_export_import.common import MlflowExportImportException
+from mlflow_export_import.common import utils
+from mlflow_export_import.common.filesystem import mk_local_path
 
 _logger = utils.getLogger(__name__)
 
 
 def read_rename_file(path):
-    with open(path, "r", encoding="utf-8") as f:
+    with open(mk_local_path(path), "r", encoding="utf-8") as f:
         dct = {}
         for line in f:
             toks = line.rstrip().split(",")
