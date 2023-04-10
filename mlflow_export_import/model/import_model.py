@@ -193,8 +193,12 @@ class ModelImporter(BaseModelImporter):
         mlflow.set_experiment(experiment_name)
         _logger.info("Importing versions:")
         for vr in model_dct["versions"]:
-            run_id = self._import_run(input_dir, experiment_name, vr)
-            self.import_version(model_name, vr, run_id, sleep_time)
+            try:
+                run_id = self._import_run(input_dir, experiment_name, vr)
+                self.import_version(model_name, vr, run_id, sleep_time)
+            except RestException as e:
+                msg = { "model": model_name, "version": vr["version"], "experiment": experiment_name, "run_id": run_id, "exception": str(e) }
+                _logger.error(f"Failed to import model version: {msg}")
         if verbose:
             model_utils.dump_model_versions(self.mlflow_client, model_name)
 
@@ -281,8 +285,12 @@ class BulkModelImporter(BaseModelImporter):
             else:
                 dst_run_id = dst_run.run_id
                 exp_name = rename_utils.rename(vr["_experiment_name"], self.experiment_renames, "experiment")
-                mlflow.set_experiment(exp_name)
-                self.import_version(model_name, vr, dst_run_id, sleep_time)
+                try:
+                    mlflow.set_experiment(exp_name)
+                    self.import_version(model_name, vr, dst_run_id, sleep_time)
+                except RestException as e:
+                    msg = { "model": model_name, "version": vr["version"], "experiment": exp_name, "run_id": dst_run_id, "exception": str(e) }
+                    _logger.error(f"Failed to import model version: {msg}")
         if verbose:
             model_utils.dump_model_versions(self.mlflow_client, model_name)
 
