@@ -50,8 +50,10 @@ def _import_experiments(mlflow_client, input_dir, use_src_user_id, experiment_na
     for exp in exps: 
         exp_input_dir = os.path.join(input_dir, "experiments", exp["id"])
         try:
+            exp_name = exp["name"]
+            exp_name = bulk_utils.replace_name(exp_name, experiment_name_replacements, "experiment")
             _run_info_map = import_experiment(
-                experiment_name = bulk_utils.replace_name(exp["name"], experiment_name_replacements),
+                experiment_name = exp_name,
                 input_dir = exp_input_dir,
                 use_src_user_id = use_src_user_id,
                 mlflow_client = mlflow_client
@@ -70,8 +72,15 @@ def _import_experiments(mlflow_client, input_dir, use_src_user_id, experiment_na
     return run_info_map, { "experiments": len(exps), "exceptions": exceptions, "duration": duration }
 
 
-def _import_models(mlflow_client, input_dir, run_info_map, delete_model, import_source_tags, 
-        model_name_replacements, verbose, use_threads
+def _import_models(mlflow_client, 
+        input_dir, 
+        run_info_map, 
+        delete_model, 
+        import_source_tags, 
+        model_name_replacements, 
+        experiment_name_replacements, 
+        verbose, 
+        use_threads
     ):
     max_workers = os.cpu_count() or 4 if use_threads else 1
     start_time = time.time()
@@ -82,27 +91,19 @@ def _import_models(mlflow_client, input_dir, run_info_map, delete_model, import_
     all_importer = AllModelImporter(
         mlflow_client = mlflow_client, 
         run_info_map = run_info_map, 
-        import_source_tags = import_source_tags
+        import_source_tags = import_source_tags,
+        experiment_name_replacements = experiment_name_replacements
     )
-
-    if use_threads:
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            for model_name in model_names:
-                dir = os.path.join(models_dir, model_name)
-                executor.submit(all_importer.import_model, 
-                   model_name = bulk_utils.replace_name(model_name, model_name_replacements),
-                   input_dir = dir,
-                   delete_model = delete_model,
-                   verbose = verbose
-                )
-    else:
+    
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for model_name in model_names:
             dir = os.path.join(models_dir, model_name)
-            all_importer.import_model(
-                model_name = bulk_utils.replace_name(model_name, model_name_replacements),
-                input_dir = dir,
-                delete_model = delete_model,
-                verbose = verbose
+            model_name = bulk_utils.replace_name(model_name, model_name_replacements, "model")
+            executor.submit(all_importer.import_model, 
+               model_name = model_name,
+               input_dir = dir,
+               delete_model = delete_model,
+               verbose = verbose
             )
 
     duration = round(time.time()-start_time, 1)
@@ -121,6 +122,8 @@ def import_all(
         mlflow_client = None
     ):
     mlflow_client = mlflow_client or mlflow.client.MlflowClient()
+    experiment_name_replacements = bulk_utils.get_name_replacements(experiment_name_replacements)
+    model_name_replacements = bulk_utils.get_name_replacements(model_name_replacements)
     start_time = time.time()
     exp_res = _import_experiments(
         mlflow_client, 
@@ -136,6 +139,7 @@ def import_all(
         delete_model, 
         import_source_tags, 
         model_name_replacements,
+        experiment_name_replacements,
         verbose, 
         use_threads
     )
@@ -165,21 +169,13 @@ def main(input_dir, delete_model, import_source_tags, use_src_user_id,
     for k,v in locals().items():
         _logger.info(f"  {k}: {v}")
 
-    experiment_name_replacements = None
-    if experiment_name_replacements_file:
-        experiment_name_replacements = bulk_utils.read_name_replacements_file(experiment_name_replacements_file)
-
-    model_name_replacements = None
-    if model_name_replacements_file:
-        model_name_replacements = bulk_utils.read_name_replacements_file(model_name_replacements_file)
-
     import_all(
         input_dir = input_dir,
         delete_model = delete_model, 
         import_source_tags = import_source_tags,
         use_src_user_id = use_src_user_id, 
-        experiment_name_replacements = experiment_name_replacements,
-        model_name_replacements = model_name_replacements,
+        experiment_name_replacements = bulk_utils.get_name_replacements(experiment_name_replacements_file),
+        model_name_replacements = bulk_utils.get_name_replacements(model_name_replacements_file),
         verbose = verbose, 
         use_threads = use_threads
     )

@@ -20,6 +20,7 @@ from mlflow_export_import.common import utils, io_utils, model_utils
 from mlflow_export_import.common.source_tags import set_source_tags_for_field, fmt_timestamps
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.run.import_run import RunImporter
+from mlflow_export_import.bulk import bulk_utils
 
 _logger = utils.getLogger(__name__)
 
@@ -234,12 +235,13 @@ class ModelImporter(BaseModelImporter):
 
 
 class AllModelImporter(BaseModelImporter):
-    """ High-level 'bulk' model importer.  """
+    """ Bulk model importer. """
 
     def __init__(self,
             run_info_map,
             run_importer = None,
             import_source_tags = False,
+            experiment_name_replacements = None,
             await_creation_for = None,
             mlflow_client = None,
         ):
@@ -250,6 +252,7 @@ class AllModelImporter(BaseModelImporter):
             await_creation_for = await_creation_for
          )
         self.run_info_map = run_info_map
+        self.experiment_name_replacements = experiment_name_replacements
 
 
     def import_model(self,
@@ -277,7 +280,8 @@ class AllModelImporter(BaseModelImporter):
                 _logger.error(f"Cannot import model version {msg} since the source run_id was probably deleted.")
             else:
                 dst_run_id = dst_run.run_id
-                mlflow.set_experiment(vr["_experiment_name"])
+                exp_name = bulk_utils.replace_name(vr["_experiment_name"], self.experiment_name_replacements, "experiment")
+                mlflow.set_experiment(exp_name)
                 self.import_version(model_name, vr, dst_run_id, sleep_time)
         if verbose:
             model_utils.dump_model_versions(self.mlflow_client, model_name)

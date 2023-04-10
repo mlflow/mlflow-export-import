@@ -169,7 +169,7 @@ def test_get_model_names_from_all_string(mlflow_context):
     assert set(model_names1) == set(model_names2)
 
 
-# == Test import with experiment replacement tests
+# == Test import with experiment rename
 
 def test_replace_experiment_names_do_replace(mlflow_context):
     model_name, exp = _create_model(mlflow_context.client_src)
@@ -213,16 +213,16 @@ def test_replace_experiment_names_do_not_replace(mlflow_context):
     assert not exp2
 
 
-# == Test import with model replacement tests
+# == Test import with model rename
 
 def test_replace_model_names_do_replace(mlflow_context):
-    model_name = create_model(mlflow_context.client_src)
+    model_name = create_model(mlflow_context.client_src) 
     export_models(
         model_names = [ model_name ],
         mlflow_client = mlflow_context.client_src,
         output_dir = mlflow_context.output_dir, 
     )
-    new_model_name = mk_uuid()
+    new_model_name = mk_uuid() + "_NEW"
     import_all(
         mlflow_client = mlflow_context.client_dst,
         input_dir = mlflow_context.output_dir,
@@ -259,9 +259,6 @@ def _get_registered_model(client, model_name):
     try:
         return client.get_registered_model(model_name)
     except RestException as e:
-        #print("ERROR.1: e:",e)
-        #print("ERROR.2: e:",e.__dict__.keys())
-        #print("ERROR.3: e:error_code:",e.error_code)
         if e.error_code == "RESOURCE_DOES_NOT_EXIST":
             return None
         raise e

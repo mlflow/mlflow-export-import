@@ -1,5 +1,9 @@
 from mlflow_export_import.common.iterators import SearchRegisteredModelsIterator
 from mlflow_export_import.common.iterators import SearchExperimentsIterator
+from mlflow_export_import.common import MlflowExportImportException
+from mlflow_export_import.common import utils
+
+_logger = utils.getLogger(__name__)
 
 
 def _get_list(names, func_list):
@@ -39,13 +43,26 @@ def read_name_replacements_file(path):
         for line in f:
             toks = line.rstrip().split(",")
             dct[toks[0]] = toks[1]
-    return dct
+        return dct
 
 
-def replace_name(name, replacements):
+def replace_name(name, replacements, object_name="object"):
     if not replacements:
         return name
     for k,v in replacements.items():
-        if name.startswith(k):
-            return name.replace(k,v)
+        if k != "" and name.startswith(k):
+            new_name = name.replace(k,v)
+            _logger.info(f"Renaming {object_name} '{name}' to '{new_name}'")
+            return new_name
     return name
+
+
+def get_name_replacements(filename_or_dict):
+    if filename_or_dict is None:
+        return None
+    if isinstance(filename_or_dict,str):
+        return read_name_replacements_file(filename_or_dict)
+    elif isinstance(filename_or_dict, dict):
+        return filename_or_dict
+    else:
+        raise MlflowExportImportException(f"Unknown name replacement type '{type(filename_or_dict)}'", http_status_code=400)

@@ -23,7 +23,7 @@ _logger = utils.getLogger(__name__)
 
 def _import_experiment(mlflow_client, exp_name, input_dir, import_source_tags, use_src_user_id, experiment_name_replacements):
     try:
-        exp_name =  bulk_utils.replace_name(exp_name, experiment_name_replacements)
+        exp_name =  bulk_utils.replace_name(exp_name, experiment_name_replacements, "experiment")
         import_experiment(
             mlflow_client = mlflow_client,
             experiment_name = exp_name,
@@ -44,6 +44,7 @@ def import_experiments(
         use_threads = False,
         mlflow_client = None
     ): 
+    experiment_name_replacements = bulk_utils.get_name_replacements(experiment_name_replacements)
     mlflow_client = mlflow_client or mlflow.client.MlflowClient()
     dct = io_utils.read_file_mlflow(os.path.join(input_dir, "experiments.json"))
     exps = dct["experiments"]
@@ -72,15 +73,11 @@ def main(input_dir, import_source_tags, use_src_user_id, experiment_name_replace
     for k,v in locals().items():
         _logger.info(f"  {k}: {v}")
 
-    experiment_name_replacements = None
-    if experiment_name_replacements_file:
-        experiment_name_replacements = bulk_utils.read_name_replacements_file(experiment_name_replacements_file) 
-
     import_experiments(
         input_dir = input_dir, 
         import_source_tags = import_source_tags,
         use_src_user_id = use_src_user_id,
-        experiment_name_replacements = experiment_name_replacements,
+        experiment_name_replacements = experiment_name_replacements_file,
         use_threads = use_threads
     )
 
