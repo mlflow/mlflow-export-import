@@ -89,7 +89,7 @@ def _dump_exception(ex, msg=""):
     _logger.info(f"==== {ex.__class__.__name__}: {msg} =====")
     _logger.info(f"  type: {type(ex)}")
     _logger.info(f"  ex:   '{ex}'")
-    _logger.info(f"  attrs:")
+    _logger.info("  attrs:")
     for k,v in ex.__dict__.items():
         _logger.info(f"    {k}: {v}")
 

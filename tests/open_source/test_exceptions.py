@@ -43,7 +43,7 @@ def test_RestException():
 def test_ctor_string():
     ex = MlflowExportImportException(_msg_base)
     _assert_messages(ex, _msg_base, None)
-    assert ex.src_exception == None
+    assert ex.src_exception is None
     assert ex.http_status_code == MlflowExportImportException.DEFAULT_HTTP_STATUS_CODE
 
 

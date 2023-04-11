@@ -211,7 +211,7 @@ class ModelImporter(BaseModelImporter):
         run_dir = os.path.join(input_dir,run_id)
         _logger.info(f"  Version {vr['version']}:")
         _logger.info(f"    current_stage: {current_stage}:")
-        _logger.info(f"    Source run - run to import:")
+        _logger.info( "    Source run - run to import:")
         _logger.info(f"      run_id: {run_id}")
         _logger.info(f"      run_artifact_uri: {run_artifact_uri}")
         _logger.info(f"      source:           {source}")
@@ -223,7 +223,7 @@ class ModelImporter(BaseModelImporter):
         )
         dst_run_id = dst_run.info.run_id
         run = self.mlflow_client.get_run(dst_run_id)
-        _logger.info(f"    Destination run - imported run:")
+        _logger.info( "    Destination run - imported run:")
         _logger.info(f"      run_id: {dst_run_id}")
         _logger.info(f"      run_artifact_uri: {run.info.artifact_uri}")
         source = _path_join(run.info.artifact_uri, model_path)

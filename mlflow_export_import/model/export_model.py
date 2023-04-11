@@ -168,7 +168,7 @@ class ModelExporter():
             self._adjust_model(model2, versions)
             permissions_utils.add_model_permissions(model2)
         else:
-            model = self.http_client.get(f"registered-models/get", {"name": model_name})
+            model = self.http_client.get("registered-models/get", {"name": model_name})
             self._adjust_model(model["registered_model"], versions)
 
         info_attr = {

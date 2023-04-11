@@ -4,12 +4,12 @@ import mlflow
 
 
 # Databricks tags that cannot or should not be set
-_DATABRICKS_SKIP_TAGS = set([
+_DATABRICKS_SKIP_TAGS = {
     "mlflow.user",
     "mlflow.log-model.history",
     "mlflow.rootRunId",
     "mlflow.experiment.sourceType", "mlflow.experiment.sourceId"
-])
+}
 
 
 def create_mlflow_tags_for_databricks_import(tags):
@@ -35,7 +35,7 @@ def strip_underscores(obj):
 
 
 def string_to_list(list_as_string):
-    if list_as_string == None:
+    if list_as_string is None:
         return []
     lst = list_as_string.split(",")
     if "" in lst: lst.remove("")
