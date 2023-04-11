@@ -88,20 +88,22 @@ class ExperimentExporter():
         _logger.info(f"Exporting experiment '{exp.name}' (ID {exp.experiment_id}) to '{output_dir}'")
         ok_run_ids = []
         failed_run_ids = []
-        j = -1
+        num_runs_exported = 0
         if run_ids:
             for j,run_id in enumerate(run_ids):
                 run = self.mlflow_client.get_run(run_id)
                 self._export_run(j, run, output_dir, ok_run_ids, failed_run_ids)
+                num_runs_exported += 1
         else:
             kwargs = {}
             if self.run_start_time:
                 kwargs = { "filter": f"start_time > {self.run_start_time}" }
             for j,run in enumerate(SearchRunsIterator(self.mlflow_client, exp.experiment_id, **kwargs)):
                 self._export_run(j, run, output_dir, ok_run_ids, failed_run_ids)
+                num_runs_exported += 1
 
         info_attr = {
-            "num_total_runs": (j+1),
+            "num_total_runs": (num_runs_exported),
             "num_ok_runs": len(ok_run_ids),
             "num_failed_runs": len(failed_run_ids),
             "failed_runs": failed_run_ids
@@ -117,8 +119,8 @@ class ExperimentExporter():
         io_utils.write_export_file(output_dir, "experiment.json", __file__, mlflow_attr, info_attr)
 
         msg = f"for experiment '{exp.name}' (ID: {exp.experiment_id})"
-        if j==0:
-            _logger.info(f"WARNING: No runs exported {msg}")
+        if num_runs_exported==0:
+            _logger.warn(f"No runs exported {msg}")
         elif len(failed_run_ids) == 0:
             _logger.info(f"{len(ok_run_ids)} runs succesfully exported {msg}")
         else:
