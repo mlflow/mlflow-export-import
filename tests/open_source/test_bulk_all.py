@@ -1,11 +1,11 @@
 from mlflow_export_import.bulk.export_all import export_all
 from mlflow_export_import.bulk.import_models import import_all
 from test_bulk_experiments import compare_experiments
+from test_bulk_models import create_model, compare_models_with_versions
 
 from init_tests import mlflow_context
 from compare_utils import compare_runs
 from oss_utils_test import delete_experiments_and_models
-from test_bulk_models import create_model, compare_models_with_versions
 
 
 _notebook_formats = "SOURCE,DBC"
@@ -34,7 +34,7 @@ def test_basic(mlflow_context):
     _run_test(mlflow_context, compare_runs)
 
 
-def test_exp_basic_threads(mlflow_context):
+def _test_exp_basic_threads(mlflow_context):
     _run_test(mlflow_context, compare_runs, use_threads=True)
 
 

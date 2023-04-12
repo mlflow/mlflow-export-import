@@ -237,21 +237,21 @@ Export several (or all) experiments to a directory.
 ```
 export-experiments --help
 
-  --experiments TEXT            Experiment names or IDs (comma delimited).
-                                For example, 'sklearn_wine,sklearn_iris' or
-                                '1,2'. 'all' will export all experiments.
-                                [required]
-  --output-dir TEXT             Output directory.  [required]
-  --export-permissions BOOLEAN  Export Databricks permissions.  [default:
-                                False]
-  --run-start-time TEXT         Only export runs started after this UTC time
-                                (inclusive). Format: YYYY-MM-DD.
-  --notebook-formats TEXT       Databricks notebook formats. Values are
-                                SOURCE, HTML, JUPYTER or DBC (comma
-                                seperated).
-  --use-threads BOOLEAN         Process in parallel using threads.
-                                Experimental: needs improved logging.
-                                [default: False]
+  --experiments TEXT             Experiment names or IDs (comma delimited).
+                                 For example, 'sklearn_wine,sklearn_iris' or
+                                 '1,2'. 'all' will export all experiments.
+                                 [required]
+  --output-dir TEXT              Output directory.  [required]
+  --export-permissions BOOLEAN   Export Databricks permissions.  [default:
+                                 False]
+  --run-start-time TEXT          Only export runs started after this UTC time
+                                 (inclusive). Format: YYYY-MM-DD.
+  --export-deleted-runs BOOLEAN  Export deleted runs.  [default: False]
+  --notebook-formats TEXT        Databricks notebook formats. Values are
+                                 SOURCE, HTML, JUPYTER or DBC (comma
+                                 seperated).
+  --use-threads BOOLEAN          Process in parallel using threads.  [default:
+                                 False]
 ```
 
 #### Examples

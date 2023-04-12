@@ -70,6 +70,15 @@ def opt_run_start_time(function):
     )(function)
     return function
 
+def opt_export_deleted_runs(function):
+    function = click.option("--export-deleted-runs",
+        help="Export deleted runs.",
+        type=bool,
+        default=False,
+        show_default=True
+    )(function)
+    return function
+
 
 # == import
 

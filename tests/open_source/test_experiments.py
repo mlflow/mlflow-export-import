@@ -1,6 +1,9 @@
+from mlflow.entities import ViewType
 from mlflow_export_import.experiment.export_experiment import export_experiment
 from mlflow_export_import.experiment.import_experiment import import_experiment
 from oss_utils_test import create_simple_run, init_output_dirs, create_dst_experiment_name
+from oss_utils_test import _create_simple_run
+from oss_utils_test import create_test_experiment
 from compare_utils import compare_runs, compare_experiment_tags
 from init_tests import mlflow_context
 
@@ -32,6 +35,7 @@ def _init_exp_test(mlflow_context, import_source_tags=False):
 
     return exp1, exp2, run1, run2
 
+
 # == basic tests
 
 def _compare_experiments(exp1, exp2, import_source_tags=False):
@@ -57,8 +61,43 @@ def test_exp_with_source_tags(mlflow_context):
         mlflow_context.output_dir, 
         import_source_tags=True)
 
+# == Test export/import deleted runs
 
-# == start_date filter 
+def test_export_deleted_runs(mlflow_context):
+    init_output_dirs(mlflow_context.output_dir)
+    exp1 = create_test_experiment(mlflow_context.client_src, 3)
+
+    runs1 =  mlflow_context.client_src.search_runs(exp1.experiment_id)
+    assert len(runs1) == 3
+
+    mlflow_context.client_src.delete_run(runs1[0].info.run_id)
+    runs1 =  mlflow_context.client_src.search_runs(exp1.experiment_id)
+    assert len(runs1) == 2
+
+    runs1 =  mlflow_context.client_src.search_runs(exp1.experiment_id, run_view_type=ViewType.ALL)
+    assert len(runs1) == 3
+
+    export_experiment(
+        mlflow_client = mlflow_context.client_src,
+        experiment_id_or_name = exp1.name,
+        output_dir = mlflow_context.output_dir,
+        export_deleted_runs = True
+    )
+
+    dst_exp_name = create_dst_experiment_name(exp1.name)
+    import_experiment(
+        mlflow_client = mlflow_context.client_dst,
+        experiment_name = dst_exp_name,
+        input_dir = mlflow_context.output_dir
+    )
+    exp2 = mlflow_context.client_dst.get_experiment_by_name(dst_exp_name)
+    runs2 =  mlflow_context.client_dst.search_runs(exp2.experiment_id)
+    assert len(runs2) == 2
+    runs2 =  mlflow_context.client_dst.search_runs(exp2.experiment_id, run_view_type=ViewType.ALL)
+    assert len(runs2) == 3
+
+
+# == Test start_date filter 
 
 def test_filter_run_no_start_date(mlflow_context):
     _run_test_run_start_date(mlflow_context, 0)
@@ -71,8 +110,6 @@ def test_filter_run_start_date_before(mlflow_context):
 
 
 def _run_test_run_start_date(mlflow_context, sleep_time):
-    from oss_utils_test import _create_simple_run
-
     init_output_dirs(mlflow_context.output_dir)
     exp1, run1a = create_simple_run(mlflow_context.client_src)
     run1a = mlflow_context.client_src.get_run(run1a.info.run_id)
@@ -86,8 +123,7 @@ def _run_test_run_start_date(mlflow_context, sleep_time):
     else:
         run_start_time = _fmt_utc_time_before(abs(sleep_time))
 
-    _create_simple_run(mlflow_context.client_src, exp1)
-    mlflow_context.client_src.search_runs(exp1.experiment_id)
+    _create_simple_run(mlflow_context.client_src)
 
     export_experiment(
         mlflow_client = mlflow_context.client_src,

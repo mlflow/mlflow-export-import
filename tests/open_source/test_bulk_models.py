@@ -6,7 +6,7 @@ from mlflow_export_import.bulk import bulk_utils
 
 from init_tests import mlflow_context
 from compare_utils import compare_runs
-from test_bulk_experiments import create_test_experiment
+from test_bulk_experiments import _create_test_experiment
 from oss_utils_test import (
     mk_test_object_name_default,
     mk_uuid,
@@ -49,7 +49,7 @@ def create_model(client):
     return model_name
 
 def _create_model(client):
-    exp = create_test_experiment(client, _num_runs)
+    exp = _create_test_experiment(client, _num_runs)
     model_name = mk_test_object_name_default()
     model = client.create_registered_model(model_name)
     for run in client.search_runs([exp.experiment_id]):
@@ -114,8 +114,8 @@ _num_runs1, _num_runs2 = (2, 3)
 def _run_test_export_runs(mlflow_context, export_all_runs):
     delete_experiments_and_models(mlflow_context)
     client1 = mlflow_context.client_src
-    exp1 = create_test_experiment(client1, _num_runs1)
-    exp2 = create_test_experiment(client1, _num_runs2)
+    exp1 = _create_test_experiment(client1, _num_runs1)
+    exp2 = _create_test_experiment(client1, _num_runs2)
     model_name = mk_test_object_name_default()
     client1.create_registered_model(model_name)
 

@@ -33,15 +33,16 @@ Accepts either an experiment ID or name.
 export-experiment --help
 
 Options:
-  --experiment TEXT             Experiment name or ID.  [required]
-  --output-dir TEXT             Output directory.  [required]
-  --export-permissions BOOLEAN  Export Databricks permissions.  [default:
-                                False]
-  --run-start-time TEXT         Only export runs started after this UTC time
-                                (inclusive). Format: YYYY-MM-DD.
-  --notebook-formats TEXT       Databricks notebook formats. Values are
-                                SOURCE, HTML, JUPYTER or DBC (comma
-                                seperated).
+  --experiment TEXT              Experiment name or ID.  [required]
+  --output-dir TEXT              Output directory.  [required]
+  --export-permissions BOOLEAN   Export Databricks permissions.  [default:
+                                 False]
+  --run-start-time TEXT          Only export runs started after this UTC time
+                                 (inclusive). Format: YYYY-MM-DD.
+  --export-deleted-runs BOOLEAN  Export deleted runs.  [default: False]
+  --notebook-formats TEXT        Databricks notebook formats. Values are
+                                 SOURCE, HTML, JUPYTER or DBC (comma
+                                 seperated).
 ```
 
 #### Examples

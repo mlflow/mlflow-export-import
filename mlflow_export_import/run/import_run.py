@@ -8,6 +8,7 @@ import click
 import base64
 
 import mlflow
+from mlflow.entities.lifecycle_stage import LifecycleStage
 from mlflow.entities import RunStatus
 from mlflow.utils.mlflow_tags import MLFLOW_PARENT_RUN_ID
 
@@ -143,6 +144,9 @@ class RunImporter():
                 self._update_mlmodel_run_id(run_id)
             self.mlflow_client.set_terminated(run_id, RunStatus.to_string(RunStatus.FINISHED))
             run = self.mlflow_client.get_run(run_id)
+            if src_run_dct["info"]["lifecycle_stage"] == LifecycleStage.DELETED:
+                self.mlflow_client.delete_run(run.info.run_id)
+                run = self.mlflow_client.get_run(run.info.run_id)
         except Exception as e:
             self.mlflow_client.set_terminated(run_id, RunStatus.to_string(RunStatus.FAILED))
             import traceback

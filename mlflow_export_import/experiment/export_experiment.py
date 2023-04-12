@@ -11,7 +11,8 @@ from mlflow_export_import.common.click_options import (
     opt_output_dir,  
     opt_notebook_formats,
     opt_export_permissions,
-    opt_run_start_time
+    opt_run_start_time,
+    opt_export_deleted_runs
 )
 from mlflow_export_import.common.iterators import SearchRunsIterator
 from mlflow_export_import.common import utils, io_utils, mlflow_utils
@@ -28,6 +29,7 @@ def export_experiment(
         run_ids = None,
         export_permissions = False,
         run_start_time = None,
+        export_deleted_runs = False,
         notebook_formats = None,
         mlflow_client = None
     ):
@@ -45,6 +47,7 @@ def export_experiment(
         mlflow_client = mlflow_client,
         export_permissions = export_permissions,
         run_start_time = run_start_time,
+        export_deleted_runs = export_deleted_runs,
         notebook_formats = notebook_formats
     )
     return exporter.export_experiment(
@@ -60,11 +63,13 @@ class ExperimentExporter():
             mlflow_client = None,
             export_permissions = False,
             run_start_time = None,
+            export_deleted_runs = False,
             notebook_formats = None
         ):
         self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
         self.export_permissions = export_permissions
         self.notebook_formats = notebook_formats
+        self.export_deleted_runs = export_deleted_runs
 
         self.run_start_time = run_start_time
         self.run_start_time_str = run_start_time
@@ -97,7 +102,10 @@ class ExperimentExporter():
         else:
             kwargs = {}
             if self.run_start_time:
-                kwargs = { "filter": f"start_time > {self.run_start_time}" }
+                kwargs["filter"] = f"start_time > {self.run_start_time}" 
+            if self.export_deleted_runs:
+                from mlflow.entities import ViewType
+                kwargs["view_type"] = ViewType.ALL
             for j,run in enumerate(SearchRunsIterator(self.mlflow_client, exp.experiment_id, **kwargs)):
                 self._export_run(j, run, output_dir, ok_run_ids, failed_run_ids)
                 num_runs_exported += 1
@@ -120,7 +128,7 @@ class ExperimentExporter():
 
         msg = f"for experiment '{exp.name}' (ID: {exp.experiment_id})"
         if num_runs_exported==0:
-            _logger.warn(f"No runs exported {msg}")
+            _logger.warning(f"No runs exported {msg}")
         elif len(failed_run_ids) == 0:
             _logger.info(f"{len(ok_run_ids)} runs succesfully exported {msg}")
         else:
@@ -139,7 +147,7 @@ class ExperimentExporter():
             return
 
         run_dir = os.path.join(output_dir, run.info.run_id)
-        _logger.info(f"Exporting run {idx+1}: {run.info.run_id} of experiment {run.info.experiment_id}")
+        _logger.info(f"Exporting run {idx+1}: {run.info.run_id} ({run.info.lifecycle_stage}) of experiment {run.info.experiment_id}")
         is_success = export_run(
             run_id = run.info.run_id,
             output_dir = run_dir,
@@ -157,9 +165,10 @@ class ExperimentExporter():
 @opt_output_dir
 @opt_export_permissions
 @opt_run_start_time
+@opt_export_deleted_runs
 @opt_notebook_formats
 
-def main(experiment, output_dir, export_permissions, run_start_time, notebook_formats):
+def main(experiment, output_dir, export_permissions, run_start_time, export_deleted_runs, notebook_formats):
     _logger.info("Options:")
     for k,v in locals().items():
         _logger.info(f"  {k}: {v}")
@@ -168,6 +177,7 @@ def main(experiment, output_dir, export_permissions, run_start_time, notebook_fo
         output_dir = output_dir,
         export_permissions = export_permissions,
         run_start_time = run_start_time,
+        export_deleted_runs = export_deleted_runs,
         notebook_formats = utils.string_to_list(notebook_formats)
     )
 

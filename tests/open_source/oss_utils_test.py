@@ -41,9 +41,10 @@ def create_experiment(client, mk_test_object_name=mk_test_object_name_default):
 
 def create_simple_run(client, run_name=None, use_metric_steps=False):
     exp = create_experiment(client)
-    return _create_simple_run(client, exp, run_name=run_name, use_metric_steps=use_metric_steps)
+    run = _create_simple_run(client, run_name=run_name, use_metric_steps=use_metric_steps)
+    return exp, run
 
-def _create_simple_run(client, exp, run_name=None, use_metric_steps=False):
+def _create_simple_run(client, run_name=None, use_metric_steps=False):
     max_depth = 4
     model = sklearn_utils.create_sklearn_model(max_depth)
     with mlflow.start_run(run_name=run_name) as run:
@@ -61,17 +62,14 @@ def _create_simple_run(client, exp, run_name=None, use_metric_steps=False):
         mlflow.log_artifact("info.txt")
         mlflow.log_artifact("info.txt", "dir2")
         mlflow.log_metric("m1", 0.1)
-    run = client.get_run(run.info.run_id)
-    return exp, run
+    return client.get_run(run.info.run_id)
 
 
-def create_runs(client):
-    create_experiment()
-    with mlflow.start_run() as run:
-        mlflow.log_param("p1", "hi")
-        mlflow.log_metric("m1", 0.786)
-        mlflow.set_tag("t1", "hi")
-    return client.search_runs(run.info.experiment_id, "")
+def create_test_experiment(client, num_runs, mk_test_object_name=mk_test_object_name_default):
+    exp = create_experiment(client, mk_test_object_name)
+    for _ in range(num_runs):
+        _create_simple_run(client)
+    return exp
 
 
 def list_experiments(client):
