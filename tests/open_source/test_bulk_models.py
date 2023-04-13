@@ -123,7 +123,6 @@ def _run_test_export_runs(mlflow_context, export_all_runs):
     _add_version(client1, model_name, runs1[0], "production")
     runs2 = client1.search_runs([exp2.experiment_id])
     _add_version(client1, model_name, runs2[0], "staging")
-    client1.get_latest_versions(model_name)
 
     _export_models(client1, model_name, mlflow_context.output_dir, export_all_runs)
     
@@ -262,3 +261,41 @@ def _get_registered_model(client, model_name):
         if e.error_code == "RESOURCE_DOES_NOT_EXIST":
             return None
         raise e
+
+
+# == Test deleted runs
+
+def test_model_deleted_runs(mlflow_context):
+    model_name = create_model(mlflow_context.client_src)
+    versions = mlflow_context.client_src.search_model_versions(filter_string=f"name='{model_name}'")
+    assert len(versions) == _num_runs
+
+    mlflow_context.client_src.delete_run(versions[0].run_id)
+    num_deleted = _get_num_deleted_runs(mlflow_context.client_src, versions)
+    assert num_deleted == _num_runs - 1
+
+    export_models(
+        model_names = [ model_name ],
+        mlflow_client = mlflow_context.client_src,
+        export_latest_versions = False,
+        output_dir = mlflow_context.output_dir, 
+        export_deleted_runs = True
+    )
+
+    import_all(
+        mlflow_client = mlflow_context.client_dst,
+        input_dir = mlflow_context.output_dir,
+        delete_model = True
+    )
+    versions = mlflow_context.client_dst.search_model_versions(filter_string=f"name='{model_name}'")
+    assert len(versions) == _num_runs
+
+    num_deleted2 = _get_num_deleted_runs(mlflow_context.client_dst, versions)
+    assert num_deleted == num_deleted2
+
+
+def _get_num_deleted_runs(client, versions):
+    """ Get the number of versions with deleted runs """
+    runs = [ client.get_run(vr.run_id)  for vr in versions ]
+    deleted_runs = [ run for run in runs if run.info.lifecycle_stage=="deleted" ]
+    return len(deleted_runs)

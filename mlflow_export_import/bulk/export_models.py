@@ -14,6 +14,7 @@ from mlflow_export_import.common.click_options import (
     opt_export_latest_versions,
     opt_export_all_runs,
     opt_export_permissions,
+    opt_export_deleted_runs,
     opt_notebook_formats,
     opt_use_threads
 )
@@ -24,6 +25,65 @@ from mlflow_export_import.bulk.model_utils import get_experiments_runs_of_models
 from mlflow_export_import.bulk import bulk_utils
 
 _logger = utils.getLogger(__name__)
+
+
+def export_models(
+        model_names,
+        output_dir,
+        stages = "",
+        export_latest_versions = False,
+        export_all_runs = False,
+        export_permissions = False,
+        export_deleted_runs = False,
+        notebook_formats = None,
+        use_threads = False,
+        mlflow_client = None
+    ):
+    mlflow_client = mlflow_client or mlflow.client.MlflowClient()
+    exps_and_runs = get_experiments_runs_of_models(mlflow_client, model_names)
+    exp_ids = exps_and_runs.keys()
+    start_time = time.time()
+    out_dir = os.path.join(output_dir, "experiments")
+    exps_to_export = exp_ids if export_all_runs else exps_and_runs
+    res_exps = export_experiments.export_experiments(
+        mlflow_client = mlflow_client,
+        experiments = exps_to_export,
+        output_dir = out_dir,
+        export_permissions = export_permissions,
+        export_deleted_runs = export_deleted_runs,
+        notebook_formats = notebook_formats,
+        use_threads = use_threads
+    )
+    res_models = _export_models(
+        mlflow_client,
+        model_names,
+        os.path.join(output_dir,"models"),
+        notebook_formats,
+        stages,
+        export_run = False,
+        use_threads = use_threads,
+        export_latest_versions = export_latest_versions,
+        export_permissions = export_permissions
+    )
+    duration = round(time.time()-start_time, 1)
+    _logger.info(f"Duration for total registered models and versions' runs export: {duration} seconds")
+
+    info_attr = {
+        "model_names": model_names,
+        "stages": stages,
+        "export_all_runs": export_all_runs,
+        "export_latest_versions": export_latest_versions,
+        "export_permissions": export_permissions,
+        "export_deleted_runs": export_deleted_runs,
+        "notebook_formats": notebook_formats,
+        "use_threads": use_threads,
+        "output_dir": output_dir,
+        "models": res_models,
+        "experiments": res_exps
+    }
+    io_utils.write_export_file(output_dir, "manifest.json", __file__, {}, info_attr)
+
+    return info_attr
 
 
 def _export_models(
@@ -92,62 +152,6 @@ def _export_models(
     return info_attr
 
 
-def export_models(
-        model_names,
-        output_dir,
-        stages = "",
-        export_latest_versions = False,
-        export_all_runs = False,
-        export_permissions = False,
-        notebook_formats = None,
-        use_threads = False,
-        mlflow_client = None
-    ):
-    mlflow_client = mlflow_client or mlflow.client.MlflowClient()
-    exps_and_runs = get_experiments_runs_of_models(mlflow_client, model_names)
-    exp_ids = exps_and_runs.keys()
-    start_time = time.time()
-    out_dir = os.path.join(output_dir, "experiments")
-    exps_to_export = exp_ids if export_all_runs else exps_and_runs
-    res_exps = export_experiments.export_experiments(
-        mlflow_client = mlflow_client,
-        experiments = exps_to_export,
-        output_dir = out_dir,
-        export_permissions = export_permissions,
-        notebook_formats = notebook_formats,
-        use_threads = use_threads
-    )
-    res_models = _export_models(
-        mlflow_client,
-        model_names,
-        os.path.join(output_dir,"models"),
-        notebook_formats,
-        stages,
-        export_run = False,
-        use_threads = use_threads,
-        export_latest_versions = export_latest_versions,
-        export_permissions = export_permissions
-    )
-    duration = round(time.time()-start_time, 1)
-    _logger.info(f"Duration for total registered models and versions' runs export: {duration} seconds")
-
-    info_attr = {
-        "model_names": model_names,
-        "stages": stages,
-        "export_all_runs": export_all_runs,
-        "export_latest_versions": export_latest_versions,
-        "export_permissions": export_permissions,
-        "notebook_formats": notebook_formats,
-        "use_threads": use_threads,
-        "output_dir": output_dir,
-        "models": res_models,
-        "experiments": res_exps
-    }
-    io_utils.write_export_file(output_dir, "manifest.json", __file__, {}, info_attr)
-
-    return info_attr
-
-
 @click.command()
 @opt_output_dir
 @click.option("--models",
@@ -160,10 +164,12 @@ def export_models(
 @opt_export_all_runs
 @opt_stages
 @opt_export_permissions
+@opt_export_deleted_runs
 @opt_notebook_formats
 @opt_use_threads
 
-def main(models, output_dir, stages, export_latest_versions, export_all_runs, export_permissions, notebook_formats, use_threads):
+def main(models, output_dir, stages, export_latest_versions, export_all_runs, 
+        export_permissions, export_deleted_runs, notebook_formats, use_threads):
     _logger.info("Options:")
     for k,v in locals().items():
         _logger.info(f"  {k}: {v}")
@@ -174,6 +180,7 @@ def main(models, output_dir, stages, export_latest_versions, export_all_runs, ex
         export_latest_versions = export_latest_versions,
         export_all_runs = export_all_runs,
         export_permissions = export_permissions,
+        export_deleted_runs = export_deleted_runs,
         notebook_formats = notebook_formats,
         use_threads = use_threads,
     )
