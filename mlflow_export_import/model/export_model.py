@@ -208,6 +208,8 @@ class ModelExporter():
         if stages is None:
             return []
         if isinstance(stages, str):
+            if stages == "":
+                return []
             stages = stages.split(",")
         stages = [stage.lower() for stage in stages]
         for stage in stages:
