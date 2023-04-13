@@ -271,7 +271,7 @@ def test_model_deleted_runs(mlflow_context):
     assert len(versions) == _num_runs
 
     mlflow_context.client_src.delete_run(versions[0].run_id)
-    num_deleted = _get_num_deleted_runs(mlflow_context.client_src, versions)
+    num_deleted = get_num_deleted_runs(mlflow_context.client_src, versions)
     assert num_deleted == _num_runs - 1
 
     export_models(
@@ -290,11 +290,11 @@ def test_model_deleted_runs(mlflow_context):
     versions = mlflow_context.client_dst.search_model_versions(filter_string=f"name='{model_name}'")
     assert len(versions) == _num_runs
 
-    num_deleted2 = _get_num_deleted_runs(mlflow_context.client_dst, versions)
+    num_deleted2 = get_num_deleted_runs(mlflow_context.client_dst, versions)
     assert num_deleted == num_deleted2
 
 
-def _get_num_deleted_runs(client, versions):
+def get_num_deleted_runs(client, versions):
     """ Get the number of versions with deleted runs """
     runs = [ client.get_run(vr.run_id)  for vr in versions ]
     deleted_runs = [ run for run in runs if run.info.lifecycle_stage=="deleted" ]
