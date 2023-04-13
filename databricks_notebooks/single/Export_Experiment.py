@@ -97,12 +97,12 @@ export_experiment(
 
 # COMMAND ----------
 
-# MAGIC %md ### Display exported experiment files
+# MAGIC %md ### Display exported JSON
 
 # COMMAND ----------
 
 import os
-output_dir = output_dir.replace("dbfs:","/dbfs")
+output_dir = mk_local_path(output_dir)
 os.environ['OUTPUT_DIR'] = output_dir
 output_dir
 
@@ -117,26 +117,3 @@ output_dir
 # COMMAND ----------
 
 # MAGIC %sh cat $OUTPUT_DIR/experiment.json
-
-# COMMAND ----------
-
-# MAGIC %md #### List run information
-
-# COMMAND ----------
-
-# find_run_dir(output_dir, "RUN_DIR", "experiment.json")
-
-# COMMAND ----------
-
-import glob
-files = [f for f in glob.glob(f"{output_dir}/*") if not f.endswith("experiment.json")]
-os.environ['RUN_DIR'] = files[0]
-files[0]
-
-# COMMAND ----------
-
-# MAGIC %sh ls -lR $RUN_DIR
-
-# COMMAND ----------
-
-# MAGIC %sh  cat $RUN_DIR/run.json

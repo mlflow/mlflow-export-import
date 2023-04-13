@@ -2,21 +2,20 @@
 # MAGIC %sh 
 # MAGIC #pip install mlflow-export-import
 # MAGIC pip install git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
-# MAGIC pip install /dbfs/home/andre.mesarovic@databricks.com/lib/wheels/mlflow_export_import-1.2.0-py3-none-any.whl
-# MAGIC #
 
 # COMMAND ----------
 
 import mlflow
 mlflow_client = mlflow.client.MlflowClient()
+print("mlflow.version:",mlflow.__version__)
 
 # COMMAND ----------
 
-def find_run_dir(output_dir, env_var_name, file_name):
-    import glob
-    files = [f for f in glob.glob(f"{output_dir}/*") if not f.endswith(file_name)]
-    os.environ[env_var_name] = files[0]
-    return files[0]
+def mk_dbfs_path(path):
+    return path.replace("/dbfs","dbfs:")
+
+def mk_local_path(path):
+    return path.replace("dbfs:","/dbfs")
 
 # COMMAND ----------
 
@@ -28,11 +27,6 @@ def get_notebook_formats(num):
     notebook_formats = notebook_formats.split(",")
     if "" in notebook_formats: notebook_formats.remove("")
     return notebook_formats
-
-# COMMAND ----------
-
-import mlflow
-print("mlflow.version:",mlflow.__version__)
 
 # COMMAND ----------
 

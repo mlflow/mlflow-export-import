@@ -55,7 +55,7 @@ dbutils.widgets.dropdown("6. Export permissions","no",["yes","no"])
 export_permissions = dbutils.widgets.get("6. Export permissions") == "yes"
 
 dbutils.widgets.dropdown("7. Export version run","yes",["yes","no"])
-export_permissions = dbutils.widgets.get("6. Export version run") == "yes"
+export_version_run = dbutils.widgets.get("7. Export version run") == "yes"
 
 notebook_formats = get_notebook_formats(8) # widget "8. Notebook formats"
 
@@ -74,17 +74,11 @@ assert_widget(model_name, "1. Model")
 assert_widget(output_dir, "2. Output base directory")
 
 output_dir += f"/{model_name}"
-
-import mlflow
 print("output_dir:", output_dir)
 
 # COMMAND ----------
 
 # MAGIC %md ### Export the model
-
-# COMMAND ----------
-
-#dbutils.widgets.remove("7. Notebook formats")
 
 # COMMAND ----------
 
@@ -108,7 +102,7 @@ export_model(
 # COMMAND ----------
 
 import os
-output_dir = output_dir.replace("dbfs:","/dbfs")
+output_dir = mk_local_path(output_dir)
 os.environ['OUTPUT_DIR'] = output_dir
 
 # COMMAND ----------
@@ -121,4 +115,10 @@ os.environ['OUTPUT_DIR'] = output_dir
 
 # COMMAND ----------
 
-# MAGIC %sh cat $OUTPUT_DIR/model.json
+# MAGIC %sh 
+# MAGIC echo $OUTPUT_DIR
+# MAGIC cat $OUTPUT_DIR/model.json
+
+# COMMAND ----------
+
+
