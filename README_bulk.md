@@ -52,6 +52,7 @@ Options:
                                   False]
   --run-start-time TEXT           Only export runs started after this UTC time
                                   (inclusive). Format: YYYY-MM-DD.
+  --export-deleted-runs BOOLEAN   Export deleted runs.  [default: False]
   --notebook-formats TEXT         Databricks notebook formats. Values are
                                   SOURCE, HTML, JUPYTER or DBC (comma
                                   seperated).
@@ -144,6 +145,7 @@ Options:
                                   Mututally exclusive with option --versions.
   --export-permissions BOOLEAN    Export Databricks permissions.  [default:
                                   False]
+  --export-deleted-runs BOOLEAN   Export deleted runs.  [default: False]
   --notebook-formats TEXT         Databricks notebook formats. Values are
                                   SOURCE, HTML, JUPYTER or DBC (comma
                                   seperated).
