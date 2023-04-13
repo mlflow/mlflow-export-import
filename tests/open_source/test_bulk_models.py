@@ -1,7 +1,7 @@
 import os
 from mlflow.exceptions import RestException
 from mlflow_export_import.bulk.export_models import export_models
-from mlflow_export_import.bulk.import_models import import_all
+from mlflow_export_import.bulk.import_models import import_models
 from mlflow_export_import.bulk import bulk_utils
 
 from init_tests import mlflow_context
@@ -70,7 +70,7 @@ def _run_test(mlflow_context, compare_func, use_threads=False):
         use_threads = False
     )
 
-    import_all(
+    import_models(
         mlflow_client = mlflow_context.client_dst,
         input_dir = mlflow_context.output_dir,
         delete_model = False,
@@ -127,7 +127,7 @@ def _run_test_export_runs(mlflow_context, export_all_runs):
     _export_models(client1, model_name, mlflow_context.output_dir, export_all_runs)
     
     client2 = mlflow_context.client_dst
-    import_all(
+    import_models(
         mlflow_client = client2, 
         input_dir = mlflow_context.output_dir, 
         delete_model = False
@@ -178,7 +178,7 @@ def test_experiment_rename_do_replace(mlflow_context):
         output_dir = mlflow_context.output_dir, 
     )
     new_exp_name = mk_uuid()
-    import_all(
+    import_models(
         mlflow_client = mlflow_context.client_dst,
         input_dir = mlflow_context.output_dir,
         delete_model = True,
@@ -200,7 +200,7 @@ def test_experiment_rename_do_not_replace(mlflow_context):
         output_dir = mlflow_context.output_dir, 
     )
     new_exp_name = mk_uuid()
-    import_all(
+    import_models(
         mlflow_client = mlflow_context.client_dst,
         input_dir = mlflow_context.output_dir,
         delete_model = True,
@@ -222,7 +222,7 @@ def test_model_rename_do_replace(mlflow_context):
         output_dir = mlflow_context.output_dir, 
     )
     new_model_name = mk_uuid() + "_NEW"
-    import_all(
+    import_models(
         mlflow_client = mlflow_context.client_dst,
         input_dir = mlflow_context.output_dir,
         delete_model = True,
@@ -242,7 +242,7 @@ def test_model_rename_do_not_replace(mlflow_context):
         output_dir = mlflow_context.output_dir, 
     )
     new_model_name = mk_uuid()
-    import_all(
+    import_models(
         mlflow_client = mlflow_context.client_dst,
         input_dir = mlflow_context.output_dir,
         delete_model = True,
@@ -282,7 +282,7 @@ def test_model_deleted_runs(mlflow_context):
         export_deleted_runs = True
     )
 
-    import_all(
+    import_models(
         mlflow_client = mlflow_context.client_dst,
         input_dir = mlflow_context.output_dir,
         delete_model = True

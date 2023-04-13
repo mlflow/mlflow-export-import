@@ -1,5 +1,5 @@
 from mlflow_export_import.bulk.export_all import export_all
-from mlflow_export_import.bulk.import_models import import_all
+from mlflow_export_import.bulk.import_models import import_models
 from test_bulk_experiments import compare_experiments
 from test_bulk_models import create_model, compare_models_with_versions, get_num_deleted_runs
 
@@ -24,7 +24,7 @@ def _run_test(mlflow_context, compare_func=compare_runs, use_threads=False):
         notebook_formats = _notebook_formats, 
         use_threads = use_threads
     )
-    import_all(
+    import_models(
         mlflow_client = mlflow_context.client_dst, 
         input_dir = mlflow_context.output_dir, 
         delete_model = True
@@ -59,7 +59,7 @@ def test_model_deleted_runs(mlflow_context):
         output_dir = mlflow_context.output_dir, 
         export_deleted_runs = True
     )
-    import_all(
+    import_models(
         mlflow_client = mlflow_context.client_dst, 
         input_dir = mlflow_context.output_dir, 
         delete_model = True
