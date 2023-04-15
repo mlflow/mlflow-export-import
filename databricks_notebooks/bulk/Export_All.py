@@ -9,8 +9,9 @@
 # MAGIC * `3. Export latest versions` - export all or just the "latest" versions.
 # MAGIC * `4. Run start date` - Export runs after this UTC date (inclusive). Example: `2023-04-05`.
 # MAGIC * `5. Export permissions` - export Databricks permissions.
-# MAGIC * `6. Notebook formats`
-# MAGIC * `7. Use threads`
+# MAGIC * `6. Export deleted runs`
+# MAGIC * `7. Notebook formats`
+# MAGIC * `8. Use threads`
 
 # COMMAND ----------
 
@@ -33,13 +34,16 @@ run_start_date = dbutils.widgets.get("4. Run start date")
 
 dbutils.widgets.dropdown("5. Export permissions","no",["yes","no"])
 export_permissions = dbutils.widgets.get("5. Export permissions") == "yes"
+
+dbutils.widgets.dropdown("6. Export deleted runs","no",["yes","no"])
+export_deleted_runs = dbutils.widgets.get("6. Export deleted runs") == "yes"
  
 all_formats = [ "SOURCE", "DBC", "HTML", "JUPYTER" ]
-dbutils.widgets.multiselect("6. Notebook formats",all_formats[0],all_formats)
-notebook_formats = dbutils.widgets.get("6. Notebook formats")
+dbutils.widgets.multiselect("7. Notebook formats",all_formats[0],all_formats)
+notebook_formats = dbutils.widgets.get("7. Notebook formats")
 
-dbutils.widgets.dropdown("7. Use threads","no",["yes","no"])
-use_threads = dbutils.widgets.get("7. Use threads") == "yes"
+dbutils.widgets.dropdown("8. Use threads","no",["yes","no"])
+use_threads = dbutils.widgets.get("8. Use threads") == "yes"
  
 if run_start_date=="": run_start_date = None
 
@@ -48,6 +52,7 @@ print("stages:", stages)
 print("export_latest_versions:", export_latest_versions)
 print("run_start_date:", run_start_date)
 print("export_permissions:", export_permissions)
+print("export_deleted_runs:", export_deleted_runs)
 print("notebook_formats:", notebook_formats)
 print("use_threads:", use_threads)
 
@@ -65,6 +70,7 @@ export_all(
     export_latest_versions = export_latest_versions,
     run_start_time = run_start_date,
     export_permissions = export_permissions,
+    export_deleted_runs = export_deleted_runs,
     notebook_formats = notebook_formats, 
     use_threads = use_threads
 )

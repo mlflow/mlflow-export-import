@@ -14,4 +14,4 @@
 # MAGIC 
 # MAGIC See: See https://github.com/mlflow/mlflow-export-import/blob/master/README_bulk.md.
 # MAGIC 
-# MAGIC Last update: 2023-04-10
+# MAGIC Last update: 2023-04-15

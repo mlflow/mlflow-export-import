@@ -10,8 +10,9 @@
 # MAGIC * `4. Export latest versions` - expor all or just the "latest" versions.
 # MAGIC * `5. Export all runs` - export all runs of an experiment that are linked to a registered model.
 # MAGIC * `6. Export permissions` - export Databricks permissions.
-# MAGIC * `7. Notebook formats`
-# MAGIC * `8. Use threads`
+# MAGIC * `7. Export deleted runs`
+# MAGIC * `8. Notebook formats`
+# MAGIC * `9. Use threads`
 # MAGIC 
 # MAGIC See: https://github.com/mlflow/mlflow-export-import/blob/master/README_bulk.md#registered-models.
 
@@ -40,12 +41,15 @@ export_all_runs = dbutils.widgets.get("5. Export all runs") == "yes"
 dbutils.widgets.dropdown("6. Export permissions","no",["yes","no"])
 export_permissions = dbutils.widgets.get("6. Export permissions") == "yes"
 
-all_formats = [ "SOURCE", "DBC", "HTML", "JUPYTER" ]
-dbutils.widgets.multiselect("7. Notebook formats",all_formats[0],all_formats)
-notebook_formats = dbutils.widgets.get("7. Notebook formats")
+dbutils.widgets.dropdown("7. Export deleted runs","no",["yes","no"])
+export_deleted_runs = dbutils.widgets.get("7. Export deleted runs") == "yes"
 
-dbutils.widgets.dropdown("8. Use threads","no",["yes","no"])
-use_threads = dbutils.widgets.get("8. Use threads") == "yes"
+all_formats = [ "SOURCE", "DBC", "HTML", "JUPYTER" ]
+dbutils.widgets.multiselect("8. Notebook formats",all_formats[0],all_formats)
+notebook_formats = dbutils.widgets.get("8. Notebook formats")
+
+dbutils.widgets.dropdown("9. Use threads","no",["yes","no"])
+use_threads = dbutils.widgets.get("9. Use threads") == "yes"
 
 export_notebook_revision = False
 export_all_runs = False
@@ -59,6 +63,7 @@ print("stages:", stages)
 print("export_latest_versions:", export_latest_versions)
 print("export_all_runs:", export_all_runs)
 print("export_permissions:", export_permissions)
+print("export_deleted_runs:", export_deleted_runs)
 print("notebook_formats:", notebook_formats)
 print("use_threads:", use_threads)
 
@@ -82,6 +87,7 @@ export_models(
     export_latest_versions = export_latest_versions,
     export_all_runs = export_all_runs,
     export_permissions = export_permissions,
+    export_deleted_runs = export_deleted_runs, 
     notebook_formats = notebook_formats,
     use_threads = use_threads
 )
