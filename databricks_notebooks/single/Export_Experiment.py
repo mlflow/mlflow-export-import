@@ -81,6 +81,14 @@ print("output_dir:", output_dir)
 
 # COMMAND ----------
 
+# MAGIC %md ### Display experiment UI link
+
+# COMMAND ----------
+
+display_experiment_info(experiment.name)
+
+# COMMAND ----------
+
 # MAGIC %md ### Export the experiment
 
 # COMMAND ----------

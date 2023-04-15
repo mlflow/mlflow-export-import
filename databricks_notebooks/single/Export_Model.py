@@ -13,7 +13,8 @@
 # MAGIC * `4. Export latest versions`
 # MAGIC * `5. Versions` - comma delimited version numbers to export.
 # MAGIC * `6. Export permissions` - Export Databricks permissions.
-# MAGIC * `7. Notebook formats` - Notebook formats to export.
+# MAGIC * `7. Export version run`
+# MAGIC * `8. Notebook formats` - Notebook formats to export.
 
 # COMMAND ----------
 
@@ -78,6 +79,14 @@ print("output_dir:", output_dir)
 
 # COMMAND ----------
 
+# MAGIC %md ### Display model UI link
+
+# COMMAND ----------
+
+display_registered_model_uri(model_name)
+
+# COMMAND ----------
+
 # MAGIC %md ### Export the model
 
 # COMMAND ----------
@@ -118,7 +127,3 @@ os.environ['OUTPUT_DIR'] = output_dir
 # MAGIC %sh 
 # MAGIC echo $OUTPUT_DIR
 # MAGIC cat $OUTPUT_DIR/model.json
-
-# COMMAND ----------
-
-

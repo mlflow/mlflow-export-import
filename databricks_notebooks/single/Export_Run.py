@@ -48,8 +48,14 @@ print("notebook_formats:", notebook_formats)
 
 assert_widget(run_id, "1. Run ID")
 assert_widget(output_dir, "2. Output base directory")
-  
-import mlflow
+
+# COMMAND ----------
+
+# MAGIC %md ### Display run UI link
+
+# COMMAND ----------
+
+display_run_uri(run_id)
 
 # COMMAND ----------
 

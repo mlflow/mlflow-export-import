@@ -52,3 +52,11 @@ import_experiment(
     input_dir = input_dir,
     import_source_tags = import_source_tags
 )
+
+# COMMAND ----------
+
+# MAGIC %md ### Display experiment UI link
+
+# COMMAND ----------
+
+display_experiment_info(experiment_name)

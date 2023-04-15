@@ -27,8 +27,6 @@
 # MAGIC   * [Bulk notebooks]($bulk/_README) - Copy multiple MLflow objects. The target object name will be the same as the source object name.
 # MAGIC * [Console Script]($scripts/_README) notebooks - command-line scripts using the Linux shell (%sh).
 # MAGIC   * [Console_Scripts]($scripts/Console_Scripts) 
-# MAGIC * Other
-# MAGIC   * [Fancy notebooks]($fancy/_README) - Fancier version of above Single notebooks. Can be ignored unless you're curious.
 # MAGIC 
 # MAGIC #### Limitations
 # MAGIC 
@@ -52,4 +50,4 @@
 
 # COMMAND ----------
 
-# MAGIC %md Last updated: 2023-04-12
+# MAGIC %md Last updated: 2023-04-15

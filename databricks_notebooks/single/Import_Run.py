@@ -6,6 +6,7 @@
 # MAGIC #### Widgets
 # MAGIC * `1. Destination experiment name` - Import run into this experiment. Will create if it doesn't exist.
 # MAGIC * `2. Input directory` - Input directory containing an exported run.
+# MAGIC * `3. Import source tags`
 
 # COMMAND ----------
 
@@ -53,6 +54,14 @@ run, _ = import_run(
     import_source_tags = import_source_tags
 )
 print("Run ID:", run.info.run_id)
+
+# COMMAND ----------
+
+# MAGIC %md ### Display run UI link
+
+# COMMAND ----------
+
+display_run_uri(run.info.run_id)
 
 # COMMAND ----------
 

@@ -11,6 +11,7 @@
 # MAGIC * `2. Destination experiment name` - contains runs created for model versions.
 # MAGIC * `3. Input directory` - Input directory containing the exported model.
 # MAGIC * `4. Delete model` - delete model and its versions before importing.
+# MAGIC * `5. Import source tags`
 # MAGIC 
 # MAGIC #### Limitations
 # MAGIC * There is a bug where you cannot create a model with the same name as a deleted model.
@@ -45,7 +46,7 @@ dbutils.widgets.dropdown("5. Import source tags","no",["yes","no"])
 import_source_tags = dbutils.widgets.get("5. Import source tags") == "yes"
 
 import os
-os.environ["INPUT_DIR"] = input_dir.replace("dbfs:","/dbfs")
+os.environ["INPUT_DIR"] = mk_local_path(input_dir)
 
 print("model_name:", model_name)
 print("input_dir:", input_dir)
@@ -86,3 +87,25 @@ import_model(
   delete_model = delete_model,
   import_source_tags = import_source_tags
 )
+
+# COMMAND ----------
+
+# MAGIC %md ### Display UI links
+
+# COMMAND ----------
+
+display_registered_model_uri(model_name)
+
+# COMMAND ----------
+
+display_experiment_info(experiment_name)
+
+# COMMAND ----------
+
+run = mlflow_client.get_run("ecdee570b07544cb8dca0b69d13ff38d")
+exp = mlflow_client.get_experiment(run.info.experiment_id)
+exp
+
+# COMMAND ----------
+
+
