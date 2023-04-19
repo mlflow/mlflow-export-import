@@ -33,7 +33,6 @@ def export_model(
         stages = None,
         versions = None,
         export_latest_versions = False,
-        export_run = True,
         export_permissions = False,
         export_deleted_runs = False,
         notebook_formats = None,
@@ -45,7 +44,6 @@ def export_model(
     :param stages: Stages to export. Default is all stages. Values are Production, Staging, Archived and None.
     :param export_latest_versions: Export latest registered model versions instead of all versions.
     :param versions: List of versions to export.
-    :param export_run: Export the run that generated a registered model's version.
     :param get_model_version_download_uri: Call MLflowClient.get_model_version_download_uri for version.
     :param mlflow_client: MlflowClient
     """
@@ -55,7 +53,6 @@ def export_model(
        stages = stages,
        versions = versions,
        export_latest_versions = export_latest_versions,
-       export_run = export_run,
        export_permissions = export_permissions,
        export_deleted_runs = export_deleted_runs,
        get_model_version_download_uri = get_model_version_download_uri,
@@ -73,7 +70,6 @@ class ModelExporter():
             stages = None,
             versions = None,
             export_latest_versions = False,
-            export_run = True,
             export_permissions = False,
             export_deleted_runs = False,
             notebook_formats = None,
@@ -85,14 +81,12 @@ class ModelExporter():
         :param stages: Stages to export. Default is all stages. Values are Production, Staging, Archived and None.
         :param versions: List of versions to export.
         :param export_latest_versions: Export latest registered model versions instead of all versions.
-        :param export_run: Export the run that generated a registered model's version.
         :param get_model_version_download_uri: Call MLflowClient.get_model_version_download_uri for version.
         :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
         """
         self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
         self.http_client = MlflowHttpClient()
         self.run_exporter = RunExporter(self.mlflow_client, export_deleted_runs=export_deleted_runs, notebook_formats=notebook_formats)
-        self.export_run = export_run
         self.stages = self._normalize_stages(stages)
         self.versions = versions if versions else []
         self.export_latest_versions = export_latest_versions
@@ -134,8 +128,7 @@ class ModelExporter():
             msg = { "name": model_name, "version": vr.version, "stage": vr.current_stage }
             _logger.info(f"Exporting model verson {j+1}/{len(versions)}: {msg} to '{opath}'")
             try:
-                if self.export_run:
-                    self.run_exporter.export_run(vr.run_id, opath)
+                self.run_exporter.export_run(vr.run_id, opath)
                 run = self.mlflow_client.get_run(vr.run_id)
                 vr_dct = dict(vr)
                 vr_dct["_run_artifact_uri"] = run.info.artifact_uri
@@ -146,16 +139,16 @@ class ModelExporter():
                     vr_dct["_download_uri"] = _download_uri
                 output_versions.append(vr_dct)
             except mlflow.exceptions.RestException as e:
-                err_dct = { "RestException": e.json , "model": vr.name, "version": vr.version, "run_id": vr.run_id }
+                err_msg = { "RestException": e.json , "model": vr.name, "version": vr.version, "run_id": vr.run_id }
                 if e.json.get("error_code",None) == "RESOURCE_DOES_NOT_EXIST":
-                    err_dct = { **{"message": "Run probably does not exist"}, **err_dct}
-                    _logger.error(err_dct)
+                    err_msg = { **{"message": "Run probably does not exist"}, **err_msg}
+                    _logger.error(err_msg)
                 else:
-                    err_dct = { **{"message": "Version cannot be exported"}, **err_dct}
-                    _logger.error(err_dct)
+                    err_msg = { **{"message": "Version cannot be exported"}, **err_msg}
+                    _logger.error(err_msg)
                     import traceback
                     traceback.print_exc()
-                failed_versions.append(err_dct)
+                failed_versions.append(err_msg)
         output_versions.sort(key=lambda x: x["version"], reverse=False)
         return output_versions, failed_versions
 

@@ -60,7 +60,6 @@ def export_models(
         os.path.join(output_dir,"models"),
         notebook_formats,
         stages,
-        export_run = False,
         use_threads = use_threads,
         export_latest_versions = export_latest_versions,
         export_permissions = export_permissions
@@ -92,7 +91,6 @@ def _export_models(
         output_dir,
         notebook_formats = None,
         stages = None,
-        export_run = True,
         use_threads = False,
         export_latest_versions = False,
         export_permissions = False
@@ -114,7 +112,6 @@ def _export_models(
                 output_dir = dir,
                 notebook_formats = notebook_formats,
                 stages = stages,
-                export_run = export_run,
                 export_latest_versions = export_latest_versions,
                 export_permissions = export_permissions,
                 mlflow_client = mlflow_client,
@@ -130,7 +127,6 @@ def _export_models(
     info_attr = {
         "model_names": model_names,
         "stages": stages,
-        "export_run": export_run,
         "export_latest_versions": export_latest_versions,
         "notebook_formats": notebook_formats,
         "use_threads": use_threads,
