@@ -29,6 +29,7 @@ _logger = utils.getLogger(__name__)
 def export_run(
         run_id,
         output_dir,
+        export_deleted_runs = False,
         notebook_formats = None,
         mlflow_client = None
     ):
@@ -41,6 +42,7 @@ def export_run(
     """
     exporter = RunExporter(
         mlflow_client = mlflow_client,
+        export_deleted_runs = export_deleted_runs,
         notebook_formats = notebook_formats
     )
     return exporter.export_run(
@@ -53,6 +55,7 @@ class RunExporter:
 
     def __init__(self, 
             mlflow_client, 
+	    export_deleted_runs = False,
             notebook_formats = None
         ):
         """
@@ -64,6 +67,7 @@ class RunExporter:
         self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
 
         self.dbx_client = DatabricksHttpClient()
+        self.export_deleted_runs = export_deleted_runs
         self.notebook_formats = notebook_formats
 
 
@@ -77,6 +81,10 @@ class RunExporter:
         :return: whether export succeeded.
         """
         run = self.mlflow_client.get_run(run_id)
+        if run.info.lifecycle_stage == "deleted" and not self.export_deleted_runs:
+            return False
+        msg = { "run_id": run.info.run_id, "lifecycle_stage": run.info.lifecycle_stage }
+        _logger.info(f"Exporting run {msg}")
         tags = run.data.tags
         tags = dict(sorted(tags.items()))
         

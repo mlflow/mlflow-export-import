@@ -151,6 +151,7 @@ class ExperimentExporter():
         is_success = export_run(
             run_id = run.info.run_id,
             output_dir = run_dir,
+            export_deleted_runs = self.export_deleted_runs,
             notebook_formats = self.notebook_formats,
             mlflow_client = self.mlflow_client
         )

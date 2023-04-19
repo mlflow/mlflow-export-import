@@ -14,6 +14,7 @@ from mlflow_export_import.common.click_options import (
     opt_stages,
     opt_versions,
     opt_export_latest_versions,
+    opt_export_deleted_runs,
     opt_export_permissions,
     opt_get_model_version_download_uri
 )
@@ -34,6 +35,7 @@ def export_model(
         export_latest_versions = False,
         export_run = True,
         export_permissions = False,
+        export_deleted_runs = False,
         notebook_formats = None,
         get_model_version_download_uri = False,
         mlflow_client = None
@@ -55,6 +57,7 @@ def export_model(
        export_latest_versions = export_latest_versions,
        export_run = export_run,
        export_permissions = export_permissions,
+       export_deleted_runs = export_deleted_runs,
        get_model_version_download_uri = get_model_version_download_uri,
        mlflow_client = mlflow_client
     )
@@ -72,6 +75,7 @@ class ModelExporter():
             export_latest_versions = False,
             export_run = True,
             export_permissions = False,
+            export_deleted_runs = False,
             notebook_formats = None,
             get_model_version_download_uri = False,
             mlflow_client = None
@@ -87,7 +91,7 @@ class ModelExporter():
         """
         self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
         self.http_client = MlflowHttpClient()
-        self.run_exporter = RunExporter(self.mlflow_client, notebook_formats=notebook_formats)
+        self.run_exporter = RunExporter(self.mlflow_client, export_deleted_runs=export_deleted_runs, notebook_formats=notebook_formats)
         self.export_run = export_run
         self.stages = self._normalize_stages(stages)
         self.versions = versions if versions else []
@@ -120,14 +124,15 @@ class ModelExporter():
 
     def _export_versions(self, model_name, versions, output_dir):
         output_versions, failed_versions = ([], [])
-        for vr in versions:
+        for j,vr in enumerate(versions):
             if len(self.stages) > 0 and not vr.current_stage.lower() in self.stages:
                 continue
             if len(self.versions) > 0 and not vr.version in self.versions:
                 continue
             opath = os.path.join(output_dir, vr.run_id)
             opath = opath.replace("dbfs:", "/dbfs")
-            _logger.info(f"Exporting model '{model_name}' version {vr.version} stage '{vr.current_stage}' to '{opath}'")
+            msg = { "name": model_name, "version": vr.version, "stage": vr.current_stage }
+            _logger.info(f"Exporting model verson {j+1}/{len(versions)}: {msg} to '{opath}'")
             try:
                 if self.export_run:
                     self.run_exporter.export_run(vr.run_id, opath)
@@ -158,7 +163,7 @@ class ModelExporter():
     def _export_model(self, model_name, output_dir):
         ori_versions = model_utils.list_model_versions(self.mlflow_client, model_name, self.export_latest_versions)
         msg = "latest" if self.export_latest_versions else "all"
-        _logger.info(f"Found {len(ori_versions)} '{msg}' versions for model '{model_name}'")
+        _logger.info(f"Exporting model '{model_name}': found {len(ori_versions)} '{msg}' versions")
         versions, failed_versions = self._export_versions(model_name, ori_versions, output_dir)
 
         if utils.importing_into_databricks() and self.export_permissions:
@@ -226,9 +231,11 @@ class ModelExporter():
 @opt_versions
 @opt_export_latest_versions
 @opt_export_permissions
+@opt_export_deleted_runs
 @opt_get_model_version_download_uri
 
-def main(model, output_dir, notebook_formats, stages, versions, export_latest_versions, export_permissions, 
+def main(model, output_dir, notebook_formats, stages, versions, export_latest_versions, 
+        export_deleted_runs, export_permissions, 
         get_model_version_download_uri):
     _logger.info("Options:")
     for k,v in locals().items():
@@ -240,6 +247,7 @@ def main(model, output_dir, notebook_formats, stages, versions, export_latest_ve
         stages = stages,
         versions = versions,
         export_latest_versions = export_latest_versions,
+        export_deleted_runs = export_deleted_runs,
         export_permissions = export_permissions,
         get_model_version_download_uri = get_model_version_download_uri,
         notebook_formats = notebook_formats

@@ -259,7 +259,7 @@ Source: [export_model.py](mlflow_export_import/model/export_model.py).
 ```
 export-model --help
 
-Options:
+Options:                          
   --model TEXT                    Registered model name.  [required]
   --output-dir TEXT               Output directory.  [required]
   --notebook-formats TEXT         Databricks notebook formats. Values are
@@ -276,6 +276,7 @@ Options:
                                   instead of all versions.  [default: False]
   --export-permissions BOOLEAN    Export Databricks permissions.  [default:
                                   False]
+  --export-deleted-runs BOOLEAN   Export deleted runs.  [default: False]
   --get-model-version-download-uri BOOLEAN
                                   Call MLflowClient.get_model_version_download
                                   _uri() for version export.  [default: False]

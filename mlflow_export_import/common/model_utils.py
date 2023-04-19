@@ -32,7 +32,6 @@ def list_model_versions(client, model_name, get_latest_versions=False):
         return list(SearchModelVersionsIterator(client, filter=f"name='{model_name}'"))
 
 
-
 def wait_until_version_is_ready(client, model_name, model_version, sleep_time=1, iterations=100):
     """ Due to blob eventual consistency, wait until a newly created version is in READY state. """
     start = time.time()

@@ -5,12 +5,13 @@ from mlflow_export_import.model.export_model import export_model
 from mlflow_export_import.model.import_model import import_model
 from mlflow_export_import.model.import_model import _extract_model_path, _path_join
 
-import oss_utils_test 
+from oss_utils_test import create_simple_run, create_version
+from oss_utils_test import mk_test_object_name_default, create_dst_model_name
 from compare_utils import compare_models_with_versions, compare_models, compare_versions
 from init_tests import mlflow_context
 
 
-# Test stages
+# == Test stages
 
 def test_export_import_model_1_stage(mlflow_context):
     model_src, model_dst = _run_test_export_import_model_stages(mlflow_context, stages=["Production"] )
@@ -30,7 +31,7 @@ def test_export_import_model_all_stages(mlflow_context):
     compare_models_with_versions(mlflow_context.client_src, mlflow_context.client_dst,  model_src, model_dst, mlflow_context.output_dir)
 
 
-# Test stages and versions
+# == Test stages and versions
 
 def test_export_import_model_both_stages(mlflow_context):
     try:
@@ -40,7 +41,7 @@ def test_export_import_model_both_stages(mlflow_context):
         pass
 
 
-# Test versions
+# == Test versions
 
 def _get_version_ids(model):
     return [vr.version for vr in model.latest_versions ]
@@ -76,19 +77,70 @@ def test_export_import_model_two_from_middle_versions(mlflow_context):
         assert(vr_src.version == vr_src_id)
         compare_versions(mlflow_context.client_src, mlflow_context.client_dst, vr_src, vr_dst, mlflow_context.output_dir)
 
+# == Test export deleted runs
 
-# Internal
+def _run_test_deleted_runs(mlflow_context, delete_run, export_deleted_runs):
+    model_name_src = mk_test_object_name_default()
+    mlflow_context.client_src.create_registered_model(model_name_src)
+
+    create_version(mlflow_context.client_src, model_name_src, "Production")
+    _, run2 = create_version(mlflow_context.client_src, model_name_src, "Staging")
+    versions = mlflow_context.client_src.search_model_versions(filter_string=f"name='{model_name_src}'")
+    if delete_run:
+        mlflow_context.client_src.delete_run(run2.info.run_id)
+    run2 = mlflow_context.client_src.get_run(run2.info.run_id)
+
+    export_model(
+        model_name = model_name_src,
+        output_dir = mlflow_context.output_dir,
+        export_deleted_runs = export_deleted_runs,
+        mlflow_client = mlflow_context.client_src
+    )
+    model_name_dst = create_dst_model_name(model_name_src)
+    import_model(
+        model_name = model_name_dst,
+        experiment_name = model_name_dst,
+        input_dir = mlflow_context.output_dir, 
+        mlflow_client = mlflow_context.client_dst
+    )
+    versions = mlflow_context.client_dst.search_model_versions(filter_string=f"name='{model_name_dst}'")
+    run_lifecycle_stages =  [ mlflow_context.client_dst.get_run(vr.run_id).info.lifecycle_stage for vr in versions ]
+    return versions, run_lifecycle_stages
+
+
+def test_export_delete_Yes_delete_run_No(mlflow_context):
+    " Test: export-deleted-runs==Yes and no run deleted "
+    versions, run_lifecycle_stages  = _run_test_deleted_runs(mlflow_context, False, True)
+    assert len(versions) == 2
+    assert run_lifecycle_stages == ["active", "active"]
+
+
+def test_export_delete_Yes_delete_run_Yes(mlflow_context):
+    " Test: export-deleted-runs==True and run deleted "
+    versions, run_lifecycle_stages = _run_test_deleted_runs(mlflow_context, True, True)
+    assert len(versions) == 2
+    assert run_lifecycle_stages == ["deleted", "active"]
+
+
+def test_export_delete_No_delete_run_Yes(mlflow_context):
+    " Test: export-deleted-runs==False and no run deleted "
+    versions, run_lifecycle_stages = _run_test_deleted_runs(mlflow_context, True, False)
+    assert len(versions) == 1
+    assert run_lifecycle_stages == ["active"]
+
+
+# == Internal
 
 def _run_test_export_import_model_stages(mlflow_context, stages=None, versions=None):
-    model_name_src = oss_utils_test.mk_test_object_name_default()
+    model_name_src = mk_test_object_name_default()
     desc = "Hello decription"
     tags = { "city": "franconia" }
     model_src = mlflow_context.client_src.create_registered_model(model_name_src, tags, desc)
 
-    _create_version(mlflow_context.client_src, model_name_src, "Production")
-    _create_version(mlflow_context.client_src, model_name_src, "Staging")
-    _create_version(mlflow_context.client_src, model_name_src, "Archived")
-    _create_version(mlflow_context.client_src, model_name_src, "None")
+    create_version(mlflow_context.client_src, model_name_src, "Production")
+    create_version(mlflow_context.client_src, model_name_src, "Staging")
+    create_version(mlflow_context.client_src, model_name_src, "Archived")
+    create_version(mlflow_context.client_src, model_name_src, "None")
 
     model_src = mlflow_context.client_src.get_registered_model(model_name_src)
     export_model(
@@ -99,7 +151,7 @@ def _run_test_export_import_model_stages(mlflow_context, stages=None, versions=N
         mlflow_client = mlflow_context.client_src
     )
 
-    model_name_dst = oss_utils_test.create_dst_model_name(model_name_src)
+    model_name_dst = create_dst_model_name(model_name_src)
     import_model(
         model_name = model_name_dst,
         experiment_name = model_name_dst,
@@ -114,23 +166,12 @@ def _run_test_export_import_model_stages(mlflow_context, stages=None, versions=N
     return model_src, model_dst
 
 
-def _create_version(client, model_name, stage=None):
-    run = _create_run(client)
-    source = f"{run.info.artifact_uri}/model"
-    desc = "My version desc"
-    tags = { "city": "franconia" }
-    vr = client.create_model_version(model_name, source, run.info.run_id, description=desc, tags=tags)
-    if stage:
-        vr = client.transition_model_version_stage(model_name, vr.version, stage)
-    return vr
-
-
 def _create_run(client):
-    _, run = oss_utils_test.create_simple_run(client)
+    _, run = create_simple_run(client)
     return client.get_run(run.info.run_id)
 
 
-# Parsing test for _extract_model_path to extract from version `source` field
+# == Test parsing for _extract_model_path to extract from version `source` field
 
 _exp_id = "1812"
 _run_id = "48cf29167ddb4e098da780f0959fb4cf"

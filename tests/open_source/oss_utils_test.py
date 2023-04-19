@@ -72,6 +72,17 @@ def create_test_experiment(client, num_runs, mk_test_object_name=mk_test_object_
     return exp
 
 
+def create_version(client, model_name, stage=None, archive_existing_versions=False):
+    _, run = create_simple_run(client)
+    source = f"{run.info.artifact_uri}/model"
+    desc = "My version desc"
+    tags = { "city": "yaxchilan" }
+    vr = client.create_model_version(model_name, source, run.info.run_id, description=desc, tags=tags)
+    if stage:
+        vr = client.transition_model_version_stage(model_name, vr.version, stage, archive_existing_versions)
+    return vr, run 
+
+
 def list_experiments(client):
     return [ exp for exp in client.search_experiments() if exp.name.startswith(TEST_OBJECT_PREFIX) ]
 

@@ -195,7 +195,8 @@ class ModelImporter(BaseModelImporter):
         for vr in model_dct["versions"]:
             try:
                 run_id = self._import_run(input_dir, experiment_name, vr)
-                self.import_version(model_name, vr, run_id, sleep_time)
+                if run_id:
+                    self.import_version(model_name, vr, run_id, sleep_time)
             except RestException as e:
                 msg = { "model": model_name, "version": vr["version"], "experiment": experiment_name, "run_id": run_id, "exception": str(e) }
                 _logger.error(f"Failed to import model version: {msg}")
@@ -209,14 +210,18 @@ class ModelImporter(BaseModelImporter):
         current_stage = vr["current_stage"]
         run_artifact_uri = vr.get("_run_artifact_uri",None)
         run_dir = os.path.join(input_dir,run_id)
+        if not os.path.exists(run_dir):
+            msg = { "model": vr["name"], "version": vr["version"], "experiment": experiment_name, "run_id": run_id }
+            _logger.warning(f"Cannot import model version because its run does not exist: {msg}")
+            return None
         _logger.info(f"  Version {vr['version']}:")
         _logger.info(f"    current_stage: {current_stage}:")
         _logger.info( "    Source run - run to import:")
-        _logger.info(f"      run_id: {run_id}")
+        _logger.info(f"      run_id:           {run_id}")
         _logger.info(f"      run_artifact_uri: {run_artifact_uri}")
         _logger.info(f"      source:           {source}")
-        model_path = _extract_model_path(source, run_id)
-        _logger.info(f"      model_path:   {model_path}")
+        model_artifact = _extract_model_path(source, run_id)
+        _logger.info(f"      model_artifact:   {model_artifact}")
         dst_run,_ = self.run_importer.import_run(
             experiment_name = experiment_name,
             input_dir = run_dir
@@ -226,7 +231,7 @@ class ModelImporter(BaseModelImporter):
         _logger.info( "    Destination run - imported run:")
         _logger.info(f"      run_id: {dst_run_id}")
         _logger.info(f"      run_artifact_uri: {run.info.artifact_uri}")
-        source = _path_join(run.info.artifact_uri, model_path)
+        source = _path_join(run.info.artifact_uri, model_artifact)
         _logger.info(f"      source:           {source}")
         return dst_run_id
 

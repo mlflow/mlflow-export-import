@@ -106,7 +106,7 @@ def _run_export_import(mlflow_context, stages, archive_existing_versions=False):
     model_name_src = oss_utils_test.mk_test_object_name_default()
     model_src = mlflow_context.client_src.create_registered_model(model_name_src)
     for stage in stages:
-        _create_version(mlflow_context.client_src, model_name_src, stage, archive_existing_versions)
+        oss_utils_test.create_version(mlflow_context.client_src, model_name_src, stage, archive_existing_versions)
     model_src = mlflow_context.client_src.get_registered_model(model_name_src)
     export_model(
         model_name = model_name_src, 
@@ -126,15 +126,6 @@ def _run_export_import(mlflow_context, stages, archive_existing_versions=False):
 
     model_dst = mlflow_context.client_dst.get_registered_model(model_name_dst)
     return model_src, model_dst
-
-
-def _create_version(client, model_name, stage=None, archive_existing_versions=False):
-    run = _create_run(client)
-    source = f"{run.info.artifact_uri}/model"
-    vr = client.create_model_version(model_name, source, run.info.run_id, description="Hello", tags={"city": "Elk"})
-    if stage:
-        vr = client.transition_model_version_stage(model_name, vr.version, stage, archive_existing_versions)
-    return vr
 
 
 def _create_run(client):
