@@ -50,7 +50,7 @@ def _export_experiment(mlflow_client, exp_id_or_name, output_dir, export_permiss
             "duration": duration
         }
         export_results.append(result)
-        _logger.info(f"Done exporting experiment {result}")
+        _logger.info(f"Done exporting experiment: {result}")
     except Exception:
         import traceback
         traceback.print_exc()
@@ -139,7 +139,7 @@ def export_experiments(
     _logger.info(f"{ok_runs}/{total_runs} runs succesfully exported")
     if failed_runs > 0:
         _logger.info(f"{failed_runs}/{total_runs} runs failed")
-    _logger.info(f"Duration for experiments export: {duration} seconds")
+    _logger.info(f"Duration for {len(experiments)} experiments export: {duration} seconds")
 
     return info_attr
 

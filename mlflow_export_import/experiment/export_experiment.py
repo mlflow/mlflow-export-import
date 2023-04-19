@@ -90,14 +90,15 @@ class ExperimentExporter():
         :return: Number of successful and number of failed runs.
         """
         exp = mlflow_utils.get_experiment(self.mlflow_client, experiment_id_or_name)
-        _logger.info(f"Exporting experiment '{exp.name}' (ID {exp.experiment_id}) to '{output_dir}'")
+        msg = { "name": exp.name, "id": exp.experiment_id, "lifecycle_stage": exp.lifecycle_stage }
+        _logger.info(f"Exporting experiment: {msg}")
         ok_run_ids = []
         failed_run_ids = []
         num_runs_exported = 0
         if run_ids:
             for j,run_id in enumerate(run_ids):
                 run = self.mlflow_client.get_run(run_id)
-                self._export_run(j, run, output_dir, ok_run_ids, failed_run_ids)
+                self._export_run(run, output_dir, ok_run_ids, failed_run_ids)
                 num_runs_exported += 1
         else:
             kwargs = {}
@@ -107,7 +108,7 @@ class ExperimentExporter():
                 from mlflow.entities import ViewType
                 kwargs["view_type"] = ViewType.ALL
             for j,run in enumerate(SearchRunsIterator(self.mlflow_client, exp.experiment_id, **kwargs)):
-                self._export_run(j, run, output_dir, ok_run_ids, failed_run_ids)
+                self._export_run(run, output_dir, ok_run_ids, failed_run_ids)
                 num_runs_exported += 1
 
         info_attr = {
@@ -137,7 +138,7 @@ class ExperimentExporter():
         return len(ok_run_ids), len(failed_run_ids) 
 
 
-    def _export_run(self, idx, run, output_dir, ok_run_ids, failed_run_ids):
+    def _export_run(self, run, output_dir, ok_run_ids, failed_run_ids):
         if self.run_start_time and run.info.start_time < self.run_start_time:
             msg = { "run_id": {run.info.run_id}, 
                 "experiment_id": {run.info.experiment_id},
@@ -147,7 +148,6 @@ class ExperimentExporter():
             return
 
         run_dir = os.path.join(output_dir, run.info.run_id)
-        _logger.info(f"Exporting run {idx+1}: {run.info.run_id} ({run.info.lifecycle_stage}) of experiment {run.info.experiment_id}")
         is_success = export_run(
             run_id = run.info.run_id,
             output_dir = run_dir,

@@ -83,8 +83,8 @@ class RunExporter:
         run = self.mlflow_client.get_run(run_id)
         if run.info.lifecycle_stage == "deleted" and not self.export_deleted_runs:
             return False
-        msg = { "run_id": run.info.run_id, "lifecycle_stage": run.info.lifecycle_stage }
-        _logger.info(f"Exporting run {msg}")
+        msg = { "run_id": run.info.run_id, "lifecycle_stage": run.info.lifecycle_stage, "experiment_id": run.info.experiment_id }
+        _logger.info(f"Exporting run: {msg}")
         tags = run.data.tags
         tags = dict(sorted(tags.items()))
         
