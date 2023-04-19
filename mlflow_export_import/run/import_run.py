@@ -31,8 +31,9 @@ class RunImporter():
     def __init__(self, 
             mlflow_client, 
             import_source_tags=False,
-            mlmodel_fix=True, 
+            mlmodel_fix=True,
             use_src_user_id=False, \
+            in_azure_ml=False, \
             dst_notebook_dir_add_run_id=False):
         """ 
         :param mlflow_client: MLflow client.
@@ -50,6 +51,8 @@ class RunImporter():
         self.mlmodel_fix = mlmodel_fix
         self.use_src_user_id = use_src_user_id
         self.in_databricks = "DATABRICKS_RUNTIME_VERSION" in os.environ
+        self.in_azure_ml = in_azure_ml
+        
         self.dst_notebook_dir_add_run_id = dst_notebook_dir_add_run_id
         self.dbx_client = DatabricksHttpClient()
         self.import_source_tags = import_source_tags
@@ -132,7 +135,7 @@ class RunImporter():
             run_id, 
             MAX_PARAMS_TAGS_PER_BATCH, 
             self.import_source_tags,
-            self.in_databricks, 
+            self.in_databricks or self.in_azure_ml, 
             src_user_id, 
             self.use_src_user_id
     )
