@@ -45,9 +45,9 @@ setup(
             "export-model = mlflow_export_import.model.export_model:main",
             "export-model-list = mlflow_export_import.model.export_model_list:main",
             "import-model = mlflow_export_import.model.import_model:main",
-            "list-models = mlflow_export_import.model.list_registered_models:main",
             "download-notebook = mlflow_export_import.notebook.download_notebook:main",
-            "http-client = mlflow_export_import.client.http_client:main"
+            "http-client = mlflow_export_import.client.http_client:main",
+            "list-models = mlflow_export_import.tools.list_registered_models:main"
          ]
       }
 )
