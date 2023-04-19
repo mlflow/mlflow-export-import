@@ -114,7 +114,7 @@ def _run_export_import(mlflow_context, stages, archive_existing_versions=False):
         mlflow_client = mlflow_context.client_src
     )
 
-    model_name_dst = oss_utils_test.create_dst_model_name(model_name_src)
+    model_name_dst = oss_utils_test.mk_dst_model_name(model_name_src)
     import_model(
         model_name = model_name_dst,
         experiment_name = model_name_dst,

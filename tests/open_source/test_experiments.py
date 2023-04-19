@@ -1,7 +1,7 @@
 from mlflow.entities import ViewType
 from mlflow_export_import.experiment.export_experiment import export_experiment
 from mlflow_export_import.experiment.import_experiment import import_experiment
-from oss_utils_test import create_simple_run, init_output_dirs, create_dst_experiment_name
+from oss_utils_test import create_simple_run, init_output_dirs, mk_dst_experiment_name
 from oss_utils_test import _create_simple_run
 from oss_utils_test import create_test_experiment
 from compare_utils import compare_runs, compare_experiment_tags
@@ -20,7 +20,7 @@ def _init_exp_test(mlflow_context, import_source_tags=False):
         output_dir = mlflow_context.output_dir
     )
 
-    dst_exp_name = create_dst_experiment_name(exp1.name)
+    dst_exp_name = mk_dst_experiment_name(exp1.name)
 
     import_experiment(
         mlflow_client = mlflow_context.client_dst,
@@ -84,7 +84,7 @@ def test_export_deleted_runs(mlflow_context):
         export_deleted_runs = True
     )
 
-    dst_exp_name = create_dst_experiment_name(exp1.name)
+    dst_exp_name = mk_dst_experiment_name(exp1.name)
     import_experiment(
         mlflow_client = mlflow_context.client_dst,
         experiment_name = dst_exp_name,
@@ -132,7 +132,7 @@ def _run_test_run_start_date(mlflow_context, sleep_time):
         run_start_time = run_start_time
     )
 
-    dst_exp_name = create_dst_experiment_name(exp1.name)
+    dst_exp_name = mk_dst_experiment_name(exp1.name)
 
     import_experiment(
         mlflow_client = mlflow_context.client_dst,

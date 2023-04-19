@@ -1,6 +1,6 @@
 from mlflow_export_import.run.export_run import export_run
 from mlflow_export_import.run.import_run import import_run
-from oss_utils_test import create_simple_run, create_dst_experiment_name
+from oss_utils_test import create_simple_run, mk_dst_experiment_name
 from utils_test import create_output_dir
 from compare_utils import compare_runs
 from init_tests import mlflow_context
@@ -16,7 +16,7 @@ def init_run_test(mlflow_context, run_name=None, use_metric_steps=False, import_
         output_dir = mlflow_context.output_run_dir,
         mlflow_client = mlflow_context.client_src
     )
-    experiment_name = create_dst_experiment_name(exp.name)
+    experiment_name = mk_dst_experiment_name(exp.name)
     run2,_ = import_run(
         experiment_name = experiment_name, 
         input_dir = mlflow_context.output_run_dir,
@@ -61,7 +61,7 @@ def test_model_predictions(mlflow_context):
         output_dir = mlflow_context.output_run_dir,
         mlflow_client = mlflow_context.client_src
     )
-    exp_name2 = create_dst_experiment_name(exp1.name)
+    exp_name2 = mk_dst_experiment_name(exp1.name)
     res = import_run(
         experiment_name = exp_name2, 
         input_dir = mlflow_context.output_run_dir,

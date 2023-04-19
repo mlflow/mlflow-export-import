@@ -6,7 +6,7 @@ from mlflow_export_import.model.import_model import import_model
 from mlflow_export_import.model.import_model import _extract_model_path, _path_join
 
 from oss_utils_test import create_simple_run, create_version
-from oss_utils_test import mk_test_object_name_default, create_dst_model_name
+from oss_utils_test import mk_test_object_name_default, mk_dst_model_name
 from compare_utils import compare_models_with_versions, compare_models, compare_versions
 from init_tests import mlflow_context
 
@@ -96,7 +96,7 @@ def _run_test_deleted_runs(mlflow_context, delete_run, export_deleted_runs):
         export_deleted_runs = export_deleted_runs,
         mlflow_client = mlflow_context.client_src
     )
-    model_name_dst = create_dst_model_name(model_name_src)
+    model_name_dst = mk_dst_model_name(model_name_src)
     import_model(
         model_name = model_name_dst,
         experiment_name = model_name_dst,
@@ -151,7 +151,7 @@ def _run_test_export_import_model_stages(mlflow_context, stages=None, versions=N
         mlflow_client = mlflow_context.client_src
     )
 
-    model_name_dst = create_dst_model_name(model_name_src)
+    model_name_dst = mk_dst_model_name(model_name_src)
     import_model(
         model_name = model_name_dst,
         experiment_name = model_name_dst,

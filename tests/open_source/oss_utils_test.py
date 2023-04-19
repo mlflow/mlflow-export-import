@@ -27,9 +27,18 @@ TEST_OBJECT_PREFIX = "test_exim"
 def mk_test_object_name_default():
     return f"{TEST_OBJECT_PREFIX}_{mk_uuid()}"
 
+
+def mk_dst_experiment_name(experiment_name):
+    # NOTE: OK as is if running two tracking servers. If running on one tracking server, will need to adjust by adding random prefix."
+    return experiment_name
+
+
+def mk_dst_model_name(model_name):
+    return model_name
+
     
 def create_experiment(client, mk_test_object_name=mk_test_object_name_default):
-    exp_name = f"{mk_test_object_name()}"
+    exp_name = mk_test_object_name()
     mlflow.set_experiment(exp_name)
     exp = client.get_experiment_by_name(exp_name)
     client.set_experiment_tag(exp.experiment_id, "version_mlflow", mlflow.__version__)
@@ -39,12 +48,15 @@ def create_experiment(client, mk_test_object_name=mk_test_object_name_default):
         client.delete_run(info.run_id)
     return exp
 
+
 def create_simple_run(client, run_name=None, use_metric_steps=False):
+    " Create run and create experiment "
     exp = create_experiment(client)
     run = _create_simple_run(client, run_name=run_name, use_metric_steps=use_metric_steps)
     return exp, run
 
 def _create_simple_run(client, run_name=None, use_metric_steps=False):
+    " Create run without creating experiment "
     max_depth = 4
     model = sklearn_utils.create_sklearn_model(max_depth)
     with mlflow.start_run(run_name=run_name) as run:
@@ -115,14 +127,6 @@ def dump_tags(tags, msg=""):
     for k,v in tags.items():
         print(f"  {k}: {v}")
 
-
-def create_dst_experiment_name(experiment_name):
-    # NOTE: OK as is if running two tracking servers. If running on one tracking server, will need to adjust by adding random prefix."
-    return experiment_name
-
-
-def create_dst_model_name(model_name):
-    return model_name
 
 # == Simple create experiment
 
