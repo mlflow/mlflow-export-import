@@ -5,6 +5,7 @@ Exports experiments to a directory.
 import os
 import time
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
 import click
 import mlflow
 
@@ -23,40 +24,6 @@ from mlflow_export_import.experiment.export_experiment import export_experiment
 
 _logger = utils.getLogger(__name__)
 
-
-def _export_experiment(mlflow_client, exp_id_or_name, output_dir, export_permissions, notebook_formats, export_results, 
-        run_start_time, export_deleted_runs, run_ids):
-    exp = mlflow_utils.get_experiment(mlflow_client, exp_id_or_name)
-    exp_output_dir = os.path.join(output_dir, exp.experiment_id)
-    ok_runs = -1; failed_runs = -1
-    try:
-        start_time = time.time()
-        ok_runs, failed_runs = export_experiment(
-            experiment_id_or_name = exp.experiment_id,
-            output_dir = exp_output_dir,
-            run_ids = run_ids,
-            export_permissions = export_permissions,
-            run_start_time = run_start_time,
-            export_deleted_runs = export_deleted_runs,
-            notebook_formats = notebook_formats,
-            mlflow_client = mlflow_client
-        )
-        duration = round(time.time() - start_time, 1)
-        result = {
-            "id" : exp.experiment_id,
-            "name": exp.name,
-            "ok_runs": ok_runs,
-            "failed_runs": failed_runs,
-            "duration": duration
-        }
-        export_results.append(result)
-        _logger.info(f"Done exporting experiment: {result}")
-    except Exception:
-        import traceback
-        traceback.print_exc()
-    return ok_runs, failed_runs
-
-
 def export_experiments(
         experiments,
         output_dir,
@@ -73,6 +40,7 @@ def export_experiments(
       - List of experiment IDs
       - Dictionary whose key is an experiment and the value is a list of run IDs 
       - String with comma-delimited experiment names or IDs such as 'sklearn_wine,sklearn_iris' or '1,2'
+    :return: Dictionary of summary information
     """
     mlflow_client = mlflow_client or mlflow.client.MlflowClient()
     start_time = time.time()
@@ -117,15 +85,18 @@ def export_experiments(
     duration = round(time.time() - start_time, 1)
     ok_runs = 0
     failed_runs = 0
+    experiment_names = []
     for future in futures:
         result = future.result()
-        ok_runs += result[0]
-        failed_runs += result[1]
+        ok_runs += result.ok_runs
+        failed_runs += result.failed_runs
+        experiment_names.append(result.name)
     
     total_runs = ok_runs + failed_runs
     duration = round(time.time() - start_time, 1)
 
     info_attr = {
+      "experiment_names": experiment_names,
       "duration": duration,
       "experiments": len(experiments),
       "total_runs": total_runs,
@@ -142,6 +113,46 @@ def export_experiments(
     _logger.info(f"Duration for {len(experiments)} experiments export: {duration} seconds")
 
     return info_attr
+
+
+def _export_experiment(mlflow_client, exp_id_or_name, output_dir, export_permissions, notebook_formats, export_results, 
+        run_start_time, export_deleted_runs, run_ids):
+    exp = mlflow_utils.get_experiment(mlflow_client, exp_id_or_name)
+    exp_output_dir = os.path.join(output_dir, exp.experiment_id)
+    ok_runs = -1; failed_runs = -1
+    try:
+        start_time = time.time()
+        ok_runs, failed_runs = export_experiment(
+            experiment_id_or_name = exp.experiment_id,
+            output_dir = exp_output_dir,
+            run_ids = run_ids,
+            export_permissions = export_permissions,
+            run_start_time = run_start_time,
+            export_deleted_runs = export_deleted_runs,
+            notebook_formats = notebook_formats,
+            mlflow_client = mlflow_client
+        )
+        duration = round(time.time() - start_time, 1)
+        result = {
+            "id" : exp.experiment_id,
+            "name": exp.name,
+            "ok_runs": ok_runs,
+            "failed_runs": failed_runs,
+            "duration": duration
+        }
+        export_results.append(result)
+        _logger.info(f"Done exporting experiment: {result}")
+    except Exception:
+        import traceback
+        traceback.print_exc()
+    return Result(exp.name, ok_runs, failed_runs)
+    
+
+@dataclass()
+class Result:
+    name: str = None
+    ok_runs: int = 0
+    failed_runs: int = 0
 
 
 @click.command()
