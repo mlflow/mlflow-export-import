@@ -42,10 +42,11 @@ class HttpClient():
     def get(self, resource, params=None):
         return json.loads(self._get(resource, params).text)
 
+
     def _post(self, resource, data=None):
         """ Executes an HTTP POST call
         :param resource: Relative path name of resource such as runs/search
-        :param data: Post request payload
+        :param data: Request request payload
         """
         uri = self._mk_uri(resource)
         data = json.dumps(data) if data else None
@@ -55,6 +56,34 @@ class HttpClient():
 
     def post(self, resource, data=None):
         return json.loads(self._post(resource, data).text)
+
+
+    def _put(self, resource, data=None):
+        """ Executes an HTTP PUT call
+        :param resource: Relative path name of resource.
+        :param data: Request payload
+        """
+        uri = self._mk_uri(resource)
+        rsp = requests.put(uri, headers=self._mk_headers(), data=data, timeout=_TIMEOUT)
+        self._check_response(rsp, uri)
+        return rsp
+
+    def put(self, resource, data=None):
+        return json.loads(self._put(resource, data).text)
+
+
+    def _patch(self, resource, data=None):
+        """ Executes an HTTP PATCH call
+        :param resource: Relative path name of resource.
+        :param data: Request payload
+        """
+        uri = self._mk_uri(resource)
+        rsp = requests.patch(uri, headers=self._mk_headers(), data=data, timeout=_TIMEOUT)
+        self._check_response(rsp, uri)
+        return rsp
+
+    def patch(self, resource, data=None):
+        return json.loads(self._patch(resource, data).text)
 
 
     def _delete(self, resource, data=None):
