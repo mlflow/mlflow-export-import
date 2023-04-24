@@ -21,7 +21,7 @@ from mlflow_export_import.common.click_options import (
 )
 from mlflow_export_import.common import utils, mlflow_utils, io_utils
 from mlflow_export_import.common.filesystem import mk_local_path
-from mlflow_export_import.common.find_artifacts import find_artifacts
+from mlflow_export_import.common.find_artifacts import find_run_model_names
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.client.http_client import DatabricksHttpClient
@@ -162,16 +162,13 @@ class RunImporter():
     def _update_mlmodel_run_id(self, run_id):
         """ 
         Workaround to fix the run_id in the destination MLmodel file since there is no method to get all model artifacts of a run.
-
-        Since an MLflow run does not keeps track of its models, there is no method to retrieve the artifact path to all its models.
+        Since an MLflow run does not keep track of its models, there is no method to retrieve the artifact path to all its models.
         This workaround recursively searches the run's root artifact directory for all MLmodel files, and assumes their directory
         represents a path to the model.
         """
-
-        mlmodel_paths = find_artifacts(run_id, "", "MLmodel")
-        for mlmodel_path in mlmodel_paths:
-            model_path = mlmodel_path.replace("/MLmodel","")
-            download_uri = f"runs:/{run_id}/{mlmodel_path}"
+        mlmodel_paths = find_run_model_names(run_id)
+        for model_path in mlmodel_paths:
+            download_uri = f"runs:/{run_id}/{model_path}/MLmodel"
             local_path = mlflow_utils.download_artifacts(self.mlflow_client, download_uri)
             mlmodel = io_utils.read_file(local_path, "yaml")
             mlmodel["run_id"] = run_id
