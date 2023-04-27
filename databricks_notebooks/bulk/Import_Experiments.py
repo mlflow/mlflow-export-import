@@ -1,12 +1,12 @@
 # Databricks notebook source
 # MAGIC %md ## Import Experiments
-# MAGIC 
+# MAGIC
 # MAGIC Widgets
 # MAGIC * `1. Input directory` - directory of exported experiments.
 # MAGIC * `2. Import source tags`
 # MAGIC * `3. Experiment rename file` - Experiment rename file.
 # MAGIC * `4. Use threads` - use multi-threaded import.
-# MAGIC 
+# MAGIC
 # MAGIC See https://github.com/mlflow/mlflow-export-import/blob/master/README_bulk.md#Import-experiments.
 
 # COMMAND ----------
@@ -40,11 +40,21 @@ assert_widget(input_dir, "1. Input directory")
 
 # COMMAND ----------
 
-from mlflow_export_import.bulk.import_experiments import import_experiments
+# MAGIC %%capture captured
+# MAGIC
+# MAGIC from mlflow_export_import.bulk.import_experiments import import_experiments
+# MAGIC
+# MAGIC import_experiments(
+# MAGIC     input_dir = input_dir, 
+# MAGIC     import_source_tags = import_source_tags,
+# MAGIC     experiment_renames = experiment_rename_file,
+# MAGIC     use_threads = use_threads
+# MAGIC )
 
-import_experiments(
-    input_dir = input_dir, 
-    import_source_tags = import_source_tags,
-    experiment_renames = experiment_rename_file,
-    use_threads = use_threads
-)
+# COMMAND ----------
+
+# DBTITLE 1,write log file
+filepath = "/mnt/public-blobs/dcoles/mlflow_import_experiments_log.txt"
+
+dbutils.fs.rm(filepath)
+dbutils.fs.put(filepath, captured.stdout)
