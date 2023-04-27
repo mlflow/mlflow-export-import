@@ -10,7 +10,7 @@ def create_databrick_config_file(secrets_scope, secrets_key, databricks_config_f
 
     import os
     if not databricks_config_file:
-        databricks_config_file = os.path.join("/tmp", f".databricks.cfg-{user}")
+        databricks_config_file = os.path.join("/tmp", f".databrickscfg-{user}")
     print(f"DATABRICKS_CONFIG_FILE: {databricks_config_file}")
     os.environ["DATABRICKS_CONFIG_FILE"] = databricks_config_file
     dbutils.fs.put(f"file:///{databricks_config_file}",f"[DEFAULT]\nhost=https://{host_name}\ntoken = "+token,overwrite=True)
