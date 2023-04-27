@@ -1,7 +1,10 @@
 
 from mlflow_export_import.client.http_client import DatabricksHttpClient
 from mlflow_export_import.common import MlflowExportImportException
-#from mlflow_export_import.common import utils
+from mlflow_export_import.common import utils
+
+_logger = utils.getLogger(__name__)
+
 
 dbx_client = DatabricksHttpClient()
 
@@ -22,11 +25,5 @@ def _call(path, root=None):
     try:
         return dbx_client.get(path)
     except MlflowExportImportException as e:
-        from mlflow_export_import.common import mlflow_utils
-        #print("ERROR:",e)
-        print("ERROR:",e.kwargs)
-        mlflow_utils.dump_exception(e)
-        error = { "error": e.kwargs }
-        if root:
-            error = { root: error }
-        return error
+        _logger.error(e.kwargs)
+        return {}
