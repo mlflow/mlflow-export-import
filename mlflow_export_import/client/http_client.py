@@ -36,7 +36,7 @@ class HttpClient():
         """
         uri = self._mk_uri(resource)
         rsp = requests.get(uri, headers=self._mk_headers(), json=params, timeout=_TIMEOUT)
-        self._check_response(rsp, uri, params)
+        self._check_response(rsp, params)
         return rsp
 
     def get(self, resource, params=None):
@@ -51,7 +51,7 @@ class HttpClient():
         uri = self._mk_uri(resource)
         data = json.dumps(data) if data else None
         rsp = requests.post(uri, headers=self._mk_headers(), data=data, timeout=_TIMEOUT)
-        self._check_response(rsp, uri, data)
+        self._check_response(rsp, data)
         return rsp
 
     def post(self, resource, data=None):
@@ -65,7 +65,7 @@ class HttpClient():
         """
         uri = self._mk_uri(resource)
         rsp = requests.put(uri, headers=self._mk_headers(), data=data, timeout=_TIMEOUT)
-        self._check_response(rsp, uri)
+        self._check_response(rsp)
         return rsp
 
     def put(self, resource, data=None):
@@ -79,7 +79,7 @@ class HttpClient():
         """
         uri = self._mk_uri(resource)
         rsp = requests.patch(uri, headers=self._mk_headers(), data=data, timeout=_TIMEOUT)
-        self._check_response(rsp, uri)
+        self._check_response(rsp)
         return rsp
 
     def patch(self, resource, data=None):
@@ -94,7 +94,7 @@ class HttpClient():
         uri = self._mk_uri(resource)
         data = json.dumps(data) if data else None
         rsp = requests.delete(uri, headers=self._mk_headers(), data=data, timeout=_TIMEOUT)
-        self._check_response(rsp, uri, data)
+        self._check_response(rsp, data)
         return rsp
 
     def delete(self, resource, data=None):
@@ -110,12 +110,22 @@ class HttpClient():
     def _mk_uri(self, resource):
         return f"{self.api_uri}/{resource}"
 
-    def _check_response(self, rsp, uri, params=None):
+    def _get_response_text(self, rsp):
+        try:
+            return rsp.json()
+        except requests.exceptions.JSONDecodeError:
+            return rsp.text
+
+    def _check_response(self, rsp, params=None):
         if rsp.status_code < 200 or rsp.status_code > 299:
-            raise MlflowExportImportException(rsp.reason,
-               http_status_code=rsp.status_code,
-               http_reason=rsp.reason,
-               uri=uri, params=params)
+            raise MlflowExportImportException(
+               rsp.reason,
+               http_status_code = rsp.status_code,
+               http_reason = rsp.reason,
+               uri = rsp.url, 
+               params = params,
+               text = self._get_response_text(rsp)
+            )
 
     def __repr__(self): 
         return self.api_uri
