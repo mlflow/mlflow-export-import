@@ -10,11 +10,11 @@ import numpy as np
 # COMMAND ----------
 
 # MAGIC %sh 
-# MAGIC find /dbfs/mnt/ccidsdatascidatalake/mlflow-migration/experiments/ -type d -maxdepth 2 > exported_experiments
+# MAGIC find /dbfs/mnt/ccidsdatascidatalake/mlflow-migration/experiments/experiments -type d -maxdepth 2 > exported_experiments
 
 # COMMAND ----------
 
-exp_pat = "^.*\/dbfs\/mnt\/ccidsdatascidatalake\/mlflow-migration\/experiments\/(.*)$"
+exp_pat = "^.*\/dbfs\/mnt\/ccidsdatascidatalake\/mlflow-migration\/experiments\/experiments\/(.*)$"
 
 filepath = "exported_experiments"
 capture = [re.findall(exp_pat, line) for line in open(filepath)]
@@ -25,7 +25,7 @@ def parse_exp_run(s):
   res = s.split("/")
   return res if len(res)==2 else [*res,None]
 
-parsed = np.array([parse_exp_run(c[0]) for c in capture if c[0]])
+parsed = np.array([parse_exp_run(c[0]) for c in capture if c])
 
 df_parsed = pd.DataFrame(dict(experiment_id=parsed[:,0], run_id=parsed[:,1]))
 
@@ -39,7 +39,7 @@ exp_df.columns = ["n_runs"]
 # COMMAND ----------
 
 # MAGIC %sh 
-# MAGIC find /dbfs/mnt/ccidsdatascidatalake/mlflow-migration/models/ -maxdepth 2 -mindepth 2 > exported_models
+# MAGIC ls /dbfs/mnt/ccidsdatascidatalake/mlflow-migration/experiments/models/ > exported_models
 
 # COMMAND ----------
 
