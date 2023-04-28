@@ -174,6 +174,12 @@ def main(api, resource, method, params, data, output_file, verbose):
     elif "POST" == method:
         rsp = client._post(resource, data)
         write_output(rsp, output_file)
+    elif "PUT" == method:
+        rsp = client._put(resource, data)
+        write_output(rsp, output_file)
+    elif "PATCH" == method:
+        rsp = client._patch(resource, data)
+        write_output(rsp, output_file)
     else:
         _logger.error(f"Unsupported HTTP method '{method}'")
 
