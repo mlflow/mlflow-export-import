@@ -60,7 +60,7 @@ class HttpClient():
 
     def _put(self, resource, data=None):
         """ Executes an HTTP PUT call
-        :param resource: Relative path name of resource.
+        :param resource: Relative path name of resource
         :param data: Request payload
         """
         uri = self._mk_uri(resource)
@@ -74,7 +74,7 @@ class HttpClient():
 
     def _patch(self, resource, data=None):
         """ Executes an HTTP PATCH call
-        :param resource: Relative path name of resource.
+        :param resource: Relative path name of resource
         :param data: Request payload
         """
         uri = self._mk_uri(resource)
@@ -144,14 +144,20 @@ class MlflowHttpClient(HttpClient):
 @click.command()
 @click.option("--api", help="API: mlflow|databricks.", default="mlflow", type=str)
 @click.option("--resource", help="API resource such as 'experiments/search'.", required=True, type=str)
-@click.option("--method", help="HTTP method: GET|POST.", default="GET", type=str)
+@click.option("--method", help="HTTP method: GET|POST|PUT|PATCH|DELETE.", default="GET", type=str)
 @click.option("--params", help="HTTP GET query parameters as JSON.", required=False, type=str)
 @click.option("--data", help="HTTP POST data as JSON.", required=False, type=str)
 @click.option("--output-file", help="Output file.", required=False, type=str)
-@click.option("--verbose", help="Verbose.", type=bool, default=False, show_default=True)
+@click.option("--verbose", help="Verbose.", type=bool, default=True, show_default=True)
 
 def main(api, resource, method, params, data, output_file, verbose):
-    def write_output(rsp, output_file):
+    if verbose:
+        _logger.info("Options:")
+        for k,v in locals().items():
+            _logger.info(f"  {k}: {v}")
+
+
+    def _write_output(rsp, output_file):
         if output_file:
             _logger.info(f"Output file: {output_file}")
             with open(output_file, "w", encoding="utf-8") as f:
@@ -159,10 +165,15 @@ def main(api, resource, method, params, data, output_file, verbose):
         else:
             _logger.info(rsp.text)
 
-    if verbose:
-        _logger.info("Options:")
-        for k,v in locals().items():
-            _logger.info(f"  {k}: {v}")
+    def _get_params(params):
+        if not params:
+            return params
+        if params.startswith("@"):
+            with open(params[1:], "r", encoding="utf-8") as f:
+                return f.read()
+        else:
+            return params
+
 
     client = DatabricksHttpClient() if api == "databricks" else MlflowHttpClient()
     method = method.upper() 
@@ -170,16 +181,17 @@ def main(api, resource, method, params, data, output_file, verbose):
         if params:
             params = json.loads(params)
         rsp = client._get(resource, params)
-        write_output(rsp, output_file)
+        _write_output(rsp, output_file)
     elif "POST" == method:
-        rsp = client._post(resource, data)
-        write_output(rsp, output_file)
+        rsp = client._post(resource, _get_params(data))
+        _write_output(rsp, output_file)
     elif "PUT" == method:
-        rsp = client._put(resource, data)
-        write_output(rsp, output_file)
+        rsp = client._put(resource, _get_params(data))
+        _write_output(rsp, output_file)
     elif "PATCH" == method:
-        rsp = client._patch(resource, data)
-        write_output(rsp, output_file)
+        data = _get_params(data)
+        rsp = client._patch(resource, _get_params(data))
+        _write_output(rsp, output_file)
     else:
         _logger.error(f"Unsupported HTTP method '{method}'")
 
