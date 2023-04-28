@@ -102,7 +102,7 @@ def _export_models(
     for model_name in model_names:
         _logger.info(f"  {model_name}")
 
-    notebook_formats = utils.string_to_list(notebook_formats),
+    notebook_formats = utils.string_to_list(notebook_formats)
     futures = []
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for model_name in model_names:
