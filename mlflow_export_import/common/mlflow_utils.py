@@ -23,7 +23,7 @@ def set_experiment(mlflow_client, dbx_client, exp_name, tags=None):
     """
     Set experiment name. 
     For Databricks, create the workspace directory if it doesn't exist.
-    :return: Experiment ID
+    :return: Experiment
     """
     if utils.importing_into_databricks():
         create_workspace_dir(dbx_client, os.path.dirname(exp_name))
@@ -38,7 +38,7 @@ def set_experiment(mlflow_client, dbx_client, exp_name, tags=None):
             raise MlflowExportImportException(ex, f"Cannot create experiment '{exp_name}'")
         exp = mlflow_client.get_experiment_by_name(exp_name)
         _logger.info(f"Using existing experiment '{exp.name}' with location '{exp.artifact_location}'")
-    return exp.experiment_id
+    return exp
 
 
 def get_first_run(mlflow_client, exp_id_or_name):

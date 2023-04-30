@@ -125,8 +125,7 @@ class RunImporter():
 
 
     def _import_run(self, dst_exp_name, input_dir, dst_notebook_dir):
-        exp_id = mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, dst_exp_name)
-        exp = self.mlflow_client.get_experiment(exp_id)
+        exp = mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, dst_exp_name)
         src_run_path = os.path.join(input_dir,"run.json")
         src_run_dct = io_utils.read_file_mlflow(src_run_path)
 
