@@ -31,7 +31,8 @@ def import_experiment(
         import_source_tags = False,
         use_src_user_id = False,
         dst_notebook_dir = None,
-        mlflow_client = None
+        mlflow_client = None,
+        dbx_client = None
     ):
     """
     :param: experiment_name: Destination experiment name.
@@ -40,12 +41,14 @@ def import_experiment(
     :param use_src_user_id: Set the destination user ID to the source user ID.
                             Source user ID is ignored when importing into
     :param mlflow_client: MLflow client.
+    :param dbx_client: Databricks client.
     :return: A map of source run IDs and destination run.info.
     """
     importer = ExperimentImporter(
         import_source_tags = import_source_tags,
         use_src_user_id = use_src_user_id,
-        mlflow_client = mlflow_client
+        mlflow_client = mlflow_client,
+        dbx_client = dbx_client
     )
     return importer.import_experiment(
         experiment_name = experiment_name,
@@ -60,15 +63,17 @@ class ExperimentImporter():
             import_source_tags = False,
             use_src_user_id = False,
             mlflow_client = None,
+            dbx_client = None
         ):
         """
         :param mlflow_client: MLflow client.
+        :param dbx_client: Databricks client.
         :param import_source_tags: Import source information for MLFlow objects and create tags in destination object.
         :param use_src_user_id: Set the destination user ID to the source user ID.
                                 Source user ID is ignored when importing into
         """
         self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
-        self.dbx_client = DatabricksHttpClient()
+        self.dbx_client = dbx_client or DatabricksHttpClient()
         self.import_source_tags = import_source_tags
         self.use_src_user_id = use_src_user_id
 
@@ -108,6 +113,7 @@ class ExperimentImporter():
         for src_run_id in run_ids:
             dst_run, src_parent_run_id = import_run(
                 mlflow_client = self.mlflow_client,
+                dbx_client = self.dbx_client,
                 experiment_name = experiment_name,
                 input_dir = os.path.join(input_dir, src_run_id),
                 dst_notebook_dir = dst_notebook_dir,

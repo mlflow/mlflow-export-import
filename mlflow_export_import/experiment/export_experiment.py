@@ -18,6 +18,7 @@ from mlflow_export_import.common.iterators import SearchRunsIterator
 from mlflow_export_import.common import utils, io_utils, mlflow_utils
 from mlflow_export_import.common import permissions_utils
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis, utc_str_to_millis
+from mlflow_export_import.client.http_client import DatabricksHttpClient
 from mlflow_export_import.run.export_run import export_run
 
 _logger = utils.getLogger(__name__)
@@ -31,7 +32,8 @@ def export_experiment(
         run_start_time = None,
         export_deleted_runs = False,
         notebook_formats = None,
-        mlflow_client = None
+        mlflow_client = None,
+        dbx_client = None
     ):
     """
     :param experiment_id_or_name: Experiment ID or name.
@@ -41,10 +43,12 @@ def export_experiment(
     :param run_start_time - Only export runs started after this UTC time (inclusive). Format: YYYY-MM-DD.
     :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
     :param mlflow_client: MLflow client.
+    :param dbx_client: Databricks client.
     :return: Number of successful and number of failed runs.
     """
     exporter = ExperimentExporter(
         mlflow_client = mlflow_client,
+        dbx_client = dbx_client,
         export_permissions = export_permissions,
         run_start_time = run_start_time,
         export_deleted_runs = export_deleted_runs,
@@ -61,12 +65,14 @@ class ExperimentExporter():
 
     def __init__(self,
             mlflow_client = None,
+            dbx_client = None,
             export_permissions = False,
             run_start_time = None,
             export_deleted_runs = False,
             notebook_formats = None
         ):
         self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
+        self.dbx_client = dbx_client or DatabricksHttpClient()
         self.export_permissions = export_permissions
         self.notebook_formats = notebook_formats
         self.export_deleted_runs = export_deleted_runs
@@ -153,7 +159,8 @@ class ExperimentExporter():
             output_dir = run_dir,
             export_deleted_runs = self.export_deleted_runs,
             notebook_formats = self.notebook_formats,
-            mlflow_client = self.mlflow_client
+            mlflow_client = self.mlflow_client,
+            dbx_client = self.dbx_client
         )
         if is_success:
             ok_run_ids.append(run.info.run_id)
