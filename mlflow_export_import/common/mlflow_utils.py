@@ -111,13 +111,19 @@ def dump_exception(ex, msg=""):
     else:
         _dump_exception(ex, msg)
 
+
 def _dump_exception(ex, msg=""):
     _logger.info(f"==== {ex.__class__.__name__}: {msg} =====")
     _logger.info(f"  type: {type(ex)}")
     _logger.info(f"  ex:   '{ex}'")
     _logger.info("  attrs:")
     for k,v in ex.__dict__.items():
-        _logger.info(f"    {k}: {v}")
+        if isinstance(v,dict):
+            _logger.info(f"    {k}:")
+            for k2,v2 in v.items():
+                _logger.info(f"      {k2}: {v2}")
+        else:
+            _logger.info(f"    {k}: {v}")
 
 
 def _dump_MlflowException(ex, msg=""):
