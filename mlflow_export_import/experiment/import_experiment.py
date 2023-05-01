@@ -146,8 +146,8 @@ class ExperimentImporter():
 @click.command()
 @opt_experiment_name
 @opt_input_dir
-@opt_import_source_tags
 @opt_import_permissions
+@opt_import_source_tags
 @opt_use_src_user_id
 @opt_dst_notebook_dir
 
