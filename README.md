@@ -127,7 +127,13 @@ Due to the fast pace of Mlflow Export Important development, it is recommended t
 pip install git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
 ```
 
-#### 3. Install from github clone
+#### 3. Install from specific commit
+
+```
+pip install git+https:///github.com/mlflow/mlflow-export-import@a334f8003a3c9c3b9cd0173827be692a39355fd8
+```
+
+#### 4. Install from github clone
 ```
 git clone https://github.com/mlflow/mlflow-export-import
 cd mlflow-export-import
