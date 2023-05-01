@@ -164,7 +164,7 @@ class ModelExporter():
             model2 = model.pop("registered_model_databricks", None)
             model["registered_model"] = model2
             self._adjust_model(model2, versions)
-            permissions_utils.add_model_permissions(model2)
+            model2["permissions"] = permissions_utils.get_model_permissions(model2["id"])
         else:
             model = self.http_client.get("registered-models/get", {"name": model_name})
             self._adjust_model(model["registered_model"], versions)

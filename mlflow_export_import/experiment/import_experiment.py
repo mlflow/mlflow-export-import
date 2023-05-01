@@ -10,11 +10,13 @@ from mlflow_export_import.common.click_options import (
     opt_experiment_name,
     opt_input_dir,
     opt_import_source_tags,
+    opt_import_permissions,
     opt_use_src_user_id,
     opt_dst_notebook_dir
 )
 from mlflow_export_import.client.http_client import DatabricksHttpClient
 from mlflow_export_import.common import utils, mlflow_utils, io_utils
+from mlflow_export_import.common.permissions_utils import import_permissions
 from mlflow_export_import.common.source_tags import (
     set_source_tags_for_field,
     mk_source_tags_mlflow_tag,
@@ -29,6 +31,7 @@ def import_experiment(
         experiment_name,
         input_dir,
         import_source_tags = False,
+        import_permissions = False,
         use_src_user_id = False,
         dst_notebook_dir = None,
         mlflow_client = None,
@@ -46,6 +49,7 @@ def import_experiment(
     """
     importer = ExperimentImporter(
         import_source_tags = import_source_tags,
+        import_permissions = import_permissions,
         use_src_user_id = use_src_user_id,
         mlflow_client = mlflow_client,
         dbx_client = dbx_client
@@ -61,6 +65,7 @@ class ExperimentImporter():
 
     def __init__(self,
             import_source_tags = False,
+            import_permissions = False,
             use_src_user_id = False,
             mlflow_client = None,
             dbx_client = None
@@ -76,6 +81,7 @@ class ExperimentImporter():
         self.dbx_client = dbx_client or DatabricksHttpClient()
         self.import_source_tags = import_source_tags
         self.use_src_user_id = use_src_user_id
+        self.import_permissions = import_permissions
 
 
     def import_experiment(self,
@@ -90,21 +96,27 @@ class ExperimentImporter():
         """
 
         path = io_utils.mk_manifest_json_path(input_dir, "experiment.json")
-        exp_dct = io_utils.read_file(path)
-        info = io_utils.get_info(exp_dct)
-        exp_dct = io_utils.get_mlflow(exp_dct)
+        root_dct = io_utils.read_file(path)
+        info = io_utils.get_info(root_dct)
+        mlflow_dct = io_utils.get_mlflow(root_dct)
+        exp_dct = mlflow_dct["experiment"]
 
-        tags = exp_dct["experiment"]["tags"] 
+        tags = exp_dct["tags"] 
         if self.import_source_tags:
             source_tags = mk_source_tags_mlflow_tag(tags)
             tags = { **tags, **source_tags }
-            exp = exp_dct["experiment"]
+            exp = mlflow_dct["experiment"]
             set_source_tags_for_field(exp, tags)
             fmt_timestamps("creation_time", exp, tags)
             fmt_timestamps("last_update_time", exp, tags)
         mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, experiment_name, tags)
 
-        run_ids = exp_dct["runs"]
+        if self.import_permissions:
+            perms_dct = mlflow_dct.get("permissions", None)
+            if perms_dct:
+                import_permissions(self.dbx_client, perms_dct, "experiment", exp.name, exp.experiment_id)
+
+        run_ids = mlflow_dct["runs"]
         failed_run_ids = info["failed_runs"]
 
         _logger.info(f"Importing {len(run_ids)} runs into experiment '{experiment_name}' from '{input_dir}'")
@@ -135,10 +147,11 @@ class ExperimentImporter():
 @opt_experiment_name
 @opt_input_dir
 @opt_import_source_tags
+@opt_import_permissions
 @opt_use_src_user_id
 @opt_dst_notebook_dir
 
-def main(input_dir, experiment_name, import_source_tags, use_src_user_id, dst_notebook_dir):
+def main(input_dir, experiment_name, import_source_tags, use_src_user_id, dst_notebook_dir, import_permissions):
     _logger.info("Options:")
     for k,v in locals().items():
         _logger.info(f"  {k}: {v}")
@@ -146,6 +159,7 @@ def main(input_dir, experiment_name, import_source_tags, use_src_user_id, dst_no
         experiment_name = experiment_name,
         input_dir = input_dir,
         import_source_tags = import_source_tags,
+        import_permissions = import_permissions,
         use_src_user_id = use_src_user_id,
         dst_notebook_dir = dst_notebook_dir
     )
