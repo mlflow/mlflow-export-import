@@ -144,7 +144,7 @@ def opt_versions(function):
 
 def opt_import_permissions(function):
     function = click.option("--import-permissions",
-        help="Import Databricks permissions.",
+        help="Import Databricks permissions using the HTTP PATCH method.",
         type=bool,
         default=False,
         show_default=True)(function)
