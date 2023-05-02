@@ -44,15 +44,13 @@ def import_model(
         verbose=False,
         await_creation_for = None,
         sleep_time = 30,
-        mlflow_client = None,
-        dbx_client = None
+        mlflow_client = None
     ):
     importer = ModelImporter(
         import_source_tags = import_source_tags,
         import_permissions = import_permissions,
         await_creation_for = await_creation_for,
-        mlflow_client = mlflow_client,
-        dbx_client = dbx_client
+        mlflow_client = mlflow_client
     )
     return importer.import_model(
         model_name = model_name,
@@ -69,7 +67,6 @@ class BaseModelImporter():
 
     def __init__(self,
             mlflow_client = None,
-            dbx_client = None,
             run_importer = None,
             import_permissions = False,
             import_source_tags = False,
@@ -81,7 +78,7 @@ class BaseModelImporter():
         :param await_creation_for: Seconds to wait for model version crreation.
         """
         self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
-        self.dbx_client = dbx_client or DatabricksHttpClient()
+        self.dbx_client = DatabricksHttpClient(self.mlflow_client.tracking_uri)
         self.run_importer = run_importer if run_importer else RunImporter(self.mlflow_client, import_source_tags=import_source_tags, mlmodel_fix=True)
         self.import_permissions = import_permissions 
         self.import_source_tags = import_source_tags 
@@ -179,7 +176,6 @@ class ModelImporter(BaseModelImporter):
 
     def __init__(self,
             mlflow_client = None,
-            dbx_client = None,
             run_importer = None,
             import_permissions = False,
             import_source_tags = False,
@@ -187,7 +183,6 @@ class ModelImporter(BaseModelImporter):
         ):
         super().__init__(
             mlflow_client = mlflow_client,
-            dbx_client = dbx_client,
             run_importer = run_importer,
             import_permissions = import_permissions,
             import_source_tags = import_source_tags,

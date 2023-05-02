@@ -31,20 +31,17 @@ def export_run(
         output_dir,
         export_deleted_runs = False,
         notebook_formats = None,
-        mlflow_client = None,
-        dbx_client = None
+        mlflow_client = None
     ):
     """
     :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
     :param run_id: Run ID.
     :param output_dir: Output directory.
     :param mlflow_client: MLflow client.
-    :param dbx_client: Databricks client.
     :return: Whether export succeeded.
     """
     exporter = RunExporter(
         mlflow_client = mlflow_client,
-        dbx_client = dbx_client,
         export_deleted_runs = export_deleted_runs,
         notebook_formats = notebook_formats
     )
@@ -58,19 +55,17 @@ class RunExporter:
 
     def __init__(self, 
             mlflow_client = None, 
-            dbx_client = None,
 	    export_deleted_runs = False,
             notebook_formats = None
         ):
         """
         :param mlflow_client: MLflow client.
-        :param dbx_client: Databricks client.
         :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
         """
         if notebook_formats is None:
             notebook_formats = []
         self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
-        self.dbx_client = dbx_client or DatabricksHttpClient()
+        self.dbx_client = DatabricksHttpClient(self.mlflow_client.tracking_uri)
         self.export_deleted_runs = export_deleted_runs
         self.notebook_formats = notebook_formats
 

@@ -38,8 +38,7 @@ def import_run(
         use_src_user_id = False,
         dst_notebook_dir_add_run_id = False,
         mlmodel_fix = True,
-        mlflow_client = None,
-        dbx_client = None
+        mlflow_client = None
     ):
     """
     Imports a run into the specified experiment.
@@ -55,7 +54,6 @@ def import_run(
     :param dst_notebook_dir: Databricks destination workspace directory for notebook import.
     :param dst_notebook_dir_add_run_id: Add the run ID to the destination notebook directory.
     :param mlflow_client: MLflow client.
-    :param dbx_client: Databricks client.
     :return: The run and its parent run ID if the run is a nested run.
     """
     importer = RunImporter(
@@ -63,8 +61,7 @@ def import_run(
         use_src_user_id = use_src_user_id,
         dst_notebook_dir_add_run_id = dst_notebook_dir_add_run_id,
         mlmodel_fix = mlmodel_fix,
-        mlflow_client = mlflow_client,
-        dbx_client = dbx_client
+        mlflow_client = mlflow_client
     )
     return importer.import_run(
         experiment_name = experiment_name,
@@ -76,7 +73,6 @@ def import_run(
 class RunImporter():
     def __init__(self, 
             mlflow_client = None,
-            dbx_client = None,
             import_source_tags = False,
             mlmodel_fix = True,
             use_src_user_id = False,
@@ -84,7 +80,6 @@ class RunImporter():
         ):
         """ 
         :param mlflow_client: MLflow client.
-        :param dbx_client: Databricks client.
         :param import_source_tags: Import source information for MLFlow objects and create tags in destination object.
         :param mlmodel_fix: Add correct run ID in destination MLmodel artifact. 
                             Can be expensive for deeply nested artifacts.
@@ -96,7 +91,7 @@ class RunImporter():
         """
 
         self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
-        self.dbx_client = dbx_client or DatabricksHttpClient()
+        self.dbx_client = DatabricksHttpClient(self.mlflow_client.tracking_uri)
         self.mlmodel_fix = mlmodel_fix
         self.use_src_user_id = use_src_user_id
         self.in_databricks = "DATABRICKS_RUNTIME_VERSION" in os.environ
