@@ -64,7 +64,7 @@ class RunExporter:
         """
         if notebook_formats is None:
             notebook_formats = []
-        self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
+        self.mlflow_client = mlflow_client or mlflow.MlflowClient()
         self.dbx_client = DatabricksHttpClient(self.mlflow_client.tracking_uri)
         self.export_deleted_runs = export_deleted_runs
         self.notebook_formats = notebook_formats

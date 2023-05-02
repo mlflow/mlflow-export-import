@@ -90,7 +90,7 @@ class RunImporter():
         :param dst_notebook_dir_add_run_id: Add the run ID to the destination notebook directory.
         """
 
-        self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
+        self.mlflow_client = mlflow_client or mlflow.MlflowClient()
         self.dbx_client = DatabricksHttpClient(self.mlflow_client.tracking_uri)
         self.mlmodel_fix = mlmodel_fix
         self.use_src_user_id = use_src_user_id

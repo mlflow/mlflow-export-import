@@ -70,16 +70,21 @@ class BaseModelImporter():
             run_importer = None,
             import_permissions = False,
             import_source_tags = False,
-            await_creation_for = None):
+            await_creation_for = None
+        ):
         """
         :param mlflow_client: MLflow client or if None create default client.
         :param run_importer: RunImporter instance.
+        :param import_permissions: Import Databricks permissions.
         :param import_source_tags: Import source information for MLFlow objects and create tags in destination object.
         :param await_creation_for: Seconds to wait for model version crreation.
         """
-        self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
+        self.mlflow_client = mlflow_client or mlflow.MlflowClient()
         self.dbx_client = DatabricksHttpClient(self.mlflow_client.tracking_uri)
-        self.run_importer = run_importer if run_importer else RunImporter(self.mlflow_client, import_source_tags=import_source_tags, mlmodel_fix=True)
+        if run_importer:
+            self.run_importer = run_importer
+        else:
+            self.run_importer = RunImporter(self.mlflow_client, import_source_tags=import_source_tags, mlmodel_fix=True)
         self.import_permissions = import_permissions 
         self.import_source_tags = import_source_tags 
         self.await_creation_for = await_creation_for 
@@ -268,6 +273,7 @@ class BulkModelImporter(BaseModelImporter):
     def __init__(self,
             run_info_map,
             run_importer = None,
+            import_permissions = False,
             import_source_tags = False,
             experiment_renames = None,
             await_creation_for = None,
@@ -276,6 +282,7 @@ class BulkModelImporter(BaseModelImporter):
         super().__init__(
             mlflow_client = mlflow_client,
             run_importer = run_importer,
+            import_permissions = import_permissions,
             import_source_tags = import_source_tags,
             await_creation_for = await_creation_for
          )

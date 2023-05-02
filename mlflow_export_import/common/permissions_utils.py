@@ -39,25 +39,23 @@ def import_permissions(dbx_client, perms_get_format, object_type, object_name, o
     """
     perms_get_format = perms_get_format.get("permissions", None)
     if not perms_get_format:
-        _logger.warning(f"1. No permissions for {object_type} '{object_name}'")
+        _logger.warning(f"No permissions for {object_type} '{object_name}'")
         return
-    acl_get = perms_get_format.get("access_control_list", None)
-    if not acl_get:
-        _logger.warning(f"2. No permissions for {object_type} '{object_name}'")
-        return
-
+    acl_get = perms_get_format.get("access_control_list", [])
     resource = f"permissions/{object_type}s/{object_id}"
 
     acl_put = map_acl(acl_get)
     _logger.info(f"Updating {len(acl_put)} permissions for {object_type} '{object_name}'. Resource: {resource}")
+
+    # We loop for each permission so as not to not cancel the entire update due to an unknown user/group error 
     for elt in acl_put:
-        elt = { "access_control_list": [elt] }
-        _logger.info(f"Updating permissions for {object_type} '{object_name}'. ACL: {elt}")
+        acl = { "access_control_list": [elt] }
+        _logger.info(f"Updating permissions for {object_type} '{object_name}'. ACL: {acl}")
         try:
-            dbx_client.patch(resource, data=elt)
+            dbx_client.patch(resource, data=acl)
             _logger.info(f"Updated permissions for {object_type} '{object_name}'")
         except MlflowExportImportException as e: 
-            _logger.error(f"Error for permissions '{elt}' for {object_type} '{object_name}': {e}")
+            _logger.error(f"Error for permissions '{acl}' for {object_type} '{object_name}': {e}")
     
 
 def map_acl(acl_get_format):

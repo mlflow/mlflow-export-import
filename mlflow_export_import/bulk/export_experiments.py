@@ -42,7 +42,7 @@ def export_experiments(
       - String with comma-delimited experiment names or IDs such as 'sklearn_wine,sklearn_iris' or '1,2'
     :return: Dictionary of summary information
     """
-    mlflow_client = mlflow_client or mlflow.client.MlflowClient()
+    mlflow_client = mlflow_client or mlflow.MlflowClient()
     start_time = time.time()
     max_workers = os.cpu_count() or 4 if use_threads else 1
 
@@ -66,7 +66,6 @@ def export_experiments(
     failed_runs = 0
     export_results = []
     futures = []
-    notebook_formats = utils.string_to_list(notebook_formats)
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for exp_id_or_name in experiments:
             run_ids = experiments_dct.get(exp_id_or_name, None)
@@ -174,7 +173,7 @@ def main(experiments, output_dir, export_permissions, run_start_time, export_del
         export_permissions = export_permissions,
         run_start_time = run_start_time,
         export_deleted_runs = export_deleted_runs,
-        notebook_formats = notebook_formats,
+        notebook_formats = utils.string_to_list(notebook_formats),
         use_threads = use_threads
     )
 

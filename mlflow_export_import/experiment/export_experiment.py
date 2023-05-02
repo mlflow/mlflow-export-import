@@ -67,7 +67,7 @@ class ExperimentExporter():
             export_deleted_runs = False,
             notebook_formats = None
         ):
-        self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
+        self.mlflow_client = mlflow_client or mlflow.MlflowClient()
         self.dbx_client = DatabricksHttpClient(self.mlflow_client.tracking_uri)
         self.export_permissions = export_permissions
         self.notebook_formats = notebook_formats

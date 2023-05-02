@@ -38,7 +38,7 @@ def import_models(
         use_threads = False,
         mlflow_client = None
     ):
-    mlflow_client = mlflow_client or mlflow.client.MlflowClient()
+    mlflow_client = mlflow_client or mlflow.MlflowClient()
     experiment_renames = rename_utils.get_renames(experiment_renames)
     model_renames = rename_utils.get_renames(model_renames)
     start_time = time.time()
