@@ -1,4 +1,5 @@
 from databricks_cli.configure import provider
+from mlflow.utils.databricks_utils import is_in_databricks_runtime
 
 
 def get_host_token_for_profile(profile=None):
@@ -8,6 +9,8 @@ def get_host_token_for_profile(profile=None):
     """
     if profile:
         cfg = provider.get_config_for_profile(profile)
+        if not cfg.host and is_in_databricks_runtime():
+            cfg = provider.get_config() 
     else:
         cfg = provider.get_config() 
     return (cfg.host, cfg.token)
