@@ -47,28 +47,35 @@ print("use_threads:", use_threads)
 
 # COMMAND ----------
 
+# DBTITLE 1,set up log file
+import os 
+from datetime import datetime
+import pytz
+
+cst = pytz.timezone('US/Central')
+now = datetime.now(tz=cst)
+date = now.strftime("%Y-%m-%d-%H:%M:%S")
+
+logfile = f"import_models.{date}.log"
+os.environ["MLFLOW_EXPORT_IMPORT_LOG_OUTPUT_FILE"] = logfile 
+
+print("Logging to", logfile)
+
+# COMMAND ----------
+
 assert_widget(input_dir, "1. Input directory")
 
 # COMMAND ----------
 
-# MAGIC %%capture captured
-# MAGIC
-# MAGIC from mlflow_export_import.bulk.import_models import import_models
-# MAGIC
-# MAGIC import_models(
-# MAGIC     input_dir = input_dir,
-# MAGIC     delete_model = delete_model,
-# MAGIC     use_src_user_id = True,
-# MAGIC     import_source_tags = import_source_tags,
-# MAGIC     experiment_renames = experiment_rename_file,
-# MAGIC     model_renames = model_rename_file,
-# MAGIC     use_threads = use_threads
-# MAGIC )
+from mlflow_export_import.bulk.import_models import import_models
 
-# COMMAND ----------
-
-# DBTITLE 1,write log file
-filepath = "/mnt/public-blobs/dcoles/mlflow_import_models_log.txt"
-
-dbutils.fs.rm(filepath)
-dbutils.fs.put(filepath, captured.stdout)
+import_models(
+  input_dir = input_dir,
+  delete_model = delete_model,
+  use_src_user_id = True,
+  verbose=True,
+  import_source_tags = import_source_tags,
+  experiment_renames = experiment_rename_file,
+  model_renames = model_rename_file,
+  use_threads = use_threads
+)

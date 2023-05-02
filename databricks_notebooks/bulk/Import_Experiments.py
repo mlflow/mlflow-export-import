@@ -15,6 +15,22 @@
 
 # COMMAND ----------
 
+# DBTITLE 1,set up log file
+import os 
+from datetime import datetime
+import pytz
+
+cst = pytz.timezone('US/Central')
+now = datetime.now(tz=cst)
+date = now.strftime("%Y-%m-%d-%H:%M:%S")
+ 
+logfile = f"import_experiments.{date}.log"
+os.environ["MLFLOW_EXPORT_IMPORT_LOG_OUTPUT_FILE"] = logfile 
+
+print("Logging to", logfile)
+
+# COMMAND ----------
+
 dbutils.widgets.text("1. Input directory", "") 
 input_dir = dbutils.widgets.get("1. Input directory")
 input_dir = input_dir.replace("dbfs:","/dbfs")
@@ -40,21 +56,17 @@ assert_widget(input_dir, "1. Input directory")
 
 # COMMAND ----------
 
-# MAGIC %%capture captured
-# MAGIC
-# MAGIC from mlflow_export_import.bulk.import_experiments import import_experiments
-# MAGIC
-# MAGIC import_experiments(
-# MAGIC     input_dir = input_dir, 
-# MAGIC     import_source_tags = import_source_tags,
-# MAGIC     experiment_renames = experiment_rename_file,
-# MAGIC     use_threads = use_threads
-# MAGIC )
+#%%capture captured
+
+from mlflow_export_import.bulk.import_experiments import import_experiments
+
+import_experiments(
+    input_dir = input_dir, 
+    import_source_tags = import_source_tags,
+    experiment_renames = experiment_rename_file,
+    use_threads = use_threads
+)
 
 # COMMAND ----------
 
-# DBTITLE 1,write log file
-filepath = "/mnt/public-blobs/dcoles/mlflow_import_experiments_log.txt"
 
-dbutils.fs.rm(filepath)
-dbutils.fs.put(filepath, captured.stdout)

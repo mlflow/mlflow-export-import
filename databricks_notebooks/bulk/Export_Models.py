@@ -1,8 +1,8 @@
 # Databricks notebook source
 # MAGIC %md ## Export Models
-# MAGIC 
+# MAGIC
 # MAGIC Export specified models, their version runs and the experiments that the runs belong to.
-# MAGIC 
+# MAGIC
 # MAGIC Widgets
 # MAGIC * `1. Models` - comma seperated registered model names to be exported. `all` will export all models.
 # MAGIC * `2. Output directory` - shared directory between source and destination workspaces.
@@ -13,7 +13,7 @@
 # MAGIC * `7. Export deleted runs`
 # MAGIC * `8. Notebook formats`
 # MAGIC * `9. Use threads`
-# MAGIC 
+# MAGIC
 # MAGIC See: https://github.com/mlflow/mlflow-export-import/blob/master/README_bulk.md#registered-models.
 
 # COMMAND ----------
@@ -66,6 +66,22 @@ print("export_permissions:", export_permissions)
 print("export_deleted_runs:", export_deleted_runs)
 print("notebook_formats:", notebook_formats)
 print("use_threads:", use_threads)
+
+# COMMAND ----------
+
+# DBTITLE 1,set up log file
+import os 
+from datetime import datetime
+import pytz
+
+cst = pytz.timezone('US/Central')
+now = datetime.now(tz=cst)
+date = now.strftime("%Y-%m-%d-%H:%M:%S")
+ 
+logfile = f"export_models.{date}.log"
+os.environ["MLFLOW_EXPORT_IMPORT_LOG_OUTPUT_FILE"] = logfile 
+
+print("Logging to", logfile)
 
 # COMMAND ----------
 
