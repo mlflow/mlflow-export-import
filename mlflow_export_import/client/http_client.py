@@ -6,6 +6,7 @@ from mlflow_export_import.common import utils
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.client import USER_AGENT
 from mlflow_export_import.client import mlflow_auth_utils
+from mlflow_export_import.client import databricks_cli_utils
 
 _logger = utils.getLogger(__name__)
 _TIMEOUT = 15
@@ -16,18 +17,26 @@ class HttpClient():
     def __init__(self, api_name, host=None, token=None):
         """
         :param api_name: Name of base API such as 'api/2.0' or 'api/2.0/mlflow'.
-        :param host: Host name of tracking server.
-        :param token: Databricks token.
+        :param host: Host name of tracking server such as 'http://localhost:5000' or 'databricks://my_profile'.
+        :param token: Databricks token if using Databricks.
         """
-        self.api_uri = "?"
-        if host is None:
+
+        if host:
+            # Assume 'host' is a Databricks profile 
+            if not host.startswith("http"):
+                profile = host.replace("databricks://","")
+                (host, token) = databricks_cli_utils.get_host_token_for_profile(profile)
+        else:
             (host, token) = mlflow_auth_utils.get_mlflow_host_token()
-            if host is None:
-                raise MlflowExportImportException(
-                    "MLflow tracking URI (MLFLOW_TRACKING_URI environment variable) is not configured correctly",
-                    http_status_code=401)
+
+        if host is None:
+            raise MlflowExportImportException(
+                "MLflow tracking URI (MLFLOW_TRACKING_URI environment variable) is not configured correctly",
+                http_status_code=401)
+
         self.api_uri = os.path.join(host, api_name)
         self.token = token
+        
 
     def _get(self, resource, params=None):
         uri = self._mk_uri(resource)
