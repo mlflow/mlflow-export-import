@@ -109,7 +109,8 @@ class ExperimentImporter():
             set_source_tags_for_field(exp, tags)
             fmt_timestamps("creation_time", exp, tags)
             fmt_timestamps("last_update_time", exp, tags)
-        mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, experiment_name, tags)
+
+        exp = mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, experiment_name, tags)
 
         if self.import_permissions:
             perms_dct = mlflow_dct.get("permissions", None)

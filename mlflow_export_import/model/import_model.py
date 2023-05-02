@@ -12,6 +12,7 @@ from mlflow_export_import.common.click_options import (
     opt_input_dir,
     opt_model,
     opt_experiment_name,
+    opt_import_permissions,
     opt_delete_model,
     opt_import_source_tags,
     opt_verbose
@@ -19,6 +20,8 @@ from mlflow_export_import.common.click_options import (
 from mlflow_export_import.common import utils, io_utils, model_utils
 from mlflow_export_import.common.source_tags import set_source_tags_for_field, fmt_timestamps
 from mlflow_export_import.common import MlflowExportImportException
+from mlflow_export_import.common.permissions_utils import import_permissions
+from mlflow_export_import.client.http_client import DatabricksHttpClient
 from mlflow_export_import.run.import_run import RunImporter
 from mlflow_export_import.bulk import rename_utils
 
@@ -36,16 +39,20 @@ def import_model(
         experiment_name,
         input_dir,
         delete_model = False,
+        import_permissions = False,
         import_source_tags = False,
         verbose=False,
         await_creation_for = None,
         sleep_time = 30,
         mlflow_client = None,
+        dbx_client = None
     ):
     importer = ModelImporter(
         import_source_tags = import_source_tags,
+        import_permissions = import_permissions,
         await_creation_for = await_creation_for,
-        mlflow_client = mlflow_client
+        mlflow_client = mlflow_client,
+        dbx_client = dbx_client
     )
     return importer.import_model(
         model_name = model_name,
@@ -61,8 +68,10 @@ class BaseModelImporter():
     """ Base class of ModelImporter subclasses. """
 
     def __init__(self,
-            mlflow_client,
+            mlflow_client = None,
+            dbx_client = None,
             run_importer = None,
+            import_permissions = False,
             import_source_tags = False,
             await_creation_for = None):
         """
@@ -72,7 +81,9 @@ class BaseModelImporter():
         :param await_creation_for: Seconds to wait for model version crreation.
         """
         self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
+        self.dbx_client = dbx_client or DatabricksHttpClient()
         self.run_importer = run_importer if run_importer else RunImporter(self.mlflow_client, import_source_tags=import_source_tags, mlmodel_fix=True)
+        self.import_permissions = import_permissions 
         self.import_source_tags = import_source_tags 
         self.await_creation_for = await_creation_for 
 
@@ -109,7 +120,7 @@ class BaseModelImporter():
         model_utils.wait_until_version_is_ready(self.mlflow_client, model_name, dst_vr, sleep_time=sleep_time)
         src_current_stage = src_vr["current_stage"]
         _logger.info(f"Importing model '{model_name}' version {dst_vr.version} stage '{src_current_stage}'")
-        if src_current_stage != "None": # fails for Databricks but no OSS
+        if src_current_stage != "None": # fails for Databricks but not OSS
             self.mlflow_client.transition_model_version_stage(model_name, dst_vr.version, src_current_stage)
 
 
@@ -151,6 +162,15 @@ class BaseModelImporter():
             if not "RESOURCE_ALREADY_EXISTS: Registered Model" in str(e):
                 raise e
             _logger.info(f"Registered model '{model_name}' already exists")
+
+        if self.import_permissions:
+            perms_dct = model_dct["permissions"]
+            if perms_dct:
+                _model = self.dbx_client.get("mlflow/databricks/registered-models/get", { "name": model_name })
+                _model2 = _model["registered_model_databricks"]
+                model_id = _model2["id"]
+                import_permissions(self.dbx_client, perms_dct, "model", model_name, model_id)
+
         return model_dct
 
 
@@ -158,14 +178,18 @@ class ModelImporter(BaseModelImporter):
     """ Low-level 'point' model importer.  """
 
     def __init__(self,
-            mlflow_client,
+            mlflow_client = None,
+            dbx_client = None,
             run_importer = None,
+            import_permissions = False,
             import_source_tags = False,
             await_creation_for = None
         ):
         super().__init__(
             mlflow_client = mlflow_client,
+            dbx_client = dbx_client,
             run_importer = run_importer,
+            import_permissions = import_permissions,
             import_source_tags = import_source_tags,
             await_creation_for = await_creation_for
         )
@@ -342,6 +366,7 @@ def _path_join(x, y):
 @opt_model
 @opt_experiment_name
 @opt_delete_model
+@opt_import_permissions
 @opt_import_source_tags
 @click.option("--await-creation-for",
     help="Await creation for specified seconds.",
@@ -356,7 +381,9 @@ def _path_join(x, y):
 )
 @opt_verbose
 
-def main(input_dir, model, experiment_name, delete_model, await_creation_for, import_source_tags, verbose, sleep_time):
+def main(input_dir, model, experiment_name, delete_model, import_permissions, import_source_tags, 
+        await_creation_for, sleep_time, verbose
+    ):
     _logger.info("Options:")
     for k,v in locals().items():
         _logger.info(f"  {k}: {v}")
@@ -365,6 +392,7 @@ def main(input_dir, model, experiment_name, delete_model, await_creation_for, im
         experiment_name = experiment_name,
         input_dir = input_dir,
         delete_model = delete_model,
+        import_permissions = import_permissions,
         import_source_tags = import_source_tags,
         await_creation_for = await_creation_for,
         sleep_time = sleep_time,

@@ -141,8 +141,8 @@ class ExperimentExporter():
         elif len(failed_run_ids) == 0:
             _logger.info(f"{len(ok_run_ids)} runs succesfully exported {msg}")
         else:
-            _logger.info(f"{len(ok_run_ids)/j} runs succesfully exported {msg}")
-            _logger.info(f"{len(failed_run_ids)/j} runs failed {msg}")
+            _logger.info(f"{len(ok_run_ids)}/{j} runs succesfully exported {msg}")
+            _logger.info(f"{len(failed_run_ids)}/{j} runs failed {msg}")
         return len(ok_run_ids), len(failed_run_ids) 
 
 

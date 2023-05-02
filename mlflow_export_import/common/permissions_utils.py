@@ -10,8 +10,8 @@ def get_experiment_permissions(dbx_client, experiment_id):
     return _get_perms(dbx_client, "experiments", experiment_id)
 
 
-def get_model_permissions(model_id):
-    return _get_perms("registered-models", model_id)
+def get_model_permissions(dbx_client, model_id):
+    return _get_perms(dbx_client, "registered-models", model_id)
 
 
 def _get_perms(dbx_client, object_type, id):
@@ -34,7 +34,7 @@ def import_permissions(dbx_client, perms_get_format, object_type, object_name, o
     """
     :param perms_get_format: Dict of permissions in GET format
     :param object_type: 'experiment' or 'registered_model'
-    :param object_name: name of object 
+    :param object_name: name of object
     :param object_id: experiment or registered_model ID
     """
     perms_get_format = perms_get_format.get("permissions", None)
@@ -47,15 +47,15 @@ def import_permissions(dbx_client, perms_get_format, object_type, object_name, o
         return
 
     resource = f"permissions/{object_type}s/{object_id}"
-    _logger.info(f"FOUND permissions for {object_type} '{object_name}'")
-    _logger.info(f"UPDATE permissions for {object_type} '{object_name}'. RESOURCE: {resource}")
 
     acl_put = map_acl(acl_get)
-    
+    _logger.info(f"Updating {len(acl_put)} permissions for {object_type} '{object_name}'. Resource: {resource}")
     for elt in acl_put:
         elt = { "access_control_list": [elt] }
+        _logger.info(f"Updating permissions for {object_type} '{object_name}'. ACL: {elt}")
         try:
             dbx_client.patch(resource, data=elt)
+            _logger.info(f"Updated permissions for {object_type} '{object_name}'")
         except MlflowExportImportException as e: 
             _logger.error(f"Error for permissions '{elt}' for {object_type} '{object_name}': {e}")
     
