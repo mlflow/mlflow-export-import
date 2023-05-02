@@ -30,7 +30,7 @@ def get_mlflow_host_token():
     try:
         toks = uri.split("//")
         profile = uri.split("//")[1] if len(toks) > 1 else None
-        return databricks_cli_utils.get_host_token(profile)
+        return databricks_cli_utils.get_host_token_for_profile(profile)
     # databricks_cli.utils.InvalidConfigurationError 
     # requests.exceptions.InvalidSchema(f"No connection adapters were found for {url!r}")
     except Exception as e: 
