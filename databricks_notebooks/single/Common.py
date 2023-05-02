@@ -6,7 +6,7 @@
 # COMMAND ----------
 
 import mlflow
-mlflow_client = mlflow.client.MlflowClient()
+mlflow_client = mlflow.MlflowClient()
 print("mlflow.version:", mlflow.__version__)
 
 # COMMAND ----------

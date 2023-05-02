@@ -22,10 +22,6 @@
 
 # COMMAND ----------
 
-dbutils.widgets.remove("8. Notebook formats")
-
-# COMMAND ----------
-
 dbutils.widgets.text("1. Models", "") 
 models = dbutils.widgets.get("1. Models")
 
