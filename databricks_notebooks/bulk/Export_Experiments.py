@@ -1,8 +1,8 @@
 # Databricks notebook source
 # MAGIC %md ## Export Experiments
-# MAGIC 
+# MAGIC
 # MAGIC Export multiple experiments and all their runs.
-# MAGIC 
+# MAGIC
 # MAGIC Widgets
 # MAGIC * `1. Experiments` - comma delimited list of either experiment IDs or experiment names. `all` will export all experiments.
 # MAGIC * `2. Output directory` - shared directory between source and destination workspaces.
@@ -34,9 +34,7 @@ export_permissions = dbutils.widgets.get("4. Export permissions") == "yes"
 dbutils.widgets.dropdown("5. Export deleted runs","no",["yes","no"])
 export_deleted_runs = dbutils.widgets.get("5. Export deleted runs") == "yes"
 
-all_formats = [ "SOURCE", "DBC", "HTML", "JUPYTER" ]
-dbutils.widgets.multiselect("6. Notebook formats",all_formats[0],all_formats)
-notebook_formats = dbutils.widgets.get("6. Notebook formats")
+notebook_formats = get_notebook_formats(6)
 
 dbutils.widgets.dropdown("7. Use threads","False",["True","False"])
 use_threads = dbutils.widgets.get("7. Use threads") == "True"
