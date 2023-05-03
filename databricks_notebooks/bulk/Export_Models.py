@@ -107,33 +107,3 @@ export_models(
     notebook_formats = notebook_formats,
     use_threads = use_threads
 )
-
-# COMMAND ----------
-
-# MAGIC %md ### Display exported files
-
-# COMMAND ----------
-
-# MAGIC %sh 
-# MAGIC echo $OUTPUT_DIR
-# MAGIC ls -l $OUTPUT_DIR
-
-# COMMAND ----------
-
-# MAGIC %sh cat $OUTPUT_DIR/manifest.json
-
-# COMMAND ----------
-
-# MAGIC %sh ls -l $OUTPUT_DIR/models
-
-# COMMAND ----------
-
-# MAGIC %sh cat $OUTPUT_DIR/models/models.json
-
-# COMMAND ----------
-
-# MAGIC %sh ls -l $OUTPUT_DIR/experiments
-
-# COMMAND ----------
-
-# MAGIC %sh cat $OUTPUT_DIR/experiments/experiments.json
