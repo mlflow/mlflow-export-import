@@ -37,7 +37,7 @@ def export_all(
         use_threads  =  False,
         mlflow_client = None
     ):
-    mlflow_client = mlflow_client or mlflow.client.MlflowClient()
+    mlflow_client = mlflow_client or mlflow.MlflowClient()
     start_time = time.time()
     res_models = export_models(
         mlflow_client = mlflow_client,

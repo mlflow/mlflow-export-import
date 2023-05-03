@@ -1,6 +1,5 @@
 import pandas as pd
 from tabulate import tabulate
-import mlflow
 
 
 # Databricks tags that cannot or should not be set
@@ -8,7 +7,8 @@ _DATABRICKS_SKIP_TAGS = {
     "mlflow.user",
     "mlflow.log-model.history",
     "mlflow.rootRunId",
-    "mlflow.experiment.sourceType", "mlflow.experiment.sourceId"
+    "mlflow.experiment.sourceType", 
+    "mlflow.experiment.sourceId"
 }
 
 
@@ -60,6 +60,7 @@ def nested_tags(dst_client, run_ids_mapping):
 
 
 def importing_into_databricks():
+    import mlflow
     return mlflow.tracking.get_tracking_uri().startswith("databricks")
 
 

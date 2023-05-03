@@ -1,8 +1,8 @@
 # Databricks notebook source
 # MAGIC %md ## Export All
-# MAGIC 
+# MAGIC
 # MAGIC Export all the MLflow registered models and all experiments of a tracking server.
-# MAGIC 
+# MAGIC
 # MAGIC **Widgets**
 # MAGIC * `1. Output directory` - shared directory between source and destination workspaces.
 # MAGIC * `2. Stages` - comma seperated stages to be exported.
@@ -37,10 +37,8 @@ export_permissions = dbutils.widgets.get("5. Export permissions") == "yes"
 
 dbutils.widgets.dropdown("6. Export deleted runs","no",["yes","no"])
 export_deleted_runs = dbutils.widgets.get("6. Export deleted runs") == "yes"
- 
-all_formats = [ "SOURCE", "DBC", "HTML", "JUPYTER" ]
-dbutils.widgets.multiselect("7. Notebook formats",all_formats[0],all_formats)
-notebook_formats = dbutils.widgets.get("7. Notebook formats")
+
+notebook_formats = get_notebook_formats(7)
 
 dbutils.widgets.dropdown("8. Use threads","no",["yes","no"])
 use_threads = dbutils.widgets.get("8. Use threads") == "yes"

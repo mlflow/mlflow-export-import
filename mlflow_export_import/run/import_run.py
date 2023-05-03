@@ -21,7 +21,7 @@ from mlflow_export_import.common.click_options import (
 )
 from mlflow_export_import.common import utils, mlflow_utils, io_utils
 from mlflow_export_import.common.filesystem import mk_local_path
-from mlflow_export_import.common.find_artifacts import find_artifacts
+from mlflow_export_import.common.find_artifacts import find_run_model_names
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.client.http_client import DatabricksHttpClient
@@ -90,12 +90,12 @@ class RunImporter():
         :param dst_notebook_dir_add_run_id: Add the run ID to the destination notebook directory.
         """
 
-        self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
+        self.mlflow_client = mlflow_client or mlflow.MlflowClient()
+        self.dbx_client = DatabricksHttpClient(self.mlflow_client.tracking_uri)
         self.mlmodel_fix = mlmodel_fix
         self.use_src_user_id = use_src_user_id
         self.in_databricks = "DATABRICKS_RUNTIME_VERSION" in os.environ
         self.dst_notebook_dir_add_run_id = dst_notebook_dir_add_run_id
-        self.dbx_client = DatabricksHttpClient()
         self.import_source_tags = import_source_tags
         _logger.debug(f"in_databricks: {self.in_databricks}")
         _logger.debug(f"importing_into_databricks: {utils.importing_into_databricks()}")
@@ -120,8 +120,7 @@ class RunImporter():
 
 
     def _import_run(self, dst_exp_name, input_dir, dst_notebook_dir):
-        exp_id = mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, dst_exp_name)
-        exp = self.mlflow_client.get_experiment(exp_id)
+        exp = mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, dst_exp_name)
         src_run_path = os.path.join(input_dir,"run.json")
         src_run_dct = io_utils.read_file_mlflow(src_run_path)
 
@@ -162,21 +161,14 @@ class RunImporter():
     def _update_mlmodel_run_id(self, run_id):
         """ 
         Workaround to fix the run_id in the destination MLmodel file since there is no method to get all model artifacts of a run.
-
-        Since an MLflow run does not keeps track of its models, there is no method to retrieve the artifact path to all its models.
+        Since an MLflow run does not keep track of its models, there is no method to retrieve the artifact path to all its models.
         This workaround recursively searches the run's root artifact directory for all MLmodel files, and assumes their directory
         represents a path to the model.
         """
-
-        mlmodel_paths = find_artifacts(run_id, "", "MLmodel")
-        for mlmodel_path in mlmodel_paths:
-            model_path = mlmodel_path.replace("/MLmodel","")
-            previous_tracking_uri = mlflow.get_tracking_uri()
-            mlflow.set_tracking_uri(self.mlflow_client._tracking_client.tracking_uri)
-            local_path = mlflow.artifacts.download_artifacts(
-                run_id = run_id,
-                artifact_path = mlmodel_path)
-            mlflow.set_tracking_uri(previous_tracking_uri)
+        mlmodel_paths = find_run_model_names(run_id)
+        for model_path in mlmodel_paths:
+            download_uri = f"runs:/{run_id}/{model_path}/MLmodel"
+            local_path = mlflow_utils.download_artifacts(self.mlflow_client, download_uri)
             mlmodel = io_utils.read_file(local_path, "yaml")
             mlmodel["run_id"] = run_id
             with tempfile.TemporaryDirectory() as dir:

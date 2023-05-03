@@ -39,7 +39,7 @@ def export_models(
         use_threads = False,
         mlflow_client = None
     ):
-    mlflow_client = mlflow_client or mlflow.client.MlflowClient()
+    mlflow_client = mlflow_client or mlflow.MlflowClient()
     exps_and_runs = get_experiments_runs_of_models(mlflow_client, model_names)
     exp_ids = exps_and_runs.keys()
     start_time = time.time()
@@ -102,7 +102,6 @@ def _export_models(
     for model_name in model_names:
         _logger.info(f"  {model_name}")
 
-    notebook_formats = utils.string_to_list(notebook_formats),
     futures = []
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for model_name in model_names:
@@ -177,7 +176,7 @@ def main(models, output_dir, stages, export_latest_versions, export_all_runs,
         export_all_runs = export_all_runs,
         export_permissions = export_permissions,
         export_deleted_runs = export_deleted_runs,
-        notebook_formats = notebook_formats,
+        notebook_formats = utils.string_to_list(notebook_formats),
         use_threads = use_threads,
     )
 

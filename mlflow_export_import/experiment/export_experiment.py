@@ -18,6 +18,7 @@ from mlflow_export_import.common.iterators import SearchRunsIterator
 from mlflow_export_import.common import utils, io_utils, mlflow_utils
 from mlflow_export_import.common import permissions_utils
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis, utc_str_to_millis
+from mlflow_export_import.client.http_client import DatabricksHttpClient
 from mlflow_export_import.run.export_run import export_run
 
 _logger = utils.getLogger(__name__)
@@ -66,14 +67,14 @@ class ExperimentExporter():
             export_deleted_runs = False,
             notebook_formats = None
         ):
-        self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
+        self.mlflow_client = mlflow_client or mlflow.MlflowClient()
+        self.dbx_client = DatabricksHttpClient(self.mlflow_client.tracking_uri)
         self.export_permissions = export_permissions
         self.notebook_formats = notebook_formats
         self.export_deleted_runs = export_deleted_runs
 
         self.run_start_time = run_start_time
         self.run_start_time_str = run_start_time
-        #_logger.debug(f"run_start_time: {run_start_time}")
         if run_start_time:
             self.run_start_time = utc_str_to_millis(self.run_start_time)
 
@@ -90,7 +91,10 @@ class ExperimentExporter():
         :return: Number of successful and number of failed runs.
         """
         exp = mlflow_utils.get_experiment(self.mlflow_client, experiment_id_or_name)
-        msg = { "name": exp.name, "id": exp.experiment_id, "lifecycle_stage": exp.lifecycle_stage }
+        msg = { "name": exp.name, "id": exp.experiment_id,
+            "mlflow.experimentType": exp.tags.get("mlflow.experimentType", None),
+            "lifecycle_stage": exp.lifecycle_stage
+        } 
         _logger.info(f"Exporting experiment: {msg}")
         ok_run_ids = []
         failed_run_ids = []
@@ -123,8 +127,8 @@ class ExperimentExporter():
         exp_dct["tags"] = dict(sorted(exp_dct["tags"].items()))
 
         mlflow_attr = { "experiment": exp_dct , "runs": ok_run_ids }
-        if utils.importing_into_databricks() and self.export_permissions:
-            permissions_utils.add_experiment_permissions(exp.experiment_id, mlflow_attr)
+        if self.export_permissions:
+            mlflow_attr["permissions"] = permissions_utils.get_experiment_permissions(self.dbx_client, exp.experiment_id)
         io_utils.write_export_file(output_dir, "experiment.json", __file__, mlflow_attr, info_attr)
 
         msg = f"for experiment '{exp.name}' (ID: {exp.experiment_id})"
@@ -133,8 +137,8 @@ class ExperimentExporter():
         elif len(failed_run_ids) == 0:
             _logger.info(f"{len(ok_run_ids)} runs succesfully exported {msg}")
         else:
-            _logger.info(f"{len(ok_run_ids)/j} runs succesfully exported {msg}")
-            _logger.info(f"{len(failed_run_ids)/j} runs failed {msg}")
+            _logger.info(f"{len(ok_run_ids)}/{j} runs succesfully exported {msg}")
+            _logger.info(f"{len(failed_run_ids)}/{j} runs failed {msg}")
         return len(ok_run_ids), len(failed_run_ids) 
 
 

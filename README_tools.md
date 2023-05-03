@@ -51,13 +51,14 @@ A convenience script to directly invoke either the MLflow API or Databricks API.
 http-client --help
 
 Options:
+Options:
   --api TEXT          API: mlflow|databricks.
-  --resource TEXT     API resource such as 'experiments/list'.  [required]
-  --method TEXT       HTTP method: GET|POST.
+  --resource TEXT     API resource such as 'experiments/search'.  [required]
+  --method TEXT       HTTP method: GET|POST|PUT|PATCH|DELETE.
   --params TEXT       HTTP GET query parameters as JSON.
-  --data TEXT         HTTP POST data as JSON.
+  --data TEXT         HTTP request entity body as JSON (for POST, PUT and
+                      PATCH).
   --output-file TEXT  Output file.
-  --verbose BOOLEAN   Verbose.  [default: False]
 ```
 
 **HTTP GET example**
@@ -65,7 +66,15 @@ Options:
 export MLFLOW_TRACKING_URI=http://localhost:5000
 
 http-client \
-  --resource experiments/list\
+  --resource experiments/list \
+  --output-file experiments.json
+```
+
+**HTTP GET example - Databricks API**
+```
+http-client \
+  --api databricks \
+  --resource clusters/list \
   --output-file experiments.json
 ```
 

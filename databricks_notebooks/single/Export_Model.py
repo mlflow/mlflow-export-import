@@ -1,11 +1,11 @@
 # Databricks notebook source
 # MAGIC %md ### Export Registered Model
-# MAGIC 
+# MAGIC
 # MAGIC ##### Overview
 # MAGIC * Export a registered model and all the runs associated with its latest versions to a DBFS folder.
 # MAGIC * Output file `model.json` contains model metadata.
 # MAGIC * Each run and its artifacts are stored as a sub-directory.
-# MAGIC 
+# MAGIC
 # MAGIC ##### Widgets
 # MAGIC * `1. Model` - Registered model name to export.
 # MAGIC * `2. Output base directory` - Base output directory to which the model name will be appended to.
@@ -55,17 +55,13 @@ versions = versions.split(",") if versions else []
 dbutils.widgets.dropdown("6. Export permissions","no",["yes","no"])
 export_permissions = dbutils.widgets.get("6. Export permissions") == "yes"
 
-dbutils.widgets.dropdown("7. Export version run","yes",["yes","no"])
-export_version_run = dbutils.widgets.get("7. Export version run") == "yes"
-
-notebook_formats = get_notebook_formats(8) # widget "8. Notebook formats"
+notebook_formats = get_notebook_formats(7) # widget "7. Notebook formats"
 
 print("model_name:", model_name)
 print("output_dir:", output_dir)
 print("stages:", stages)
 print("export_latest_versions:", export_latest_versions)
 print("export_permissions:", export_permissions)
-print("export_version_run:", export_version_run)
 print("notebook_formats:", notebook_formats)
 print("versions:", versions)
 
@@ -100,7 +96,6 @@ export_model(
     versions = versions,
     export_latest_versions = export_latest_versions,
     export_permissions = export_permissions,
-    export_run = export_version_run,
     notebook_formats = notebook_formats
 )
 

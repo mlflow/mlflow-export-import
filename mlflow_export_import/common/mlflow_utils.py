@@ -1,4 +1,5 @@
 import os
+import mlflow
 from mlflow.exceptions import RestException
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common.iterators import SearchModelVersionsIterator
@@ -22,7 +23,7 @@ def set_experiment(mlflow_client, dbx_client, exp_name, tags=None):
     """
     Set experiment name. 
     For Databricks, create the workspace directory if it doesn't exist.
-    :return: Experiment ID
+    :return: Experiment
     """
     if utils.importing_into_databricks():
         create_workspace_dir(dbx_client, os.path.dirname(exp_name))
@@ -37,7 +38,7 @@ def set_experiment(mlflow_client, dbx_client, exp_name, tags=None):
             raise MlflowExportImportException(ex, f"Cannot create experiment '{exp_name}'")
         exp = mlflow_client.get_experiment_by_name(exp_name)
         _logger.info(f"Using existing experiment '{exp.name}' with location '{exp.artifact_location}'")
-    return exp.experiment_id
+    return exp
 
 
 def get_first_run(mlflow_client, exp_id_or_name):
@@ -74,9 +75,34 @@ def create_workspace_dir(dbx_client, workspace_dir):
     _logger.info(f"Creating Databricks workspace directory '{workspace_dir}'")
     dbx_client.post("workspace/mkdirs", { "path": workspace_dir })
 
+# == Download artifact issue
+
+def download_artifacts(client, download_uri, dst_path=None, fix=True):
+    """ 
+    Apparently the tracking_uri argument is not honored for mlflow.artifacts.download_artifacts().
+    It seems that tracking_uri is ignored and the global mlflow.get_tracking_uri() is always used.
+    If the two happen to be the same operation will succeed.
+    If not, it fails.
+    Issue: Merge pull request #104 from mingyu89/fix-download-artifacts
+    """ 
+    if fix:
+        previous_tracking_uri = mlflow.get_tracking_uri()
+        mlflow.set_tracking_uri(client._tracking_client.tracking_uri)
+        local_path = mlflow.artifacts.download_artifacts(
+            artifact_uri = download_uri,
+            dst_path = dst_path,
+        )
+        mlflow.set_tracking_uri(previous_tracking_uri)
+    else:
+        local_path = mlflow.artifacts.download_artifacts(
+            artifact_uri = download_uri,
+            dst_path = dst_path,
+            tracking_uri = client._tracking_client.tracking_uri
+        )
+    return local_path
+
 
 # == Dump exception functions
-
 
 def dump_exception(ex, msg=""):
     from mlflow.exceptions import MlflowException
@@ -85,13 +111,19 @@ def dump_exception(ex, msg=""):
     else:
         _dump_exception(ex, msg)
 
+
 def _dump_exception(ex, msg=""):
     _logger.info(f"==== {ex.__class__.__name__}: {msg} =====")
     _logger.info(f"  type: {type(ex)}")
     _logger.info(f"  ex:   '{ex}'")
     _logger.info("  attrs:")
     for k,v in ex.__dict__.items():
-        _logger.info(f"    {k}: {v}")
+        if isinstance(v,dict):
+            _logger.info(f"    {k}:")
+            for k2,v2 in v.items():
+                _logger.info(f"      {k2}: {v2}")
+        else:
+            _logger.info(f"    {k}: {v}")
 
 
 def _dump_MlflowException(ex, msg=""):

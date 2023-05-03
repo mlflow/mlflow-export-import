@@ -110,7 +110,9 @@ import-experiment --help
 
 Options:
   --experiment-name TEXT        Destination experiment name  [required]
-  --input-dir TEXT              Input path - directory  [required]
+  --input-dir TEXT              Input directory  [required]
+  --import-permissions BOOLEAN  Import Databricks permissions.  [default:
+                                False]
   --import-source-tags BOOLEAN  Import source information for registered model
                                 and its versions ad tags in destination
                                 object.  [default: False]
@@ -120,11 +122,12 @@ Options:
                                 source user field is ignored since it is
                                 automatically picked up from your Databricks
                                 access token.  There is no MLflow API endpoint
-                                to explicity set the user field for any
-                                objects such as Run or Experiment.
+                                to explicity set the user_id for Run and
+                                Registered Model.
   --dst-notebook-dir TEXT       Databricks destination workpsace base
                                 directory for notebook. A run ID will be added
                                 to contain the run's notebook.
+  --help                        Show this message and exit.
 ```
 
 #### Import examples

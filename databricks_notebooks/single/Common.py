@@ -1,12 +1,14 @@
 # Databricks notebook source
 # MAGIC %sh 
 # MAGIC #pip install mlflow-export-import
-# MAGIC pip install git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
+# MAGIC #pip install git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
+# MAGIC
+# MAGIC pip install git+https:///github.com/mlflow/mlflow-export-import@issue-69-permissions#egg=mlflow-export-import
 
 # COMMAND ----------
 
 import mlflow
-mlflow_client = mlflow.client.MlflowClient()
+mlflow_client = mlflow.MlflowClient()
 print("mlflow.version:", mlflow.__version__)
 
 # COMMAND ----------

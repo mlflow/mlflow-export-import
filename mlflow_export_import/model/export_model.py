@@ -7,6 +7,7 @@ import click
 import mlflow
 
 from mlflow_export_import.client.http_client import MlflowHttpClient
+from mlflow_export_import.client.http_client import DatabricksHttpClient
 from mlflow_export_import.common.click_options import (
     opt_model,
     opt_output_dir,
@@ -84,8 +85,10 @@ class ModelExporter():
         :param get_model_version_download_uri: Call MLflowClient.get_model_version_download_uri for version.
         :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
         """
-        self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
-        self.http_client = MlflowHttpClient()
+        self.mlflow_client = mlflow_client or mlflow.MlflowClient()
+        self.http_client = MlflowHttpClient(self.mlflow_client.tracking_uri) 
+        self.dbx_client = DatabricksHttpClient(self.mlflow_client.tracking_uri)
+
         self.run_exporter = RunExporter(self.mlflow_client, export_deleted_runs=export_deleted_runs, notebook_formats=notebook_formats)
         self.stages = self._normalize_stages(stages)
         self.versions = versions if versions else []
@@ -162,9 +165,9 @@ class ModelExporter():
         if utils.importing_into_databricks() and self.export_permissions:
             model = self.http_client.get("databricks/registered-models/get", { "name": model_name })
             model2 = model.pop("registered_model_databricks", None)
-            model["registered_model"] = model2
             self._adjust_model(model2, versions)
-            permissions_utils.add_model_permissions(model2)
+            model2["permissions"] = permissions_utils.get_model_permissions(self.dbx_client, model2["id"])
+            model["registered_model"] = model2
         else:
             model = self.http_client.get("registered-models/get", {"name": model_name})
             self._adjust_model(model["registered_model"], versions)
@@ -245,7 +248,6 @@ def main(model, output_dir, notebook_formats, stages, versions, export_latest_ve
         get_model_version_download_uri = get_model_version_download_uri,
         notebook_formats = notebook_formats
     )
-
 
 if __name__ == "__main__":
     main()

@@ -1,8 +1,8 @@
 # Databricks notebook source
 # MAGIC %md ## Export Models
-# MAGIC 
+# MAGIC
 # MAGIC Export specified models, their version runs and the experiments that the runs belong to.
-# MAGIC 
+# MAGIC
 # MAGIC Widgets
 # MAGIC * `1. Models` - comma seperated registered model names to be exported. `all` will export all models.
 # MAGIC * `2. Output directory` - shared directory between source and destination workspaces.
@@ -13,7 +13,7 @@
 # MAGIC * `7. Export deleted runs`
 # MAGIC * `8. Notebook formats`
 # MAGIC * `9. Use threads`
-# MAGIC 
+# MAGIC
 # MAGIC See: https://github.com/mlflow/mlflow-export-import/blob/master/README_bulk.md#registered-models.
 
 # COMMAND ----------
@@ -44,9 +44,7 @@ export_permissions = dbutils.widgets.get("6. Export permissions") == "yes"
 dbutils.widgets.dropdown("7. Export deleted runs","no",["yes","no"])
 export_deleted_runs = dbutils.widgets.get("7. Export deleted runs") == "yes"
 
-all_formats = [ "SOURCE", "DBC", "HTML", "JUPYTER" ]
-dbutils.widgets.multiselect("8. Notebook formats",all_formats[0],all_formats)
-notebook_formats = dbutils.widgets.get("8. Notebook formats")
+notebook_formats = get_notebook_formats(8)
 
 dbutils.widgets.dropdown("9. Use threads","no",["yes","no"])
 use_threads = dbutils.widgets.get("9. Use threads") == "yes"

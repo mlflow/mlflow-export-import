@@ -54,7 +54,7 @@ def export_run(
 class RunExporter:
 
     def __init__(self, 
-            mlflow_client, 
+            mlflow_client = None, 
 	    export_deleted_runs = False,
             notebook_formats = None
         ):
@@ -64,9 +64,8 @@ class RunExporter:
         """
         if notebook_formats is None:
             notebook_formats = []
-        self.mlflow_client = mlflow_client or mlflow.client.MlflowClient()
-
-        self.dbx_client = DatabricksHttpClient()
+        self.mlflow_client = mlflow_client or mlflow.MlflowClient()
+        self.dbx_client = DatabricksHttpClient(self.mlflow_client.tracking_uri)
         self.export_deleted_runs = export_deleted_runs
         self.notebook_formats = notebook_formats
 

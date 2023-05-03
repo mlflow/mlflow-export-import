@@ -92,5 +92,5 @@ def import_run_data(mlflow_client, run_dct, run_id, import_source_tags, src_user
 
 if __name__ == "__main__":
     import sys
-    client = mlflow.client.MlflowClient()
+    client = mlflow.MlflowClient()
     _log_metrics(client, sys.argv[1],100)
