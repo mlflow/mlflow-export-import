@@ -17,8 +17,8 @@
 # MAGIC
 # MAGIC **More information**
 # MAGIC
-# MAGIC * See [Console_Scripts_Single]($../console_scripts/Console_Scripts_Single) to execute scripts from shell (%sh).
-# MAGIC * See [github.com/mlflow/mlflow-export-import/blob/master/README_single.md](https://github.com/mlflow/mlflow-export-import/blob/master/README_single.md).
+# MAGIC * [Console_Scripts_Single]($../console_scripts/Console_Scripts_Single) to execute scripts from shell (%sh).
+# MAGIC * [github.com/mlflow/mlflow-export-import/blob/master/README_single.md](https://github.com/mlflow/mlflow-export-import/blob/master/README_single.md).
 
 # COMMAND ----------
 
