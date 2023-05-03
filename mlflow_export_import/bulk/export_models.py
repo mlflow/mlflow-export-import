@@ -104,7 +104,7 @@ def _export_models(
 
     notebook_formats = utils.string_to_list(notebook_formats),
     futures = []
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+    with ThreadPoolExecutor() as executor:
         for model_name in model_names:
             dir = os.path.join(output_dir, model_name)
             future = executor.submit(export_model,
