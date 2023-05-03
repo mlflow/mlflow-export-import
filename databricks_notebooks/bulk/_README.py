@@ -5,7 +5,7 @@
 # MAGIC   * [Export_Experiments]($Export_Experiments)
 # MAGIC   * [Import_Experiments]($Import_Experiments)
 # MAGIC * Models
-# MAGIC   * [Export_Models]($Export_Models)
+# MAGIC   * [Export_Models]($Export_Models) - Exports models and dependent objects (runs and experiments)
 # MAGIC   * [Import_Models]($Import_Models) - Imports models and dependent objects (runs and experiments)
 # MAGIC * All - entire workspace of MLflow objects
 # MAGIC   * [Export_All]($Export_All) 

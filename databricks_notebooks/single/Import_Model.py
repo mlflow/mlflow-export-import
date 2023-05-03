@@ -11,10 +11,8 @@
 # MAGIC * `2. Destination experiment name` - contains runs created for model versions.
 # MAGIC * `3. Input directory` - Input directory containing the exported model.
 # MAGIC * `4. Delete model` - delete model and its versions before importing.
-# MAGIC * `5. Import source tags`
-# MAGIC
-# MAGIC #### Limitations
-# MAGIC * There is a bug where you cannot create a model with the same name as a deleted model.
+# MAGIC * `5. Import permissions`
+# MAGIC * `6. Import source tags`
 
 # COMMAND ----------
 

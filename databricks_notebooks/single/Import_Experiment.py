@@ -4,7 +4,8 @@
 # MAGIC **Widgets**
 # MAGIC * `1. Input directory` - Input directory containing an exported experiment.
 # MAGIC * `2. Destination experiment name` - will create experiment if it doesn't exist.
-# MAGIC * `3. Import source tags` 
+# MAGIC * `3. Import permissions`
+# MAGIC * `4. Import source tags` 
 
 # COMMAND ----------
 
