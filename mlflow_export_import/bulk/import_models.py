@@ -14,6 +14,7 @@ from mlflow_export_import.common.click_options import (
     opt_delete_model,
     opt_use_src_user_id,
     opt_verbose, 
+    opt_import_permissions, 
     opt_import_source_tags, 
     opt_experiment_rename_file,
     opt_model_rename_file,
@@ -30,6 +31,7 @@ _logger = utils.getLogger(__name__)
 def import_models(
         input_dir, 
         delete_model, 
+        import_permissions = False, 
         import_source_tags = False, 
         use_src_user_id = False, 
         experiment_renames = None, 
@@ -45,6 +47,7 @@ def import_models(
     exp_res = _import_experiments(
         mlflow_client, 
         input_dir, 
+        import_permissions, 
         use_src_user_id,
         experiment_renames
     )
@@ -54,6 +57,7 @@ def import_models(
         input_dir, 
         run_info_map, 
         delete_model, 
+        import_permissions, 
         import_source_tags, 
         model_renames,
         experiment_renames,
@@ -74,7 +78,7 @@ def _remap(run_info_map):
     return res
 
 
-def _import_experiments(mlflow_client, input_dir, use_src_user_id, experiment_renames):
+def _import_experiments(mlflow_client, input_dir, import_permissions, use_src_user_id, experiment_renames):
     start_time = time.time()
 
     dct = io_utils.read_file_mlflow(os.path.join(input_dir,"experiments","experiments.json"))
@@ -94,6 +98,7 @@ def _import_experiments(mlflow_client, input_dir, use_src_user_id, experiment_re
             _run_info_map = import_experiment(
                 experiment_name = exp_name,
                 input_dir = exp_input_dir,
+                import_permissions = import_permissions,
                 use_src_user_id = use_src_user_id,
                 mlflow_client = mlflow_client
             )
@@ -115,6 +120,7 @@ def _import_models(mlflow_client,
         input_dir, 
         run_info_map, 
         delete_model, 
+        import_permissions, 
         import_source_tags, 
         model_renames, 
         experiment_renames, 
@@ -130,6 +136,7 @@ def _import_models(mlflow_client,
     all_importer = BulkModelImporter(
         mlflow_client = mlflow_client, 
         run_info_map = run_info_map, 
+        import_permissions = import_permissions,
         import_source_tags = import_source_tags,
         experiment_renames = experiment_renames
     )
@@ -152,16 +159,20 @@ def _import_models(mlflow_client,
 @click.command()
 @opt_input_dir
 @opt_delete_model
-@opt_import_source_tags
-@opt_use_src_user_id
-@opt_verbose
+@opt_import_permissions
 @opt_experiment_rename_file
 @opt_model_rename_file
+@opt_import_source_tags
+@opt_use_src_user_id
 @opt_use_threads
+@opt_verbose
 
-def main(input_dir, delete_model, import_source_tags, use_src_user_id, 
+def main(input_dir, delete_model, 
+        import_permissions,
         experiment_rename_file, 
         model_rename_file, 
+        import_source_tags, 
+        use_src_user_id, 
         use_threads,
         verbose, 
     ):
@@ -172,10 +183,11 @@ def main(input_dir, delete_model, import_source_tags, use_src_user_id,
     import_models(
         input_dir = input_dir,
         delete_model = delete_model, 
-        import_source_tags = import_source_tags,
-        use_src_user_id = use_src_user_id, 
+        import_permissions = import_permissions, 
         experiment_renames = rename_utils.get_renames(experiment_rename_file),
         model_renames = rename_utils.get_renames(model_rename_file),
+        import_source_tags = import_source_tags,
+        use_src_user_id = use_src_user_id, 
         verbose = verbose, 
         use_threads = use_threads
     )
