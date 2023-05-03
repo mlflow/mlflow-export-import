@@ -27,7 +27,7 @@ def _download_notebook(notebook_workspace_path, output_dir, format, extension, r
         "format": format
     }
     if revision_id:
-        params["revision_timestamp"] = revision_id # NOTE: not documented publicly
+        params ["revision"] = { "revision_timestamp": revision_id } # NOTE: not publicly documented
     notebook_name = os.path.basename(notebook_workspace_path)
     try:
         rsp = dbx_client._get("workspace/export", params)
