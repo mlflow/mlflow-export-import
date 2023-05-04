@@ -1,10 +1,13 @@
+import os
 import time
+import mlflow
 from mlflow.exceptions import RestException
 from mlflow.entities.model_registry.model_version_status import ModelVersionStatus
 
 from mlflow_export_import.common.iterators import SearchModelVersionsIterator
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
 from mlflow_export_import.common import utils
+from mlflow_export_import.common import filesystem as _filesystem
 
 _logger = utils.getLogger(__name__)
 
@@ -44,6 +47,26 @@ def wait_until_version_is_ready(client, model_name, model_version, sleep_time=1,
         time.sleep(sleep_time)
     end = time.time()
     _logger.info(f"Waited {round(end-start,2)} seconds")
+
+
+def export_version_model(client, version, output_dir):
+    """
+    Exports the model version's "cached" MLflow model.
+    :param client: MLflowClient.
+    :param version: Model version.
+    :param output_dir: Output directory.
+    :return: Result of MlflowClient.get_model_version_download_uri().
+    """
+
+    download_uri = client.get_model_version_download_uri(version.name, version.version)
+    dst_path = os.path.join(output_dir, "version_models", version.version) 
+    _logger.info(f"Exporting model version 'cached' model to: '{dst_path}'")
+    mlflow.artifacts.download_artifacts(
+        artifact_uri = download_uri,
+        dst_path = _filesystem.mk_local_path(dst_path),
+        tracking_uri = client._tracking_client.tracking_uri
+    )
+    return download_uri
 
 
 def show_versions(model_name, versions, msg):

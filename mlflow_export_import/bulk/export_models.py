@@ -15,6 +15,7 @@ from mlflow_export_import.common.click_options import (
     opt_export_all_runs,
     opt_export_permissions,
     opt_export_deleted_runs,
+    opt_export_version_model,
     opt_notebook_formats,
     opt_use_threads
 )
@@ -35,6 +36,7 @@ def export_models(
         export_all_runs = False,
         export_permissions = False,
         export_deleted_runs = False,
+        export_version_model = False,
         notebook_formats = None,
         use_threads = False,
         mlflow_client = None
@@ -62,6 +64,7 @@ def export_models(
         stages,
         use_threads = use_threads,
         export_latest_versions = export_latest_versions,
+        export_version_model = export_version_model,
         export_permissions = export_permissions
     )
     duration = round(time.time()-start_time, 1)
@@ -93,6 +96,7 @@ def _export_models(
         stages = None,
         use_threads = False,
         export_latest_versions = False,
+        export_version_model = False,
         export_permissions = False
     ):
     max_workers = os.cpu_count() or 4 if use_threads else 1
@@ -109,10 +113,11 @@ def _export_models(
             future = executor.submit(export_model,
                 model_name = model_name,
                 output_dir = dir,
-                notebook_formats = notebook_formats,
                 stages = stages,
                 export_latest_versions = export_latest_versions,
+                export_version_model = export_version_model,
                 export_permissions = export_permissions,
+                notebook_formats = notebook_formats,
                 mlflow_client = mlflow_client,
             )
             futures.append(future)
@@ -160,11 +165,14 @@ def _export_models(
 @opt_stages
 @opt_export_permissions
 @opt_export_deleted_runs
+@opt_export_version_model
 @opt_notebook_formats
 @opt_use_threads
 
 def main(models, output_dir, stages, export_latest_versions, export_all_runs, 
-        export_permissions, export_deleted_runs, notebook_formats, use_threads):
+        export_permissions, export_deleted_runs, export_version_model, 
+        notebook_formats, use_threads
+    ):
     _logger.info("Options:")
     for k,v in locals().items():
         _logger.info(f"  {k}: {v}")
@@ -176,6 +184,7 @@ def main(models, output_dir, stages, export_latest_versions, export_all_runs,
         export_all_runs = export_all_runs,
         export_permissions = export_permissions,
         export_deleted_runs = export_deleted_runs,
+        export_version_model = export_version_model,
         notebook_formats = utils.string_to_list(notebook_formats),
         use_threads = use_threads,
     )

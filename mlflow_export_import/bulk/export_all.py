@@ -14,6 +14,7 @@ from mlflow_export_import.common.click_options import (
     opt_export_permissions,
     opt_run_start_time,
     opt_export_deleted_runs,
+    opt_export_version_model,
     opt_notebook_formats, 
     opt_use_threads,
 )
@@ -28,11 +29,12 @@ _logger = utils.getLogger(__name__)
 
 def export_all(
         output_dir,
+        run_start_time = None,
         stages = "",
         export_latest_versions = False,
-        export_permissions = False,
-        run_start_time = None,
         export_deleted_runs = False,
+        export_version_model = False,
+        export_permissions = False,
         notebook_formats = None,
         use_threads  =  False,
         mlflow_client = None
@@ -46,8 +48,9 @@ def export_all(
         stages = stages,
         export_latest_versions = export_latest_versions,
         export_all_runs = True,
-        export_permissions = export_permissions,
         export_deleted_runs = export_deleted_runs,
+        export_permissions = export_permissions,
+        export_version_model = export_version_model,
         notebook_formats = notebook_formats, 
         use_threads = use_threads
     )
@@ -82,23 +85,30 @@ def export_all(
 @opt_output_dir
 @opt_export_latest_versions
 @opt_stages
-@opt_export_permissions
 @opt_run_start_time
 @opt_export_deleted_runs
+@opt_export_version_model
+@opt_export_permissions
 @opt_notebook_formats
 @opt_use_threads
 
-def main(output_dir, stages, export_latest_versions, export_permissions, run_start_time, export_deleted_runs, notebook_formats, use_threads):
+def main(output_dir, stages, export_latest_versions, run_start_time, 
+        export_deleted_runs, 
+        export_version_model,
+        export_permissions,
+        notebook_formats, use_threads
+     ):
     _logger.info("Options:")
     for k,v in locals().items():
         _logger.info(f"  {k}: {v}")
     export_all(
         output_dir = output_dir, 
         stages = stages,
-        export_latest_versions = export_latest_versions,
-        export_permissions = export_permissions, 
         run_start_time = run_start_time, 
+        export_latest_versions = export_latest_versions,
         export_deleted_runs = export_deleted_runs, 
+        export_version_model = export_version_model, 
+        export_permissions = export_permissions, 
         notebook_formats = notebook_formats, 
         use_threads = use_threads
     )

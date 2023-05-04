@@ -79,12 +79,21 @@ def opt_export_deleted_runs(function):
     )(function)
     return function
 
+def opt_export_version_model(function):
+    function = click.option("--export-version-model",
+        help="Export registered model version's 'cached' MLflow model.",
+        type=bool,
+        default=False,
+        show_default=True
+    )(function)
+    return function
+
 
 # == import
 
 def opt_input_dir(function):
     function = click.option("--input-dir",
-        help="Input directory",
+        help="Input directory.",
         type=str,
         required=True
     )(function)
