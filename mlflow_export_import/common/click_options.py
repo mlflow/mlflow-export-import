@@ -115,7 +115,8 @@ def opt_use_src_user_id(function):
                  When importing into Databricks, the source user field is ignored since it is automatically picked up from your Databricks access token. 
                  There is no MLflow API endpoint to explicity set the user_id for Run and Registered Model.""",
         type=bool,
-        default=False
+        default=False,
+        show_default=True
     )(function)
     return function
 
@@ -130,7 +131,7 @@ def opt_dst_notebook_dir(function):
 
 def opt_experiment_name(function):
     function = click.option("--experiment-name",
-        help="Destination experiment name",
+        help="Destination experiment name.",
         type=str,
         required=True
     )(function)

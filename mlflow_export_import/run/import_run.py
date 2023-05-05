@@ -215,20 +215,20 @@ class RunImporter():
 
 @click.command()
 @opt_input_dir
-@opt_import_source_tags
 @opt_experiment_name
+@opt_import_source_tags
 @opt_use_src_user_id
 @opt_dst_notebook_dir
-@click.option("--mlmodel-fix",
-    help="Add correct run ID in destination MLmodel artifact. Can be expensive for deeply nested artifacts.", 
-    type=bool, 
-    default=True, 
-    show_default=True
-)
 @click.option("--dst-notebook-dir-add-run-id",
     help="Add the run ID to the destination notebook workspace directory.",
     type=str,
     required=False,
+    show_default=True
+)
+@click.option("--mlmodel-fix",
+    help="Add correct run ID in destination MLmodel artifact. Can be expensive for deeply nested artifacts.", 
+    type=bool, 
+    default=True, 
     show_default=True
 )
 
