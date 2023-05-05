@@ -26,7 +26,7 @@ os.environ["MLFLOW_EXPORT_IMPORT_LOG_OUTPUT_FILE"] = logfile
 os.environ["MLFLOW_EXPORT_IMPORT_LOG_FORMAT"]="%(threadName)s-%(levelname)s-%(message)s"
 os.environ["MLFLOW_TRACKING_URI"]="databricks"
 os.environ["DATABRICKS_HOST"] = "https://adb-374784251182712.12.azuredatabricks.net/"
-os.environ["DATABRICKS_TOKEN"] = "hidden"
+os.environ["DATABRICKS_TOKEN"] = "dapidb973ceb6dac26397c3d9c0b3d4158e5"
 
 # COMMAND ----------
 
