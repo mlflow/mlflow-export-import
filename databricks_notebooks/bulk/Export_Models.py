@@ -23,10 +23,6 @@
 
 # COMMAND ----------
 
-dbutils.widgets.removeAll()
-
-# COMMAND ----------
-
 dbutils.widgets.text("01. Models", "") 
 models = dbutils.widgets.get("01. Models")
 
