@@ -10,8 +10,9 @@
 # MAGIC * `4. Run start date` - Export runs after this UTC date (inclusive). Example: `2023-04-05`.
 # MAGIC * `5. Export permissions` - export Databricks permissions.
 # MAGIC * `6. Export deleted runs`
-# MAGIC * `7. Notebook formats`
-# MAGIC * `8. Use threads`
+# MAGIC * `7. Export version MLflow model`
+# MAGIC * `8. Notebook formats`
+# MAGIC * `9. Use threads`
 
 # COMMAND ----------
 
@@ -38,10 +39,13 @@ export_permissions = dbutils.widgets.get("5. Export permissions") == "yes"
 dbutils.widgets.dropdown("6. Export deleted runs","no",["yes","no"])
 export_deleted_runs = dbutils.widgets.get("6. Export deleted runs") == "yes"
 
-notebook_formats = get_notebook_formats(7)
+dbutils.widgets.dropdown("7. Export version MLflow model","no",["yes","no"]) # TODO
+export_version_model = dbutils.widgets.get("7. Export version MLflow model") == "yes"
 
-dbutils.widgets.dropdown("8. Use threads","no",["yes","no"])
-use_threads = dbutils.widgets.get("8. Use threads") == "yes"
+notebook_formats = get_notebook_formats(8)
+
+dbutils.widgets.dropdown("9. Use threads","no",["yes","no"])
+use_threads = dbutils.widgets.get("9. Use threads") == "yes"
  
 if run_start_date=="": run_start_date = None
 
@@ -51,6 +55,7 @@ print("export_latest_versions:", export_latest_versions)
 print("run_start_date:", run_start_date)
 print("export_permissions:", export_permissions)
 print("export_deleted_runs:", export_deleted_runs)
+print("export_version_model:", export_version_model)
 print("notebook_formats:", notebook_formats)
 print("use_threads:", use_threads)
 
@@ -69,6 +74,7 @@ export_all(
     run_start_time = run_start_date,
     export_permissions = export_permissions,
     export_deleted_runs = export_deleted_runs,
+    export_version_model = export_version_model,
     notebook_formats = notebook_formats, 
     use_threads = use_threads
 )

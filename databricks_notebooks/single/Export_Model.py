@@ -3,17 +3,17 @@
 # MAGIC
 # MAGIC ##### Overview
 # MAGIC * Export a registered model and all the runs associated with its latest versions to a DBFS folder.
-# MAGIC * Output file `model.json` contains model metadata.
+# MAGIC * Output file `model.json` contains exported model metadata.
 # MAGIC * Each run and its artifacts are stored as a sub-directory.
 # MAGIC
 # MAGIC ##### Widgets
 # MAGIC * `1. Model` - Registered model name to export.
 # MAGIC * `2. Output base directory` - Base output directory to which the model name will be appended to.
 # MAGIC * `3. Stages` - Model version stages to export.
-# MAGIC * `4. Export latest versions`
-# MAGIC * `5. Versions` - comma delimited version numbers to export.
+# MAGIC * `4. Export latest versions`.
+# MAGIC * `5. Versions` - Comma delimited version numbers to export.
 # MAGIC * `6. Export permissions` - Export Databricks permissions.
-# MAGIC * `7. Export version run`
+# MAGIC * `7. Export version MLflow model`.
 # MAGIC * `8. Notebook formats` - Notebook formats to export.
 
 # COMMAND ----------
@@ -55,12 +55,15 @@ versions = versions.split(",") if versions else []
 dbutils.widgets.dropdown("6. Export permissions","no",["yes","no"])
 export_permissions = dbutils.widgets.get("6. Export permissions") == "yes"
 
-notebook_formats = get_notebook_formats(7) # widget "7. Notebook formats"
+dbutils.widgets.dropdown("7. Export version MLflow model","no",["yes","no"])
+export_version_model = dbutils.widgets.get("7. Export version MLflow model") == "yes"
+
+notebook_formats = get_notebook_formats(8) # widget "7. Notebook formats"
 
 print("model_name:", model_name)
 print("output_dir:", output_dir)
 print("stages:", stages)
-print("export_latest_versions:", export_latest_versions)
+print("export_version_model:", export_version_model)
 print("export_permissions:", export_permissions)
 print("notebook_formats:", notebook_formats)
 print("versions:", versions)
@@ -95,6 +98,7 @@ export_model(
     stages = stages,
     versions = versions,
     export_latest_versions = export_latest_versions,
+    export_version_model = export_version_model,
     export_permissions = export_permissions,
     notebook_formats = notebook_formats
 )

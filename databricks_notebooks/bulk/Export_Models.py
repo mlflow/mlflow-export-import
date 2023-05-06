@@ -4,15 +4,16 @@
 # MAGIC Export specified models, their version runs and the experiments that the runs belong to.
 # MAGIC
 # MAGIC Widgets
-# MAGIC * `1. Models` - comma seperated registered model names to be exported. `all` will export all models.
-# MAGIC * `2. Output directory` - shared directory between source and destination workspaces.
-# MAGIC * `3. Stages` - stages to be exported.
-# MAGIC * `4. Export latest versions` - expor all or just the "latest" versions.
-# MAGIC * `5. Export all runs` - export all runs of an experiment that are linked to a registered model.
-# MAGIC * `6. Export permissions` - export Databricks permissions.
-# MAGIC * `7. Export deleted runs`
-# MAGIC * `8. Notebook formats`
-# MAGIC * `9. Use threads`
+# MAGIC * `01. Models` - comma seperated registered model names to be exported. `all` will export all models.
+# MAGIC * `02. Output directory` - shared directory between source and destination workspaces.
+# MAGIC * `03. Stages` - stages to be exported.
+# MAGIC * `04. Export latest versions` - expor all or just the "latest" versions.
+# MAGIC * `05. Export all runs` - export all runs of an experiment that are linked to a registered model.
+# MAGIC * `06. Export permissions` - export Databricks permissions.
+# MAGIC * `07. Export deleted runs`
+# MAGIC * `08. Export version MLflow model`
+# MAGIC * `08. Notebook formats`
+# MAGIC * `10. Use threads`
 # MAGIC
 # MAGIC See: https://github.com/mlflow/mlflow-export-import/blob/master/README_bulk.md#registered-models.
 
@@ -22,32 +23,39 @@
 
 # COMMAND ----------
 
-dbutils.widgets.text("1. Models", "") 
-models = dbutils.widgets.get("1. Models")
+dbutils.widgets.removeAll()
 
-dbutils.widgets.text("2. Output directory", "dbfs:/mnt/andre-work/exim/experiments") 
-output_dir = dbutils.widgets.get("2. Output directory")
+# COMMAND ----------
+
+dbutils.widgets.text("01. Models", "") 
+models = dbutils.widgets.get("01. Models")
+
+dbutils.widgets.text("02. Output directory", "dbfs:/mnt/andre-work/exim/experiments") 
+output_dir = dbutils.widgets.get("02. Output directory")
 output_dir = output_dir.replace("dbfs:","/dbfs")
 
-dbutils.widgets.multiselect("3. Stages", "Production", ["Production","Staging","Archived","None"])
-stages = dbutils.widgets.get("3. Stages")
+dbutils.widgets.multiselect("03. Stages", "Production", ["Production","Staging","Archived","None"])
+stages = dbutils.widgets.get("03. Stages")
 
-dbutils.widgets.dropdown("4. Export latest versions","no",["yes","no"])
-export_latest_versions = dbutils.widgets.get("4. Export latest versions") == "yes"
+dbutils.widgets.dropdown("04. Export latest versions","no",["yes","no"])
+export_latest_versions = dbutils.widgets.get("04. Export latest versions") == "yes"
 
-dbutils.widgets.dropdown("5. Export all runs","no",["yes","no"])
-export_all_runs = dbutils.widgets.get("5. Export all runs") == "yes"
+dbutils.widgets.dropdown("05. Export all runs","no",["yes","no"])
+export_all_runs = dbutils.widgets.get("05. Export all runs") == "yes"
 
-dbutils.widgets.dropdown("6. Export permissions","no",["yes","no"])
-export_permissions = dbutils.widgets.get("6. Export permissions") == "yes"
+dbutils.widgets.dropdown("06. Export permissions","no",["yes","no"])
+export_permissions = dbutils.widgets.get("06. Export permissions") == "yes"
 
-dbutils.widgets.dropdown("7. Export deleted runs","no",["yes","no"])
-export_deleted_runs = dbutils.widgets.get("7. Export deleted runs") == "yes"
+dbutils.widgets.dropdown("07. Export deleted runs","no",["yes","no"])
+export_deleted_runs = dbutils.widgets.get("07. Export deleted runs") == "yes"
 
-notebook_formats = get_notebook_formats(8)
+dbutils.widgets.dropdown("08. Export version MLflow model","no",["yes","no"]) # TODO
+export_version_model = dbutils.widgets.get("08. Export version MLflow model") == "yes"
 
-dbutils.widgets.dropdown("9. Use threads","no",["yes","no"])
-use_threads = dbutils.widgets.get("9. Use threads") == "yes"
+notebook_formats = get_notebook_formats("09")
+
+dbutils.widgets.dropdown("10. Use threads","no",["yes","no"])
+use_threads = dbutils.widgets.get("10. Use threads") == "yes"
 
 export_notebook_revision = False
 export_all_runs = False
@@ -62,6 +70,7 @@ print("export_latest_versions:", export_latest_versions)
 print("export_all_runs:", export_all_runs)
 print("export_permissions:", export_permissions)
 print("export_deleted_runs:", export_deleted_runs)
+print("export_version_model:", export_version_model)
 print("notebook_formats:", notebook_formats)
 print("use_threads:", use_threads)
 
@@ -84,6 +93,7 @@ export_models(
     stages = stages, 
     export_latest_versions = export_latest_versions,
     export_all_runs = export_all_runs,
+    export_version_model = export_version_model,
     export_permissions = export_permissions,
     export_deleted_runs = export_deleted_runs, 
     notebook_formats = notebook_formats,
