@@ -20,7 +20,7 @@ cst = pytz.timezone('US/Central')
 now = datetime.now(tz=cst)
 date = now.strftime("%Y%m%d_%H%M")
  
-logfile = f"export_models_{date}.log"
+logfile = f"export_experiments_{date}.log"
 os.environ["MLFLOW_EXPORT_IMPORT_LOG_OUTPUT_FILE"] = logfile 
 
 os.environ["MLFLOW_EXPORT_IMPORT_LOG_FORMAT"]="%(threadName)s-%(levelname)s-%(message)s"
@@ -40,19 +40,19 @@ os.environ["DATABRICKS_TOKEN"] = "dapidb973ceb6dac26397c3d9c0b3d4158e5"
 
 # DBTITLE 0,`export-models` options
 # MAGIC %sh 
-# MAGIC export-models --help
+# MAGIC export-experiments --help
 
 # COMMAND ----------
 
 # DBTITLE 1,cli execution
 # MAGIC %sh 
-# MAGIC export-models \
-# MAGIC   --output-dir /dbfs/mnt/ccidsdatascidatalake/mlflow-migration-01 \
-# MAGIC   --models all \
-# MAGIC   --stages 'Archived, Staging, Production' \
+# MAGIC export-experiments \
+# MAGIC   --output-dir /dbfs/mnt/ccidsdatascidatalake/mlflow-migration-01/experiments \
+# MAGIC   --experiments all \
+# MAGIC   --run-start-time 2022-11-01 \
 # MAGIC   --export-permissions True \
 # MAGIC   --notebook-formats SOURCE \
-# MAGIC   --export-version-model True
+# MAGIC   --use-threads True
 
 # COMMAND ----------
 
