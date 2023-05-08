@@ -24,9 +24,12 @@ logfile = f"export_experiments_{date}.log"
 os.environ["MLFLOW_EXPORT_IMPORT_LOG_OUTPUT_FILE"] = logfile 
 
 os.environ["MLFLOW_EXPORT_IMPORT_LOG_FORMAT"]="%(threadName)s-%(levelname)s-%(message)s"
+
 os.environ["MLFLOW_TRACKING_URI"]="databricks"
-os.environ["DATABRICKS_HOST"] = "https://adb-374784251182712.12.azuredatabricks.net/"
-os.environ["DATABRICKS_TOKEN"] = "dapidb973ceb6dac26397c3d9c0b3d4158e5"
+
+with open("/dbfs/FileStore/shared_uploads/darrell.coles@crowncastle.com/azure_databricks_credentials") as f:
+  os.environ["DATABRICKS_HOST"]  = f.readline().strip("\n")
+  os.environ["DATABRICKS_TOKEN"] = f.readline().strip("\n")
 
 # COMMAND ----------
 
@@ -35,6 +38,8 @@ os.environ["DATABRICKS_TOKEN"] = "dapidb973ceb6dac26397c3d9c0b3d4158e5"
 # MAGIC echo $MLFLOW_EXPORT_IMPORT_LOG_OUTPUT_FILE
 # MAGIC echo $MLFLOW_EXPORT_IMPORT_LOG_FORMAT
 # MAGIC echo $MLFLOW_TRACKING_URI
+# MAGIC # echo $DATABRICKS_HOST
+# MAGIC # echo $DATABRICKS_TOKEN
 
 # COMMAND ----------
 
