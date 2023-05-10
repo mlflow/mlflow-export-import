@@ -20,7 +20,7 @@ from oss_utils_test import (
     TEST_OBJECT_PREFIX
 )
 
-client = mlflow.client.MlflowClient()
+client = mlflow.MlflowClient()
 
 # ==== Test SearchExperimentsIterator
 
@@ -63,9 +63,9 @@ def test_search_experiments_max_results_custom():
     experiments2 = SearchExperimentsIterator(client, max_results=max_results)
     assert len(experiments1) == len(list(experiments2))
 
-# == search_experiments view_type tests ZZZ
+# == search_experiments view_type tests
 #
-# Since experiments are tombstoned and not physically, 
+# Since experiments are tombston-ed and not physically deleted, 
 # we have to write some non-obvious logic to account for deleted experiments.
 #
 
