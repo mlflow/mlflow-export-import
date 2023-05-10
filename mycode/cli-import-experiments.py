@@ -59,8 +59,4 @@ with open("/dbfs/FileStore/shared_uploads/darrell.coles@crowncastle.com/aws_data
 
 # COMMAND ----------
 
-# MAGIC %sh cat /dbfs/mnt/ccidsdatascidatalake/mlflow-migration-01/experiments/experiments.json
-
-# COMMAND ----------
-
 
