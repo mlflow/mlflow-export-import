@@ -4,7 +4,7 @@
 # MAGIC Export specified models, their version runs and the experiments that the runs belong to.
 # MAGIC
 # MAGIC Widgets
-# MAGIC * `01. Models` - comma seperated registered model names to be exported. `all` will export all models.
+# MAGIC * `01. Models` - comma seperated registered model names to be exported. `all` will export all models. Or filename (ending with .txt) with model names.
 # MAGIC * `02. Output directory` - shared directory between source and destination workspaces.
 # MAGIC * `03. Stages` - stages to be exported.
 # MAGIC * `04. Export latest versions` - expor all or just the "latest" versions.

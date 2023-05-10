@@ -4,7 +4,7 @@
 # MAGIC Export multiple experiments and all their runs.
 # MAGIC
 # MAGIC Widgets
-# MAGIC * `1. Experiments` - comma delimited list of either experiment IDs or experiment names. `all` will export all experiments.
+# MAGIC * `1. Experiments` - comma delimited list of either experiment IDs or experiment names. `all` will export all experiments. Or filename (ending with .txt) with experiment names/IDs.
 # MAGIC * `2. Output directory` - shared directory between source and destination workspaces.
 # MAGIC * `3. Run start date` - Export runs after this UTC date (inclusive). Example: `2023-04-05`.
 # MAGIC * `4. Export permissions` - export Databricks permissions.
