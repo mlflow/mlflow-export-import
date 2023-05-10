@@ -55,7 +55,7 @@ with open("/dbfs/FileStore/shared_uploads/darrell.coles@crowncastle.com/aws_data
 # MAGIC   --input-dir /dbfs/mnt/ccidsdatascidatalake/mlflow-migration-01/experiments \
 # MAGIC   --import-source-tags True \
 # MAGIC   --import-permissions True \
-# MAGIC   --use-threads True
+# MAGIC #  --use-threads True
 
 # COMMAND ----------
 
