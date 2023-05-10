@@ -41,6 +41,18 @@ def export_models(
         use_threads = False,
         mlflow_client = None
     ):
+    """
+    :param: model_names: Can be either:
+      - Filename (ending with '.txt') containing list of model names
+      - List of model names
+      - String with comma-delimited model names such as 'model1,model2'
+    :return: Dictionary of summary information
+    """
+
+    if isinstance(model_names,str) and model_names.endswith(".txt"):
+        with open(model_names, "r", encoding="utf-8") as f:
+            model_names = f.read().splitlines()
+
     mlflow_client = mlflow_client or mlflow.MlflowClient()
     exps_and_runs = get_experiments_runs_of_models(mlflow_client, model_names)
     exp_ids = exps_and_runs.keys()
@@ -153,13 +165,15 @@ def _export_models(
 
 
 @click.command()
-@opt_output_dir
 @click.option("--models",
-    help="Registered model names (comma delimited).  \
-        For example, 'model1,model2'. 'all' will export all models.",
+    help="Registered model names (comma delimited) \
+ or filename ending with '.txt' containing them.\
+ For example, 'model1,model2'. 'all' will export all models.\
+ Or 'models.txt' will contain a list of model names.",
     type=str,
     required=True
 )
+@opt_output_dir
 @opt_export_latest_versions
 @opt_export_all_runs
 @opt_stages

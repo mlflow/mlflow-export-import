@@ -36,29 +36,38 @@ def export_experiments(
     ):
     """
     :param: experiments: Can be either:
+      - File (ending with '.txt') containing list of experiment names or IDS
       - List of experiment names 
       - List of experiment IDs
       - Dictionary whose key is an experiment and the value is a list of run IDs 
       - String with comma-delimited experiment names or IDs such as 'sklearn_wine,sklearn_iris' or '1,2'
     :return: Dictionary of summary information
     """
+
     mlflow_client = mlflow_client or mlflow.MlflowClient()
     start_time = time.time()
     max_workers = os.cpu_count() or 4 if use_threads else 1
 
-    export_all_runs = not isinstance(experiments, dict) 
-    experiments = bulk_utils.get_experiment_ids(mlflow_client, experiments)
-    if export_all_runs:
+    if isinstance(experiments,str) and experiments.endswith(".txt"):
+        with open(experiments, "r", encoding="utf-8") as f:
+            experiments = f.read().splitlines()
         table_data = experiments
         columns = ["Experiment Name or ID"]
         experiments_dct = {}
     else:
-        experiments_dct = experiments # we passed in a dict
-        experiments = experiments.keys()
-        table_data = [ [exp_id,len(runs)] for exp_id,runs in experiments_dct.items() ]
-        num_runs = sum(x[1] for x in table_data)
-        table_data.append(["Total",num_runs])
-        columns = ["Experiment ID", "# Runs"]
+        export_all_runs = not isinstance(experiments, dict) 
+        experiments = bulk_utils.get_experiment_ids(mlflow_client, experiments)
+        if export_all_runs:
+            table_data = experiments
+            columns = ["Experiment Name or ID"]
+            experiments_dct = {}
+        else:
+            experiments_dct = experiments # we passed in a dict
+            experiments = experiments.keys()
+            table_data = [ [exp_id,len(runs)] for exp_id,runs in experiments_dct.items() ]
+            num_runs = sum(x[1] for x in table_data)
+            table_data.append(["Total",num_runs])
+            columns = ["Experiment ID", "# Runs"]
     utils.show_table("Experiments",table_data,columns)
     _logger.info("")
 

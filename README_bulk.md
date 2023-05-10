@@ -82,18 +82,20 @@ Copy registered models and transitively all the objects that the model versions 
 See also [Single tools Registered Model Tools](README_single.md#registered-model-tools).
 
 When exporting a registered models the following model's associated objects are also transitively exported:
-* All the versions of a model.
+* Versions of a model.
 * The run associated with each version.
 * The experiment that the run belongs to. 
 
 **Scripts**
-* `export-models` - exports registered models and their versions' backing run along with the experiment that the run belongs to.
-* `import-models` - imports models and their versions' runs and experiments from the above exported directory.
+* `export-models` - exports registered models.
+* `import-models` - imports models.
 
 
-**Output directory**
+### Export directory
 
-See [sample JSON export](samples/databricks/bulk/models).
+Export directory samples: 
+[open source](samples/oss_mlflow/bulk/models)
+\- [Databricks](samples/databricks/bulk/models).
 
 ```
 +-manifest.json
@@ -107,7 +109,7 @@ See [sample JSON export](samples/databricks/bulk/models).
 |
 +-experiments/
 | +-experiments.json
-| +-1/
+| +-1280664374380606/
 | | +-experiment.json
 | | | . . .
 ```
@@ -129,10 +131,12 @@ Source: [export_models.py](mlflow_export_import/bulk/export_models.py).
 export-models --help
 
 Options:
-  --output-dir TEXT               Output directory.  [required]
-  --models TEXT                   Registered model names (comma delimited).
+  --models TEXT                   Registered model names (comma delimited)  or
+                                  filename ending with '.txt' containing them.
                                   For example, 'model1,model2'. 'all' will
-                                  export all models.  [required]
+                                  export all models. Or 'models.txt' will
+                                  contain a list of model names.  [required]
+  --output-dir TEXT               Output directory.  [required]
   --export-latest-versions BOOLEAN
                                   Export latest registered model versions
                                   instead of all versions.  [default: False]
@@ -146,6 +150,8 @@ Options:
   --export-permissions BOOLEAN    Export Databricks permissions.  [default:
                                   False]
   --export-deleted-runs BOOLEAN   Export deleted runs.  [default: False]
+  --export-version-model BOOLEAN  Export registered model version's 'cached'
+                                  MLflow model.  [default: False]
   --notebook-formats TEXT         Databricks notebook formats. Values are
                                   SOURCE, HTML, JUPYTER or DBC (comma
                                   seperated).
@@ -174,6 +180,22 @@ export-models \
   --output-dir out \
   --models sklearn*
 ```
+
+##### Export models from filename
+```
+export-models \
+  --output-dir out \
+  --models my-models.txt
+```
+
+where `my-models.txt` is:
+```
+sklearn_iris
+sklearn_wine
+```
+
+XX
+
 
 ### Import registered models 
 
@@ -218,7 +240,13 @@ import-models  --input-dir out
 
 Export/import experiments to a directory.
 
-**Output directory**
+### Export Directory 
+
+Export directory samples: 
+[open source](samples/oss_mlflow/bulk/experiments)
+\- [Databricks](samples/databricks/bulk/experiments).
+
+**Export directory**
 ```
 +-experiments.json
 | +-5bd3b8a44faf4803989544af5cb4d66e/
@@ -258,151 +286,46 @@ export-experiments --help
 
 #### Examples
 
-Export experiments by experiment ID.
+##### Export experiments by experiment ID
 ```
 export-experiments \
-  --experiments 2,3 --output-dir out
+  --experiments 1280664374380606,e090757fcb8f49cb \
+  --output-dir out
 ```
 
-Export experiments by experiment name.
+##### Export experiments by experiment name
 ```
 export-experiments \
-  --experiments sklearn,sparkml --output-dir out
+  --experiments /Users/me@my.com/sklearn_iris,/Users/me@my.com/keras_mnist \
+  --output-dir out
 ```
 
-Export all experiments.
+##### Export experiments from filename - XX
+```
+export-experiments \
+  --output-dir out \
+  --experiments my-experiments.txt
+```
+
+where `my-experiments.txt` is:
+```
+/Users/me@my.com/sklearn_iris
+/Users/me@my.com/keras_mnist
+```
+
+##### Export all experiments
 ```
 export-experiments \
   --experiments all --output-dir out
 ```
 
 ```
-Exporting experiment 'Default' (ID 0) to 'out/0'
-Exporting experiment 'sklearn' (ID 1) to 'out/1'
-Exporting experiment 'keras_mnist' (ID 2) to 'out/2'
+Exporting experiment: {'name': '/Users/me@my.com/sklearn_iris', 'id': '1280664374380606', 'mlflow.experimentType': 'MLFLOW_EXPERIMENT', 'lifecycle_stage': 'active'}
+Exporting experiment: {'name': '/Users/me@my.com/keras_mnist', 'id': 'e090757fcb8f49cb', 'mlflow.experimentType': 'NOTEBOOK', 'lifecycle_stage': 'active'}
 . . .
-
 249 experiments exported
 1770/1770 runs succesfully exported
-Duration: 1.6 seonds
-```
-
-#### Export directory structure
-
-The root output directory contains an experiments.json file and a subdirectory for each experiment (named for the experiment ID).
-
-Each experiment subdirectory in turn contains its own experiment.json file and a subdirectory for each run.
-The run directory contains a run.json file containing run metadata and artifact directories.
-
-In the example below we have two experiments - 1 and 7. Experiment 1 (sklearn) has two runs (f4eaa7ddbb7c41148fe03c530d9b486f and 5f80bb7cd0fc40038e0e17abe22b304c) whereas experiment 7 (sparkml) has one run (ffb7f72a8dfb46edb4b11aed21de444b).
-
-```
-+-experiments.json
-+-1/
-| +-experiment.json
-| +-f4eaa7ddbb7c41148fe03c530d9b486f/
-| | +-run.json
-| | +-artifacts/
-| |   +-sklearn-model/
-| |   +-onnx-model/
-| +-5f80bb7cd0fc40038e0e17abe22b304c/
-| | +-run.json
-|   +-artifacts/
-|     +-sklearn-model/
-|     +-onnx-model/
-+-7/
-| +-experiment.json
-| +-ffb7f72a8dfb46edb4b11aed21de444b/
-| | +-run.json
-|   +-artifacts/
-|     +-spark-model/
-|     +-mleap-model/
-```
-
-Sample experiments.json
-```
-{
-  "system": {
-    "package_version": "1.1.2",
-    "script": "export_experiments.py"
-  },
-  "info": {
-    "duration": 0.2,
-    "experiments": 3,
-    "total_runs": 2,
-    "ok_runs": 2,
-    "failed_runs": 0
-  },
-  "mlflow": {
-    "experiments": [
-      {
-        "id": "2",
-        "name": "sklearn",
-        "ok_runs": 1,
-        "failed_runs": 0,
-        "duration": 0.1
-      },
-      {
-        "id": "2",
-        "name": "sparkml",
-        "ok_runs": 1,
-        "failed_runs": 0,
-        "duration": 0.1
-      },
-```
-
-Sample experiment.json
-```
-{
-  "system": {
-    "package_version": "1.1.2",
-  }
-  "info": {
-    "num_total_runs": 1,
-    "num_ok_runs": 1,
-    "num_failed_runs": 0,
-    "failed_runs": []
-  },
-  "mlflow": {
-    "experiment": {
-      "experiment_id": "1",
-      "name": "sklearn_wine",
-      "artifact_location": "/Users/andre.mesarovic/work/mlflow_server/local_mlrun/mlruns/1",
-      "lifecycle_stage": "active",
-      "tags": {
-        "experiment_created": "2022-12-15 02:17:43",
-        "version_mlflow": "2.0.1"
-      },
-      "creation_time": 1671070664091,
-      "last_update_time": 1671070664091
-    }
-    "runs": [
-      "a83cebbccbca41299360c695c5ea72f3"
-    ],
-  }
-```
-
-Sample experiment.json
-```
-{
-  "experiment": {
-    "experiment_id": "1",
-    "name": "sklearn",
-    "artifact_location": "/opt/mlflow/server/mlruns/1",
-    "lifecycle_stage": "active"
-  },
-  "export_info": {
-    "export_time": "2022-01-14 03:26:42",
-    "num_total_runs": 2,
-    "num_ok_runs": 2,
-    "ok_runs": [
-      "4445f19b7bf04d0fb0173424db476198",
-      "d835e17257ad4d6db92441ad93bec549"
-    ],
-    "num_failed_runs": 0,
-    "failed_runs": []
-  }
-}
+Duration: 103.6 seonds
 ```
 
 ### Import experiments
@@ -419,21 +342,21 @@ If the experiment already exists, the source runs will be added to it.
 import-experiments --help
 
 Options:
-  --input-dir TEXT               Input directory  [required]
-  --import-source-tags BOOLEAN   Import source information for registered
-                                 model and its versions ad tags in destination
-                                 object.  [default: False]
-  --use-src-user-id BOOLEAN      Set the destination user field to the source
-                                 user field.  Only valid for open source
-                                 MLflow.  When importing into Databricks, the
-                                 source user field is ignored since it is
-                                 automatically picked up from your Databricks
-                                 access token.  There is no MLflow API
-                                 endpoint to explicity set the user_id for Run
-                                 and Registered Model.
-  --experiment-rename-file TEXT  File with experiment names replacements:
-                                 comma-delimited line such as
-                                 'old_name,new_name'.
+  --experiments TEXT             Experiment names or IDs (comma delimited) or
+                                 filename ending with '.txt' containing them.
+                                 For example, 'sklearn_wine,sklearn_iris' or
+                                 '1,2'. 'all' will export all experiments.
+                                 Or 'experiments.txt' will contain a list of
+                                 experiment names or IDs.  [required]
+  --output-dir TEXT              Output directory.  [required]
+  --export-permissions BOOLEAN   Export Databricks permissions.  [default:
+                                 False]
+  --run-start-time TEXT          Only export runs started after this UTC time
+                                 (inclusive). Format: YYYY-MM-DD.
+  --export-deleted-runs BOOLEAN  Export deleted runs.  [default: False]
+  --notebook-formats TEXT        Databricks notebook formats. Values are
+                                 SOURCE, HTML, JUPYTER or DBC (comma
+                                 seperated).
   --use-threads BOOLEAN          Process in parallel using threads.  [default:
                                  False]
 ```

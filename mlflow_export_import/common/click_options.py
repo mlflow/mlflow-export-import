@@ -182,8 +182,9 @@ def opt_delete_model(function):
 
 def opt_experiments(function):
     function = click.option("--experiments",
-        help="Experiment names or IDs (comma delimited).  \
-               For example, 'sklearn_wine,sklearn_iris' or '1,2'. 'all' will export all experiments.",
+        help="Experiment names or IDs (comma delimited) or filename ending with '.txt' containing them.  \
+               For example, 'sklearn_wine,sklearn_iris' or '1,2'. 'all' will export all experiments. \
+               Or 'experiments.txt' will contain a list of experiment names or IDs.",
         type=str,
         required=True
     )(function)
