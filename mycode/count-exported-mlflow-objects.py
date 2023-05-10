@@ -39,7 +39,7 @@ exp_df.columns = ["n_runs"]
 # COMMAND ----------
 
 # MAGIC %sh 
-# MAGIC ls /dbfs/mnt/ccidsdatascidatalake/mlflow-migration-01/models/ > exported_models
+# MAGIC ls /dbfs/mnt/ccidsdatascidatalake/mlflow-migration-models/models/ > exported_models
 
 # COMMAND ----------
 
