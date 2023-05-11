@@ -2,6 +2,7 @@
 import mlflow
 import pandas as pd
 import numpy as np
+from datetime import datetime
 
 # COMMAND ----------
 
@@ -23,16 +24,35 @@ def email(exp):
     return exp.tags['mlflow.ownerEmail']
   except:
     return "none"
+    
+def run_start_time(run: pandas.Series)->datetime.datetime:
+  return datetime(
+    year=run.start_time.year,
+    month=run.start_time.month,
+    day=run.start_time.day)
   
-def n_runs(exp):
+def n_runs(exp, start_time=None):
+  """
+  Parameters
+  ==========
+  start_time (str): date; format 'YYYY-MM-DD'  
+  """
+  runs = mlflow.search_runs(exp.experiment_id)
   try:
-    return len(mlflow.search_runs(exp.experiment_id))
+    if start_time:
+      year, month, day = start_time.split("-")
+      dt_thresh = datetime(year=int(year), month=int(month), day=int(day))
+      return len([1 for _, run in runs.iterrows() if run_start_time(run) >= dt_thresh])
+    else:
+      return len(runs)
   except:
     0
 
 # COMMAND ----------
 
-data = np.array([(exp_id(exp), n_runs(exp), email(exp)) for exp in mlflow.search_experiments()])
+start_time = "2022-11-01"
+
+data = np.array([(exp_id(exp), n_runs(exp, start_time), email(exp)) for exp in mlflow.search_experiments()])
 
 df = pd.DataFrame(dict(experiment_id=data[:,0], n_runs=data[:,1], owner_email=data[:,2]))
 df["n_runs"] = df.n_runs.astype(int)

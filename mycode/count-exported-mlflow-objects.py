@@ -10,11 +10,11 @@ import numpy as np
 # COMMAND ----------
 
 # MAGIC %sh 
-# MAGIC find /dbfs/mnt/ccidsdatascidatalake/mlflow-migration-01/experiments -type d -maxdepth 2 > exported_experiments
+# MAGIC find /dbfs/mnt/ccidsdatascidatalake/mlflow-migration-models/experiments -type d -maxdepth 2 > exported_experiments
 
 # COMMAND ----------
 
-exp_pat = "^.*\/dbfs\/mnt\/ccidsdatascidatalake\/mlflow-migration-01\/experiments\/(.*)$"
+exp_pat = "^.*\/dbfs\/mnt\/ccidsdatascidatalake\/mlflow-migration-models\/experiments\/(.*)$"
 
 filepath = "exported_experiments"
 capture = [re.findall(exp_pat, line) for line in open(filepath)]
@@ -60,38 +60,38 @@ print("There are", n_models, "registered models")
 
 # COMMAND ----------
 
-import os 
+# import os 
 
-def exp_id(exp):
-  try:
-    return exp.experiment_id
-  except:
-    return "none"
+# def exp_id(exp):
+#   try:
+#     return exp.experiment_id
+#   except:
+#     return "none"
   
-def exp_id_after_import(exp):
-  try:
-    return exp.experiment_id
-  except:
-    return "none"
+# def exp_id_after_import(exp):
+#   try:
+#     return exp.experiment_id
+#   except:
+#     return "none"
 
-def email(exp):
-  try:
-    return exp.tags['mlflow.ownerEmail']
-  except:
-    return "none"
+# def email(exp):
+#   try:
+#     return exp.tags['mlflow.ownerEmail']
+#   except:
+#     return "none"
   
-def n_runs(exp):
-  try:
-    return len(mlflow.search_runs(exp_id(exp)))
-  except:
-    0
+# def n_runs(exp):
+#   try:
+#     return len(mlflow.search_runs(exp_id(exp)))
+#   except:
+#     0
     
-result = []
-for exp in mlflow.search_experiments():
-  result.append([os.path.basename(exp.name), email(exp), n_runs(exp)])
+# result = []
+# for exp in mlflow.search_experiments():
+#   result.append([os.path.basename(exp.name), email(exp), n_runs(exp)])
   
-df = spark.createDataFrame(result,["experiment_name","owner","n_runs"])
-display(df)
+# df = spark.createDataFrame(result,["experiment_name","owner","n_runs"])
+# display(df)
 
 # COMMAND ----------
 

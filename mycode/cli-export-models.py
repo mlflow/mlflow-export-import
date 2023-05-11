@@ -54,7 +54,7 @@ with open("/dbfs/FileStore/shared_uploads/darrell.coles@crowncastle.com/azure_da
 # MAGIC export-models \
 # MAGIC   --output-dir /dbfs/mnt/ccidsdatascidatalake/mlflow-migration-models \
 # MAGIC   --models all \
-# MAGIC   --stages 'Archived, Staging, Production' \
+# MAGIC   --stages 'Production,Staging,Archived,None' \
 # MAGIC   --export-permissions True \
 # MAGIC   --notebook-formats SOURCE \
 # MAGIC   --export-version-model True
