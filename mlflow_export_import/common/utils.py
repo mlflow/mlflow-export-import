@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 from tabulate import tabulate
 
@@ -78,3 +79,7 @@ def get_user():
 def getLogger(name):
     from mlflow_export_import.common import logging_utils
     return logging_utils.get_logger(name)
+
+
+def get_threads(use_threads=False):
+    return os.cpu_count() or 4 if use_threads else 1

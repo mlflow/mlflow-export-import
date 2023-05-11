@@ -111,7 +111,7 @@ def _export_models(
         export_version_model = False,
         export_permissions = False
     ):
-    max_workers = os.cpu_count() or 4 if use_threads else 1
+    max_workers = utils.get_threads(use_threads)
     start_time = time.time()
     model_names = bulk_utils.get_model_names(mlflow_client, model_names)
     _logger.info("Models to export:")

@@ -127,7 +127,7 @@ def _import_models(mlflow_client,
         verbose, 
         use_threads
     ):
-    max_workers = os.cpu_count() or 4 if use_threads else 1
+    max_workers = utils.get_threads(use_threads)
     start_time = time.time()
 
     models_dir = os.path.join(input_dir, "models")

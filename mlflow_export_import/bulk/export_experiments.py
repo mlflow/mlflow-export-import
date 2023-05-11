@@ -47,7 +47,7 @@ def export_experiments(
 
     mlflow_client = mlflow_client or mlflow.MlflowClient()
     start_time = time.time()
-    max_workers = os.cpu_count() or 4 if use_threads else 1
+    max_workers = utils.get_threads(use_threads)
 
     if isinstance(experiments,str) and experiments.endswith(".txt"):
         with open(experiments, "r", encoding="utf-8") as f:

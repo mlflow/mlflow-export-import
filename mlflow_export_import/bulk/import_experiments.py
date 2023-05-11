@@ -39,7 +39,7 @@ def import_experiments(
     for exp in exps:
         _logger.info(f"  {exp}")
 
-    max_workers = os.cpu_count() or 4 if use_threads else 1
+    max_workers = utils.get_threads(use_threads)
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for exp in exps:
             exp_input_dir = os.path.join(input_dir,exp["id"])
