@@ -18,6 +18,7 @@ from mlflow_export_import.common.click_options import (
     opt_export_deleted_runs,
     opt_use_threads
 )
+from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common import utils, io_utils, mlflow_utils
 from mlflow_export_import.bulk import bulk_utils
 from mlflow_export_import.experiment.export_experiment import export_experiment
@@ -125,10 +126,12 @@ def export_experiments(
 
 def _export_experiment(mlflow_client, exp_id_or_name, output_dir, export_permissions, notebook_formats, export_results, 
         run_start_time, export_deleted_runs, run_ids):
-    exp = mlflow_utils.get_experiment(mlflow_client, exp_id_or_name)
-    exp_output_dir = os.path.join(output_dir, exp.experiment_id)
     ok_runs = -1; failed_runs = -1
+    exp_name = exp_id_or_name
     try:
+        exp = mlflow_utils.get_experiment(mlflow_client, exp_id_or_name)
+        exp_name = exp.name
+        exp_output_dir = os.path.join(output_dir, exp.experiment_id)
         start_time = time.time()
         ok_runs, failed_runs = export_experiment(
             experiment_id_or_name = exp.experiment_id,
@@ -150,10 +153,15 @@ def _export_experiment(mlflow_client, exp_id_or_name, output_dir, export_permiss
         }
         export_results.append(result)
         _logger.info(f"Done exporting experiment: {result}")
-    except Exception:
+    except MlflowExportImportException as e:
+        err_msg = { "experiment": exp_name, "MlflowExportImportException": e.kwargs }
+        _logger.error(err_msg)
+    except Exception as e:
+        err_msg = { "experiment": exp_name, "Exception": e }
+        _logger.error(err_msg)
         import traceback
         traceback.print_exc()
-    return Result(exp.name, ok_runs, failed_runs)
+    return Result(exp_name, ok_runs, failed_runs)
     
 
 @dataclass()

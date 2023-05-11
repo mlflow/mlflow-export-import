@@ -45,10 +45,9 @@ def _create_test_experiment(client, num_runs, mk_test_object_name=mk_test_object
 
 # == Compare
 
-def compare_experiments(mlflow_context, compare_func):
+def compare_experiments(mlflow_context, compare_func=compare_runs):
     exps1 = sorted(_search_experiments(mlflow_context.client_src), key=lambda x: x.name)
     exps2 = sorted(_search_experiments(mlflow_context.client_dst), key=lambda x: x.name)
-# ZZZ
     assert len(exps1) == len(exps2)
     for x in zip(exps1, exps2):
         exp1, exp2 = x[0], x[1]
@@ -109,6 +108,21 @@ def test_get_experiment_ids_from_list(mlflow_context):
     assert exp_ids1 == exp_ids2
 
 
+def test_failed_export(mlflow_context):
+    delete_experiments_and_models(mlflow_context)
+    exps = [ _create_test_experiment(mlflow_context.client_src, 1), _create_test_experiment(mlflow_context.client_src, 2) ]
+    exp_names = [ exps[0].name, "foo", exps[1].name ]
+    export_experiments(
+        mlflow_client = mlflow_context.client_src,
+        experiments = exp_names,
+        output_dir = mlflow_context.output_dir
+    )
+    import_experiments(
+        mlflow_client = mlflow_context.client_dst, 
+        input_dir = mlflow_context.output_dir)
+    compare_experiments(mlflow_context)
+
+
 # == Test import with experiment replacement tests
 
 def test_experiment_renames_do_replace(mlflow_context):
@@ -150,6 +164,7 @@ def test_experiment_renames_dont_replace(mlflow_context):
     exp2 = mlflow_context.client_dst.get_experiment_by_name(new_name)
     assert not exp2 
 
+
 # == Test export/import deleted runs
 
 def _purge(exps1, exps2):
@@ -164,6 +179,7 @@ def _delete_experiments(mlflow_context):
         mlflow_context.client_src.delete_experiment(exp.experiment_id)
     for exp in mlflow_context.client_dst.search_experiments():
         mlflow_context.client_dst.delete_experiment(exp.experiment_id)
+
 
 def test_export_deleted_runs(mlflow_context):
     init_output_dirs(mlflow_context.output_dir)

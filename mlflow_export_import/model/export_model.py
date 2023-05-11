@@ -5,6 +5,7 @@ Export a registered model and all the experiment runs associated with each versi
 import os
 import click
 import mlflow
+from mlflow.exceptions import RestException
 
 from mlflow_export_import.client.http_client import MlflowHttpClient
 from mlflow_export_import.client.http_client import DatabricksHttpClient
@@ -112,57 +113,26 @@ class ModelExporter():
         """
         :param model_name: Registered model name.
         :param output_dir: Output directory.
-        :return: Returns bool (if export succeeded) and the model name.
+        :return: Returns bool and the model name (if export succeeded).
         """
         try:
             self._export_model(model_name, output_dir)
             return True, model_name
+        except RestException as e:
+            err_msg = { "model": model_name, "RestException": e.json  }
+            if e.json.get("error_code",None) == "RESOURCE_DOES_NOT_EXIST":
+                err_msg = { **{"message": "Model does not exist"}, **err_msg}
+                _logger.error(err_msg = { **{"message": "Model does not exist"}, **err_msg})
+            else:
+                _logger.error({ **{"message": "Model cannot be exported"}, **err_msg})
+                import traceback
+                traceback.print_exc()
+            return False, model_name
         except Exception as e:
-            _logger.error(e)
+            _logger.error({ "model": model_name, "Exception": e })
             import traceback
             traceback.print_exc()
             return False, model_name
-
-
-    def _export_versions(self, versions, output_dir):
-        output_versions, failed_versions = ([], [])
-        for j,vr in enumerate(versions):
-            if len(self.stages) > 0 and not vr.current_stage.lower() in self.stages:
-                continue
-            if len(self.versions) > 0 and not vr.version in self.versions:
-                continue
-            self._export_version(vr, output_dir, output_versions, failed_versions, j, len(versions))
-        output_versions.sort(key=lambda x: x["version"], reverse=False)
-        return output_versions, failed_versions
-
-
-    def _export_version(self, vr, output_dir, output_versions, failed_versions, j, num_versions):
-        opath = os.path.join(output_dir, vr.run_id)
-        msg = { "name": vr.name, "version": vr.version, "stage": vr.current_stage }
-        _logger.info(f"Exporting model verson {j+1}/{num_versions}: {msg} to '{opath}'")
-
-        try:
-            self.run_exporter.export_run(vr.run_id, opath)
-            run = self.mlflow_client.get_run(vr.run_id)
-            vr_dct = dict(vr)
-            vr_dct["_run_artifact_uri"] = run.info.artifact_uri
-            experiment = mlflow.get_experiment(run.info.experiment_id)
-            vr_dct["_experiment_name"] = experiment.name
-            if self.export_version_model:
-                vr_dct["_download_uri"] = model_utils.export_version_model(self.mlflow_client, vr, output_dir)
-            output_versions.append(vr_dct)
-
-        except mlflow.exceptions.RestException as e:
-            err_msg = { "RestException": e.json , "model": vr.name, "version": vr.version, "run_id": vr.run_id }
-            if e.json.get("error_code",None) == "RESOURCE_DOES_NOT_EXIST":
-                err_msg = { **{"message": "Run probably does not exist"}, **err_msg}
-                _logger.error(err_msg)
-            else:
-                err_msg = { **{"message": "Version cannot be exported"}, **err_msg}
-                _logger.error(err_msg)
-                import traceback
-                traceback.print_exc()
-            failed_versions.append(err_msg)
 
 
     def _export_model(self, model_name, output_dir):
@@ -194,8 +164,49 @@ class ModelExporter():
         _logger.info(f"Exported {len(versions)}/{len(ori_versions)} '{msg}' versions for model '{model_name}'")
 
 
+    def _export_versions(self, versions, output_dir):
+        output_versions, failed_versions = ([], [])
+        for j,vr in enumerate(versions):
+            if len(self.stages) > 0 and not vr.current_stage.lower() in self.stages:
+                continue
+            if len(self.versions) > 0 and not vr.version in self.versions:
+                continue
+            self._export_version(vr, output_dir, output_versions, failed_versions, j, len(versions))
+        output_versions.sort(key=lambda x: x["version"], reverse=False)
+        return output_versions, failed_versions
+
+
+    def _export_version(self, vr, output_dir, output_versions, failed_versions, j, num_versions):
+        opath = os.path.join(output_dir, vr.run_id)
+        msg = { "name": vr.name, "version": vr.version, "stage": vr.current_stage }
+        _logger.info(f"Exporting model verson {j+1}/{num_versions}: {msg} to '{opath}'")
+
+        try:
+            self.run_exporter.export_run(vr.run_id, opath)
+            run = self.mlflow_client.get_run(vr.run_id)
+            vr_dct = dict(vr)
+            vr_dct["_run_artifact_uri"] = run.info.artifact_uri
+            experiment = mlflow.get_experiment(run.info.experiment_id)
+            vr_dct["_experiment_name"] = experiment.name
+            if self.export_version_model:
+                vr_dct["_download_uri"] = model_utils.export_version_model(self.mlflow_client, vr, output_dir)
+            output_versions.append(vr_dct)
+
+        except RestException as e:
+            err_msg = { "model": vr.name, "version": vr.version, "run_id": vr.run_id, "RestException": e.json  }
+            if e.json.get("error_code",None) == "RESOURCE_DOES_NOT_EXIST":
+                err_msg = { **{"message": "Version run probably does not exist"}, **err_msg}
+                _logger.error(err_msg)
+            else:
+                err_msg = { **{"message": "Version cannot be exported"}, **err_msg}
+                _logger.error(err_msg)
+                import traceback
+                traceback.print_exc()
+            failed_versions.append(err_msg)
+
+
     def _adjust_model(self, model, versions):
-        """ Add nicely formatted timestamps and for aesthetic reasons, line up the dict attributes nicely"""
+        """ Add nicely formatted timestamps and for aesthetic reasons order the dict attributes"""
         self._adjust_timestamp(model, "creation_timestamp")
         self._adjust_timestamp(model, "last_updated_timestamp")
         tags = model.pop("tags", None)

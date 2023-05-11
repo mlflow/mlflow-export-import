@@ -222,7 +222,7 @@ class ModelImporter(BaseModelImporter):
                 if run_id:
                     self.import_version(model_name, vr, run_id, sleep_time)
             except RestException as e:
-                msg = { "model": model_name, "version": vr["version"], "experiment": experiment_name, "run_id": run_id, "exception": str(e) }
+                msg = { "model": model_name, "version": vr["version"], "experiment": experiment_name, "run_id": run_id, "RestException": str(e) }
                 _logger.error(f"Failed to import model version: {msg}")
         if verbose:
             model_utils.dump_model_versions(self.mlflow_client, model_name)

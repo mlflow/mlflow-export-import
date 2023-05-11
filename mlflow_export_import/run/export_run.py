@@ -14,6 +14,7 @@ from mlflow_export_import.common.click_options import (
     opt_output_dir,
     opt_notebook_formats
 )
+from mlflow.exceptions import RestException
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
@@ -79,35 +80,36 @@ class RunExporter:
         :param output_dir: Output directory.
         :return: whether export succeeded.
         """
-        run = self.mlflow_client.get_run(run_id)
-        if run.info.lifecycle_stage == "deleted" and not self.export_deleted_runs:
-            return False
-        msg = { "run_id": run.info.run_id, "lifecycle_stage": run.info.lifecycle_stage, "experiment_id": run.info.experiment_id }
-        _logger.info(f"Exporting run: {msg}")
-        tags = run.data.tags
-        tags = dict(sorted(tags.items()))
-        
-        info = utils.strip_underscores(run.info)
-        info["_start_time"] = fmt_ts_millis(run.info.start_time)
-        info["_end_time"] = fmt_ts_millis(run.info.end_time)
-        mlflow_attr = {
-            "info": info,
-            "params": run.data.params,
-            "metrics": self._get_metrics_with_steps(run),
-            "tags": tags
-        }
-        io_utils.write_export_file(output_dir, "run.json", __file__, mlflow_attr)
-        fs =  _filesystem.get_filesystem(".")
-
-        # copy artifacts
-        dst_path = os.path.join(output_dir, "artifacts")
+        experiment_id = None
         try:
+            run = self.mlflow_client.get_run(run_id)
+            if run.info.lifecycle_stage == "deleted" and not self.export_deleted_runs:
+                return False
+            experiment_id = run.info.experiment_id
+            msg = { "run_id": run.info.run_id, "lifecycle_stage": run.info.lifecycle_stage, "experiment_id": run.info.experiment_id }
+            _logger.info(f"Exporting run: {msg}")
+            tags = run.data.tags
+            tags = dict(sorted(tags.items()))
+        
+            info = utils.strip_underscores(run.info)
+            info["_start_time"] = fmt_ts_millis(run.info.start_time)
+            info["_end_time"] = fmt_ts_millis(run.info.end_time)
+            mlflow_attr = {
+                "info": info,
+                "params": run.data.params,
+                "metrics": self._get_metrics_with_steps(run),
+                "tags": tags
+            }
+            io_utils.write_export_file(output_dir, "run.json", __file__, mlflow_attr)
+            fs =  _filesystem.get_filesystem(".")
+
+            # copy artifacts
+            dst_path = os.path.join(output_dir, "artifacts")
             artifacts = self.mlflow_client.list_artifacts(run.info.run_id)
             if len(artifacts) > 0: # Because of https://github.com/mlflow/mlflow/issues/2839
                 fs.mkdirs(dst_path)
                 mlflow.artifacts.download_artifacts(
                    run_id = run.info.run_id, 
-                   artifact_path = "", 
                    dst_path = _filesystem.mk_local_path(dst_path), 
                    tracking_uri = self.mlflow_client._tracking_client.tracking_uri)
             notebook = tags.get(MLFLOW_DATABRICKS_NOTEBOOK_PATH, None)
@@ -118,8 +120,13 @@ class RunExporter:
                 _logger.warning(f"Cannot export notebook for run '{run_id}' since tag '{MLFLOW_DATABRICKS_NOTEBOOK_PATH}' is not set.")
             return True
 
+        except RestException as e:
+            err_msg = { "run_id": run_id, "experiment_id": experiment_id, "RestException": e.json }
+            _logger.error(err_msg)
+            return False
         except Exception as e:
-            _logger.error(f"run_id: {run.info.run_id}, Exception: {e}")
+            err_msg = { "run_id": run_id, "experiment_id": experiment_id, "Exception": e }
+            _logger.error(err_msg)
             traceback.print_exc()
             return False
 

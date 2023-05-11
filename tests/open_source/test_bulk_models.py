@@ -16,14 +16,13 @@ from oss_utils_test import (
 
 # == Setup
 
-_notebook_formats = "SOURCE,DBC"
 _num_models = 2
 _num_runs = 2
 
 
 # == Compare
 
-def compare_models_with_versions(mlflow_context, compare_func):
+def compare_models_with_versions(mlflow_context, compare_func=compare_runs):
     test_dir = os.path.join(mlflow_context.output_dir, "test_compare_runs")
     exps = list_experiments(mlflow_context.client_src)
     exp_ids = [ exp.experiment_id for exp in exps ]
@@ -57,41 +56,54 @@ def _create_model(client):
         client.create_model_version(model_name, source, run.info.run_id)
     return model.name, exp
 
-def _run_test(mlflow_context, compare_func, use_threads=False):
+def _run_test(mlflow_context, use_threads=False):
     delete_experiments_and_models(mlflow_context)
     model_names = [ create_model(mlflow_context.client_src) for j in range(0, _num_models) ]
+    _run_test_with_models_names(mlflow_context, model_names, use_threads)
+    models = mlflow_context.client_dst.search_registered_models()
+    assert len(models) == len(model_names)
+
+def _run_test_with_models_names(mlflow_context, model_names, use_threads=False):
     export_models(
         mlflow_client = mlflow_context.client_src,
         model_names = model_names, 
         output_dir = mlflow_context.output_dir, 
-        notebook_formats = _notebook_formats, 
         stages = "None", 
         export_all_runs = False, 
-        use_threads = False
+        use_threads = use_threads
     )
-
     import_models(
         mlflow_client = mlflow_context.client_dst,
         input_dir = mlflow_context.output_dir,
         delete_model = False,
         use_src_user_id = False,
-        verbose = False,
         use_threads = use_threads
     )
-
-    compare_models_with_versions(mlflow_context, compare_func)
+    compare_models_with_versions(mlflow_context)
 
 
 # == Export/import registered model tests
 
 def test_basic(mlflow_context):
-    _run_test(mlflow_context, compare_runs)
+    _run_test(mlflow_context)
 
 def test_exp_basic_threads(mlflow_context):
-    _run_test(mlflow_context, compare_runs, use_threads=True)
+    _run_test(mlflow_context, use_threads=True)
 
 def test_exp_with_source_tags(mlflow_context):
-    _run_test(mlflow_context, compare_runs)
+    _run_test(mlflow_context)
+
+def test_failed_model_export(mlflow_context):
+    delete_experiments_and_models(mlflow_context)
+    model_names = [
+        create_model(mlflow_context.client_src),
+        "foo",
+        create_model(mlflow_context.client_src)
+   ]
+    _run_test_with_models_names(mlflow_context, model_names)
+    models = mlflow_context.client_dst.search_registered_models()
+    assert len(models) == 2
+
 
 # == Test number if all runs of an experiment or just those of the version are exported
 

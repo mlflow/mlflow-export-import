@@ -104,6 +104,10 @@ def download_artifacts(client, download_uri, dst_path=None, fix=True):
 
 # == Dump exception functions
 
+def mk_msg_RestException(e):
+    return { "RestException": { **e.json,  **{ "http_status_code": e.get_http_status_code()} } }
+
+
 def dump_exception(ex, msg=""):
     from mlflow.exceptions import MlflowException
     if issubclass(ex.__class__,MlflowException):
@@ -123,6 +127,8 @@ def _dump_exception(ex, msg=""):
             for k2,v2 in v.items():
                 _logger.info(f"      {k2}: {v2}")
         else:
+            if k == "src_exception" and v:
+                _logger.info(f"    {k}: {type(v)}")
             _logger.info(f"    {k}: {v}")
 
 
