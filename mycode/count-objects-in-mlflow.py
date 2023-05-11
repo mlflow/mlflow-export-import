@@ -6,6 +6,16 @@ from datetime import datetime
 
 # COMMAND ----------
 
+wij = dbutils.widgets
+
+wij.text("start_time","")
+start_time = wij.get("start_time")
+start_time = start_time if start_time else None
+
+print("start_time:", start_time)
+
+# COMMAND ----------
+
 # DBTITLE 1,inspection functions
 def exp_id(exp):
   try:
@@ -25,7 +35,16 @@ def email(exp):
   except:
     return "none"
     
-def run_start_time(run: pandas.Series)->datetime.datetime:
+def run_start_time(run):
+  """
+  Parameters
+  ==========
+    run (pandas.Series): run parameters
+  
+  Returns
+  =======
+    datetime
+  """
   return datetime(
     year=run.start_time.year,
     month=run.start_time.month,
@@ -49,8 +68,6 @@ def n_runs(exp, start_time=None):
     0
 
 # COMMAND ----------
-
-start_time = "2022-11-01"
 
 data = np.array([(exp_id(exp), n_runs(exp, start_time), email(exp)) for exp in mlflow.search_experiments()])
 
