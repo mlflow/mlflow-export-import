@@ -166,13 +166,25 @@ databricks fs cp dist/mlflow_export_import-1.0.0-py3-none-any.whl {MY_DBFS_PATH}
 
 ### Laptop to Databricks usage
 
-To run the tools externally (from your laptop) against a Databricks tracking server (workspace) set the following environment variables:
+There are several ways to run the tools from your laptop against a Databricks workspace.
+
+
+1. With .~/databrickscfg and no profile specified. The host and token are picked up from the DEFAULT profile.
 ```
 export MLFLOW_TRACKING_URI=databricks
-export DATABRICKS_HOST=https://mycompany.cloud.databricks.com
+```
+2. Specify profile in  ~/.databrickscfg.
+```
+export MLFLOW_TRACKING_URI=databricks://MY_PROFILE
+```
+3. To override ~/.databrickscfg values or without ~/.databrickscfg file.
+```
+export MLFLOW_TRACKING_URI=databricks
+export DATABRICKS_HOST=https://myshard.cloud.databricks.com
 export DATABRICKS_TOKEN=MY_TOKEN
 ```
-For full details see [Access the MLflow tracking server from outside Databricks](https://docs.databricks.com/applications/mlflow/access-hosted-tracking-server.html).
+
+See the Databricks documentation page `Access the MLflow tracking server from outside Databricks` - [AWS](https://docs.databricks.com/applications/mlflow/access-hosted-tracking-server.html) or [Azure](https://docs.microsoft.com/en-us/azure/databricks/applications/mlflow/access-hosted-tracking-server).
 
 
 ## Running tools
