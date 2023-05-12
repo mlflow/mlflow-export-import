@@ -18,6 +18,7 @@ from mlflow_export_import.common.click_options import (
     opt_notebook_formats, 
     opt_use_threads,
 )
+from mlflow_export_import.common.iterators import SearchExperimentsIterator
 from mlflow_export_import.common import utils, io_utils
 from mlflow_export_import.bulk.export_models import export_models
 from mlflow_export_import.bulk.export_experiments import export_experiments
@@ -54,9 +55,16 @@ def export_all(
         notebook_formats = notebook_formats, 
         use_threads = use_threads
     )
+
+    # Only import those experiments not exported by above export_models()
+    exported_exp_names = res_models["experiments"]["experiment_names"]
+    all_exps = SearchExperimentsIterator(mlflow_client)
+    all_exp_names = [ exp.name for exp in all_exps ]
+    remaining_exp_names = list(set(all_exp_names) - set(exported_exp_names))
+
     res_exps = export_experiments(
         mlflow_client = mlflow_client,
-        experiments = "all",
+        experiments = remaining_exp_names,
         output_dir = os.path.join(output_dir,"experiments"),
         export_permissions = export_permissions,
         run_start_time = run_start_time,
@@ -65,7 +73,6 @@ def export_all(
         use_threads = use_threads
     )
     duration = round(time.time() - start_time, 1)
-
     info_attr = {
         "stages": ALL_STAGES,
         "export_latest_versions": export_latest_versions,
