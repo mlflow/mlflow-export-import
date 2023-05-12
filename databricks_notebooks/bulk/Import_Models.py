@@ -8,7 +8,7 @@
 # MAGIC * `4. Experiment rename file` - Experiment rename file.
 # MAGIC * `5. Import permissions`
 # MAGIC * `6. Import source tags`
-# MAGIC * `7. Use threads` - use multi-threaded import
+# MAGIC * `7. Use threads` - use multi-threaded import.
 # MAGIC
 # MAGIC See https://github.com/mlflow/mlflow-export-import/blob/master/README_bulk.md#Import-registered-models
 

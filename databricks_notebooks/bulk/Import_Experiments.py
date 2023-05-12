@@ -3,9 +3,9 @@
 # MAGIC
 # MAGIC Widgets
 # MAGIC * `1. Input directory` - directory of exported experiments.
-# MAGIC * `2. Import source tags`
-# MAGIC * `3. Experiment rename file` - Experiment rename file.
-# MAGIC * `4. Import permissions`
+# MAGIC * `2. Experiment rename file` - Experiment rename file.
+# MAGIC * `3. Import permissions`
+# MAGIC * `4. Import source tags`
 # MAGIC * `5. Use threads` - use multi-threaded import.
 # MAGIC
 # MAGIC See https://github.com/mlflow/mlflow-export-import/blob/master/README_bulk.md#Import-experiments.
@@ -20,23 +20,23 @@ dbutils.widgets.text("1. Input directory", "")
 input_dir = dbutils.widgets.get("1. Input directory")
 input_dir = input_dir.replace("dbfs:","/dbfs")
 
-dbutils.widgets.dropdown("2. Import source tags","no",["yes","no"])
-import_source_tags = dbutils.widgets.get("2. Import source tags") == "yes"
-
-dbutils.widgets.text("3. Experiment rename file","")
-val = dbutils.widgets.get("3. Experiment rename file") 
+dbutils.widgets.text("2. Experiment rename file","")
+val = dbutils.widgets.get("2. Experiment rename file") 
 experiment_rename_file = val or None 
 
-dbutils.widgets.dropdown("4. Import permissions","no",["yes","no"])
-import_permissions = dbutils.widgets.get("4. Import permissions") == "yes"
+dbutils.widgets.dropdown("3. Import permissions","no",["yes","no"])
+import_permissions = dbutils.widgets.get("3. Import permissions") == "yes"
+
+dbutils.widgets.dropdown("4. Import source tags","no",["yes","no"])
+import_source_tags = dbutils.widgets.get("4. Import source tags") == "yes"
 
 dbutils.widgets.dropdown("5. Use threads","no",["yes","no"])
 use_threads = dbutils.widgets.get("5. Use threads") == "yes"
 
 print("input_dir:", input_dir)
-print("import_source_tags:", import_source_tags)
 print("experiment_rename_file:", experiment_rename_file)
 print("import_permissions:", import_permissions)
+print("import_source_tags:", import_source_tags)
 print("use_threads:", use_threads)
 
 # COMMAND ----------
