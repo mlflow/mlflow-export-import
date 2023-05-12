@@ -142,16 +142,20 @@ pip install -e .
 
 ### Databricks notebook setup
 
-There are two different ways to install the package in a Databricks notebook.
+Make sure your cluster has MLflow 2.2.1 (Databricks Runtime ML version 13.0) or later installed.
+
+There are two different ways to install the mlflow-export-import package in a Databricks notebook.
 
 #### 1. Install package in notebook
 
 See documentation: [Install notebook-scoped libraries with %pip](https://docs.databricks.com/libraries/notebooks-python-libraries.html#install-notebook-scoped-libraries-with-pip).
 
+The section above has other pip install alternatives you can use.
 
 ```
 %pip install mlflow-export-import
 ```
+
 
 #### 2. Install package as a wheel on cluster
 
