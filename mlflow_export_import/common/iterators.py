@@ -15,7 +15,7 @@ class BaseIterator():
 
     def _call_iter(self):
         if mlflow.__version__ < "2.2.1":
-            return self.search_method(self.filter)  #7623 - https://mlflow.org/docs/2.1.1/python_api/mlflow.client.html
+            return self.search_method(filter_string=self.filter)  #7623 - https://mlflow.org/docs/2.1.1/python_api/mlflow.client.html
         else:
             return self.search_method(filter_string=self.filter, **self.kwargs) # https://mlflow.org/docs/latest/python_api/mlflow.client.html
 
