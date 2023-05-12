@@ -7,6 +7,7 @@
 
 import mlflow
 mlflow_client = mlflow.MlflowClient()
+print("MLflow version",mlflow.__version__)
 
 # COMMAND ----------
 
