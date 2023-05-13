@@ -37,7 +37,8 @@ class Options:
     versions: None
     export_latest_versions: bool
     export_deleted_runs: bool
-    export_version_model: bool export_permissions: bool
+    export_version_model: bool
+    export_permissions: bool
     notebook_formats: []
 
 def export_model(
