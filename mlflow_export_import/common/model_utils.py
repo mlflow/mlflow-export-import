@@ -60,7 +60,7 @@ def export_version_model(client, version, output_dir):
 
     download_uri = client.get_model_version_download_uri(version.name, version.version)
     dst_path = os.path.join(output_dir, "version_models", version.version) 
-    _logger.info(f"Exporting model version 'cached' model to: '{dst_path}'")
+    _logger.info(f"Exporting model version 'cached model' to: '{dst_path}'")
     mlflow.artifacts.download_artifacts(
         artifact_uri = download_uri,
         dst_path = _filesystem.mk_local_path(dst_path),

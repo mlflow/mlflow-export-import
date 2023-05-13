@@ -29,21 +29,19 @@ from mlflow_export_import.run import run_data_importer
 
 _logger = utils.getLogger(__name__)
 
-
 def import_run(
-        experiment_name,
         input_dir,
-        dst_notebook_dir = None,
+        experiment_name,
         import_source_tags = False,
+        dst_notebook_dir = None,
         use_src_user_id = False,
-        dst_notebook_dir_add_run_id = False,
         mlmodel_fix = True,
         mlflow_client = None
     ):
     """
     Imports a run into the specified experiment.
-    :param experiment_name: Experiment name.
-    :param input_dir: Source input directory that contains the exported run.
+    :param experiment_name: Experiment name to add the run to.
+    :param input_dir: Directory that contains the exported run.
     :param dst_notebook_dir: Databricks destination workpsace directory for notebook.
     :param import_source_tags: Import source information for MLFlow objects and create tags in destination object.
     :param mlmodel_fix: Add correct run ID in destination MLmodel artifact.
@@ -52,165 +50,118 @@ def import_run(
                             Source user ID is ignored when importing into
                             Databricks since setting it is not allowed.
     :param dst_notebook_dir: Databricks destination workspace directory for notebook import.
-    :param dst_notebook_dir_add_run_id: Add the run ID to the destination notebook directory.
     :param mlflow_client: MLflow client.
     :return: The run and its parent run ID if the run is a nested run.
     """
-    importer = RunImporter(
-        import_source_tags = import_source_tags,
-        use_src_user_id = use_src_user_id,
-        dst_notebook_dir_add_run_id = dst_notebook_dir_add_run_id,
-        mlmodel_fix = mlmodel_fix,
-        mlflow_client = mlflow_client
-    )
-    return importer.import_run(
-        experiment_name = experiment_name,
-        input_dir = input_dir,
-        dst_notebook_dir = dst_notebook_dir
-    )
+
+    def _mk_ex(src_run_dct, dst_run_id, exp_name):
+        return { "message": "Cannot import run", 
+            "src_run_dct": src_run_dct["info"].get("run_id",None), 
+            "dst_run_dct": dst_run_id,
+            "experiment": exp_name
+    }
+
+    mlflow_client = mlflow_client or mlflow.MlflowClient()
+    dbx_client = DatabricksHttpClient(mlflow_client.tracking_uri)
+
+    #_logger.debug(f"importing_into_databricks: {utils.importing_into_databricks()}")
+    _logger.info(f"Importing run from '{input_dir}'")
+
+    exp = mlflow_utils.set_experiment(mlflow_client, dbx_client, experiment_name)
+    src_run_path = os.path.join(input_dir, "run.json")
+    src_run_dct = io_utils.read_file_mlflow(src_run_path)
+    in_databricks = "DATABRICKS_RUNTIME_VERSION" in os.environ
+    #_logger.debug(f"in_databricks: {in_databricks}")
+
+    run = mlflow_client.create_run(exp.experiment_id)
+    run_id = run.info.run_id
+    try:
+        run_data_importer.import_run_data(
+            mlflow_client,
+            src_run_dct,
+            run_id,
+            import_source_tags,
+            src_run_dct["info"]["user_id"],
+            use_src_user_id,
+            in_databricks
+        )
+        path = os.path.join(input_dir, "artifacts")
+        if os.path.exists(_filesystem.mk_local_path(path)):
+            mlflow_client.log_artifacts(run_id, mk_local_path(path))
+        if mlmodel_fix:
+            _update_mlmodel_run_id(mlflow_client, run_id)
+        mlflow_client.set_terminated(run_id, RunStatus.to_string(RunStatus.FINISHED))
+        run = mlflow_client.get_run(run_id)
+        if src_run_dct["info"]["lifecycle_stage"] == LifecycleStage.DELETED:
+            mlflow_client.delete_run(run.info.run_id)
+            run = mlflow_client.get_run(run.info.run_id)
+    except Exception as e:
+        mlflow_client.set_terminated(run_id, RunStatus.to_string(RunStatus.FAILED))
+        import traceback
+        traceback.print_exc()
+        raise MlflowExportImportException(e, f"Importing run {run_id} of experiment '{exp.name}' failed")
+
+    if utils.importing_into_databricks() and dst_notebook_dir:
+        _upload_databricks_notebook(dbx_client, input_dir, src_run_dct, dst_notebook_dir)
+
+    res = (run, src_run_dct["tags"].get(MLFLOW_PARENT_RUN_ID, None))
+    _logger.info(f"Imported run '{run.info.run_id}' into experiment '{experiment_name}'")
+    return res
 
 
-class RunImporter():
-    def __init__(self, 
-            mlflow_client = None,
-            import_source_tags = False,
-            mlmodel_fix = True,
-            use_src_user_id = False,
-            dst_notebook_dir_add_run_id = False
-        ):
-        """ 
-        :param mlflow_client: MLflow client.
-        :param import_source_tags: Import source information for MLFlow objects and create tags in destination object.
-        :param mlmodel_fix: Add correct run ID in destination MLmodel artifact. 
-                            Can be expensive for deeply nested artifacts.
-        :param use_src_user_id: Set the destination user ID to the source user ID. 
-                                Source user ID is ignored when importing into 
-                                Databricks since setting it is not allowed.
-        :param dst_notebook_dir: Databricks destination workspace directory for notebook import.
-        :param dst_notebook_dir_add_run_id: Add the run ID to the destination notebook directory.
-        """
-
-        self.mlflow_client = mlflow_client or mlflow.MlflowClient()
-        self.dbx_client = DatabricksHttpClient(self.mlflow_client.tracking_uri)
-        self.mlmodel_fix = mlmodel_fix
-        self.use_src_user_id = use_src_user_id
-        self.in_databricks = "DATABRICKS_RUNTIME_VERSION" in os.environ
-        self.dst_notebook_dir_add_run_id = dst_notebook_dir_add_run_id
-        self.import_source_tags = import_source_tags
-        _logger.debug(f"in_databricks: {self.in_databricks}")
-        _logger.debug(f"importing_into_databricks: {utils.importing_into_databricks()}")
+def _update_mlmodel_run_id(mlflow_client, run_id):
+    """
+    Workaround to fix the run_id in the destination MLmodel file since there is no method to get all model artifacts of a run.
+    Since an MLflow run does not keep track of its models, there is no method to retrieve the artifact path to all its models.
+    This workaround recursively searches the run's root artifact directory for all MLmodel files, and assumes their directory
+    represents a path to the model.
+    """
+    mlmodel_paths = find_run_model_names(run_id)
+    for model_path in mlmodel_paths:
+        download_uri = f"runs:/{run_id}/{model_path}/MLmodel"
+        local_path = mlflow_utils.download_artifacts(mlflow_client, download_uri)
+        mlmodel = io_utils.read_file(local_path, "yaml")
+        mlmodel["run_id"] = run_id
+        with tempfile.TemporaryDirectory() as dir:
+            output_path = os.path.join(dir, "MLmodel")
+            io_utils.write_file(output_path, mlmodel, "yaml")
+            if model_path == "MLmodel":
+                model_path = ""
+            mlflow_client.log_artifact(run_id, output_path, model_path)
 
 
-    def import_run(self, 
-            experiment_name,
-            input_dir,
-            dst_notebook_dir = None
-        ):
-        """ 
-        Imports a run into the specified experiment.
-        :param experiment_name: Experiment name.
-        :param input_dir: Source input directory that contains the exported run.
-        :param dst_notebook_dir: Databricks destination workpsace directory for notebook.
-        :return: The run and its parent run ID if the run is a nested run.
-        """
-        _logger.info(f"Importing run from '{input_dir}'")
-        res = self._import_run(experiment_name, input_dir, dst_notebook_dir)
-        _logger.info(f"Imported run into '{experiment_name}/{res[0].info.run_id}'")
-        return res
+def _upload_databricks_notebook(dbx_client, input_dir, src_run_dct, dst_notebook_dir):
+    run_id = src_run_dct["info"]["run_id"]
+    tag_key = "mlflow.databricks.notebookPath"
+    src_notebook_path = src_run_dct["tags"].get(tag_key,None)
+    if not src_notebook_path:
+        _logger.warning(f"No tag '{tag_key}' for run_id '{run_id}'")
+        return
+    notebook_name = os.path.basename(src_notebook_path)
 
+    format = "source"
+    notebook_path = os.path.join(input_dir,"artifacts","notebooks",f"{notebook_name}.{format}")
+    if not os.path.exists(notebook_path):
+        _logger.warning(f"Source '{notebook_path}' does not exist for run_id '{run_id}'")
+        return
 
-    def _import_run(self, dst_exp_name, input_dir, dst_notebook_dir):
-        exp = mlflow_utils.set_experiment(self.mlflow_client, self.dbx_client, dst_exp_name)
-        src_run_path = os.path.join(input_dir,"run.json")
-        src_run_dct = io_utils.read_file_mlflow(src_run_path)
-
-        run = self.mlflow_client.create_run(exp.experiment_id)
-        run_id = run.info.run_id
-        try:
-            run_data_importer.import_run_data(
-                self.mlflow_client,
-                src_run_dct,
-                run_id, 
-                self.import_source_tags, 
-                src_run_dct["info"]["user_id"],
-                self.use_src_user_id, 
-                self.in_databricks
-            )
-            path = os.path.join(input_dir, "artifacts")
-            if os.path.exists(_filesystem.mk_local_path(path)):
-                self.mlflow_client.log_artifacts(run_id, mk_local_path(path))
-            if self.mlmodel_fix:
-                self._update_mlmodel_run_id(run_id)
-            self.mlflow_client.set_terminated(run_id, RunStatus.to_string(RunStatus.FINISHED))
-            run = self.mlflow_client.get_run(run_id)
-            if src_run_dct["info"]["lifecycle_stage"] == LifecycleStage.DELETED:
-                self.mlflow_client.delete_run(run.info.run_id)
-                run = self.mlflow_client.get_run(run.info.run_id)
-        except Exception as e:
-            self.mlflow_client.set_terminated(run_id, RunStatus.to_string(RunStatus.FAILED))
-            import traceback
-            traceback.print_exc()
-            raise MlflowExportImportException(e, f"Importing run {run_id} of experiment '{exp.name}' failed")
-        if utils.importing_into_databricks() and dst_notebook_dir:
-            ndir = os.path.join(dst_notebook_dir, run_id) if self.dst_notebook_dir_add_run_id else dst_notebook_dir
-            self._upload_databricks_notebook(input_dir, src_run_dct, ndir)
-
-        return (run, src_run_dct["tags"].get(MLFLOW_PARENT_RUN_ID, None))
-
-
-    def _update_mlmodel_run_id(self, run_id):
-        """ 
-        Workaround to fix the run_id in the destination MLmodel file since there is no method to get all model artifacts of a run.
-        Since an MLflow run does not keep track of its models, there is no method to retrieve the artifact path to all its models.
-        This workaround recursively searches the run's root artifact directory for all MLmodel files, and assumes their directory
-        represents a path to the model.
-        """
-        mlmodel_paths = find_run_model_names(run_id)
-        for model_path in mlmodel_paths:
-            download_uri = f"runs:/{run_id}/{model_path}/MLmodel"
-            local_path = mlflow_utils.download_artifacts(self.mlflow_client, download_uri)
-            mlmodel = io_utils.read_file(local_path, "yaml")
-            mlmodel["run_id"] = run_id
-            with tempfile.TemporaryDirectory() as dir:
-                output_path = os.path.join(dir, "MLmodel")
-                io_utils.write_file(output_path, mlmodel, "yaml")
-                if model_path == "MLmodel":
-                    model_path = ""
-                self.mlflow_client.log_artifact(run_id, output_path, model_path)
-
-
-    def _upload_databricks_notebook(self, input_dir, src_run_dct, dst_notebook_dir):
-        run_id = src_run_dct["info"]["run_id"]
-        tag_key = "mlflow.databricks.notebookPath"
-        src_notebook_path = src_run_dct["tags"].get(tag_key,None)
-        if not src_notebook_path:
-            _logger.warning(f"No tag '{tag_key}' for run_id '{run_id}'")
-            return
-        notebook_name = os.path.basename(src_notebook_path)
-
-        format = "source" 
-        notebook_path = os.path.join(input_dir,"artifacts","notebooks",f"{notebook_name}.{format}")
-        if not os.path.exists(notebook_path): 
-            _logger.warning(f"Source '{notebook_path}' does not exist for run_id '{run_id}'")
-            return
-
-        with open(notebook_path, "r", encoding="utf-8") as f:
-            content = f.read()
-        dst_notebook_path = os.path.join(dst_notebook_dir,notebook_name)
-        content = base64.b64encode(content.encode()).decode("utf-8")
-        data = {
-            "path": dst_notebook_path,
-            "language": "PYTHON",
-            "format": format,
-            "overwrite": True,
-            "content": content
-            }
-        mlflow_utils.create_workspace_dir(self.dbx_client, dst_notebook_dir)
-        try:
-            _logger.info(f"Importing notebook '{dst_notebook_path}' for run {run_id}")
-            self.dbx_client._post("workspace/import", data)
-        except MlflowExportImportException as e:
-            _logger.warning(f"Cannot save notebook '{dst_notebook_path}'. {e}")
+    with open(notebook_path, "r", encoding="utf-8") as f:
+        content = f.read()
+    dst_notebook_path = os.path.join(dst_notebook_dir, notebook_name)
+    content = base64.b64encode(content.encode()).decode("utf-8")
+    data = {
+        "path": dst_notebook_path,
+        "language": "PYTHON",
+        "format": format,
+        "overwrite": True,
+        "content": content
+        }
+    mlflow_utils.create_workspace_dir(dbx_client, dst_notebook_dir)
+    try:
+        _logger.info(f"Importing notebook '{dst_notebook_path}' for run {run_id}")
+        dbx_client._post("workspace/import", data)
+    except MlflowExportImportException as e:
+        _logger.warning(f"Cannot save notebook '{dst_notebook_path}'. {e}")
 
 
 @click.command()
@@ -219,37 +170,30 @@ class RunImporter():
 @opt_import_source_tags
 @opt_use_src_user_id
 @opt_dst_notebook_dir
-@click.option("--dst-notebook-dir-add-run-id",
-    help="Add the run ID to the destination notebook workspace directory.",
-    type=str,
-    required=False,
-    show_default=True
-)
 @click.option("--mlmodel-fix",
-    help="Add correct run ID in destination MLmodel artifact. Can be expensive for deeply nested artifacts.", 
-    type=bool, 
-    default=True, 
+    help="Add correct run ID in destination MLmodel artifact. Can be expensive for deeply nested artifacts.",
+    type=bool,
+    default=True,
     show_default=True
 )
 
-def main(input_dir, 
-        experiment_name, 
+def main(input_dir,
+        experiment_name,
         import_source_tags,
-        mlmodel_fix, 
+        mlmodel_fix,
         use_src_user_id,
-        dst_notebook_dir, 
-        dst_notebook_dir_add_run_id):
+        dst_notebook_dir
+    ):
     _logger.info("Options:")
     for k,v in locals().items():
         _logger.info(f"  {k}: {v}")
     import_run(
-        experiment_name = experiment_name,
         input_dir = input_dir,
-        dst_notebook_dir = dst_notebook_dir,
+        experiment_name = experiment_name,
         import_source_tags = import_source_tags,
-        mlmodel_fix = mlmodel_fix,
+        dst_notebook_dir = dst_notebook_dir,
         use_src_user_id = use_src_user_id,
-        dst_notebook_dir_add_run_id = dst_notebook_dir_add_run_id
+        mlmodel_fix = mlmodel_fix
     )
 
 

@@ -18,8 +18,8 @@ def init_run_test(mlflow_context, run_name=None, use_metric_steps=False, import_
     )
     experiment_name = mk_dst_experiment_name(exp.name)
     run2,_ = import_run(
-        experiment_name = experiment_name, 
         input_dir = mlflow_context.output_run_dir,
+        experiment_name = experiment_name, 
         import_source_tags = import_source_tags ,
         mlflow_client = mlflow_context.client_dst
     )
@@ -63,8 +63,8 @@ def test_model_predictions(mlflow_context):
     )
     exp_name2 = mk_dst_experiment_name(exp1.name)
     res = import_run(
-        experiment_name = exp_name2, 
         input_dir = mlflow_context.output_run_dir,
+        experiment_name = exp_name2, 
         mlflow_client = mlflow_context.client_dst
     )
     run_id2 = res[0].info.run_id
