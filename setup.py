@@ -6,9 +6,16 @@ CORE_REQUIREMENTS = [
     "wheel"
 ]
 
+
+import os
+from importlib.machinery import SourceFileLoader
+version = (
+    SourceFileLoader("mlflow_export_import.version", os.path.join("mlflow_export_import", "version.py")).load_module().__version__
+)
+
 setup(
     name="mlflow_export_import",
-    version = "1.2.0",
+    version=version,
     author = "Andre Mesarovic",
     description = "Copy MLflow objects (experiments, runs or registered models) to another tracking server",
     long_description=open("README.md").read(),

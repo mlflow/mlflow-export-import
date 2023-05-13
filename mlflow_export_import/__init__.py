@@ -1,6 +1,9 @@
 import os
 import json
 import mlflow
+from mlflow_export_import import version
+
+__version__ = version.__version__
 
 # monkey patch mlflow.tracking.MlflowClient to return tracking URI in __repr__
 
