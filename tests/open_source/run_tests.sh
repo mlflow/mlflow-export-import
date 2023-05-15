@@ -11,7 +11,7 @@
 #
 # Example:
 #
-#  run_tests.sh 5005 5006
+#  run_tests.sh 5010 5011
 #
 # ===========================================================
 
@@ -42,8 +42,7 @@ message() {
 
 run_tests() {
   message "STAGE 2: RUN TESTS"
-  export PYTHONPATH=../..:.
-  time -p python -u -m pytest -s \
+  time -p pytest -s \
     --junitxml=$JUNIT_FILE \
     --html=$HTML_FILE \
     --self-contained-html \
@@ -78,14 +77,14 @@ run() {
   echo "$0: MLFLOW_TRACKING_URI: $MLFLOW_TRACKING_URI"
   launch_server $PORT_SRC &
   launch_server $PORT_DST &
-  sleep 5
+  sleep 5 # wait for the tracking servers to come up
   run_tests
   kill_server $PORT_SRC
   kill_server $PORT_DST
 }
 
 run_all() {
-  time -p run 2>&1 | tee run_tests.log
+  time -p run
   echo
   echo "******************************************************"
   echo

@@ -1,11 +1,11 @@
 from mlflow.entities import ViewType
 from mlflow_export_import.experiment.export_experiment import export_experiment
 from mlflow_export_import.experiment.import_experiment import import_experiment
-from oss_utils_test import create_simple_run, init_output_dirs, mk_dst_experiment_name
-from oss_utils_test import _create_simple_run
-from oss_utils_test import create_test_experiment
-from compare_utils import compare_runs, compare_experiment_tags
-from init_tests import mlflow_context
+from tests.open_source.oss_utils_test import create_simple_run, init_output_dirs, mk_dst_experiment_name
+from tests.open_source.oss_utils_test import _create_simple_run
+from tests.open_source.oss_utils_test import create_test_experiment
+from tests.compare_utils import compare_runs, compare_experiment_tags
+from tests.open_source.init_tests import mlflow_context
 
 # == Setup
 

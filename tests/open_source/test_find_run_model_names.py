@@ -3,8 +3,8 @@
 
 import mlflow
 from mlflow_export_import.common.find_artifacts import find_run_model_names
-from oss_utils_test import create_experiment
-from sklearn_utils import create_sklearn_model
+from tests.open_source.oss_utils_test import create_experiment
+from tests.open_source.sklearn_utils import create_sklearn_model
 
 client = mlflow.MlflowClient()
 

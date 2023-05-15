@@ -34,7 +34,7 @@ The script does the following:
 
 **Example**
 ```
-run_tests.sh 5005 5006
+run_tests.sh 5010 5011
 ```
 ```
 ======================== 43 passed in 295.36s (0:04:55) ========================

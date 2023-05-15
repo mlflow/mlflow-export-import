@@ -4,10 +4,10 @@ from mlflow_export_import.bulk.export_models import export_models
 from mlflow_export_import.bulk.import_models import import_models
 from mlflow_export_import.bulk import bulk_utils
 
-from init_tests import mlflow_context
-from compare_utils import compare_runs
-from test_bulk_experiments import _create_test_experiment
-from oss_utils_test import (
+from tests.open_source.init_tests import mlflow_context
+from tests.compare_utils import compare_runs
+from tests.open_source.test_bulk_experiments import _create_test_experiment
+from tests.open_source.oss_utils_test import (
     mk_test_object_name_default,
     mk_uuid,
     list_experiments,

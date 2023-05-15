@@ -7,9 +7,9 @@ from mlflow_export_import.model.export_model import export_model
 from mlflow_export_import.model.import_model import import_model
 from mlflow_export_import.common.model_utils import list_model_versions
 
-import oss_utils_test 
-from init_tests import mlflow_context
-from compare_utils import compare_models, compare_versions
+from tests.compare_utils import compare_models, compare_versions
+from tests.open_source import oss_utils_test 
+from tests.open_source.init_tests import mlflow_context
 
 # == Test with archive_existing_versions=False (default)
 

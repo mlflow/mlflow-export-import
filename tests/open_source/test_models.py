@@ -5,10 +5,10 @@ from mlflow_export_import.model.export_model import export_model
 from mlflow_export_import.model.import_model import import_model
 from mlflow_export_import.model.import_model import _extract_model_path, _path_join
 
-from oss_utils_test import create_simple_run, create_version
-from oss_utils_test import mk_test_object_name_default, mk_dst_model_name
-from compare_utils import compare_models_with_versions, compare_models, compare_versions
-from init_tests import mlflow_context
+from tests.open_source.oss_utils_test import create_simple_run, create_version
+from tests.open_source.oss_utils_test import mk_test_object_name_default, mk_dst_model_name
+from tests.compare_utils import compare_models_with_versions, compare_models, compare_versions
+from tests.open_source.init_tests import mlflow_context
 
 
 # == Test stages

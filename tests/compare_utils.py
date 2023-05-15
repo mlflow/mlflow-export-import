@@ -1,10 +1,10 @@
 """
-Compare run utilities.
+Compare MLflow object utilities.
 """
 
 from mlflow_export_import.common import utils
 from mlflow_export_import.common.source_tags import ExportTags
-import utils_test
+from tests import utils_test
 
 def compare_runs(client_src, client_dst, run1, run2, output_dir, import_source_tags=False):
     if import_source_tags:

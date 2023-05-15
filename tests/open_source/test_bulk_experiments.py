@@ -6,10 +6,10 @@ from mlflow_export_import.bulk import bulk_utils
 from mlflow_export_import.bulk.export_experiments import export_experiments
 from mlflow_export_import.bulk.import_experiments import import_experiments
 
-import sklearn_utils
-from init_tests import mlflow_context
-from compare_utils import compare_runs
-from oss_utils_test import (
+from tests.open_source import sklearn_utils
+from tests.open_source.init_tests import mlflow_context
+from tests.compare_utils import compare_runs
+from tests.open_source.oss_utils_test import (
     init_output_dirs,
     mk_uuid,
     delete_experiments_and_models,
@@ -36,7 +36,7 @@ def _create_simple_run(idx=0):
 
 
 def _create_test_experiment(client, num_runs, mk_test_object_name=mk_test_object_name_default):
-    from oss_utils_test import create_experiment
+    from tests.open_source.oss_utils_test import create_experiment
     exp = create_experiment(client, mk_test_object_name)
     for j in range(num_runs):
         _create_simple_run(j)

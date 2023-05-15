@@ -1,9 +1,9 @@
 from mlflow_export_import.run.export_run import export_run
 from mlflow_export_import.run.import_run import import_run
-from oss_utils_test import create_simple_run, mk_dst_experiment_name
-from utils_test import create_output_dir
-from compare_utils import compare_runs
-from init_tests import mlflow_context
+from tests.open_source.oss_utils_test import create_simple_run, mk_dst_experiment_name
+from tests.utils_test import create_output_dir
+from tests.compare_utils import compare_runs
+from tests.open_source.init_tests import mlflow_context
 
 # == Setup
 
@@ -47,7 +47,7 @@ def test_run_basic_use_metric_steps(mlflow_context):
 
 # == Test for source and exported model prediction equivalence
 
-import sklearn_utils
+from tests.open_source import sklearn_utils
 import cloudpickle as pickle
 import numpy as np
 
