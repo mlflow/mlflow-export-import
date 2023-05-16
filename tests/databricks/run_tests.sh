@@ -1,6 +1,4 @@
 
-export PYTHONPATH=.:../..:..
-
 export MLFLOW_TRACKING_URI=databricks
 
 if [ $# -gt 0 ] ; then
@@ -14,7 +12,7 @@ LOG_FILE=run_tests.log
 
 run() {
   echo "MLFLOW_TRACKING_URI: $MLFLOW_TRACKING_URI"
-  time -p python -u -m pytest -s \
+  time -p pytest -s \
     --junitxml=$JUNIT_FILE \
     --html=$HTML_FILE \
     --self-contained-html \

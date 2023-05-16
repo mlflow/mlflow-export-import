@@ -4,6 +4,7 @@ import mlflow
 from databricks_cli.sdk import service
 
 from mlflow_export_import.common import mlflow_utils
+from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.workflow_api.workflow_api_client import WorkflowApiClient
 from mlflow_export_import.client import databricks_utils
 
@@ -12,7 +13,7 @@ from databricks_cli.dbfs.api import DbfsApi, DbfsPath
 from databricks_cli.clusters.api import ClusterApi
 
 print(f"MLflow Tracking URI: {mlflow.get_tracking_uri()}")
-mlflow_client = mlflow.tracking.MlflowClient()
+mlflow_client = mlflow.MlflowClient()
 print(f"mlflow_client: {mlflow_client}")
 
 workflow_client = WorkflowApiClient()
@@ -270,7 +271,7 @@ class DatabricksTester():
             cluster = self.cluster_api.create_cluster(self.cluster_spec)
             cluster_id = cluster["cluster_id"]
         else:
-            raise Exception(f"Unknown cluster type: {type(self.cluster_spec)}. Must be a string or dict.")
+            raise MlflowExportImportException(f"Unknown cluster type: {type(self.cluster_spec)}. Must be a string or dict.")
         cluster = self.cluster_api.get_cluster(cluster_id)
         print(f"Using cluster: id={cluster_id} name={cluster['cluster_name']}")
         return cluster_id

@@ -7,11 +7,11 @@ import mlflow
 from init_tests import test_context
 from databricks_cli.dbfs.api import DbfsPath
 from mlflow_export_import.common import mlflow_utils
-from compare_utils import compare_runs, compare_models_with_versions
-import utils_test
-import init_tests
+from tests.databricks import init_tests
+from tests.compare_utils import compare_runs, compare_models_with_versions
+from tests import utils_test
 
-mlflow_client = mlflow.tracking.MlflowClient()
+mlflow_client = mlflow.MlflowClient()
 print(f"mlflow_client: {mlflow_client}")
 print("MLflow Tracking URI:", mlflow.get_tracking_uri())
 

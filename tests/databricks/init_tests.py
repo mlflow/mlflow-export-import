@@ -3,7 +3,7 @@ import pytest
 import tempfile
 from mlflow_export_import.client import databricks_utils
 from databricks_tester import DatabricksTester
-import utils_test
+from tests import utils_test
 
 cfg = utils_test.read_config_file()
 
