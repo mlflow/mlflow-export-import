@@ -4,12 +4,14 @@ Databricks notebook tests for MLflow export import notebooks.
 
 import os
 import mlflow
-from init_tests import test_context
 from databricks_cli.dbfs.api import DbfsPath
+
 from mlflow_export_import.common import mlflow_utils
-from tests.databricks import init_tests
+
 from tests.compare_utils import compare_runs, compare_models_with_versions
 from tests import utils_test
+from tests.databricks import init_tests
+from tests.databricks.init_tests import test_context
 
 mlflow_client = mlflow.MlflowClient()
 print(f"mlflow_client: {mlflow_client}")
