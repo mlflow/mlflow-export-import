@@ -5,8 +5,8 @@
 Experimental WIP.
 
 Tools:
-* [Filter one model from export-models directory](#Filter-one-model-from-export-models-directory)
 * [Rewrite models and experiments of JSON export directory](#Rewrite-models-and-experiments-of-JSON-export-directory)
+* [Filter one model from export-models directory](#Filter-one-model-from-export-models-directory)
 
 
 ## Rewrite models and experiments of JSON export directory
