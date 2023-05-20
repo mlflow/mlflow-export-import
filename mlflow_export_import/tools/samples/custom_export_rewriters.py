@@ -1,5 +1,5 @@
 """ 
-Sample export-models processors:
+Sample post-processing rewriters for models and experiments:
   1. for registered model truncate versions to one
   2. for experiment truncate runs to one
 """
