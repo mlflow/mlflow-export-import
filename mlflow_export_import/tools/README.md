@@ -5,8 +5,8 @@
 Experimental WIP.
 
 Tools:
-* [Post-process exports-model JSON export output](#Post-process-exports-model-JSON-export-output)
-* [Rewrite models and experiments of JSON export directory](Rewrite-models-and-experiments-of-JSON-export-directory)
+* [Filter one model from export-models directory](#Filter-one-model-from-export-models-directory)
+* [Rewrite models and experiments of JSON export directory](#Rewrite-models-and-experiments-of-JSON-export-directory)
 
 
 ## Rewrite models and experiments of JSON export directory
