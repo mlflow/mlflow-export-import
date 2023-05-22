@@ -342,7 +342,6 @@ Source: [import_model.py](mlflow_export_import/model/import_model.py).
 import-model --help
 
 Options:
-```
   --input-dir TEXT              Input directory  [required]
   --model TEXT                  Registered model name.  [required]
   --experiment-name TEXT        Destination experiment name  [required]
