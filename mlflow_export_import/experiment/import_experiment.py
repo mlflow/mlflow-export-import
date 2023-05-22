@@ -37,15 +37,15 @@ def import_experiment(
         mlflow_client = None
     ):
     """
-    :param: experiment_name: Destination experiment name.
-    :param: input_dir: Source experiment directory.
-    :param: import_source_tags: Import source information for MLflow objects and create tags in destination object.
-    :param: import_permissions: Import Databricks permissions.
-    :param: use_src_user_id: Set the destination user ID to the source user ID.
+    :param experiment_name: Destination experiment name.
+    :param input_dir: Source experiment directory.
+    :param import_source_tags: Import source information for MLflow objects and create tags in destination object.
+    :param import_permissions: Import Databricks permissions.
+    :param use_src_user_id: Set the destination user ID to the source user ID.
                             Source user ID is ignored when importing into Databricks.
-    :param: dst_notebook_dir: Destination Databricks workspace directory if importing notebook.
-    :param: mlflow_client: MLflow client.
-    :return: A map of source run IDs and destination run.info.
+    :param dst_notebook_dir: Destination Databricks workspace directory if importing notebook.
+    :param mlflow_client: MLflow client.
+    :return: Dictionary of source run_id (key) to destination run.info object (value).
     """
 
     mlflow_client = mlflow_client or mlflow.MlflowClient()

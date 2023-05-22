@@ -303,12 +303,12 @@ class BulkModelImporter(BaseModelImporter):
         _logger.info(f"Importing {len(model_dct['versions'])} versions:")
         for vr in model_dct["versions"]:
             src_run_id = vr["run_id"]
-            dst_run = self.run_info_map.get(src_run_id, None)
-            if not dst_run:
+            dst_run_info = self.run_info_map.get(src_run_id, None)
+            if not dst_run_info:
                 msg = { "model": model_name, "version": vr["version"], "stage": vr["current_stage"], "run_id": src_run_id }
                 _logger.error(f"Cannot import model version {msg} since the source run_id was probably deleted.")
             else:
-                dst_run_id = dst_run.run_id
+                dst_run_id = dst_run_info.run_id
                 exp_name = rename_utils.rename(vr["_experiment_name"], self.experiment_renames, "experiment")
                 try:
                     mlflow.set_experiment(exp_name)
