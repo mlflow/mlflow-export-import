@@ -1,16 +1,17 @@
 {
   "system": {
-    "package_version": "1.1.2",
+    "package_version": "1.2.0",
     "script": "export_experiment.py",
-    "export_time": 1671579740,
-    "_export_time": "2022-12-20 23:42:20",
-    "mlflow_version": "2.0.1",
-    "mlflow_tracking_uri": "http://127.0.0.1:5000",
-    "user": "andre",
+    "export_time": 1684688346,
+    "_export_time": "2023-05-21 16:59:06",
+    "mlflow_version": "2.3.2",
+    "mlflow_tracking_uri": "http://127.0.0.1:5020",
     "platform": {
       "python_version": "3.8.15",
-      "system": "Darwin"
-    }
+      "system": "Darwin",
+      "processor": "i386"
+    },
+    "user": "andre"
   },
   "info": {
     "num_total_runs": 1,
@@ -20,16 +21,18 @@
   },
   "mlflow": {
     "experiment": {
-      "experiment_id": "2",
+      "experiment_id": "1",
       "name": "sklearn_wine",
       "artifact_location": "/opt/mlflow/server/mlruns/1",
       "lifecycle_stage": "active",
       "tags": {
-        "experiment_created": "2022-12-20 23:40:08",
-        "version_mlflow": "2.0.1"
+        "experiment_created": "2023-05-20 19:04:09",
+        "version_mlflow": "2.3.2"
       },
-      "creation_time": 1671579608376,
-      "last_update_time": 1671579608376
+      "creation_time": 1684623705797,
+      "last_update_time": 1684623705797,
+      "_creation_time": "2023-05-20 23:01:46",
+      "_last_update_time": "2023-05-20 23:01:46"
     },
     "runs": [
       "eb66c160957d4a28b11d3f1b968df9cd"
