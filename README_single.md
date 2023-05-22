@@ -188,7 +188,7 @@ Produces a directory with the following structure:
 
 Sample run.json files:
 [OSS](samples/oss_mlflow/single/experiments/basic/eb66c160957d4a28b11d3f1b968df9cd/run.json)
-\- [Databricks](samples/databricks/single/experiments/basic/f2e3f75c845d4365addbc9c0262a58a5/run.json).
+\- [Databricks](samples/databricks/single/experiments/workspace_notebooks/notebook_experiment/f7816bc76f254f22ab25549a7c2c9b06/run.json).
 
 
 ### Import run

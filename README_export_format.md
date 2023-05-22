@@ -69,7 +69,7 @@ Column legend:
 |------|--------|--------|----------|------------|
 |      |        | **Basic**  | **Src Tags** |     |
 | Single | Experiment | [link](samples/oss_mlflow/single/experiments/basic) |[link](samples/oss_mlflow/single/experiments/src_tags) | [link](samples/databricks/single/experiments/basic) |
-| Single | Model | [link](samples/oss_mlflow/single/models/basic/model.json) |[link](samples/oss_mlflow/single/models/src_tags/model.json) |
+| Single | Model | [link](samples/oss_mlflow/single/models/basic/model.json) |[link](samples/oss_mlflow/single/models/src_tags/model.json) |  [link](samples/databricks/single/models) |
 | Bulk | Experiment | [link](samples/oss_mlflow/bulk/experiments) | | [link](samples/databricks/bulk/experiments) | 
 | Bulk | Model | [link](samples/oss_mlflow/bulk/experiments) || [link](samples/databricks/bulk/models) |
 
