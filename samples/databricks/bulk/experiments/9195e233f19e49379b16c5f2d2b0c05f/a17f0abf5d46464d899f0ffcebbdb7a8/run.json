@@ -1,0 +1,78 @@
+{
+  "system": {
+    "package_version": "1.2.0",
+    "script": "export_run.py",
+    "export_time": 1684725509,
+    "_export_time": "2023-05-22 03:18:29",
+    "mlflow_version": "2.3.2",
+    "mlflow_tracking_uri": "databricks://e2_demo",
+    "platform": {
+      "python_version": "3.8.15",
+      "system": "Darwin",
+      "processor": "i386"
+    },
+    "user": "andre"
+  },
+  "mlflow": {
+    "info": {
+      "run_uuid": "a17f0abf5d46464d899f0ffcebbdb7a8",
+      "run_id": "a17f0abf5d46464d899f0ffcebbdb7a8",
+      "experiment_id": "9195e233f19e49379b16c5f2d2b0c05f",
+      "user_id": "",
+      "status": "FINISHED",
+      "start_time": 1684339053373,
+      "end_time": 1684339081033,
+      "lifecycle_stage": "active",
+      "artifact_uri": "dbfs:/databricks/mlflow-tracking/9195e233f19e49379b16c5f2d2b0c05f/a17f0abf5d46464d899f0ffcebbdb7a8/artifacts",
+      "run_name": "2023-05-17 15:50:19 - 2.3.1",
+      "_start_time": "2023-05-17 15:57:33",
+      "_end_time": "2023-05-17 15:58:01"
+    },
+    "params": {
+      "my_batch_size": "128",
+      "my_epochs": "2"
+    },
+    "metrics": {
+      "my_acc": [
+        {
+          "value": 0.9729999899864197,
+          "timestamp": 1684339064781,
+          "step": 0
+        }
+      ],
+      "my_loss": [
+        {
+          "value": 0.08887006342411041,
+          "timestamp": 1684339064845,
+          "step": 0
+        }
+      ]
+    },
+    "tags": {
+      "mlflow.databricks.cluster.id": "0414-154233-qm0df4rx",
+      "mlflow.databricks.cluster.info": "{\"cluster_name\":\"andre_ML_13.1\",\"spark_version\":\"13.1.x-cpu-ml-scala2.12\",\"node_type_id\":\"i3.xlarge\",\"driver_node_type_id\":\"i3.xlarge\",\"autotermination_minutes\":120,\"disk_spec\":{\"disk_count\":0},\"num_workers\":1}",
+      "mlflow.databricks.cluster.libraries": "{\"installable\":[],\"redacted\":[]}",
+      "mlflow.databricks.gitRepoCommit": "dde2e2ca09f74fa0b1d05f71e63778600ee9806c",
+      "mlflow.databricks.gitRepoProvider": "gitHub",
+      "mlflow.databricks.gitRepoReference": "master",
+      "mlflow.databricks.gitRepoReferenceType": "branch",
+      "mlflow.databricks.gitRepoRelativePath": "databricks/notebooks/basic/Keras_Mnist",
+      "mlflow.databricks.gitRepoStatus": "unknown",
+      "mlflow.databricks.gitRepoUrl": "https://github.com/amesar/mlflow-examples",
+      "mlflow.databricks.notebook.commandID": "7167713489519079369_6884355830173426785_ac15b3ecceef4196bc25c8413764eb2b",
+      "mlflow.databricks.notebookID": "1765187885495869",
+      "mlflow.databricks.notebookPath": "/Repos/andre@mycompany.com/mlflow-examples/databricks/notebooks/basic/Keras_Mnist",
+      "mlflow.databricks.webappURL": "https://mycompany.cloud.com",
+      "mlflow.databricks.workspaceID": "2556758628403379",
+      "mlflow.databricks.workspaceURL": "mycompany.cloud.com",
+      "mlflow.log-model.history": "[{\"artifact_path\":\"model\",\"flavors\":{\"tensorflow\":{\"data\":\"data\",\"code\":null,\"save_format\":\"tf\",\"model_type\":\"keras\",\"keras_version\":\"2.11.0\"},\"python_function\":{\"loader_module\":\"mlflow.tensorflow\",\"python_version\":\"3.10.6\",\"data\":\"data\",\"env\":{\"conda\":\"conda.yaml\",\"virtualenv\":\"python_env.yaml\"}}},\"run_id\":\"a17f0abf5d46464d899f0ffcebbdb7a8\",\"model_uuid\":\"caf7832f6abf43c5905c42a9d32c943a\",\"utc_time_created\":\"2023-05-17 15:57:44.908636\",\"mlflow_version\":\"2.3.1\",\"databricks_runtime\":\"13.1.x-cpu-ml-scala2.12\"}]",
+      "mlflow.runName": "2023-05-17 15:50:19 - 2.3.1",
+      "mlflow.source.name": "/Repos/andre@mycompany.com/mlflow-examples/databricks/notebooks/basic/Keras_Mnist",
+      "mlflow.source.type": "NOTEBOOK",
+      "mlflow.user": "andre@mycompany.com",
+      "version.keras": "2.11.0",
+      "version.mlflow": "2.3.1",
+      "version.tensorflow": "2.11.0"
+    }
+  }
+}

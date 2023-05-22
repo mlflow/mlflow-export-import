@@ -1,0 +1,48 @@
+{
+  "system": {
+    "package_version": "1.2.0",
+    "script": "export_experiment.py",
+    "export_time": 1684725509,
+    "_export_time": "2023-05-22 03:18:29",
+    "mlflow_version": "2.3.2",
+    "mlflow_tracking_uri": "databricks://e2_demo",
+    "platform": {
+      "python_version": "3.8.15",
+      "system": "Darwin",
+      "processor": "i386"
+    },
+    "user": "andre"
+  },
+  "info": {
+    "num_total_runs": 3,
+    "num_ok_runs": 3,
+    "num_failed_runs": 0,
+    "failed_runs": []
+  },
+  "mlflow": {
+    "experiment": {
+      "experiment_id": "1280664374380606",
+      "name": "/Users/andre@mycompany.com/experiments/sklearn_wine/Sklearn_Wine_ws",
+      "artifact_location": "dbfs:/databricks/mlflow-tracking/1280664374380606",
+      "lifecycle_stage": "active",
+      "tags": {
+        "mlflow.experiment.sourceName": "/Users/andre@mycompany.com/experiments/sklearn_wine/Sklearn_Wine_ws",
+        "mlflow.experimentType": "MLFLOW_EXPERIMENT",
+        "mlflow.note.content": "WS notebook - WS experiment\n/Users/andre@mycompany.com/experiments/sklearn_wine/Sklearn_Wine_ws",
+        "mlflow.ownerEmail": "andre@mycompany.com",
+        "mlflow.ownerId": "4566812440727830",
+        "timestamp": "2023-04-16 07:36:09",
+        "version_mlflow": "2.2.1"
+      },
+      "creation_time": 1681630570495,
+      "last_update_time": 1683945877431,
+      "_creation_time": "2023-04-16 07:36:10",
+      "_last_update_time": "2023-05-13 02:44:37"
+    },
+    "runs": [
+      "253000ee70914831850defc593ba4740",
+      "85716eddd2ba4d938713b245e80df662",
+      "851de1f466304650a77c949f5d386d9f"
+    ]
+  }
+}

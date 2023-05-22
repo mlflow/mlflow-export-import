@@ -1,48 +1,145 @@
 {
   "system": {
-    "package_version": "1.1.2",
+    "package_version": "1.2.0",
     "script": "export_model.py",
-    "export_time": 1672632808,
-    "_export_time": "2023-01-02 04:13:28",
-    "mlflow_version": "2.1.1",
-    "mlflow_tracking_uri": "databricks",
-    "user": "andre",
+    "export_time": 1684724517,
+    "_export_time": "2023-05-22 03:01:57",
+    "mlflow_version": "2.3.2",
+    "mlflow_tracking_uri": "databricks://e2_demo",
     "platform": {
       "python_version": "3.8.15",
-      "system": "Darwin"
-    }
+      "system": "Darwin",
+      "processor": "i386"
+    },
+    "user": "andre"
   },
   "info": {
-    "num_target_stages": 1,
+    "num_target_stages": 4,
     "num_target_versions": 0,
-    "num_src_versions": 4,
-    "num_dst_versions": 1
+    "num_src_versions": 2,
+    "num_dst_versions": 2,
+    "failed_versions": [],
+    "export_latest_versions": false,
+    "export_permissions": true
   },
   "mlflow": {
     "registered_model": {
-      "name": "Keras_MNIST",
-      "creation_timestamp": 1647885388373,
-      "last_updated_timestamp": 1672632789449,
+      "name": "Keras_Mnist",
+      "creation_timestamp": 1682321350649,
+      "last_updated_timestamp": 1684339074511,
       "user_id": "andre@mycompany.com",
-      "latest_versions": [
+      "id": "1ff0e29bfd2d425494bb2da87445f56a",
+      "permission_level": "CAN_MANAGE",
+      "_creation_timestamp": "2023-04-24 07:29:11",
+      "_last_updated_timestamp": "2023-05-17 15:57:55",
+      "versions": [
         {
-          "creation_timestamp": 1671030163254,
-          "current_stage": "Production",
+          "aliases": [],
+          "creation_timestamp": 1682321350875,
+          "current_stage": "None",
           "description": "",
-          "last_updated_timestamp": 1672632789449,
-          "name": "Keras_MNIST",
-          "run_id": "00823dcf475e4466aa71dd6f96799185",
+          "last_updated_timestamp": 1682321353351,
+          "name": "Keras_Mnist",
+          "run_id": "9b901d0d3c214880a4d38d0fceb3092c",
           "run_link": "",
-          "source": "dbfs:/databricks/mlflow/6499427/00823dcf475e4466aa71dd6f96799185/artifacts/model",
+          "source": "dbfs:/databricks/mlflow-tracking/9195e233f19e49379b16c5f2d2b0c05f/9b901d0d3c214880a4d38d0fceb3092c/artifacts/model",
           "status": "READY",
           "status_message": "",
           "tags": {},
           "user_id": "andre@mycompany.com",
-          "version": "4",
-          "_run_artifact_uri": "dbfs:/databricks/mlflow/6499427/00823dcf475e4466aa71dd6f96799185/artifacts",
-          "_experiment_name": "/Users/andre@mycompany.com/mlflow/mlflow_galleries/models_basic/python/05a_Keras_Train_Predict"
+          "version": "1",
+          "_run_artifact_uri": "dbfs:/databricks/mlflow-tracking/9195e233f19e49379b16c5f2d2b0c05f/9b901d0d3c214880a4d38d0fceb3092c/artifacts",
+          "_experiment_name": "/Repos/andre@mycompany.com/mlflow-examples/databricks/notebooks/basic/Keras_Mnist",
+          "_download_uri": "dbfs:/databricks/mlflow-registry/1e08c2c303194e44ad4210b8fbb086f8/models/model",
+          "_creation_timestamp": "2023-04-24 07:29:11",
+          "_last_updated_timestamp": "2023-04-24 07:29:13"
+        },
+        {
+          "aliases": [],
+          "creation_timestamp": 1684339074511,
+          "current_stage": "None",
+          "description": "",
+          "last_updated_timestamp": 1684339077453,
+          "name": "Keras_Mnist",
+          "run_id": "a17f0abf5d46464d899f0ffcebbdb7a8",
+          "run_link": "",
+          "source": "dbfs:/databricks/mlflow-tracking/9195e233f19e49379b16c5f2d2b0c05f/a17f0abf5d46464d899f0ffcebbdb7a8/artifacts/model",
+          "status": "READY",
+          "status_message": "",
+          "tags": {},
+          "user_id": "andre@mycompany.com",
+          "version": "2",
+          "_run_artifact_uri": "dbfs:/databricks/mlflow-tracking/9195e233f19e49379b16c5f2d2b0c05f/a17f0abf5d46464d899f0ffcebbdb7a8/artifacts",
+          "_experiment_name": "/Repos/andre@mycompany.com/mlflow-examples/databricks/notebooks/basic/Keras_Mnist",
+          "_download_uri": "dbfs:/databricks/mlflow-registry/12f0cd5eb23043e19d07f250e7e677df/models/model",
+          "_creation_timestamp": "2023-05-17 15:57:55",
+          "_last_updated_timestamp": "2023-05-17 15:57:57"
         }
-      ]
+      ],
+      "permissions": {
+        "permission_levels": [
+          {
+            "permission_level": "CAN_READ",
+            "description": "Can view the details of the registered model and its model versions, and use the model versions."
+          },
+          {
+            "permission_level": "CAN_EDIT",
+            "description": "Can view and edit the details of a registered model and its model versions (except stage changes), and add new model versions."
+          },
+          {
+            "permission_level": "CAN_MANAGE_STAGING_VERSIONS",
+            "description": "Can view and edit the details of a registered model and its model versions, add new model versions, and manage stage transitions between non-Production stages."
+          },
+          {
+            "permission_level": "CAN_MANAGE_PRODUCTION_VERSIONS",
+            "description": "Can view and edit the details of a registered model and its model versions, add new model versions, and manage stage transitions between any stages."
+          },
+          {
+            "permission_level": "CAN_MANAGE",
+            "description": "Can manage permissions on, view all details of, and perform all actions on the registered model and its model versions."
+          }
+        ],
+        "permissions": {
+          "object_id": "/registered-models/1ff0e29bfd2d425494bb2da87445f56a",
+          "object_type": "registered-model",
+          "access_control_list": [
+            {
+              "group_name": "admins",
+              "all_permissions": [
+                {
+                  "permission_level": "CAN_MANAGE",
+                  "inherited": true,
+                  "inherited_from_object": [
+                    "/registered-models/"
+                  ]
+                }
+              ]
+            },
+            {
+              "group_name": "users",
+              "all_permissions": [
+                {
+                  "permission_level": "CAN_MANAGE",
+                  "inherited": true,
+                  "inherited_from_object": [
+                    "/registered-models/"
+                  ]
+                }
+              ]
+            },
+            {
+              "user_name": "andre@mycompany.com",
+              "display_name": "andre",
+              "all_permissions": [
+                {
+                  "permission_level": "CAN_MANAGE",
+                  "inherited": false
+                }
+              ]
+            }
+          ]
+        }
+      }
     }
   }
 }
