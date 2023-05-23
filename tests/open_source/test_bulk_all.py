@@ -7,7 +7,7 @@ from tests.open_source.init_tests import mlflow_context
 from tests.compare_utils import compare_runs
 from tests.open_source.oss_utils_test import delete_experiments_and_models
 
-# == Helperf functions
+# == Helper functions
 
 _notebook_formats = "SOURCE,DBC"
 _num_models = 2
@@ -17,16 +17,16 @@ _num_runs = 2
 def _run_test(mlflow_context, compare_func=compare_runs, use_threads=False):
     delete_experiments_and_models(mlflow_context)
     for _ in range(0, _num_models):
-        create_model(mlflow_context.client_src) 
+        create_model(mlflow_context.client_src)
     export_all(
         mlflow_client = mlflow_context.client_src,
-        output_dir = mlflow_context.output_dir, 
-        notebook_formats = _notebook_formats, 
+        output_dir = mlflow_context.output_dir,
+        notebook_formats = _notebook_formats,
         use_threads = use_threads
     )
     import_models(
-        mlflow_client = mlflow_context.client_dst, 
-        input_dir = mlflow_context.output_dir, 
+        mlflow_client = mlflow_context.client_dst,
+        input_dir = mlflow_context.output_dir,
         delete_model = True
     )
     compare_experiments(mlflow_context, compare_func)
@@ -56,12 +56,12 @@ def test_model_deleted_runs(mlflow_context):
 
     export_all(
         mlflow_client = mlflow_context.client_src,
-        output_dir = mlflow_context.output_dir, 
+        output_dir = mlflow_context.output_dir,
         export_deleted_runs = True
     )
     import_models(
-        mlflow_client = mlflow_context.client_dst, 
-        input_dir = mlflow_context.output_dir, 
+        mlflow_client = mlflow_context.client_dst,
+        input_dir = mlflow_context.output_dir,
         delete_model = True
     )
     versions = mlflow_context.client_dst.search_model_versions(filter_string=f"name='{model_name}'")

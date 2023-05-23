@@ -48,18 +48,13 @@ def _compare_experiments(exp1, exp2, import_source_tags=False):
 def test_exp_basic(mlflow_context):
     exp1, exp2, run1, run2 = _init_exp_test(mlflow_context)
     _compare_experiments(exp1, exp2)
-    compare_runs(mlflow_context.client_src, mlflow_context.client_dst, 
-        run1, run2, 
-        mlflow_context.output_dir)
+    compare_runs(mlflow_context, run1, run2)
 
 
 def test_exp_with_source_tags(mlflow_context):
     exp1, exp2, run1, run2 = _init_exp_test(mlflow_context, import_source_tags=True)
     _compare_experiments(exp1, exp2, True)
-    compare_runs(mlflow_context.client_src, mlflow_context.client_dst, 
-        run1, run2, 
-        mlflow_context.output_dir, 
-        import_source_tags=True)
+    compare_runs(mlflow_context, run1, run2, import_source_tags=True)
 
 # == Test export/import deleted runs
 

@@ -20,26 +20,26 @@ _num_tags = 10
 def test_params(mlflow_context):
     run1, run2 = _init_test_runs(mlflow_context, num_params = _num_params)
     assert len(run1.data.params) == MAX_PARAMS_TAGS_PER_BATCH + _num_params
-    compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, mlflow_context.output_dir)
+    compare_runs(mlflow_context, run1, run2)
 
 
 def test_metrics(mlflow_context):
     run1, run2 = _init_test_runs(mlflow_context, num_metrics=_num_metrics)
     assert len(run1.data.metrics) == MAX_METRICS_PER_BATCH + _num_metrics
-    compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, mlflow_context.output_dir)
+    compare_runs(mlflow_context, run1, run2)
 
 
 def test_tags(mlflow_context):
     run1, run2 = _init_test_runs(mlflow_context, num_tags=_num_tags)
     assert len(run1.data.tags) >= MAX_PARAMS_TAGS_PER_BATCH + _num_tags
-    compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, mlflow_context.output_dir)
+    compare_runs(mlflow_context, run1, run2)
 
 
 def test_params_and_metrics(mlflow_context):
     run1, run2 = _init_test_runs(mlflow_context, num_params=_num_params, num_metrics=_num_metrics)
     assert len(run1.data.params) == MAX_PARAMS_TAGS_PER_BATCH + _num_params
     assert len(run1.data.metrics) == MAX_METRICS_PER_BATCH + _num_metrics
-    compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, mlflow_context.output_dir)
+    compare_runs(mlflow_context, run1, run2)
 
 
 def _init_test_runs(mlflow_context, num_params=None, num_metrics=None, num_tags=None):

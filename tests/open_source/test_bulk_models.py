@@ -38,7 +38,7 @@ def compare_models_with_versions(mlflow_context, compare_func=compare_runs):
             tdir = os.path.join(test_dir,run2.info.run_id)
             os.makedirs(tdir)
             assert run1.info.run_id != run2.info.run_id
-            compare_func(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, tdir)
+            compare_func(mlflow_context, run1, run2)
 
 
 # == Helper methods
@@ -66,10 +66,10 @@ def _run_test(mlflow_context, use_threads=False):
 def _run_test_with_models_names(mlflow_context, model_names, use_threads=False):
     export_models(
         mlflow_client = mlflow_context.client_src,
-        model_names = model_names, 
-        output_dir = mlflow_context.output_dir, 
-        stages = "None", 
-        export_all_runs = False, 
+        model_names = model_names,
+        output_dir = mlflow_context.output_dir,
+        stages = "None",
+        export_all_runs = False,
         use_threads = use_threads
     )
     import_models(
@@ -118,7 +118,7 @@ def _export_models(client, model_name, output_dir, export_all_runs):
     export_models(
         mlflow_client = client,
         model_names = [ model_name ],
-        output_dir = output_dir, 
+        output_dir = output_dir,
         stages = "production,staging",
         export_all_runs = export_all_runs
     )
@@ -139,11 +139,11 @@ def _run_test_export_runs(mlflow_context, export_all_runs):
     _add_version(client1, model_name, runs2[0], "staging")
 
     _export_models(client1, model_name, mlflow_context.output_dir, export_all_runs)
-    
+
     client2 = mlflow_context.client_dst
     import_models(
-        mlflow_client = client2, 
-        input_dir = mlflow_context.output_dir, 
+        mlflow_client = client2,
+        input_dir = mlflow_context.output_dir,
         delete_model = False
     )
     exps2 = client2.search_experiments()
@@ -152,7 +152,7 @@ def _run_test_export_runs(mlflow_context, export_all_runs):
 
 
 def test_export_all_experiment_runs(mlflow_context):
-    """ 
+    """
     Test that we export all runs of experiments that are referenced by version runs.
     """
     num_runs = _run_test_export_runs(mlflow_context, True)
@@ -160,14 +160,14 @@ def test_export_all_experiment_runs(mlflow_context):
 
 
 def test_export_only_version_runs(mlflow_context):
-    """ 
+    """
     Test that we export only runs referenced by version.
     """
     num_runs = _run_test_export_runs(mlflow_context, False)
     assert num_runs == 2
 
 
-# == Parsing tests for extracting model names from CLI comma-delimitd string option 
+# == Parsing tests for extracting model names from CLI comma-delimitd string option
 
 def test_get_model_names_from_comma_delimited_string(mlflow_context):
     delete_experiments_and_models(mlflow_context)
@@ -189,7 +189,7 @@ def test_experiment_rename_do_replace(mlflow_context):
     export_models(
         model_names = [ model_name ],
         mlflow_client = mlflow_context.client_src,
-        output_dir = mlflow_context.output_dir, 
+        output_dir = mlflow_context.output_dir,
     )
     new_exp_name = mk_uuid()
     import_models(
@@ -211,14 +211,14 @@ def test_experiment_rename_do_not_replace(mlflow_context):
     export_models(
         model_names = [ model_name ],
         mlflow_client = mlflow_context.client_src,
-        output_dir = mlflow_context.output_dir, 
+        output_dir = mlflow_context.output_dir,
     )
     new_exp_name = mk_uuid()
     import_models(
         mlflow_client = mlflow_context.client_dst,
         input_dir = mlflow_context.output_dir,
         delete_model = True,
-        experiment_renames = { "foo": new_exp_name } 
+        experiment_renames = { "foo": new_exp_name }
     )
     exp2 = mlflow_context.client_dst.get_experiment_by_name(exp.name)
     assert exp2
@@ -229,11 +229,11 @@ def test_experiment_rename_do_not_replace(mlflow_context):
 # == Test import with model rename
 
 def test_model_rename_do_replace(mlflow_context):
-    model_name = create_model(mlflow_context.client_src) 
+    model_name = create_model(mlflow_context.client_src)
     export_models(
         model_names = [ model_name ],
         mlflow_client = mlflow_context.client_src,
-        output_dir = mlflow_context.output_dir, 
+        output_dir = mlflow_context.output_dir,
     )
     new_model_name = mk_uuid() + "_NEW"
     import_models(
@@ -253,7 +253,7 @@ def test_model_rename_do_not_replace(mlflow_context):
     export_models(
         model_names = [ model_name ],
         mlflow_client = mlflow_context.client_src,
-        output_dir = mlflow_context.output_dir, 
+        output_dir = mlflow_context.output_dir,
     )
     new_model_name = mk_uuid()
     import_models(
@@ -292,7 +292,7 @@ def test_model_deleted_runs(mlflow_context):
         model_names = [ model_name ],
         mlflow_client = mlflow_context.client_src,
         export_latest_versions = False,
-        output_dir = mlflow_context.output_dir, 
+        output_dir = mlflow_context.output_dir,
         export_deleted_runs = True
     )
 
