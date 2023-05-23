@@ -7,8 +7,17 @@ from tests.open_source.init_tests import mlflow_context
 
 # == Setup
 
-def init_run_test(mlflow_context, run_name=None, use_metric_steps=False, import_source_tags=False):
-    exp, run1 = create_simple_run(mlflow_context.client_src, run_name=run_name, use_metric_steps=use_metric_steps)
+def _init_run_test(mlflow_context, 
+        run_name = None, 
+        model_artifact = "model", 
+        import_source_tags = False,
+        use_metric_steps = False
+    ):
+    exp, run1 = create_simple_run(mlflow_context.client_src, 
+        run_name = run_name, 
+        model_artifact = model_artifact, 
+        use_metric_steps = use_metric_steps
+    )
     create_output_dir(mlflow_context.output_run_dir)
 
     export_run(
@@ -29,21 +38,25 @@ def init_run_test(mlflow_context, run_name=None, use_metric_steps=False, import_
 # == Regular tests
 
 def test_run_basic(mlflow_context):
-    run1, run2 = init_run_test(mlflow_context, "test_run_basic")
+    run1, run2 = _init_run_test(mlflow_context, "test_run_basic")
     compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, mlflow_context.output_dir)
 
 
 def test_run_with_source_tags(mlflow_context):
-    run1, run2 = init_run_test(mlflow_context, "test_run_with_source_tags", import_source_tags=True)
+    run1, run2 = _init_run_test(mlflow_context, "test_run_with_source_tags", import_source_tags=True)
     compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, mlflow_context.output_dir, import_source_tags=True)
 
 
 def test_run_basic_use_metric_steps(mlflow_context):
-    run1, run2 = init_run_test(mlflow_context,
+    run1, run2 = _init_run_test(mlflow_context,
         run_name = "_test_run_basic_use_metric_steps",
         use_metric_steps = True)
     compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, mlflow_context.output_dir)
 
+
+def test_model_artifact_at_root(mlflow_context):
+    run1, run2 = _init_run_test(mlflow_context, "test_run_basic", model_artifact="")
+    compare_runs(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, mlflow_context.output_dir)
 
 # == Test for source and exported model prediction equivalence
 

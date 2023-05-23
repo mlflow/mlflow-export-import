@@ -11,9 +11,12 @@ client = mlflow.client.MlflowClient()
 
 
 def find_run_model_names(run_id):
-    """ Return a list of model artifact paths of an MLflow run. """
+    """ 
+    Return a list of model artifact directory paths of an MLflow run. 
+    Looks for any directory with an 'MLmodel' file and returns its directory.
+    """
     matches = find_artifacts(run_id, "", "MLmodel")
-    return [ m.replace("/MLmodel","") for m in matches ]
+    return [ m.replace("/MLmodel","").replace("MLmodel","") for m in matches ]
 
 
 def find_artifacts(run_id, path, target, max_level=sys.maxsize):
@@ -23,7 +26,7 @@ def find_artifacts(run_id, path, target, max_level=sys.maxsize):
 def _find_artifacts(run_id, path, target, max_level, level, matches):
     if level+1 > max_level: 
         return matches
-    artifacts = client.list_artifacts(run_id,path)
+    artifacts = client.list_artifacts(run_id, path)
     for art in artifacts:
         filename = os.path.basename(art.path)
         if filename == target:
@@ -45,8 +48,8 @@ def main(run_id, path, target, max_level): # pragma: no cover
         print(f"  {k}: {v}")
     matches = find_artifacts(run_id, path, target, max_level)
     print("Matches:")
-    for x in matches:
-        print(" ",x)
+    for m in matches:
+        print(" ",m)
 
 
 if __name__ == "__main__": 
