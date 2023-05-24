@@ -106,5 +106,5 @@ For job 'github', the job task executes the notebook from github and not from th
 | External MLflow project | github | | |
 | External non-project | laptop | | |
 
-For an example with "source tags, see [here](samples/databricks/single/experiments/workspace_experiments/workspace_notebook_src_tags).
+For an example with "source tags", see [here](samples/databricks/single/experiments/workspace_experiments/workspace_notebook_src_tags).
 
