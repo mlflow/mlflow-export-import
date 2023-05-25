@@ -1,4 +1,14 @@
 # Databricks notebook source
+# MAGIC %md
+# MAGIC This notebook takes the name of a registered mlflow model and hashes its production stage.
+# MAGIC
+# MAGIC Because MLflow artifacts are abstracted behind a permission wall, the notebook first uses `mlflow-export-import` to export the production model to ephemeral storage (public blobs).
+# MAGIC Once the model is exported, the notebook finds the first production model (technically, there should only be one but this may not be the case in DEV) and hashes its model files, which are stored in the `model/` subdirectory.
+# MAGIC The model files are `conda.yaml`, `MLmodel`, `model.pkl`, and `requirements.txt`.
+# MAGIC The 4 hashes are then concatenated and hashed to create the final, model hash.
+
+# COMMAND ----------
+
 # MAGIC %config Completer.use_jedi=False
 
 # COMMAND ----------
