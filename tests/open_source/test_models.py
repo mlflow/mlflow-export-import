@@ -5,10 +5,10 @@ from mlflow_export_import.model.export_model import export_model
 from mlflow_export_import.model.import_model import import_model
 from mlflow_export_import.model.import_model import _extract_model_path, _path_join
 
-from oss_utils_test import create_simple_run, create_version
-from oss_utils_test import mk_test_object_name_default, mk_dst_model_name
-from compare_utils import compare_models_with_versions, compare_models, compare_versions
-from init_tests import mlflow_context
+from tests.open_source.oss_utils_test import create_simple_run, create_version
+from tests.open_source.oss_utils_test import mk_test_object_name_default, mk_dst_model_name
+from tests.compare_utils import compare_models_with_versions, compare_models, compare_versions
+from tests.open_source.init_tests import mlflow_context
 
 
 # == Test stages
@@ -16,19 +16,19 @@ from init_tests import mlflow_context
 def test_export_import_model_1_stage(mlflow_context):
     model_src, model_dst = _run_test_export_import_model_stages(mlflow_context, stages=["Production"] )
     assert len(model_dst.latest_versions) == 1
-    compare_models_with_versions(mlflow_context.client_src, mlflow_context.client_dst,  model_src, model_dst, mlflow_context.output_dir)
+    compare_models_with_versions(mlflow_context, model_src, model_dst)
 
 
 def test_export_import_model_2_stages(mlflow_context):
     model_src, model_dst = _run_test_export_import_model_stages(mlflow_context, stages=["Production","Staging"])
     assert len(model_dst.latest_versions) == 2
-    compare_models_with_versions(mlflow_context.client_src, mlflow_context.client_dst,  model_src, model_dst, mlflow_context.output_dir)
+    compare_models_with_versions(mlflow_context, model_src, model_dst)
 
 
 def test_export_import_model_all_stages(mlflow_context):
     model_src, model_dst = _run_test_export_import_model_stages(mlflow_context, stages=None)
     assert len(model_dst.latest_versions) == 4
-    compare_models_with_versions(mlflow_context.client_src, mlflow_context.client_dst,  model_src, model_dst, mlflow_context.output_dir)
+    compare_models_with_versions(mlflow_context, model_src, model_dst)
 
 
 # == Test stages and versions
@@ -54,7 +54,7 @@ def _get_version_ids_dst(model):
 def test_export_import_model_first_two_versions(mlflow_context):
     model_src, model_dst = _run_test_export_import_model_stages(mlflow_context, versions=["1","2"])
     assert len(model_dst.latest_versions) == 2
-    compare_models_with_versions(mlflow_context.client_src, mlflow_context.client_dst,  model_src, model_dst, mlflow_context.output_dir)
+    compare_models_with_versions(mlflow_context, model_src, model_dst)
     ids_src = _get_version_ids(model_src)
     ids_dst = _get_version_ids(model_dst)
     for j, id in enumerate(ids_dst):
@@ -75,7 +75,7 @@ def test_export_import_model_two_from_middle_versions(mlflow_context):
         assert(len(vr_src)) == 1
         vr_src = vr_src[0]
         assert(vr_src.version == vr_src_id)
-        compare_versions(mlflow_context.client_src, mlflow_context.client_dst, vr_src, vr_dst, mlflow_context.output_dir)
+        compare_versions(mlflow_context, vr_src, vr_dst)
 
 # == Test export deleted runs
 
@@ -100,7 +100,7 @@ def _run_test_deleted_runs(mlflow_context, delete_run, export_deleted_runs):
     import_model(
         model_name = model_name_dst,
         experiment_name = model_name_dst,
-        input_dir = mlflow_context.output_dir, 
+        input_dir = mlflow_context.output_dir,
         mlflow_client = mlflow_context.client_dst
     )
     versions = mlflow_context.client_dst.search_model_versions(filter_string=f"name='{model_name_dst}'")
@@ -155,9 +155,9 @@ def _run_test_export_import_model_stages(mlflow_context, stages=None, versions=N
     import_model(
         model_name = model_name_dst,
         experiment_name = model_name_dst,
-        input_dir = mlflow_context.output_dir, 
+        input_dir = mlflow_context.output_dir,
         import_source_tags = True,
-        delete_model = True, 
+        delete_model = True,
         sleep_time = 10,
         mlflow_client = mlflow_context.client_dst
     )

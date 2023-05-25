@@ -188,7 +188,7 @@ Produces a directory with the following structure:
 
 Sample run.json files:
 [OSS](samples/oss_mlflow/single/experiments/basic/eb66c160957d4a28b11d3f1b968df9cd/run.json)
-\- [Databricks](samples/databricks/single/experiments/basic/f2e3f75c845d4365addbc9c0262a58a5/run.json).
+\- [Databricks](samples/databricks/single/experiments/notebook_experiments/workspace_notebook/f7816bc76f254f22ab25549a7c2c9b06/run.json).
 
 
 ### Import run
@@ -201,29 +201,25 @@ Imports a run from a directory.
 import-run --help
 
 Options:
-  --input-dir TEXT                Input directory.  [required]
-  --experiment-name TEXT          Destination experiment name  [required]
-  --import-source-tags BOOLEAN    Import source information for registered
-                                  model and its versions ad tags in
-                                  destination object.  [default: False]
-  --use-src-user-id BOOLEAN       Set the destination user field to the source
-                                  user field.  Only valid for open source
-                                  MLflow.  When importing into Databricks, the
-                                  source user field is ignored since it is
-                                  automatically picked up from your Databricks
-                                  access token.  There is no MLflow API
-                                  endpoint to explicity set the user_id for
-                                  Run and Registered Model.  [default: False]
-  --dst-notebook-dir TEXT         Databricks destination workpsace base
-                                  directory for notebook. A run ID will be
-                                  added to contain the run's notebook.
-  --dst-notebook-dir-add-run-id TEXT
-                                  Add the run ID to the destination notebook
-                                  workspace directory.
-  --mlmodel-fix BOOLEAN           Add correct run ID in destination MLmodel
-                                  artifact. Can be expensive for deeply nested
-                                  artifacts.  [default: True]
-
+  --input-dir TEXT              Input directory.  [required]
+  --experiment-name TEXT        Destination experiment name.  [required]
+  --import-source-tags BOOLEAN  Import source information for registered model
+                                and its versions ad tags in destination
+                                object.  [default: False]
+  --use-src-user-id BOOLEAN     Set the destination user field to the source
+                                user field.  Only valid for open source
+                                MLflow.  When importing into Databricks, the
+                                source user field is ignored since it is
+                                automatically picked up from your Databricks
+                                access token.  There is no MLflow API endpoint
+                                to explicity set the user_id for Run and
+                                Registered Model.  [default: False]
+  --dst-notebook-dir TEXT       Databricks destination workpsace base
+                                directory for notebook. A run ID will be added
+                                to contain the run's notebook.
+  --mlmodel-fix BOOLEAN         Add correct run ID in destination MLmodel
+                                artifact. Can be expensive for deeply nested
+                                artifacts.  [default: True]
 ```
 
 #### Import examples
@@ -346,7 +342,6 @@ Source: [import_model.py](mlflow_export_import/model/import_model.py).
 import-model --help
 
 Options:
-```
   --input-dir TEXT              Input directory  [required]
   --model TEXT                  Registered model name.  [required]
   --experiment-name TEXT        Destination experiment name  [required]

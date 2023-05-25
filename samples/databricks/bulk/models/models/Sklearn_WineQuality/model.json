@@ -1,56 +1,124 @@
 {
   "system": {
-    "package_version": "1.1.2",
+    "package_version": "1.2.0",
     "script": "export_model.py",
-    "export_time": 1671263265,
-    "_export_time": "2022-12-17 07:47:45",
-    "mlflow_version": "2.0.1",
-    "mlflow_tracking_uri": "databricks",
-    "user": "andre",
+    "export_time": 1684724517,
+    "_export_time": "2023-05-22 03:01:57",
+    "mlflow_version": "2.3.2",
+    "mlflow_tracking_uri": "databricks://e2_demo",
     "platform": {
       "python_version": "3.8.15",
-      "system": "Darwin"
-    }
+      "system": "Darwin",
+      "processor": "i386"
+    },
+    "user": "andre"
   },
   "info": {
-    "num_target_stages": 1,
+    "num_target_stages": 4,
     "num_target_versions": 0,
-    "num_src_versions": 6,
-    "num_dst_versions": 1
+    "num_src_versions": 1,
+    "num_dst_versions": 1,
+    "failed_versions": [],
+    "export_latest_versions": false,
+    "export_permissions": true
   },
   "mlflow": {
     "registered_model": {
-      "name": "Sklearn_WineQuality",
-      "creation_timestamp": 1670474748916,
-      "last_updated_timestamp": 1670836055687,
+      "name": "Sklearn_Wine_ws",
+      "creation_timestamp": 1683036938229,
+      "last_updated_timestamp": 1683036976470,
       "user_id": "andre@mycompany.com",
-      "latest_versions": [
+      "id": "51c5e9c42e244e2aa2a65476b934f5a4",
+      "permission_level": "CAN_MANAGE",
+      "_creation_timestamp": "2023-05-02 14:15:38",
+      "_last_updated_timestamp": "2023-05-02 14:16:16",
+      "versions": [
         {
-          "creation_timestamp": 1670836049446,
+          "aliases": [],
+          "creation_timestamp": 1683036938504,
           "current_stage": "Production",
           "description": "",
-          "last_updated_timestamp": 1670836055687,
-          "name": "Sklearn_WineQuality",
-          "run_id": "fb5ad45332b241a89d73da6e7aff8b36",
+          "last_updated_timestamp": 1683036976470,
+          "name": "Sklearn_Wine_ws",
+          "run_id": "851de1f466304650a77c949f5d386d9f",
           "run_link": "",
-          "source": "dbfs:/databricks/mlflow-tracking/13368311/fb5ad45332b241a89d73da6e7aff8b36/artifacts/sklearn-model",
+          "source": "dbfs:/databricks/mlflow-tracking/1280664374380606/851de1f466304650a77c949f5d386d9f/artifacts/model",
           "status": "READY",
           "status_message": "",
-          "tags": {
-            "ver_tag": "hello"
-          },
+          "tags": {},
           "user_id": "andre@mycompany.com",
-          "version": "6",
-          "_run_artifact_uri": "dbfs:/databricks/mlflow-tracking/13368311/fb5ad45332b241a89d73da6e7aff8b36/artifacts",
-          "_experiment_name": "/Users/andre@mycompany.com/mlflow/mlflow-export-import/export_samples/Sklearn_WineQuality"
+          "version": "1",
+          "_run_artifact_uri": "dbfs:/databricks/mlflow-tracking/1280664374380606/851de1f466304650a77c949f5d386d9f/artifacts",
+          "_experiment_name": "/Users/andre@mycompany.com/experiments/sklearn_wine/Sklearn_Wine_ws",
+          "_download_uri": "dbfs:/databricks/mlflow-registry/7a266e07eafb4101881488203b40ed64/models/model",
+          "_creation_timestamp": "2023-05-02 14:15:39",
+          "_last_updated_timestamp": "2023-05-02 14:16:16"
         }
       ],
-      "tags": [
-        {
-          "key": "sample_tag",
-          "value": "hi"
+      "permissions": {
+        "permission_levels": [
+          {
+            "permission_level": "CAN_READ",
+            "description": "Can view the details of the registered model and its model versions, and use the model versions."
+          },
+          {
+            "permission_level": "CAN_EDIT",
+            "description": "Can view and edit the details of a registered model and its model versions (except stage changes), and add new model versions."
+          },
+          {
+            "permission_level": "CAN_MANAGE_STAGING_VERSIONS",
+            "description": "Can view and edit the details of a registered model and its model versions, add new model versions, and manage stage transitions between non-Production stages."
+          },
+          {
+            "permission_level": "CAN_MANAGE_PRODUCTION_VERSIONS",
+            "description": "Can view and edit the details of a registered model and its model versions, add new model versions, and manage stage transitions between any stages."
+          },
+          {
+            "permission_level": "CAN_MANAGE",
+            "description": "Can manage permissions on, view all details of, and perform all actions on the registered model and its model versions."
+          }
+        ],
+        "permissions": {
+          "object_id": "/registered-models/51c5e9c42e244e2aa2a65476b934f5a4",
+          "object_type": "registered-model",
+          "access_control_list": [
+            {
+              "user_name": "andre@mycompany.com",
+              "display_name": "andre",
+              "all_permissions": [
+                {
+                  "permission_level": "CAN_MANAGE",
+                  "inherited": false
+                }
+              ]
+            },
+            {
+              "group_name": "admins",
+              "all_permissions": [
+                {
+                  "permission_level": "CAN_MANAGE",
+                  "inherited": true,
+                  "inherited_from_object": [
+                    "/registered-models/"
+                  ]
+                }
+              ]
+            },
+            {
+              "group_name": "users",
+              "all_permissions": [
+                {
+                  "permission_level": "CAN_MANAGE",
+                  "inherited": true,
+                  "inherited_from_object": [
+                    "/registered-models/"
+                  ]
+                }
+              ]
+            }
+          ]
         }
-      ]
+      }
     }
   }
 }

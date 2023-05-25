@@ -1,11 +1,14 @@
 from collections import namedtuple
 import pytest
 import tempfile
+
 from mlflow_export_import.client import databricks_utils
-from databricks_tester import DatabricksTester
-import utils_test
+
+from tests import utils_test
+from tests.databricks.databricks_tester import DatabricksTester
 
 cfg = utils_test.read_config_file()
+
 
 _tester = DatabricksTester(
     ws_base_dir = cfg["ws_base_dir"], 
@@ -15,6 +18,7 @@ _tester = DatabricksTester(
     model_name = cfg["model_name"], 
     run_name_prefix = cfg["run_name_prefix"]
 )
+
 
 from databricks_cli.dbfs.api import DbfsApi
 _dbfs_api = DbfsApi(databricks_utils.get_api_client())

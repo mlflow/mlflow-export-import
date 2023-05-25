@@ -1,0 +1,48 @@
+{
+  "system": {
+    "package_version": "1.2.0",
+    "script": "export_experiment.py",
+    "export_time": 1681541244,
+    "_export_time": "2023-04-15 06:47:24",
+    "mlflow_version": "2.2.1",
+    "mlflow_tracking_uri": "databricks",
+    "platform": {
+      "python_version": "3.10.6",
+      "system": "Linux",
+      "processor": "x86_64"
+    },
+    "user": "root",
+    "databricks": {
+      "DATABRICKS_RUNTIME_VERSION": "13.0"
+    }
+  },
+  "info": {
+    "num_total_runs": 1,
+    "num_ok_runs": 1,
+    "num_failed_runs": 0,
+    "failed_runs": []
+  },
+  "mlflow": {
+    "experiment": {
+      "experiment_id": "1280664374378362",
+      "name": "/Users/andre@mycompany.com/experiments/Sklearn_Wine_job",
+      "artifact_location": "dbfs:/databricks/mlflow-tracking/1280664374378362",
+      "lifecycle_stage": "active",
+      "tags": {
+        "mlflow.experiment.sourceName": "/Users/andre@mycompany.com/experiments/Sklearn_Wine_job",
+        "mlflow.experimentType": "MLFLOW_EXPERIMENT",
+        "mlflow.ownerEmail": "andre@mycompany.com",
+        "mlflow.ownerId": "4566812440727830",
+        "timestamp": "2023-04-15 06:21:44",
+        "version_mlflow": "2.2.1"
+      },
+      "creation_time": 1681539704973,
+      "last_update_time": 1681539706472,
+      "_creation_time": "2023-04-15 06:21:45",
+      "_last_update_time": "2023-04-15 06:21:46"
+    },
+    "runs": [
+      "e559b53f67884160b37e27f4475a26e3"
+    ]
+  }
+}

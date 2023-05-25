@@ -1,0 +1,74 @@
+{
+  "system": {
+    "package_version": "1.2.0",
+    "script": "export_run.py",
+    "export_time": 1684303741,
+    "_export_time": "2023-05-17 06:09:01",
+    "mlflow_version": "2.3.2",
+    "mlflow_tracking_uri": "databricks://e2_demo",
+    "platform": {
+      "python_version": "3.8.15",
+      "system": "Darwin",
+      "processor": "i386"
+    },
+    "user": "andre"
+  },
+  "mlflow": {
+    "info": {
+      "run_uuid": "253000ee70914831850defc593ba4740",
+      "run_id": "253000ee70914831850defc593ba4740",
+      "experiment_id": "1280664374380606",
+      "user_id": "",
+      "status": "FINISHED",
+      "start_time": 1683945877431,
+      "end_time": 1683945880724,
+      "lifecycle_stage": "active",
+      "artifact_uri": "dbfs:/databricks/mlflow-tracking/1280664374380606/253000ee70914831850defc593ba4740/artifacts",
+      "run_name": "851de1f466304650a77c949f5d386d9f",
+      "_start_time": "2023-05-13 02:44:37",
+      "_end_time": "2023-05-13 02:44:41"
+    },
+    "params": {
+      "max_depth": "1",
+      "max_leaf_nodes": "None"
+    },
+    "metrics": {
+      "r2": [
+        {
+          "value": 0.1553172302194683,
+          "timestamp": 1681630579458,
+          "step": 0
+        }
+      ],
+      "rmse": [
+        {
+          "value": 0.7986004372118107,
+          "timestamp": 1681630579236,
+          "step": 0
+        }
+      ]
+    },
+    "tags": {
+      "mlflow.databricks.cluster.id": "0414-154233-qm0df4rx",
+      "mlflow.databricks.cluster.info": "{\"cluster_name\":\"Andre_ML_13.0\",\"spark_version\":\"13.0.x-cpu-ml-scala2.12\",\"node_type_id\":\"i3.xlarge\",\"driver_node_type_id\":\"i3.xlarge\",\"autotermination_minutes\":120,\"disk_spec\":{\"disk_count\":0},\"num_workers\":1}",
+      "mlflow.databricks.cluster.libraries": "{\"installable\":[],\"redacted\":[]}",
+      "mlflow.databricks.notebook.commandID": "3527702579137640954_8374924253965797983_041de288996c42ef97161546f39184f0",
+      "mlflow.databricks.notebookID": "1280664374380381",
+      "mlflow.databricks.notebookPath": "/Users/andre@mycompany.com/mlflow/mlflow-examples-basic/Sklearn_Wine",
+      "mlflow.databricks.notebookRevisionID": "1683945880975",
+      "mlflow.databricks.webappURL": "https://mycompany.cloud.com",
+      "mlflow.databricks.workspaceID": "2556758628403379",
+      "mlflow.databricks.workspaceURL": "mycompany.cloud.com",
+      "mlflow.runName": "851de1f466304650a77c949f5d386d9f",
+      "mlflow.source.name": "/Users/andre@mycompany.com/mlflow/mlflow-examples-basic/Sklearn_Wine",
+      "mlflow.source.type": "NOTEBOOK",
+      "mlflow.user": "andre@mycompany.com",
+      "save_signature": "False",
+      "timestamp": "2023-04-16 07:36:09",
+      "version.DATABRICKS_RUNTIME_VERSION": "13.0",
+      "version.mlflow": "2.2.1",
+      "version.python": "3.10.6",
+      "version.sklearn": "1.1.1"
+    }
+  }
+}

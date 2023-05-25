@@ -1,54 +1,124 @@
 {
   "system": {
-    "package_version": "1.1.2",
+    "package_version": "1.2.0",
     "script": "export_model.py",
-    "export_time": 1671257896,
-    "_export_time": "2022-12-17 06:18:16",
-    "mlflow_version": "2.0.1",
+    "export_time": 1684716641,
+    "_export_time": "2023-05-22 00:50:41",
+    "mlflow_version": "2.3.2",
     "mlflow_tracking_uri": "http://127.0.0.1:5020",
-    "user": "andre",
     "platform": {
       "python_version": "3.8.15",
-      "system": "Darwin"
-    }
+      "system": "Darwin",
+      "processor": "i386"
+    },
+    "user": "andre"
   },
   "info": {
     "num_target_stages": 0,
     "num_target_versions": 0,
-    "num_src_versions": 1,
-    "num_dst_versions": 1
+    "num_src_versions": 3,
+    "num_dst_versions": 3,
+    "failed_versions": [],
+    "export_latest_versions": false,
+    "export_permissions": false
   },
   "mlflow": {
     "registered_model": {
       "name": "sklearn_wine",
-      "creation_timestamp": 1671070667678,
-      "last_updated_timestamp": 1671070667701,
+      "creation_timestamp": 1684716075258,
+      "last_updated_timestamp": 1684716088532,
       "description": "Skearn Wine Quality model",
-      "latest_versions": [
+      "aliases": [
         {
-          "creation_timestamp": 1671070667691,
-          "current_stage": "Production",
-          "description": "v1 Production",
-          "last_updated_timestamp": 1671070667719,
-          "name": "sklearn_wine",
-          "run_id": "a83cebbccbca41299360c695c5ea72f3",
-          "run_link": "",
-          "source": "/opt/mlflow/server/mlruns/1/a83cebbccbca41299360c695c5ea72f3/artifacts/sklearn-model",
-          "status": "READY",
-          "status_message": "",
-          "tags": {
-            "registered_version_info": "v1 Production"
-          },
-          "user_id": "",
-          "version": "1",
-          "_run_artifact_uri": "/opt/mlflow/server/mlruns/1/a83cebbccbca41299360c695c5ea72f3/artifacts",
-          "_experiment_name": "sklearn_wine"
+          "alias": "about-ready",
+          "version": "2"
+        },
+        {
+          "alias": "good-to-go",
+          "version": "1"
+        },
+        {
+          "alias": "just-in-case",
+          "version": "3"
         }
       ],
+      "_creation_timestamp": "2023-05-22 00:41:15",
+      "_last_updated_timestamp": "2023-05-22 00:41:29",
       "tags": [
         {
           "key": "info",
           "value": "Skearn Wine Quality model"
+        }
+      ],
+      "versions": [
+        {
+          "aliases": [],
+          "creation_timestamp": 1684716075276,
+          "current_stage": "Production",
+          "description": "v1 Production - wine",
+          "last_updated_timestamp": 1684716075307,
+          "name": "sklearn_wine",
+          "run_id": "d583ca20513841749b26907cb2d3952b",
+          "run_link": "",
+          "source": "/opt/mlflow/server/mlruns/1/d583ca20513841749b26907cb2d3952b/artifacts/model",
+          "status": "READY",
+          "status_message": "",
+          "tags": {
+            "registered_version_info": "v1 Production - wine"
+          },
+          "user_id": "",
+          "version": "1",
+          "_run_artifact_uri": "/opt/mlflow/server/mlruns/1/d583ca20513841749b26907cb2d3952b/artifacts",
+          "_experiment_name": "sklearn_wine",
+          "_download_uri": "/opt/mlflow/server/mlruns/1/d583ca20513841749b26907cb2d3952b/artifacts/model",
+          "_creation_timestamp": "2023-05-22 00:41:15",
+          "_last_updated_timestamp": "2023-05-22 00:41:15"
+        },
+        {
+          "aliases": [],
+          "creation_timestamp": 1684716081798,
+          "current_stage": "Staging",
+          "description": "v2 Staging - wine",
+          "last_updated_timestamp": 1684716081835,
+          "name": "sklearn_wine",
+          "run_id": "af9e86e62bc44e7d805c03554965a27c",
+          "run_link": "",
+          "source": "/opt/mlflow/server/mlruns/1/af9e86e62bc44e7d805c03554965a27c/artifacts/model",
+          "status": "READY",
+          "status_message": "",
+          "tags": {
+            "registered_version_info": "v2 Staging - wine"
+          },
+          "user_id": "",
+          "version": "2",
+          "_run_artifact_uri": "/opt/mlflow/server/mlruns/1/af9e86e62bc44e7d805c03554965a27c/artifacts",
+          "_experiment_name": "sklearn_wine",
+          "_download_uri": "/opt/mlflow/server/mlruns/1/af9e86e62bc44e7d805c03554965a27c/artifacts/model",
+          "_creation_timestamp": "2023-05-22 00:41:22",
+          "_last_updated_timestamp": "2023-05-22 00:41:22"
+        },
+        {
+          "aliases": [],
+          "creation_timestamp": 1684716088532,
+          "current_stage": "None",
+          "description": "v3 Archived - wine",
+          "last_updated_timestamp": 1684716088548,
+          "name": "sklearn_wine",
+          "run_id": "b8413159b1d345f6a25949328b865734",
+          "run_link": "",
+          "source": "/opt/mlflow/server/mlruns/1/b8413159b1d345f6a25949328b865734/artifacts/model",
+          "status": "READY",
+          "status_message": "",
+          "tags": {
+            "registered_version_info": "v3 Archived - wine"
+          },
+          "user_id": "",
+          "version": "3",
+          "_run_artifact_uri": "/opt/mlflow/server/mlruns/1/b8413159b1d345f6a25949328b865734/artifacts",
+          "_experiment_name": "sklearn_wine",
+          "_download_uri": "/opt/mlflow/server/mlruns/1/b8413159b1d345f6a25949328b865734/artifacts/model",
+          "_creation_timestamp": "2023-05-22 00:41:29",
+          "_last_updated_timestamp": "2023-05-22 00:41:29"
         }
       ]
     }

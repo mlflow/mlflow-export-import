@@ -1,0 +1,12 @@
+mlflow<3,>=2.3
+category-encoders==2.6.0
+cffi==1.15.1
+cloudpickle==2.0.0
+databricks-automl-runtime==0.2.16
+defusedxml==0.7.1
+holidays==0.22
+lightgbm==3.3.5
+matplotlib==3.5.2
+psutil==5.9.0
+scikit-learn==1.1.1
+typing-extensions==4.3.0

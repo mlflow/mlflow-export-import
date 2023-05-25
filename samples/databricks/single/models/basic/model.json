@@ -2,10 +2,10 @@
   "system": {
     "package_version": "1.2.0",
     "script": "export_model.py",
-    "export_time": 1681525638,
-    "_export_time": "2023-04-15 02:27:18",
-    "mlflow_version": "2.2.2",
-    "mlflow_tracking_uri": "databricks://e2_workfood",
+    "export_time": 1684721715,
+    "_export_time": "2023-05-22 02:15:15",
+    "mlflow_version": "2.3.2",
+    "mlflow_tracking_uri": "databricks://e2_demo",
     "platform": {
       "python_version": "3.8.15",
       "system": "Darwin",
@@ -16,60 +16,75 @@
   "info": {
     "num_target_stages": 0,
     "num_target_versions": 0,
-    "num_src_versions": 3,
-    "num_dst_versions": 3,
-    "failed_versions": [],
+    "num_src_versions": 2,
+    "num_dst_versions": 2,
+    "failed_versions": [
+      {
+        "message": "Version run probably does not exist",
+        "model": "Sklearn_Wine",
+        "version": "1",
+        "run_id": "3c0b2decc41c4dc0becd3d60bc814a4d",
+        "RestException": {
+          "error_code": "RESOURCE_DOES_NOT_EXIST",
+          "message": "Run '3c0b2decc41c4dc0becd3d60bc814a4d' not found."
+        }
+      }
+    ],
     "export_latest_versions": true,
     "export_permissions": true
   },
   "mlflow": {
     "registered_model": {
       "name": "Sklearn_Wine",
-      "creation_timestamp": 1680931584248,
-      "last_updated_timestamp": 1681435287008,
+      "creation_timestamp": 1681518898830,
+      "last_updated_timestamp": 1682226984978,
       "user_id": "andre@mycompany.com",
-      "id": "32aaa09aa75b42169eded072d87384ae",
+      "id": "7a803419ce4a455aaff1ebf6a494bfea",
       "permission_level": "CAN_MANAGE",
-      "_creation_timestamp": "2023-04-08 05:26:24",
-      "_last_updated_timestamp": "2023-04-14 01:21:27",
+      "_creation_timestamp": "2023-04-15 00:34:59",
+      "_last_updated_timestamp": "2023-04-23 05:16:25",
       "versions": [
         {
-          "creation_timestamp": 1681435280765,
-          "current_stage": "Production",
+          "aliases": [],
+          "creation_timestamp": 1681757772338,
+          "current_stage": "Staging",
           "description": "",
-          "last_updated_timestamp": 1681435287008,
+          "last_updated_timestamp": 1682226984978,
           "name": "Sklearn_Wine",
-          "run_id": "46994755603d4ebe8d8f0c99aa03093d",
+          "run_id": "a3a68a4c68f642919430689c682b89c5",
           "run_link": "",
-          "source": "dbfs:/databricks/mlflow-tracking/539d6527ade743d1aaf8268a1236143e/46994755603d4ebe8d8f0c99aa03093d/artifacts/model",
+          "source": "dbfs:/databricks/mlflow-tracking/e090757fcb8f49cb9822f65f2fe7ed91/a3a68a4c68f642919430689c682b89c5/artifacts/model",
           "status": "READY",
           "status_message": "",
           "tags": {},
           "user_id": "andre@mycompany.com",
-          "version": "22",
-          "_run_artifact_uri": "dbfs:/databricks/mlflow-tracking/539d6527ade743d1aaf8268a1236143e/46994755603d4ebe8d8f0c99aa03093d/artifacts",
+          "version": "2",
+          "_run_artifact_uri": "dbfs:/databricks/mlflow-tracking/e090757fcb8f49cb9822f65f2fe7ed91/a3a68a4c68f642919430689c682b89c5/artifacts",
           "_experiment_name": "/Repos/andre@mycompany.com/mlflow-examples/databricks/notebooks/basic/Sklearn_Wine",
-          "_creation_timestamp": "2023-04-14 01:21:21",
-          "_last_updated_timestamp": "2023-04-14 01:21:27"
+          "_download_uri": "dbfs:/databricks/mlflow-registry/6ec58d8b111f4869b361e7203d8860db/models/model",
+          "_creation_timestamp": "2023-04-17 18:56:12",
+          "_last_updated_timestamp": "2023-04-23 05:16:25"
         },
         {
-          "creation_timestamp": 1681106529337,
-          "current_stage": "Staging",
-          "description": "repo nb exp",
-          "last_updated_timestamp": 1681106535630,
+          "aliases": [],
+          "creation_timestamp": 1681758858985,
+          "current_stage": "Production",
+          "description": "",
+          "last_updated_timestamp": 1682015831144,
           "name": "Sklearn_Wine",
-          "run_id": "5d63485ae97948a98a5bc088d4613217",
+          "run_id": "1e764e678e9b47acb11d2fa64d1e8c1f",
           "run_link": "",
-          "source": "dbfs:/databricks/mlflow-tracking/2801509028408306/5d63485ae97948a98a5bc088d4613217/artifacts/model",
+          "source": "dbfs:/databricks/mlflow-tracking/e090757fcb8f49cb9822f65f2fe7ed91/1e764e678e9b47acb11d2fa64d1e8c1f/artifacts/model",
           "status": "READY",
           "status_message": "",
           "tags": {},
           "user_id": "andre@mycompany.com",
-          "version": "9",
-          "_run_artifact_uri": "dbfs:/databricks/mlflow-tracking/2801509028408306/5d63485ae97948a98a5bc088d4613217/artifacts",
-          "_experiment_name": "/Users/andre@mycompany.com/experiments/Sklearn_Wine_ws",
-          "_creation_timestamp": "2023-04-10 06:02:09",
-          "_last_updated_timestamp": "2023-04-10 06:02:16"
+          "version": "3",
+          "_run_artifact_uri": "dbfs:/databricks/mlflow-tracking/e090757fcb8f49cb9822f65f2fe7ed91/1e764e678e9b47acb11d2fa64d1e8c1f/artifacts",
+          "_experiment_name": "/Repos/andre@mycompany.com/mlflow-examples/databricks/notebooks/basic/Sklearn_Wine",
+          "_download_uri": "dbfs:/databricks/mlflow-registry/ed0ba93f4db04035aed50da14290743f/models/model",
+          "_creation_timestamp": "2023-04-17 19:14:19",
+          "_last_updated_timestamp": "2023-04-20 18:37:11"
         }
       ],
       "permissions": {
@@ -96,32 +111,9 @@
           }
         ],
         "permissions": {
-          "object_id": "/registered-models/32aaa09aa75b42169eded072d87384ae",
+          "object_id": "/registered-models/7a803419ce4a455aaff1ebf6a494bfea",
           "object_type": "registered-model",
           "access_control_list": [
-            {
-              "user_name": "diberville.torngat@mycompany.com",
-              "display_name": "diberville.torngat@mycompany.com",
-              "all_permissions": [
-                {
-                  "permission_level": "CAN_EDIT",
-                  "inherited": true,
-                  "inherited_from_object": [
-                    "/registered-models/"
-                  ]
-                }
-              ]
-            },
-            {
-              "user_name": "andre@mycompany.com",
-              "display_name": "andre@mycompany.com",
-              "all_permissions": [
-                {
-                  "permission_level": "CAN_MANAGE",
-                  "inherited": false
-                }
-              ]
-            },
             {
               "group_name": "admins",
               "all_permissions": [
@@ -135,11 +127,10 @@
               ]
             },
             {
-              "user_name": "k2.karakoram@mycompany.com",
-              "display_name": "k2.karakoram@mycompany.com",
+              "group_name": "users",
               "all_permissions": [
                 {
-                  "permission_level": "CAN_READ",
+                  "permission_level": "CAN_MANAGE",
                   "inherited": true,
                   "inherited_from_object": [
                     "/registered-models/"
@@ -148,15 +139,12 @@
               ]
             },
             {
-              "user_name": "cairn.gorm@mycompany.com",
-              "display_name": "cairn.gorm@mycompany.com",
+              "user_name": "andre@mycompany.com",
+              "display_name": "andre",
               "all_permissions": [
                 {
                   "permission_level": "CAN_MANAGE",
-                  "inherited": true,
-                  "inherited_from_object": [
-                    "/registered-models/"
-                  ]
+                  "inherited": false
                 }
               ]
             }

@@ -1,10 +1,10 @@
 {
   "system": {
-    "package_version": "1.1.2",
+    "package_version": "1.2.0",
     "script": "export_models.py",
-    "export_time": 1676433314,
-    "_export_time": "2023-02-15 03:55:14",
-    "mlflow_version": "2.1.1",
+    "export_time": 1684724517,
+    "_export_time": "2023-05-22 03:01:57",
+    "mlflow_version": "2.3.2",
     "mlflow_tracking_uri": "databricks://e2_demo",
     "platform": {
       "python_version": "3.8.15",
@@ -14,36 +14,47 @@
     "user": "andre"
   },
   "info": {
-    "model_names": "Sklearn_WineQuality,Keras_MNIST",
+    "model_names": "Sklearn_Wine_ws,Keras_Mnist",
     "stages": "Production,Staging,Archived,None",
     "export_all_runs": false,
     "export_latest_versions": false,
-    "notebook_formats": "SOURCE,DBC",
+    "export_permissions": true,
+    "export_deleted_runs": false,
+    "notebook_formats": [
+      "SOURCE",
+      "DBC"
+    ],
     "use_threads": false,
     "output_dir": "out",
     "models": {
       "model_names": [
-        "Sklearn_WineQuality",
-        "Keras_MNIST"
+        "Sklearn_Wine_ws",
+        "Keras_Mnist"
       ],
       "stages": "Production,Staging,Archived,None",
-      "export_run": false,
       "export_latest_versions": false,
-      "notebook_formats": "SOURCE,DBC",
+      "notebook_formats": [
+        "SOURCE",
+        "DBC"
+      ],
       "use_threads": false,
       "output_dir": "out/models",
-      "num_total_models": 1,
-      "num_ok_models": 1,
+      "num_total_models": 2,
+      "num_ok_models": 2,
       "num_failed_models": 0,
-      "duration": 4.2,
+      "duration": 20.0,
       "failed_models": []
     },
     "experiments": {
-      "duration": 26.3,
-      "experiments": 1,
-      "total_runs": 4,
-      "ok_runs": 4,
-      "failed_runs": 0
+      "experiment_names": [
+        "/Users/andre@mycompany.com/experiments/sklearn_wine/Sklearn_Wine_ws",
+        "/Repos/andre@mycompany.com/mlflow-examples/databricks/notebooks/basic/Keras_Mnist"
+      ],
+      "duration": 14.2,
+      "experiments": 2,
+      "total_runs": 3,
+      "ok_runs": 2,
+      "failed_runs": 1
     }
   },
   "mlflow": {}

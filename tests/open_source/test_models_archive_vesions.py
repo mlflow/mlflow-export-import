@@ -7,9 +7,9 @@ from mlflow_export_import.model.export_model import export_model
 from mlflow_export_import.model.import_model import import_model
 from mlflow_export_import.common.model_utils import list_model_versions
 
-import oss_utils_test 
-from init_tests import mlflow_context
-from compare_utils import compare_models, compare_versions
+from tests.compare_utils import compare_models, compare_versions
+from tests.open_source import oss_utils_test 
+from tests.open_source.init_tests import mlflow_context
 
 # == Test with archive_existing_versions=False (default)
 
@@ -99,7 +99,7 @@ def _run_test(mlflow_context, stage, num_stages, archive_existing_versions=False
     assert len(src_all_versions) == len(dst_all_versions)
     assert len(model_src.latest_versions) == len(model_dst.latest_versions)
 
-    _compare_models_with_versions(mlflow_context.client_src, mlflow_context.client_dst, model_src, model_dst, mlflow_context.output_dir)
+    _compare_models_with_versions(mlflow_context, model_src, model_dst)
 
 
 def _run_export_import(mlflow_context, stages, archive_existing_versions=False):
@@ -133,21 +133,21 @@ def _create_run(client):
     return client.get_run(run.info.run_id)
 
 
-def _compare_models_with_versions(mlflow_client_src, mlflow_client_dst, model_src, model_dst, output_dir):
+def _compare_models_with_versions(mlflow_context, model_src, model_dst):
 
     def _sort_versions(versions):
         return sorted(versions, key=lambda vr: vr.version)
 
-    def _compare_version_lists(src_versions, dst_versions, output_dir):
+    def _compare_version_lists(src_versions, dst_versions):
         src_versions = _sort_versions(src_versions)
         dst_versions = _sort_versions(dst_versions)
         assert len(src_versions) == len(dst_versions)
         for (vr_src, vr_dst) in zip(src_versions, dst_versions):
-            compare_versions(mlflow_client_src, mlflow_client_dst, vr_src, vr_dst, output_dir)
+            compare_versions(mlflow_context, vr_src, vr_dst)
 
-    compare_models(model_src, model_dst, mlflow_client_src!=mlflow_client_dst)
-    _compare_version_lists(model_src.latest_versions, model_dst.latest_versions, output_dir)
+    compare_models(model_src, model_dst, mlflow_context.client_src!=mlflow_context.client_dst)
+
     _compare_version_lists(
-        list_model_versions(mlflow_client_src, model_src.name),
-        list_model_versions(mlflow_client_dst, model_dst.name),
-        output_dir)
+        list_model_versions(mlflow_context.client_src, model_src.name),
+        list_model_versions(mlflow_context.client_dst, model_dst.name)
+    )

@@ -6,6 +6,12 @@ There are two types of tests:
 * [Open source MLlflow tests](open_source/README.md). Numerous tests. Launches a source and destination tracking server and runs tests to ensure that the exported MLflow objects (runs, experiments and registered models) are correctly imported.
 * [Databricks MLflow notebook tests](databricks/README.md). Smaller number of smoke tests for Databricks notebooks. Launches Databricks jobs to ensure that [Databricks export-import notebooks](../databricks_notebooks/README.md) execute properly.
 
+## Setup
+
+```
+pip install -e ..[tests] --upgrade 
+```
+
 ## Reports and logs
 
 The test script creates the folowing files:
@@ -27,13 +33,4 @@ Failed Databricks Tests:
 * [run_tests_junit.xml](databricks/samples/failed/run_tests_junit.xml)
 * [run_tests_report.html](databricks/samples/failed/run_tests_report.html)
 
-## Setup
-
-Since the testing environment requires the tracking server (unlike the root setup.py which uses the `mlflow-skinny` package),
-we need a separate environment which installs the `mlflow` package.
-
-```
-conda env create conda.yaml
-conda activate mlflow-export-import-test
-```
 

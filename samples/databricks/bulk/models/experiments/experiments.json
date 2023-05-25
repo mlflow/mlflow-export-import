@@ -1,46 +1,44 @@
 {
   "system": {
-    "package_version": "1.1.2",
+    "package_version": "1.2.0",
     "script": "export_experiments.py",
-    "export_time": 1671263265,
-    "_export_time": "2022-12-17 07:47:45",
-    "mlflow_version": "2.0.1",
-    "mlflow_tracking_uri": "databricks",
-    "user": "andre",
+    "export_time": 1684724517,
+    "_export_time": "2023-05-22 03:01:57",
+    "mlflow_version": "2.3.2",
+    "mlflow_tracking_uri": "databricks://e2_demo",
     "platform": {
       "python_version": "3.8.15",
-      "system": "Darwin"
-    }
+      "system": "Darwin",
+      "processor": "i386"
+    },
+    "user": "andre"
   },
   "info": {
-    "duration": 56.9,
-    "experiments": 3,
-    "total_runs": 10,
-    "ok_runs": 10,
-    "failed_runs": 0
+    "experiment_names": [
+      "/Users/andre@mycompany.com/experiments/sklearn_wine/Sklearn_Wine_ws",
+      "/Repos/andre@mycompany.com/mlflow-examples/databricks/notebooks/basic/Keras_Mnist"
+    ],
+    "duration": 14.2,
+    "experiments": 2,
+    "total_runs": 3,
+    "ok_runs": 2,
+    "failed_runs": 1
   },
   "mlflow": {
     "experiments": [
       {
-        "id": "13368311",
-        "name": "/Users/andre@mycompany.com/mlflow/mlflow-export-import/export_samples/Sklearn_WineQuality",
-        "ok_runs": 4,
+        "id": "1280664374380606",
+        "name": "/Users/andre@mycompany.com/experiments/sklearn_wine/Sklearn_Wine_ws",
+        "ok_runs": 1,
         "failed_runs": 0,
-        "duration": 18.9
+        "duration": 7.1
       },
       {
-        "id": "13373532",
-        "name": "/Users/andre@mycompany.com/experiments/samples/Sklearn_WineQuality",
-        "ok_runs": 2,
-        "failed_runs": 0,
-        "duration": 9.2
-      },
-      {
-        "id": "6499427",
-        "name": "/Users/andre@mycompany.com/mlflow/mlflow_galleries/models_basic/python/05a_Keras_Train_Predict",
-        "ok_runs": 4,
-        "failed_runs": 0,
-        "duration": 27.7
+        "id": "9195e233f19e49379b16c5f2d2b0c05f",
+        "name": "/Repos/andre@mycompany.com/mlflow-examples/databricks/notebooks/basic/Keras_Mnist",
+        "ok_runs": 1,
+        "failed_runs": 1,
+        "duration": 6.2
       }
     ]
   }

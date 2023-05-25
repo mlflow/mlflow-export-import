@@ -1,10 +1,10 @@
 import shortuuid
 import time
 import mlflow
-import sklearn_utils
 from mlflow_export_import.common import utils, model_utils
 from mlflow.utils.mlflow_tags import MLFLOW_RUN_NOTE # NOTE: ""mlflow.note.content" - used for Experiment Description too!
-import utils_test
+from tests import utils_test
+from tests.open_source import sklearn_utils
 
 _logger = utils.getLogger(__name__)
 
@@ -49,13 +49,13 @@ def create_experiment(client, mk_test_object_name=mk_test_object_name_default):
     return exp
 
 
-def create_simple_run(client, run_name=None, use_metric_steps=False):
+def create_simple_run(client, run_name=None, model_artifact="model", use_metric_steps=False):
     " Create run and create experiment "
     exp = create_experiment(client)
-    run = _create_simple_run(client, run_name=run_name, use_metric_steps=use_metric_steps)
+    run = _create_simple_run(client, run_name=run_name, model_artifact=model_artifact, use_metric_steps=use_metric_steps)
     return exp, run
 
-def _create_simple_run(client, run_name=None, use_metric_steps=False):
+def _create_simple_run(client, run_name=None, model_artifact="model", use_metric_steps=False):
     " Create run without creating experiment "
     max_depth = 4
     model = sklearn_utils.create_sklearn_model(max_depth)
@@ -68,7 +68,7 @@ def _create_simple_run(client, run_name=None, use_metric_steps=False):
             mlflow.log_metric("rmse", 0.789)
         mlflow.set_tag("my_tag", "my_val")
         mlflow.set_tag("my_uuid",mk_uuid())
-        mlflow.sklearn.log_model(model, "model")
+        mlflow.sklearn.log_model(model, model_artifact)
         with open("info.txt", "w", encoding="utf-8") as f:
             f.write("Hi artifact")
         mlflow.log_artifact("info.txt")

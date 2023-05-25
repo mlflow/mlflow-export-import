@@ -1,39 +1,44 @@
 {
   "system": {
-    "package_version": "1.1.2",
+    "package_version": "1.2.0",
     "script": "export_experiments.py",
-    "export_time": 1672631409,
-    "_export_time": "2023-01-02 03:50:09",
-    "mlflow_version": "2.1.1",
-    "mlflow_tracking_uri": "databricks",
-    "user": "andre",
+    "export_time": 1684725509,
+    "_export_time": "2023-05-22 03:18:29",
+    "mlflow_version": "2.3.2",
+    "mlflow_tracking_uri": "databricks://e2_demo",
     "platform": {
       "python_version": "3.8.15",
-      "system": "Darwin"
-    }
+      "system": "Darwin",
+      "processor": "i386"
+    },
+    "user": "andre"
   },
   "info": {
-    "duration": 11.2,
+    "experiment_names": [
+      "/Users/andre@mycompany.com/experiments/sklearn_wine/Sklearn_Wine_ws",
+      "/Repos/andre@mycompany.com/mlflow-examples/databricks/notebooks/basic/Keras_Mnist"
+    ],
+    "duration": 14.3,
     "experiments": 2,
-    "total_runs": 6,
-    "ok_runs": 6,
+    "total_runs": 4,
+    "ok_runs": 4,
     "failed_runs": 0
   },
   "mlflow": {
     "experiments": [
       {
-        "id": "76bcc705806b407fb971843bfb5e5cae",
-        "name": "/Repos/andre@mycompany.com/dbx-repo-mlflow/01_Iris_Train",
-        "ok_runs": 4,
+        "id": "9195e233f19e49379b16c5f2d2b0c05f",
+        "name": "/Repos/andre@mycompany.com/mlflow-examples/databricks/notebooks/basic/Keras_Mnist",
+        "ok_runs": 1,
         "failed_runs": 0,
-        "duration": 9.1
+        "duration": 5.3
       },
       {
-        "id": "13368311",
-        "name": "/Users/andre@mycompany.com/mlflow/mlflow-export-import/export_samples/Sklearn_WineQuality",
-        "ok_runs": 2,
+        "id": "1280664374380606",
+        "name": "/Users/andre@mycompany.com/experiments/sklearn_wine/Sklearn_Wine_ws",
+        "ok_runs": 3,
         "failed_runs": 0,
-        "duration": 10.6
+        "duration": 13.4
       }
     ]
   }

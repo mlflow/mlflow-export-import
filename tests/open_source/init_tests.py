@@ -3,7 +3,7 @@ import pytest
 import tempfile
 from collections import namedtuple
 import mlflow
-import utils_test
+from tests import utils_test
 
 from mlflow_export_import.common import utils
 _logger = utils.getLogger(__name__)

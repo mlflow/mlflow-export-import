@@ -1,0 +1,110 @@
+{
+  "system": {
+    "package_version": "1.2.0",
+    "script": "export_experiment.py",
+    "export_time": 1684303741,
+    "_export_time": "2023-05-17 06:09:01",
+    "mlflow_version": "2.3.2",
+    "mlflow_tracking_uri": "databricks://e2_demo",
+    "platform": {
+      "python_version": "3.8.15",
+      "system": "Darwin",
+      "processor": "i386"
+    },
+    "user": "andre"
+  },
+  "info": {
+    "num_total_runs": 1,
+    "num_ok_runs": 1,
+    "num_failed_runs": 0,
+    "failed_runs": []
+  },
+  "mlflow": {
+    "experiment": {
+      "experiment_id": "1280664374380606",
+      "name": "/Users/andre@mycompany.com/experiments/sklearn_wine/Sklearn_Wine_ws",
+      "artifact_location": "dbfs:/databricks/mlflow-tracking/1280664374380606",
+      "lifecycle_stage": "active",
+      "tags": {
+        "mlflow.experiment.sourceName": "/Users/andre@mycompany.com/experiments/sklearn_wine/Sklearn_Wine_ws",
+        "mlflow.experimentType": "MLFLOW_EXPERIMENT",
+        "mlflow.note.content": "WS notebook - WS experiment\n/Users/andre@mycompany.com/experiments/sklearn_wine/Sklearn_Wine_ws",
+        "mlflow.ownerEmail": "andre@mycompany.com",
+        "mlflow.ownerId": "4566812440727830",
+        "timestamp": "2023-04-16 07:36:09",
+        "version_mlflow": "2.2.1"
+      },
+      "creation_time": 1681630570495,
+      "last_update_time": 1683945877431,
+      "_creation_time": "2023-04-16 07:36:10",
+      "_last_update_time": "2023-05-13 02:44:37"
+    },
+    "runs": [
+      "253000ee70914831850defc593ba4740"
+    ],
+    "permissions": {
+      "permission_levels": [
+        {
+          "permission_level": "CAN_READ",
+          "description": "Can view the experiment"
+        },
+        {
+          "permission_level": "CAN_EDIT",
+          "description": "Can view, log runs, and edit the experiment"
+        },
+        {
+          "permission_level": "CAN_MANAGE",
+          "description": "Can view, log runs, edit, delete, and change permissions of the experiment"
+        }
+      ],
+      "permissions": {
+        "object_id": "/experiments/1280664374380606",
+        "object_type": "mlflowExperiment",
+        "access_control_list": [
+          {
+            "group_name": "test",
+            "all_permissions": [
+              {
+                "permission_level": "CAN_MANAGE",
+                "inherited": false
+              }
+            ]
+          },
+          {
+            "group_name": "admins",
+            "all_permissions": [
+              {
+                "permission_level": "CAN_MANAGE",
+                "inherited": false
+              },
+              {
+                "permission_level": "CAN_MANAGE",
+                "inherited": true,
+                "inherited_from_object": [
+                  "/directories/"
+                ]
+              }
+            ]
+          },
+          {
+            "user_name": "andre@mycompany.com",
+            "display_name": "andre",
+            "all_permissions": [
+              {
+                "permission_level": "CAN_MANAGE",
+                "inherited": false
+              },
+              {
+                "permission_level": "CAN_MANAGE",
+                "inherited": true,
+                "inherited_from_object": [
+                  "/directories/767933989557963"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

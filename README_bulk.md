@@ -48,11 +48,13 @@ Options:
                                   is all stages and all versions. Stages are
                                   Production, Staging, Archived and None.
                                   Mututally exclusive with option --versions.
-  --export-permissions BOOLEAN    Export Databricks permissions.  [default:
-                                  False]
   --run-start-time TEXT           Only export runs started after this UTC time
                                   (inclusive). Format: YYYY-MM-DD.
-  --export-deleted-runs BOOLEAN   Export deleted runs.  [default: False]
+  --export-deleted-runs BOOLEAN   Export deleted runs.  [default: False] 
+  --export-version-model BOOLEAN  Export registered model version's 'cached'
+                                  MLflow model.  [default: False] 
+  --export-permissions BOOLEAN    Export Databricks permissions.  [default:
+                                  False]
   --notebook-formats TEXT         Databricks notebook formats. Values are
                                   SOURCE, HTML, JUPYTER or DBC (comma
                                   seperated).
@@ -194,8 +196,6 @@ sklearn_iris
 sklearn_wine
 ```
 
-XX
-
 
 ### Import registered models 
 
@@ -206,9 +206,17 @@ Source: [import_models.py](mlflow_export_import/bulk/import_models.py).
 import-models --help
 
 Options:
-  --input-dir TEXT               Input directory  [required]
+  --input-dir TEXT               Input directory.  [required]
   --delete-model BOOLEAN         If the model exists, first delete the model
                                  and all its versions.  [default: False]
+  --import-permissions BOOLEAN   Import Databricks permissions using the HTTP
+                                 PATCH method.  [default: False]
+  --experiment-rename-file TEXT  File with experiment names replacements:
+                                 comma-delimited line such as
+                                 'old_name,new_name'.
+  --model-rename-file TEXT       File with registered model names
+                                 replacements: comma-delimited line such as
+                                 'old_name,new_name'.
   --import-source-tags BOOLEAN   Import source information for registered
                                  model and its versions ad tags in destination
                                  object.  [default: False]
@@ -219,14 +227,7 @@ Options:
                                  automatically picked up from your Databricks
                                  access token.  There is no MLflow API
                                  endpoint to explicity set the user_id for Run
-                                 and Registered Model.
-  --verbose BOOLEAN              Verbose.  [default: False]
-  --experiment-rename-file TEXT  File with experiment names replacements:
-                                 comma-delimited line such as
-                                 'old_name,new_name'.
-  --model-rename-file TEXT       File with registered model names
-                                 replacements: comma-delimited line such as
-                                 'old_name,new_name'.
+                                 and Registered Model.  [default: False]
   --use-threads BOOLEAN          Process in parallel using threads.  [default:
                                  False]
 ```
@@ -264,9 +265,11 @@ Export directory samples:
 Export several (or all) experiments to a directory.
 
 #### Usage
+
 ```
 export-experiments --help
 
+Options:
   --experiments TEXT             Experiment names or IDs (comma delimited).
                                  For example, 'sklearn_wine,sklearn_iris' or
                                  '1,2'. 'all' will export all experiments.
@@ -300,7 +303,7 @@ export-experiments \
   --output-dir out
 ```
 
-##### Export experiments from filename - XX
+##### Export experiments from filename 
 ```
 export-experiments \
   --output-dir out \
@@ -342,25 +345,26 @@ If the experiment already exists, the source runs will be added to it.
 import-experiments --help
 
 Options:
-  --experiments TEXT             Experiment names or IDs (comma delimited) or
-                                 filename ending with '.txt' containing them.
-                                 For example, 'sklearn_wine,sklearn_iris' or
-                                 '1,2'. 'all' will export all experiments.
-                                 Or 'experiments.txt' will contain a list of
-                                 experiment names or IDs.  [required]
-  --output-dir TEXT              Output directory.  [required]
-  --export-permissions BOOLEAN   Export Databricks permissions.  [default:
-                                 False]
-  --run-start-time TEXT          Only export runs started after this UTC time
-                                 (inclusive). Format: YYYY-MM-DD.
-  --export-deleted-runs BOOLEAN  Export deleted runs.  [default: False]
-  --notebook-formats TEXT        Databricks notebook formats. Values are
-                                 SOURCE, HTML, JUPYTER or DBC (comma
-                                 seperated).
+  --input-dir TEXT               Input directory.  [required]
+  --import-permissions BOOLEAN   Import Databricks permissions using the HTTP
+                                 PATCH method.  [default: False]
+  --import-source-tags BOOLEAN   Import source information for registered
+                                 model and its versions ad tags in destination
+                                 object.  [default: False]
+  --use-src-user-id BOOLEAN      Set the destination user field to the source
+                                 user field.  Only valid for open source
+                                 MLflow.  When importing into Databricks, the
+                                 source user field is ignored since it is
+                                 automatically picked up from your Databricks
+                                 access token.  There is no MLflow API
+                                 endpoint to explicity set the user_id for Run
+                                 and Registered Model.  [default: False]
+  --experiment-rename-file TEXT  File with experiment names replacements:
+                                 comma-delimited line such as
+                                 'old_name,new_name'.
   --use-threads BOOLEAN          Process in parallel using threads.  [default:
                                  False]
 ```
-
 
 
 #### Examples

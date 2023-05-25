@@ -1,11 +1,11 @@
 from mlflow.entities import ViewType
 from mlflow_export_import.experiment.export_experiment import export_experiment
 from mlflow_export_import.experiment.import_experiment import import_experiment
-from oss_utils_test import create_simple_run, init_output_dirs, mk_dst_experiment_name
-from oss_utils_test import _create_simple_run
-from oss_utils_test import create_test_experiment
-from compare_utils import compare_runs, compare_experiment_tags
-from init_tests import mlflow_context
+from tests.open_source.oss_utils_test import create_simple_run, init_output_dirs, mk_dst_experiment_name
+from tests.open_source.oss_utils_test import _create_simple_run
+from tests.open_source.oss_utils_test import create_test_experiment
+from tests.compare_utils import compare_runs, compare_experiment_tags
+from tests.open_source.init_tests import mlflow_context
 
 # == Setup
 
@@ -48,18 +48,13 @@ def _compare_experiments(exp1, exp2, import_source_tags=False):
 def test_exp_basic(mlflow_context):
     exp1, exp2, run1, run2 = _init_exp_test(mlflow_context)
     _compare_experiments(exp1, exp2)
-    compare_runs(mlflow_context.client_src, mlflow_context.client_dst, 
-        run1, run2, 
-        mlflow_context.output_dir)
+    compare_runs(mlflow_context, run1, run2)
 
 
 def test_exp_with_source_tags(mlflow_context):
     exp1, exp2, run1, run2 = _init_exp_test(mlflow_context, import_source_tags=True)
     _compare_experiments(exp1, exp2, True)
-    compare_runs(mlflow_context.client_src, mlflow_context.client_dst, 
-        run1, run2, 
-        mlflow_context.output_dir, 
-        import_source_tags=True)
+    compare_runs(mlflow_context, run1, run2, import_source_tags=True)
 
 # == Test export/import deleted runs
 

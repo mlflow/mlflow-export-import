@@ -1,21 +1,22 @@
 """
-Compare run utilities.
+Compare MLflow object utilities.
 """
 
 from mlflow_export_import.common import utils
 from mlflow_export_import.common.source_tags import ExportTags
-import utils_test
+from tests import utils_test
 
-def compare_runs(client_src, client_dst, run1, run2, output_dir, import_source_tags=False):
+def compare_runs(mlflow_context, run1, run2, import_source_tags=False, output_dir=None):
+    output_dir = output_dir or mlflow_context.output_dir
     if import_source_tags:
         _compare_runs_with_source_tags(run1, run2)
     else:
-        _compare_runs_without_source_tags(client_src, client_dst, run1, run2, output_dir)
-    
+        _compare_runs_without_source_tags(mlflow_context, run1, run2, output_dir)
 
-def _compare_runs_without_source_tags(client_src, client_dst, run1, run2, output_dir):
+
+def _compare_runs_without_source_tags(mlflow_context, run1, run2, output_dir):
     _compare_common_tags(run1, run2)
-    _compare_runs_without_tags(client_src, client_dst, run1, run2, output_dir)
+    _compare_runs_without_tags(mlflow_context, run1, run2, output_dir)
 
 
 def _compare_runs_with_source_tags(run1, run2):
@@ -30,9 +31,9 @@ def _compare_runs_with_source_tags(run1, run2):
 def compare_experiment_tags(tags1, tags2, import_source_tags=False):
     if not import_source_tags:
         assert tags1 == tags2
-        return 
+        return
 
-    source_tags2 = { k:v for k,v in tags2.items() if k.startswith(ExportTags.PREFIX_MLFLOW_TAG) } 
+    source_tags2 = { k:v for k,v in tags2.items() if k.startswith(ExportTags.PREFIX_MLFLOW_TAG) }
     mlflow_tags1 = { k:v for k,v in tags1.items() if k.startswith("mlflow.") }
     mlflow_tags2 = { k.replace(f"{ExportTags.PREFIX_MLFLOW_TAG}.","mlflow."):v for k,v in source_tags2.items() }
     assert mlflow_tags1 == mlflow_tags2
@@ -47,11 +48,11 @@ def _compare_common_tags(run1, run2):
     assert tags1 == tags2
 
 
-def _compare_runs_without_tags(client_src, client_dst, run1, run2, output_dir):
+def _compare_runs_without_tags(mlflow_context, run1, run2, output_dir):
     run_artifact_dir1, run_artifact_dir2 = utils_test.create_run_artifact_dirs(output_dir)
     _compare_run_info(run1, run2)
     _compare_data(run1, run2)
-    _compare_artifacts(client_src, client_dst, run1, run2, run_artifact_dir1, run_artifact_dir2)
+    _compare_artifacts(mlflow_context, run1, run2, run_artifact_dir1, run_artifact_dir2)
 
 
 def _compare_run_info(run1, run2):
@@ -65,14 +66,14 @@ def _compare_data(run1, run2):
     _compare_common_tags(run1, run2)
 
 
-def _compare_artifacts(client_src, client_dst, run1, run2, run_artifact_dir1, run_artifact_dir2):
-    path1 = client_src.download_artifacts(run1.info.run_id, ".", dst_path=run_artifact_dir1)
-    path2 = client_dst.download_artifacts(run2.info.run_id, ".", dst_path=run_artifact_dir2)
+def _compare_artifacts(mlflow_context, run1, run2, run_artifact_dir1, run_artifact_dir2):
+    path1 = mlflow_context.client_src.download_artifacts(run1.info.run_id, ".", dst_path=run_artifact_dir1)
+    path2 = mlflow_context.client_dst.download_artifacts(run2.info.run_id, ".", dst_path=run_artifact_dir2)
     assert utils_test.compare_dirs(path1, path2)
 
 
 def compare_models(model_src, model_dst, compare_name):
-    if compare_name: 
+    if compare_name:
         assert model_src.name == model_dst.name
     else:
         assert model_src.name != model_dst.name # When testing against Databricks, for now we use one tracking server and thus the model names are different
@@ -80,29 +81,29 @@ def compare_models(model_src, model_dst, compare_name):
     assert model_src.tags.items() <= model_dst.tags.items()
 
 
-def compare_models_with_versions(mlflow_client_src, mlflow_client_dst, model_src, model_dst, output_dir):
-    compare_models(model_src, model_dst, mlflow_client_src!=mlflow_client_dst)
+def compare_models_with_versions(mlflow_context, model_src, model_dst):
+    compare_models(model_src, model_dst, mlflow_context.client_src!=mlflow_context.client_dst)
     for (vr_src, vr_dst) in zip(model_src.latest_versions, model_dst.latest_versions):
-        compare_versions(mlflow_client_src, mlflow_client_dst, vr_src, vr_dst, output_dir)
+        compare_versions(mlflow_context, vr_src, vr_dst)
 
 
-def compare_versions(mlflow_client_src, mlflow_client_dst, vr_src, vr_dst, output_dir):
+def compare_versions(mlflow_context, vr_src, vr_dst):
     assert vr_src.current_stage == vr_dst.current_stage
     assert vr_src.description == vr_dst.description
     assert vr_src.status == vr_dst.status
     assert vr_src.status_message == vr_dst.status_message
-    if mlflow_client_src != mlflow_client_src:
+    if mlflow_context.client_src != mlflow_context.client_dst:
         assert vr_src.name == vr_dst.name
     if not utils.importing_into_databricks():
         assert vr_src.user_id == vr_dst.user_id
 
     tags_dst = { k:v for k,v in vr_dst.tags.items() if not k.startswith(ExportTags.PREFIX_ROOT) }
     assert vr_src.tags == tags_dst
-    
+
     assert vr_src.run_id != vr_dst.run_id
-    run_src = mlflow_client_src.get_run(vr_src.run_id)
-    run_dst = mlflow_client_dst.get_run(vr_dst.run_id)
-    compare_runs(mlflow_client_src, mlflow_client_dst, run_src, run_dst, output_dir)
+    run_src = mlflow_context.client_src.get_run(vr_src.run_id)
+    run_dst = mlflow_context.client_dst.get_run(vr_dst.run_id)
+    compare_runs(mlflow_context, run_src, run_dst)
 
 
 def dump_runs(run1, run2):

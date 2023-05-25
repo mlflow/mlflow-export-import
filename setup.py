@@ -6,9 +6,16 @@ CORE_REQUIREMENTS = [
     "wheel"
 ]
 
+
+import os
+from importlib.machinery import SourceFileLoader
+version = (
+    SourceFileLoader("mlflow_export_import.version", os.path.join("mlflow_export_import", "version.py")).load_module().__version__
+)
+
 setup(
     name="mlflow_export_import",
-    version = "1.2.0",
+    version=version,
     author = "Andre Mesarovic",
     description = "Copy MLflow objects (experiments, runs or registered models) to another tracking server",
     long_description=open("README.md").read(),
@@ -16,13 +23,14 @@ setup(
     url = "https://github.com/mlflow/mlflow-export-import",
     project_urls={
         "Bug Tracker": "https://github.com/mlflow/mlflow-export-import/issues",
-        "Documentation": "https://github.com/mlflow/mlflow-export-import/blob/master/README.md", 
+        "Documentation": "https://github.com/mlflow/mlflow-export-import/blob/master/README.md",
         "Source Code": "https://github.com/mlflow/mlflow-export-import/"
     },
     python_requires = ">=3.8",
-    packages = find_packages(),
+    packages=find_packages(exclude=["tests", "tests.*"]),
     zip_safe = False,
     install_requires = CORE_REQUIREMENTS,
+    extras_require= { "tests": [ "mlflow", "pytest","pytest-html>=3.2.0", "shortuuid>=1.0.11" ] },
     license = "Apache License 2.0",
     keywords = "mlflow ml ai",
     classifiers = [

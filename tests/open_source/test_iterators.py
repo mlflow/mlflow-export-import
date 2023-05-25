@@ -11,7 +11,7 @@ from mlflow_export_import.common.iterators import (
     #SearchModelVersionsIterator,
     SearchRunsIterator
 )
-from oss_utils_test import (
+from tests.open_source.oss_utils_test import (
     list_experiments, 
     create_experiment, 
     delete_experiments, 

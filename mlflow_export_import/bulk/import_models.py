@@ -13,30 +13,30 @@ from mlflow_export_import.common.click_options import (
     opt_input_dir,
     opt_delete_model,
     opt_use_src_user_id,
-    opt_verbose, 
-    opt_import_permissions, 
-    opt_import_source_tags, 
+    opt_verbose,
+    opt_import_permissions,
+    opt_import_source_tags,
     opt_experiment_rename_file,
     opt_model_rename_file,
     opt_use_threads
 )
 from mlflow_export_import.common import utils, io_utils
-from mlflow_export_import.experiment.import_experiment import import_experiment
 from mlflow_export_import.model.import_model import BulkModelImporter
+from mlflow_export_import.bulk.import_experiments import import_experiments
 from mlflow_export_import.bulk import rename_utils
 
 _logger = utils.getLogger(__name__)
 
 
 def import_models(
-        input_dir, 
-        delete_model, 
-        import_permissions = False, 
-        import_source_tags = False, 
-        use_src_user_id = False, 
-        experiment_renames = None, 
-        model_renames = None, 
-        verbose = False, 
+        input_dir,
+        delete_model,
+        import_permissions = False,
+        import_source_tags = False,
+        use_src_user_id = False,
+        experiment_renames = None,
+        model_renames = None,
+        verbose = False,
         use_threads = False,
         mlflow_client = None
     ):
@@ -44,87 +44,93 @@ def import_models(
     experiment_renames = rename_utils.get_renames(experiment_renames)
     model_renames = rename_utils.get_renames(model_renames)
     start_time = time.time()
-    exp_res = _import_experiments(
-        mlflow_client, 
-        input_dir, 
-        import_permissions, 
+    exp_run_info_map, exp_info = _import_experiments(
+        mlflow_client,
+        input_dir,
+        experiment_renames,
+        import_permissions,
+        import_source_tags,
         use_src_user_id,
-        experiment_renames
+        use_threads
     )
-    run_info_map = _remap(exp_res[0])
+    run_info_map = _flatten_run_info_map(exp_run_info_map)
     model_res = _import_models(
-        mlflow_client, 
-        input_dir, 
-        run_info_map, 
-        delete_model, 
-        import_permissions, 
-        import_source_tags, 
+        mlflow_client,
+        input_dir,
+        run_info_map,
+        delete_model,
+        import_permissions,
+        import_source_tags,
         model_renames,
         experiment_renames,
-        verbose, 
+        verbose,
         use_threads
     )
     duration = round(time.time()-start_time, 1)
-    dct = { "duration": duration, "experiment_import": exp_res[1], "model_import": model_res }
+    dct = { "duration": duration, "experiments_import": exp_info, "models_import": model_res }
     _logger.info("\nImport report:")
     _logger.info(f"{json.dumps(dct,indent=2)}\n")
 
 
-def _remap(run_info_map):
-    res = {}
-    for dct in run_info_map.values():
-        for src_run_id,run_info in dct.items():
-            res[src_run_id] = run_info
-    return res
+def _flatten_run_info_map(exp_run_info_map):
+    run_info_map = {}
+    for dct in exp_run_info_map.values():
+        if dct:
+            for src_run_id, dst_run_info in dct.items():
+                run_info_map[src_run_id] =  dst_run_info
+    return run_info_map
 
 
-def _import_experiments(mlflow_client, input_dir, import_permissions, use_src_user_id, experiment_renames):
+def _import_experiments(mlflow_client,
+        input_dir,
+        experiment_renames,
+        import_permissions,
+        import_source_tags,
+        use_src_user_id,
+        use_threads
+    ):
     start_time = time.time()
 
-    dct = io_utils.read_file_mlflow(os.path.join(input_dir,"experiments","experiments.json"))
-    exps = dct["experiments"]
-
-    _logger.info("Experiments:")
-    for exp in exps: 
-        _logger.info(f"  {exp}")
-    run_info_map = {}
-    exceptions = []
-
-    for exp in exps: 
-        exp_input_dir = os.path.join(input_dir, "experiments", exp["id"])
-        try:
-            exp_name = exp["name"]
-            exp_name = rename_utils.rename(exp_name, experiment_renames, "experiment")
-            _run_info_map = import_experiment(
-                experiment_name = exp_name,
-                input_dir = exp_input_dir,
-                import_permissions = import_permissions,
-                use_src_user_id = use_src_user_id,
-                mlflow_client = mlflow_client
-            )
-            run_info_map[exp["id"]] = _run_info_map
-        except Exception as e:
-            exceptions.append(str(e))
-            import traceback
-            traceback.print_exc()
-
+    exp_run_info_map = import_experiments(
+        input_dir = os.path.join(input_dir,"experiments"),
+        import_permissions = import_permissions,
+        import_source_tags = import_source_tags,
+        use_src_user_id = use_src_user_id,
+        experiment_renames = experiment_renames,
+        use_threads = use_threads,
+        mlflow_client = mlflow_client
+    )
     duration = round(time.time()-start_time, 1)
-    if len(exceptions) > 0:
-        _logger.info(f"Errors: {len(exceptions)}")
+
+    exp_run_info_map_ok = {}
+    num_exceptions = 0
+    for x in exp_run_info_map:
+        if x:
+            exp_id, run_info_map = x[0], x[1]
+            exp_run_info_map_ok[exp_id] = run_info_map
+        else:
+            num_exceptions += 1
+
+    if num_exceptions > 0:
+        _logger.warning(f"Errors: {num_exceptions}")
     _logger.info(f"Duration: {duration} seconds")
 
-    return run_info_map, { "experiments": len(exps), "exceptions": exceptions, "duration": duration }
+    return exp_run_info_map_ok, { 
+        "experiments": len(exp_run_info_map),
+        "exceptions": num_exceptions,
+        "duration": duration 
+    }
 
 
-def _import_models(mlflow_client, 
-        input_dir, 
-        run_info_map, 
-        delete_model, 
-        import_permissions, 
-        import_source_tags, 
-        model_renames, 
-        experiment_renames, 
-        verbose, 
+def _import_models(mlflow_client,
+        input_dir,
+        run_info_map,
+        delete_model,
+        import_permissions,
+        import_source_tags,
+        model_renames,
+        experiment_renames,
+        verbose,
         use_threads
     ):
     max_workers = utils.get_threads(use_threads)
@@ -134,8 +140,8 @@ def _import_models(mlflow_client,
     models = io_utils.read_file_mlflow(os.path.join(models_dir,"models.json"))
     model_names = models["models"]
     all_importer = BulkModelImporter(
-        mlflow_client = mlflow_client, 
-        run_info_map = run_info_map, 
+        mlflow_client = mlflow_client,
+        run_info_map = run_info_map,
         import_permissions = import_permissions,
         import_source_tags = import_source_tags,
         experiment_renames = experiment_renames
@@ -145,7 +151,7 @@ def _import_models(mlflow_client,
         for model_name in model_names:
             dir = os.path.join(models_dir, model_name)
             model_name = rename_utils.rename(model_name, model_renames, "model")
-            executor.submit(all_importer.import_model, 
+            executor.submit(all_importer.import_model,
                model_name = model_name,
                input_dir = dir,
                delete_model = delete_model,
@@ -167,14 +173,14 @@ def _import_models(mlflow_client,
 @opt_use_threads
 @opt_verbose
 
-def main(input_dir, delete_model, 
+def main(input_dir, delete_model,
         import_permissions,
-        experiment_rename_file, 
-        model_rename_file, 
-        import_source_tags, 
-        use_src_user_id, 
+        experiment_rename_file,
+        model_rename_file,
+        import_source_tags,
+        use_src_user_id,
         use_threads,
-        verbose, 
+        verbose,
     ):
     _logger.info("Options:")
     for k,v in locals().items():
@@ -182,13 +188,13 @@ def main(input_dir, delete_model,
 
     import_models(
         input_dir = input_dir,
-        delete_model = delete_model, 
-        import_permissions = import_permissions, 
+        delete_model = delete_model,
+        import_permissions = import_permissions,
         experiment_renames = rename_utils.get_renames(experiment_rename_file),
         model_renames = rename_utils.get_renames(model_rename_file),
         import_source_tags = import_source_tags,
-        use_src_user_id = use_src_user_id, 
-        verbose = verbose, 
+        use_src_user_id = use_src_user_id,
+        verbose = verbose,
         use_threads = use_threads
     )
 

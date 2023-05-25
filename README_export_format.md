@@ -59,18 +59,52 @@ Each object export file is comprised of three JSON parts:
 
 ## Sample export JSON files 
 
-For Databricks, all examples use workspace notebooks except the `Git Repo` column.
+### Open source and Databricks MLflow examples
 
 Column legend:
 * Basic - Basic default export.
-* Src Tags - Import source tags into destination tracking server. 
-* Git Repo - Databricks Repo notebook. 
+* Src Tags - Import source tags into destination tracking server with `--import-source-tags`.
 
-| Mode | Object | OSS    |          | Databricks |          |   |
-|------|--------|--------|----------|------------|----------|---|
-|      |        | **Basic**  | **Src Tags** | **Basic**      | **Src Tags** | **Git Repo** |
-| Single | Experiment | [link](samples/oss_mlflow/single/experiments/basic) |[link](samples/oss_mlflow/single/experiments/src_tags) | [link](samples/databricks/single/experiments/basic) | [link](samples/databricks/single/experiments/src_tags) | [link](samples/databricks/single/experiments/git_repo) |
-| Single | Model | [link](samples/oss_mlflow/single/models/basic/model.json) |[link](samples/oss_mlflow/single/models/src_tags/model.json) | [link](samples/databricks/single/models/basic/model.json) | [link](samples/databricks/single/models/src_tags/model.json) |  |
-| Bulk | Experiment | [link](samples/oss_mlflow/bulk/experiments) | | [link](samples/databricks/bulk/experiments) |  | |
-| Bulk | Model | [link](samples/oss_mlflow/bulk/experiments) || [link](samples/databricks/bulk/models) | | |
+| Mode | Object | OSS    |          | Databricks |
+|------|--------|--------|----------|------------|
+|      |        | **Basic**  | **Src Tags** |     |
+| Single | Experiment | [link](samples/oss_mlflow/single/experiments/basic) |[link](samples/oss_mlflow/single/experiments/src_tags) | [link](samples/databricks/single/experiments/basic) |
+| Single | Model | [link](samples/oss_mlflow/single/models/basic/model.json) |[link](samples/oss_mlflow/single/models/src_tags/model.json) |  [link](samples/databricks/single/models) |
+| Bulk | Experiment | [link](samples/oss_mlflow/bulk/experiments) | | [link](samples/databricks/bulk/experiments) | 
+| Bulk | Model | [link](samples/oss_mlflow/bulk/experiments) || [link](samples/databricks/bulk/models) |
+
+
+### Databricks MLflow experiment examples
+
+There are two types of Databricks experiments: [workspace and notebook experiments](https://docs.databricks.com/mlflow/experiments.html#organize-training-runs-with-mlflow-experiments). When qualified by the two types of notebooks (workspace and repo notebook) this leads to 
+the following four combinations:
+
+* Workspace notebook with default notebook experiment.
+* Workspace notebook with explictly set workspace experiment.
+* Repo notebook with default notebook experiment.
+* Repo notebook with explictly set workspace experiment.
+
+Experiments can be generated from other sources besides the workspace UI.
+Besides these four standard experiment types, there are also others:
+* Automatically created experiments by AutoML.
+* External Databricks jobs (can execute either a workspace or repo notebook)
+* Externally running an [MLflow project against Databricks](https://docs.databricks.com/mlflow/projects.html).
+* Externally calling the Databricks MLflow tracking API from your laptop.
+
+Column legend:
+* Mode - from where the experiment run is executed.
+* Notebook - either a workspace or repo notebook or external.
+For job 'github', the job task executes the notebook from github and not from the workspace.
+
+
+| Mode | Notebook | Workspace experiment | Notebook experiment |
+|-----|----|----|----|
+| UI | Workspace | [link](samples/databricks/single/experiments/workspace_experiments/workspace_notebook) | [link](samples/databricks/single/experiments/notebook_experiments/workspace_notebook) |
+| UI | Repo | [link](samples/databricks/single/experiments/workspace_experiments/repo_notebook) | [link](samples/databricks/single/experiments/notebook_experiments/repo_notebook) |
+| UI AutoML | Workspace | [link](samples/databricks/single/experiments/workspace_experiments/automl_workspace_notebook) | |
+| Job | Repo | [link](samples/databricks/single/experiments/workspace_experiments/job_repo_notebook) | |
+| External MLflow project | github | | |
+| External non-project | laptop | | |
+
+For an example with "source tags", see [here](samples/databricks/single/experiments/workspace_experiments/workspace_notebook_src_tags).
 

@@ -1,0 +1,352 @@
+{
+  "system": {
+    "package_version": "1.2.0",
+    "script": "export_run.py",
+    "export_time": 1684696807,
+    "_export_time": "2023-05-21 19:20:07",
+    "mlflow_version": "2.3.2",
+    "mlflow_tracking_uri": "databricks://e2_demo",
+    "platform": {
+      "python_version": "3.8.15",
+      "system": "Darwin",
+      "processor": "i386"
+    },
+    "user": "andre"
+  },
+  "mlflow": {
+    "info": {
+      "run_uuid": "5e1e2c44039a40afafc760b837a4daab",
+      "run_id": "5e1e2c44039a40afafc760b837a4daab",
+      "experiment_id": "536189130328851",
+      "user_id": "",
+      "status": "FINISHED",
+      "start_time": 1684696609604,
+      "end_time": 1684696618714,
+      "lifecycle_stage": "active",
+      "artifact_uri": "dbfs:/databricks/mlflow-tracking/536189130328851/5e1e2c44039a40afafc760b837a4daab/artifacts",
+      "run_name": "calm-seal-985",
+      "_start_time": "2023-05-21 19:16:50",
+      "_end_time": "2023-05-21 19:16:59"
+    },
+    "params": {
+      "column_selector": "ColumnSelector(cols=['alcohol', 'density', 'fixed acidity', 'residual sugar',\n                     'sulphates', 'volatile acidity', 'citric acid',\n                     'free sulfur dioxide', 'pH', 'chlorides',\n                     'total sulfur dioxide'])",
+      "column_selector__cols": "['alcohol', 'density', 'fixed acidity', 'residual sugar', 'sulphates', 'volatile acidity', 'citric acid', 'free sulfur dioxide', 'pH', 'chlorides', 'total sulfur dioxide']",
+      "memory": "None",
+      "preprocessor": "ColumnTransformer(remainder='passthrough', sparse_threshold=0,\n                  transformers=[('numerical',\n                                 Pipeline(steps=[('converter',\n                                                  FunctionTransformer(func=<function <lambda> at 0x7fa5d6f6cca0>)),\n                                                 ('imputers',\n                                                  ColumnTransformer(transformers=[('impute_mean',\n                                                 ...",
+      "preprocessor__n_jobs": "None",
+      "preprocessor__numerical": "Pipeline(steps=[('converter',\n                 FunctionTransformer(func=<function <lambda> at 0x7fa5d6f6cca0>)),\n                ('imputers',\n                 ColumnTransformer(transformers=[('impute_mean',\n                                                  SimpleImputer(),\n                                                  ['alcohol', 'chlorides',\n                                                   'citric acid', 'density',\n                                                   'fixed acidity',\n   ...",
+      "preprocessor__numerical__converter": "FunctionTransformer(func=<function <lambda> at 0x7fa5d6f6cca0>)",
+      "preprocessor__numerical__converter__accept_sparse": "False",
+      "preprocessor__numerical__converter__check_inverse": "True",
+      "preprocessor__numerical__converter__feature_names_out": "None",
+      "preprocessor__numerical__converter__func": "<function <lambda> at 0x7fa5d6f6cca0>",
+      "preprocessor__numerical__converter__inv_kw_args": "None",
+      "preprocessor__numerical__converter__inverse_func": "None",
+      "preprocessor__numerical__converter__kw_args": "None",
+      "preprocessor__numerical__converter__validate": "False",
+      "preprocessor__numerical__imputers": "ColumnTransformer(transformers=[('impute_mean', SimpleImputer(),\n                                 ['alcohol', 'chlorides', 'citric acid',\n                                  'density', 'fixed acidity',\n                                  'free sulfur dioxide', 'pH', 'residual sugar',\n                                  'sulphates', 'total sulfur dioxide',\n                                  'volatile acidity'])])",
+      "preprocessor__numerical__imputers__impute_mean": "SimpleImputer()",
+      "preprocessor__numerical__imputers__impute_mean__add_indicator": "False",
+      "preprocessor__numerical__imputers__impute_mean__copy": "True",
+      "preprocessor__numerical__imputers__impute_mean__fill_value": "None",
+      "preprocessor__numerical__imputers__impute_mean__missing_values": "nan",
+      "preprocessor__numerical__imputers__impute_mean__strategy": "mean",
+      "preprocessor__numerical__imputers__impute_mean__verbose": "deprecated",
+      "preprocessor__numerical__imputers__n_jobs": "None",
+      "preprocessor__numerical__imputers__remainder": "drop",
+      "preprocessor__numerical__imputers__sparse_threshold": "0.3",
+      "preprocessor__numerical__imputers__transformer_weights": "None",
+      "preprocessor__numerical__imputers__transformers": "[('impute_mean', SimpleImputer(), ['alcohol', 'chlorides', 'citric acid', 'density', 'fixed acidity', 'free sulfur dioxide', 'pH', 'residual sugar', 'sulphates', 'total sulfur dioxide', 'volatile acidity'])]",
+      "preprocessor__numerical__imputers__verbose": "False",
+      "preprocessor__numerical__imputers__verbose_feature_names_out": "True",
+      "preprocessor__numerical__memory": "None",
+      "preprocessor__numerical__standardizer": "StandardScaler()",
+      "preprocessor__numerical__standardizer__copy": "True",
+      "preprocessor__numerical__standardizer__with_mean": "True",
+      "preprocessor__numerical__standardizer__with_std": "True",
+      "preprocessor__numerical__steps": "[('converter', FunctionTransformer(func=<function <lambda> at 0x7fa5d6f6cca0>)), ('imputers', ColumnTransformer(transformers=[('impute_mean', SimpleImputer(),\n                                 ['alcohol', 'chlorides', 'citric acid',\n                                  'density', 'fixed acidity',\n                                  'free sulfur dioxide', 'pH', 'residual sugar',\n                                  'sulphates', 'total sulfur dioxide',\n                                  'volatile acidity...",
+      "preprocessor__numerical__verbose": "False",
+      "preprocessor__remainder": "passthrough",
+      "preprocessor__sparse_threshold": "0",
+      "preprocessor__transformer_weights": "None",
+      "preprocessor__transformers": "[('numerical', Pipeline(steps=[('converter',\n                 FunctionTransformer(func=<function <lambda> at 0x7fa5d6f6cca0>)),\n                ('imputers',\n                 ColumnTransformer(transformers=[('impute_mean',\n                                                  SimpleImputer(),\n                                                  ['alcohol', 'chlorides',\n                                                   'citric acid', 'density',\n                                                   'fixe...",
+      "preprocessor__verbose": "False",
+      "preprocessor__verbose_feature_names_out": "True",
+      "regressor": "LGBMRegressor(colsample_bytree=0.6505873538375593, lambda_l1=497.23364507194253,\n              lambda_l2=10.247278083927856, learning_rate=0.010591811060159174,\n              max_bin=496, max_depth=5, min_child_samples=41, n_estimators=162,\n              num_leaves=9, random_state=668290694,\n              subsample=0.6795749046696467)",
+      "regressor__boosting_type": "gbdt",
+      "regressor__class_weight": "None",
+      "regressor__colsample_bytree": "0.6505873538375593",
+      "regressor__importance_type": "split",
+      "regressor__lambda_l1": "497.23364507194253",
+      "regressor__lambda_l2": "10.247278083927856",
+      "regressor__learning_rate": "0.010591811060159174",
+      "regressor__max_bin": "496",
+      "regressor__max_depth": "5",
+      "regressor__min_child_samples": "41",
+      "regressor__min_child_weight": "0.001",
+      "regressor__min_split_gain": "0.0",
+      "regressor__n_estimators": "162",
+      "regressor__n_jobs": "-1",
+      "regressor__num_leaves": "9",
+      "regressor__objective": "None",
+      "regressor__random_state": "668290694",
+      "regressor__reg_alpha": "0.0",
+      "regressor__reg_lambda": "0.0",
+      "regressor__silent": "warn",
+      "regressor__subsample": "0.6795749046696467",
+      "regressor__subsample_for_bin": "200000",
+      "regressor__subsample_freq": "0",
+      "steps": "[('column_selector', ColumnSelector(cols=['alcohol', 'density', 'fixed acidity', 'residual sugar',\n                     'sulphates', 'volatile acidity', 'citric acid',\n                     'free sulfur dioxide', 'pH', 'chlorides',\n                     'total sulfur dioxide'])), ('preprocessor', ColumnTransformer(remainder='passthrough', sparse_threshold=0,\n                  transformers=[('numerical',\n                                 Pipeline(steps=[('converter',\n                             ...",
+      "verbose": "False"
+    },
+    "metrics": {
+      "test_example_count": [
+        {
+          "value": 996.0,
+          "timestamp": 1684696618641,
+          "step": 0
+        }
+      ],
+      "test_max_error": [
+        {
+          "value": 2.865889219323776,
+          "timestamp": 1684696618641,
+          "step": 0
+        }
+      ],
+      "test_mean_absolute_error": [
+        {
+          "value": 0.6832642975834493,
+          "timestamp": 1684696618641,
+          "step": 0
+        }
+      ],
+      "test_mean_absolute_percentage_error": [
+        {
+          "value": 0.1203250875087607,
+          "timestamp": 1684696618641,
+          "step": 0
+        }
+      ],
+      "test_mean_on_target": [
+        {
+          "value": 5.899598393574297,
+          "timestamp": 1684696618641,
+          "step": 0
+        }
+      ],
+      "test_mean_squared_error": [
+        {
+          "value": 0.7820006370911705,
+          "timestamp": 1684696618641,
+          "step": 0
+        }
+      ],
+      "test_r2_score": [
+        {
+          "value": -0.0011733191601897008,
+          "timestamp": 1684696618641,
+          "step": 0
+        }
+      ],
+      "test_root_mean_squared_error": [
+        {
+          "value": 0.8843079989976176,
+          "timestamp": 1684696618641,
+          "step": 0
+        }
+      ],
+      "test_score": [
+        {
+          "value": -0.0011733191601897008,
+          "timestamp": 1684696618641,
+          "step": 0
+        }
+      ],
+      "test_sum_on_target": [
+        {
+          "value": 5876.0,
+          "timestamp": 1684696618641,
+          "step": 0
+        }
+      ],
+      "training_example_count": [
+        {
+          "value": 2937.0,
+          "timestamp": 1684696618133,
+          "step": 0
+        }
+      ],
+      "training_max_error": [
+        {
+          "value": 3.1347569015371377,
+          "timestamp": 1684696618133,
+          "step": 0
+        }
+      ],
+      "training_mean_absolute_error": [
+        {
+          "value": 0.676497169244308,
+          "timestamp": 1684696610673,
+          "step": 0
+        },
+        {
+          "value": 0.676497169244308,
+          "timestamp": 1684696618133,
+          "step": 0
+        }
+      ],
+      "training_mean_absolute_percentage_error": [
+        {
+          "value": 0.1210314872118243,
+          "timestamp": 1684696618133,
+          "step": 0
+        }
+      ],
+      "training_mean_on_target": [
+        {
+          "value": 5.865509022812393,
+          "timestamp": 1684696618133,
+          "step": 0
+        }
+      ],
+      "training_mean_squared_error": [
+        {
+          "value": 0.7971465695601759,
+          "timestamp": 1684696610673,
+          "step": 0
+        },
+        {
+          "value": 0.7971465695601759,
+          "timestamp": 1684696618133,
+          "step": 0
+        }
+      ],
+      "training_r2_score": [
+        {
+          "value": 0.0002803688985720809,
+          "timestamp": 1684696610673,
+          "step": 0
+        },
+        {
+          "value": 0.0002803688985720809,
+          "timestamp": 1684696618133,
+          "step": 0
+        }
+      ],
+      "training_root_mean_squared_error": [
+        {
+          "value": 0.8928306499892216,
+          "timestamp": 1684696610673,
+          "step": 0
+        },
+        {
+          "value": 0.8928306499892216,
+          "timestamp": 1684696618133,
+          "step": 0
+        }
+      ],
+      "training_score": [
+        {
+          "value": 0.0002803688985720809,
+          "timestamp": 1684696610685,
+          "step": 0
+        },
+        {
+          "value": 0.0002803688985720809,
+          "timestamp": 1684696618133,
+          "step": 0
+        }
+      ],
+      "training_sum_on_target": [
+        {
+          "value": 17227.0,
+          "timestamp": 1684696618133,
+          "step": 0
+        }
+      ],
+      "val_example_count": [
+        {
+          "value": 920.0,
+          "timestamp": 1684696618390,
+          "step": 0
+        }
+      ],
+      "val_max_error": [
+        {
+          "value": 3.134110780676224,
+          "timestamp": 1684696618390,
+          "step": 0
+        }
+      ],
+      "val_mean_absolute_error": [
+        {
+          "value": 0.659932524139666,
+          "timestamp": 1684696618390,
+          "step": 0
+        }
+      ],
+      "val_mean_absolute_percentage_error": [
+        {
+          "value": 0.11617969548025348,
+          "timestamp": 1684696618390,
+          "step": 0
+        }
+      ],
+      "val_mean_on_target": [
+        {
+          "value": 5.890217391304348,
+          "timestamp": 1684696618390,
+          "step": 0
+        }
+      ],
+      "val_mean_squared_error": [
+        {
+          "value": 0.7481320551622238,
+          "timestamp": 1684696618390,
+          "step": 0
+        }
+      ],
+      "val_r2_score": [
+        {
+          "value": -0.0005371824461015695,
+          "timestamp": 1684696618390,
+          "step": 0
+        }
+      ],
+      "val_root_mean_squared_error": [
+        {
+          "value": 0.864946272991695,
+          "timestamp": 1684696618390,
+          "step": 0
+        }
+      ],
+      "val_score": [
+        {
+          "value": -0.0005371824461015695,
+          "timestamp": 1684696618390,
+          "step": 0
+        }
+      ],
+      "val_sum_on_target": [
+        {
+          "value": 5419.0,
+          "timestamp": 1684696618390,
+          "step": 0
+        }
+      ]
+    },
+    "tags": {
+      "estimator_class": "sklearn.pipeline.Pipeline",
+      "estimator_name": "Pipeline",
+      "mlflow.databricks.notebookID": "536189130329757",
+      "mlflow.datasets": "[{\"name\":\"527bce1909134eed0d0b93e60603cd77\",\"hash\":\"527bce1909134eed0d0b93e60603cd77\",\"model\":\"9d7059b0d26949b29eec886d308b6a4f\"},{\"name\":\"435c410d4f55bbcec3ebe66e02487765\",\"hash\":\"435c410d4f55bbcec3ebe66e02487765\",\"model\":\"9d7059b0d26949b29eec886d308b6a4f\"},{\"name\":\"69270c4dfa097d87466461501c0b8322\",\"hash\":\"69270c4dfa097d87466461501c0b8322\",\"model\":\"9d7059b0d26949b29eec886d308b6a4f\"}]",
+      "mlflow.log-model.history": "[{\"artifact_path\":\"model\",\"saved_input_example_info\":{\"artifact_path\":\"input_example.json\",\"type\":\"dataframe\",\"pandas_orient\":\"split\"},\"signature\":{\"inputs\":\"[{\\\"name\\\": \\\"fixed acidity\\\", \\\"type\\\": \\\"double\\\"}, {\\\"name\\\": \\\"volatile acidity\\\", \\\"type\\\": \\\"double\\\"}, {\\\"name\\\": \\\"citric acid\\\", \\\"type\\\": \\\"double\\\"}, {\\\"name\\\": \\\"residual sugar\\\", \\\"type\\\": \\\"double\\\"}, {\\\"name\\\": \\\"chlorides\\\", \\\"type\\\": \\\"double\\\"}, {\\\"name\\\": \\\"free sulfur dioxide\\\", \\\"type\\\": \\\"double\\\"}, {\\\"name\\\": \\\"total sulfur dioxide\\\", \\\"type\\\": \\\"double\\\"}, {\\\"name\\\": \\\"density\\\", \\\"type\\\": \\\"double\\\"}, {\\\"name\\\": \\\"pH\\\", \\\"type\\\": \\\"double\\\"}, {\\\"name\\\": \\\"sulphates\\\", \\\"type\\\": \\\"double\\\"}, {\\\"name\\\": \\\"alcohol\\\", \\\"type\\\": \\\"double\\\"}]\",\"outputs\":\"[{\\\"type\\\": \\\"tensor\\\", \\\"tensor-spec\\\": {\\\"dtype\\\": \\\"float64\\\", \\\"shape\\\": [-1]}}]\"},\"flavors\":{\"python_function\":{\"predict_fn\":\"predict\",\"model_path\":\"model.pkl\",\"loader_module\":\"mlflow.sklearn\",\"env\":{\"conda\":\"conda.yaml\",\"virtualenv\":\"python_env.yaml\"},\"python_version\":\"3.10.6\"},\"sklearn\":{\"pickled_model\":\"model.pkl\",\"sklearn_version\":\"1.1.1\",\"serialization_format\":\"cloudpickle\",\"code\":null}},\"run_id\":\"5e1e2c44039a40afafc760b837a4daab\",\"model_uuid\":\"b13b14bd62734b31baa2e5664ad86417\",\"utc_time_created\":\"2023-05-21 19:16:51.054335\",\"mlflow_version\":\"2.3.1\"}]",
+      "mlflow.runName": "calm-seal-985",
+      "mlflow.source.name": "Notebook: LightGBMRegressor",
+      "mlflow.source.type": "NOTEBOOK",
+      "mlflow.user": "andre@mycompany.com",
+      "model_type": "lightgbm_regressor"
+    }
+  }
+}

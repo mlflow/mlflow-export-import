@@ -1,5 +1,5 @@
 """
-Import a registered model and all the experiment runs associated with its versions.
+Import a registered model and all the runs associated with each version.
 """
 
 import os
@@ -22,7 +22,7 @@ from mlflow_export_import.common.source_tags import set_source_tags_for_field, f
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common.permissions_utils import import_permissions
 from mlflow_export_import.client.http_client import DatabricksHttpClient
-from mlflow_export_import.run.import_run import RunImporter
+from mlflow_export_import.run.import_run import import_run
 from mlflow_export_import.bulk import rename_utils
 
 _logger = utils.getLogger(__name__)
@@ -67,24 +67,19 @@ class BaseModelImporter():
 
     def __init__(self,
             mlflow_client = None,
-            run_importer = None,
             import_permissions = False,
             import_source_tags = False,
             await_creation_for = None
         ):
         """
         :param mlflow_client: MLflow client or if None create default client.
-        :param run_importer: RunImporter instance.
         :param import_permissions: Import Databricks permissions.
         :param import_source_tags: Import source information for MLFlow objects and create tags in destination object.
         :param await_creation_for: Seconds to wait for model version crreation.
         """
         self.mlflow_client = mlflow_client or mlflow.MlflowClient()
         self.dbx_client = DatabricksHttpClient(self.mlflow_client.tracking_uri)
-        if run_importer:
-            self.run_importer = run_importer
-        else:
-            self.run_importer = RunImporter(self.mlflow_client, import_source_tags=import_source_tags, mlmodel_fix=True)
+        self.import_source_tags=import_source_tags
         self.import_permissions = import_permissions 
         self.import_source_tags = import_source_tags 
         self.await_creation_for = await_creation_for 
@@ -181,14 +176,12 @@ class ModelImporter(BaseModelImporter):
 
     def __init__(self,
             mlflow_client = None,
-            run_importer = None,
             import_permissions = False,
             import_source_tags = False,
             await_creation_for = None
         ):
         super().__init__(
             mlflow_client = mlflow_client,
-            run_importer = run_importer,
             import_permissions = import_permissions,
             import_source_tags = import_source_tags,
             await_creation_for = await_creation_for
@@ -222,7 +215,7 @@ class ModelImporter(BaseModelImporter):
                 if run_id:
                     self.import_version(model_name, vr, run_id, sleep_time)
             except RestException as e:
-                msg = { "model": model_name, "version": vr["version"], "experiment": experiment_name, "run_id": run_id, "RestException": str(e) }
+                msg = { "model": model_name, "version": vr["version"], "src_run_id": vr["run_id"], "experiment": experiment_name, "RestException": str(e) }
                 _logger.error(f"Failed to import model version: {msg}")
         if verbose:
             model_utils.dump_model_versions(self.mlflow_client, model_name)
@@ -246,9 +239,12 @@ class ModelImporter(BaseModelImporter):
         _logger.info(f"      source:           {source}")
         model_artifact = _extract_model_path(source, run_id)
         _logger.info(f"      model_artifact:   {model_artifact}")
-        dst_run,_ = self.run_importer.import_run(
+
+        dst_run,_ = import_run(
+            input_dir = run_dir,
             experiment_name = experiment_name,
-            input_dir = run_dir
+            import_source_tags = self.import_source_tags,
+            mlflow_client = self.mlflow_client
         )
         dst_run_id = dst_run.info.run_id
         run = self.mlflow_client.get_run(dst_run_id)
@@ -272,7 +268,6 @@ class BulkModelImporter(BaseModelImporter):
 
     def __init__(self,
             run_info_map,
-            run_importer = None,
             import_permissions = False,
             import_source_tags = False,
             experiment_renames = None,
@@ -281,7 +276,6 @@ class BulkModelImporter(BaseModelImporter):
         ):
         super().__init__(
             mlflow_client = mlflow_client,
-            run_importer = run_importer,
             import_permissions = import_permissions,
             import_source_tags = import_source_tags,
             await_creation_for = await_creation_for
@@ -309,12 +303,12 @@ class BulkModelImporter(BaseModelImporter):
         _logger.info(f"Importing {len(model_dct['versions'])} versions:")
         for vr in model_dct["versions"]:
             src_run_id = vr["run_id"]
-            dst_run = self.run_info_map.get(src_run_id, None)
-            if not dst_run:
+            dst_run_info = self.run_info_map.get(src_run_id, None)
+            if not dst_run_info:
                 msg = { "model": model_name, "version": vr["version"], "stage": vr["current_stage"], "run_id": src_run_id }
                 _logger.error(f"Cannot import model version {msg} since the source run_id was probably deleted.")
             else:
-                dst_run_id = dst_run.run_id
+                dst_run_id = dst_run_info.run_id
                 exp_name = rename_utils.rename(vr["_experiment_name"], self.experiment_renames, "experiment")
                 try:
                     mlflow.set_experiment(exp_name)

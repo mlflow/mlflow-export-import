@@ -1,10 +1,7 @@
 import os
 import shutil
 import yaml
-import mlflow
-import mlflow.sklearn
 
-print("MLflow version:", mlflow.__version__)
 
 def create_output_dir(output_dir):
     if os.path.exists(output_dir):

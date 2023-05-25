@@ -1,0 +1,44 @@
+{
+  "system": {
+    "package_version": "1.2.0",
+    "script": "export_experiment.py",
+    "export_time": 1684725509,
+    "_export_time": "2023-05-22 03:18:29",
+    "mlflow_version": "2.3.2",
+    "mlflow_tracking_uri": "databricks://e2_demo",
+    "platform": {
+      "python_version": "3.8.15",
+      "system": "Darwin",
+      "processor": "i386"
+    },
+    "user": "andre"
+  },
+  "info": {
+    "num_total_runs": 1,
+    "num_ok_runs": 1,
+    "num_failed_runs": 0,
+    "failed_runs": []
+  },
+  "mlflow": {
+    "experiment": {
+      "experiment_id": "9195e233f19e49379b16c5f2d2b0c05f",
+      "name": "/Repos/andre@mycompany.com/mlflow-examples/databricks/notebooks/basic/Keras_Mnist",
+      "artifact_location": "dbfs:/databricks/mlflow-tracking/9195e233f19e49379b16c5f2d2b0c05f",
+      "lifecycle_stage": "active",
+      "tags": {
+        "mlflow.experiment.sourceId": "1765187885495869",
+        "mlflow.experiment.sourceName": "/Repos/andre@mycompany.com/mlflow-examples/databricks/notebooks/basic/Keras_Mnist",
+        "mlflow.experiment.sourceType": "REPO_NOTEBOOK",
+        "mlflow.ownerEmail": "andre@mycompany.com",
+        "mlflow.ownerId": "4566812440727830"
+      },
+      "creation_time": 1681490229478,
+      "last_update_time": 1684339053373,
+      "_creation_time": "2023-04-14 16:37:09",
+      "_last_update_time": "2023-05-17 15:57:33"
+    },
+    "runs": [
+      "a17f0abf5d46464d899f0ffcebbdb7a8"
+    ]
+  }
+}

@@ -6,10 +6,10 @@ from mlflow_export_import.bulk import bulk_utils
 from mlflow_export_import.bulk.export_experiments import export_experiments
 from mlflow_export_import.bulk.import_experiments import import_experiments
 
-import sklearn_utils
-from init_tests import mlflow_context
-from compare_utils import compare_runs
-from oss_utils_test import (
+from tests.open_source import sklearn_utils
+from tests.open_source.init_tests import mlflow_context
+from tests.compare_utils import compare_runs
+from tests.open_source.oss_utils_test import (
     init_output_dirs,
     mk_uuid,
     delete_experiments_and_models,
@@ -36,7 +36,7 @@ def _create_simple_run(idx=0):
 
 
 def _create_test_experiment(client, num_runs, mk_test_object_name=mk_test_object_name_default):
-    from oss_utils_test import create_experiment
+    from tests.open_source.oss_utils_test import create_experiment
     exp = create_experiment(client, mk_test_object_name)
     for j in range(num_runs):
         _create_simple_run(j)
@@ -48,6 +48,7 @@ def _create_test_experiment(client, num_runs, mk_test_object_name=mk_test_object
 def compare_experiments(mlflow_context, compare_func=compare_runs):
     exps1 = sorted(_search_experiments(mlflow_context.client_src), key=lambda x: x.name)
     exps2 = sorted(_search_experiments(mlflow_context.client_dst), key=lambda x: x.name)
+    assert len(exps1) > 0
     assert len(exps1) == len(exps2)
     for x in zip(exps1, exps2):
         exp1, exp2 = x[0], x[1]
@@ -62,7 +63,8 @@ def compare_experiments(mlflow_context, compare_func=compare_runs):
         base_dir = os.path.join(mlflow_context.output_dir,"test_compare_runs")
         os.makedirs(base_dir, exist_ok=True)
         odir = os.path.join(base_dir,run1.info.experiment_id)
-        compare_func(mlflow_context.client_src, mlflow_context.client_dst, run1, run2, odir)
+        compare_func(mlflow_context, run1, run2, output_dir=odir)
+
 
 # == Export/import Experiments tests
 
@@ -77,7 +79,7 @@ def _run_test(mlflow_context, compare_func, use_threads=False):
         notebook_formats = _notebook_formats,
         use_threads = use_threads)
     import_experiments(
-        mlflow_client = mlflow_context.client_dst, 
+        mlflow_client = mlflow_context.client_dst,
         input_dir = mlflow_context.output_dir)
     compare_experiments(mlflow_context, compare_func)
 
@@ -118,7 +120,7 @@ def test_failed_export(mlflow_context):
         output_dir = mlflow_context.output_dir
     )
     import_experiments(
-        mlflow_client = mlflow_context.client_dst, 
+        mlflow_client = mlflow_context.client_dst,
         input_dir = mlflow_context.output_dir)
     compare_experiments(mlflow_context)
 
@@ -134,8 +136,8 @@ def test_experiment_renames_do_replace(mlflow_context):
 
     new_name = "foo_bar"
     import_experiments(
-        mlflow_client = mlflow_context.client_dst, 
-        input_dir = mlflow_context.output_dir, 
+        mlflow_client = mlflow_context.client_dst,
+        input_dir = mlflow_context.output_dir,
         experiment_renames = { exp.name: new_name } )
 
     exp2 = mlflow_context.client_dst.get_experiment_by_name(exp.name)
@@ -154,15 +156,15 @@ def test_experiment_renames_dont_replace(mlflow_context):
 
     new_name = "bar"
     import_experiments(
-        mlflow_client = mlflow_context.client_dst, 
-        input_dir = mlflow_context.output_dir, 
+        mlflow_client = mlflow_context.client_dst,
+        input_dir = mlflow_context.output_dir,
         experiment_renames = { "foo": new_name } )
 
     exp2 = mlflow_context.client_dst.get_experiment_by_name(exp.name)
     assert exp2
     assert exp2.name == exp.name
     exp2 = mlflow_context.client_dst.get_experiment_by_name(new_name)
-    assert not exp2 
+    assert not exp2
 
 
 # == Test export/import deleted runs
@@ -201,7 +203,7 @@ def test_export_deleted_runs(mlflow_context):
         export_deleted_runs = True)
 
     import_experiments(
-        mlflow_client = mlflow_context.client_dst, 
+        mlflow_client = mlflow_context.client_dst,
         input_dir = mlflow_context.output_dir)
 
     exps2 = _search_experiments(mlflow_context.client_dst)

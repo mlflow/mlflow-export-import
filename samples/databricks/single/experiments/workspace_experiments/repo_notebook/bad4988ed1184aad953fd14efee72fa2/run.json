@@ -1,0 +1,82 @@
+{
+  "system": {
+    "package_version": "1.2.0",
+    "script": "export_run.py",
+    "export_time": 1684720394,
+    "_export_time": "2023-05-22 01:53:14",
+    "mlflow_version": "2.3.2",
+    "mlflow_tracking_uri": "databricks://e2_demo",
+    "platform": {
+      "python_version": "3.8.15",
+      "system": "Darwin",
+      "processor": "i386"
+    },
+    "user": "andre"
+  },
+  "mlflow": {
+    "info": {
+      "run_uuid": "bad4988ed1184aad953fd14efee72fa2",
+      "run_id": "bad4988ed1184aad953fd14efee72fa2",
+      "experiment_id": "1280664374380231",
+      "user_id": "",
+      "status": "FINISHED",
+      "start_time": 1681628061553,
+      "end_time": 1681628067677,
+      "lifecycle_stage": "active",
+      "artifact_uri": "dbfs:/databricks/mlflow-tracking/1280664374380231/bad4988ed1184aad953fd14efee72fa2/artifacts",
+      "run_name": "bad4988ed1184aad953fd14efee72fa2",
+      "_start_time": "2023-04-16 06:54:22",
+      "_end_time": "2023-04-16 06:54:28"
+    },
+    "params": {
+      "max_depth": "1",
+      "max_leaf_nodes": "None"
+    },
+    "metrics": {
+      "r2": [
+        {
+          "value": 0.1553172302194683,
+          "timestamp": 1681628067612,
+          "step": 0
+        }
+      ],
+      "rmse": [
+        {
+          "value": 0.7986004372118107,
+          "timestamp": 1681628067547,
+          "step": 0
+        }
+      ]
+    },
+    "tags": {
+      "mlflow.databricks.cluster.id": "0414-154233-qm0df4rx",
+      "mlflow.databricks.cluster.info": "{\"cluster_name\":\"Andre_ML_13.0\",\"spark_version\":\"13.0.x-cpu-ml-scala2.12\",\"node_type_id\":\"i3.xlarge\",\"driver_node_type_id\":\"i3.xlarge\",\"autotermination_minutes\":120,\"disk_spec\":{\"disk_count\":0},\"num_workers\":1}",
+      "mlflow.databricks.cluster.libraries": "{\"installable\":[],\"redacted\":[]}",
+      "mlflow.databricks.gitRepoCommit": "2be1907b392eaf9d5c91eb324524a84ed764a0b2",
+      "mlflow.databricks.gitRepoProvider": "gitHub",
+      "mlflow.databricks.gitRepoReference": "master",
+      "mlflow.databricks.gitRepoReferenceType": "branch",
+      "mlflow.databricks.gitRepoRelativePath": "databricks/notebooks/basic/Sklearn_Wine",
+      "mlflow.databricks.gitRepoStatus": "unknown",
+      "mlflow.databricks.gitRepoUrl": "https://github.com/amesar/mlflow-examples",
+      "mlflow.databricks.notebook.commandID": "6934812075835057189_8813927112301034901_eedb1347a563456dac0bacc4cb692f70",
+      "mlflow.databricks.notebookID": "1765187885495747",
+      "mlflow.databricks.notebookPath": "/Repos/andre@mycompany.com/mlflow-examples/databricks/notebooks/basic/Sklearn_Wine",
+      "mlflow.databricks.notebookRevisionID": "1681628067805",
+      "mlflow.databricks.webappURL": "https://mycompany.cloud.com",
+      "mlflow.databricks.workspaceID": "2556758628403379",
+      "mlflow.databricks.workspaceURL": "mycompany.cloud.com",
+      "mlflow.log-model.history": "[{\"artifact_path\":\"model\",\"flavors\":{\"python_function\":{\"predict_fn\":\"predict\",\"model_path\":\"model.pkl\",\"loader_module\":\"mlflow.sklearn\",\"env\":{\"conda\":\"conda.yaml\",\"virtualenv\":\"python_env.yaml\"},\"python_version\":\"3.10.6\"},\"sklearn\":{\"pickled_model\":\"model.pkl\",\"sklearn_version\":\"1.1.1\",\"serialization_format\":\"cloudpickle\",\"code\":null}},\"run_id\":\"bad4988ed1184aad953fd14efee72fa2\",\"model_uuid\":\"af590986e20d4e3f81267aa576d5cc3a\",\"utc_time_created\":\"2023-04-16 06:54:22.493367\",\"mlflow_version\":\"2.2.1\",\"databricks_runtime\":\"13.0.x-cpu-ml-scala2.12\"}]",
+      "mlflow.runName": "bad4988ed1184aad953fd14efee72fa2",
+      "mlflow.source.name": "/Repos/andre@mycompany.com/mlflow-examples/databricks/notebooks/basic/Sklearn_Wine",
+      "mlflow.source.type": "NOTEBOOK",
+      "mlflow.user": "andre@mycompany.com",
+      "save_signature": "False",
+      "timestamp": "2023-04-16 06:54:18",
+      "version.DATABRICKS_RUNTIME_VERSION": "13.0",
+      "version.mlflow": "2.2.1",
+      "version.python": "3.10.6",
+      "version.sklearn": "1.1.1"
+    }
+  }
+}

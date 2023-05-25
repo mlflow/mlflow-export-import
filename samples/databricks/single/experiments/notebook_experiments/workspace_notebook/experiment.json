@@ -1,0 +1,61 @@
+{
+  "system": {
+    "package_version": "1.2.0",
+    "script": "export_experiment.py",
+    "export_time": 1684718874,
+    "_export_time": "2023-05-22 01:27:54",
+    "mlflow_version": "2.3.2",
+    "mlflow_tracking_uri": "databricks://e2_demo",
+    "platform": {
+      "python_version": "3.8.15",
+      "system": "Darwin",
+      "processor": "i386"
+    },
+    "user": "andre"
+  },
+  "info": {
+    "num_total_runs": 1,
+    "num_ok_runs": 1,
+    "num_failed_runs": 0,
+    "failed_runs": []
+  },
+  "mlflow": {
+    "experiment": {
+      "experiment_id": "1280664374380381",
+      "name": "/Users/andre@mycompany.com/mlflow/mlflow-examples-basic/Sklearn_Wine",
+      "artifact_location": "dbfs:/databricks/mlflow-tracking/1280664374380381",
+      "lifecycle_stage": "active",
+      "tags": {
+        "mlflow.experiment.sourceName": "/Users/andre@mycompany.com/mlflow/mlflow-examples-basic/Sklearn_Wine",
+        "mlflow.experimentType": "NOTEBOOK",
+        "mlflow.note.content": "WS notebook - NB experiment\n/Users/andre@mycompany.com/mlflow/mlflow-examples-basic/Sklearn_Wine",
+        "mlflow.ownerEmail": "andre@mycompany.com",
+        "mlflow.ownerId": "4566812440727830"
+      },
+      "creation_time": 1681628993361,
+      "last_update_time": 1681628993361,
+      "_creation_time": "2023-04-16 07:09:53",
+      "_last_update_time": "2023-04-16 07:09:53"
+    },
+    "runs": [
+      "f7816bc76f254f22ab25549a7c2c9b06"
+    ],
+    "permissions": {
+      "permission_levels": [
+        {
+          "permission_level": "CAN_READ",
+          "description": "Can view the experiment"
+        },
+        {
+          "permission_level": "CAN_EDIT",
+          "description": "Can view, log runs, and edit the experiment"
+        },
+        {
+          "permission_level": "CAN_MANAGE",
+          "description": "Can view, log runs, edit, delete, and change permissions of the experiment"
+        }
+      ],
+      "permissions": {}
+    }
+  }
+}
