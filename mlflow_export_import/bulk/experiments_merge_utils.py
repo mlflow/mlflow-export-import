@@ -5,13 +5,23 @@ new export_experiments when both are called by export_all
 
 def merge_info(info1, info2):
     info = info1.copy()
-    info["duration"] += info2["duration"]
-    info["duration"] = round(info["duration"],1)
-    info["experiments"] += info2["experiments"]
-    info["total_runs"] += info2["total_runs"]
-    info["ok_runs"] += info2["ok_runs"]
-    info["failed_runs"] += info2["failed_runs"]
+
+    # export_file_version 2 change
+    if "status" in info:
+        status = info["status"]
+        status2 = info2["status"]
+    else:
+        status, status2 = info, info2
+
+    status["duration"] += status2["duration"]
+    status["duration"] = round(status["duration"],1)
+    status["experiments"] += status2["experiments"]
+    status["total_runs"] += status2["total_runs"]
+    status["ok_runs"] += status2["ok_runs"]
+    status["failed_runs"] += status2["failed_runs"]
+
     return info
+
 
 def merge_mlflow(mlflow1, mlflow2):
     return { "experiments":  mlflow1["experiments"] +  mlflow2["experiments"] }

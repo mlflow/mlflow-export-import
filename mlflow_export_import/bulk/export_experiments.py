@@ -41,7 +41,7 @@ def export_experiments(
       - File (ending with '.txt') containing list of experiment names or IDS
       - List of experiment names 
       - List of experiment IDs
-      - Dictionary whose key is an experiment and the value is a list of run IDs 
+      - Dictionary whose key is an experiment id and the value is a list of its run IDs 
       - String with comma-delimited experiment names or IDs such as 'sklearn_wine,sklearn_iris' or '1,2'
     :return: Dictionary of summary information
     """
@@ -49,6 +49,7 @@ def export_experiments(
     mlflow_client = mlflow_client or mlflow.MlflowClient()
     start_time = time.time()
     max_workers = utils.get_threads(use_threads)
+    experiments_arg = _convert_dict_keys_to_list(experiments)
 
     if isinstance(experiments,str) and experiments.endswith(".txt"):
         with open(experiments, "r", encoding="utf-8") as f:
@@ -106,12 +107,23 @@ def export_experiments(
     duration = round(time.time() - start_time, 1)
 
     info_attr = {
-      "experiment_names": experiment_names,
-      "duration": duration,
-      "experiments": len(experiments),
-      "total_runs": total_runs,
-      "ok_runs": ok_runs,
-      "failed_runs": failed_runs
+        "experiment_names": experiment_names,
+        "options": {
+            "experiments": experiments_arg,
+            "output_dir": output_dir,
+            "export_permissions": export_permissions,
+            "run_start_time": run_start_time,
+            "export_deleted_runs": export_deleted_runs,
+            "notebook_formats": notebook_formats,
+            "use_threads": use_threads
+        },
+        "status": {
+            "duration": duration,
+            "experiments": len(experiments),
+            "total_runs": total_runs,
+            "ok_runs": ok_runs,
+            "failed_runs": failed_runs
+        }
     }
     mlflow_attr = { "experiments": export_results }
 
@@ -176,10 +188,15 @@ def _export_experiment(mlflow_client, exp_id_or_name, output_dir, export_permiss
     except Exception as e:
         err_msg = { "message": "Cannot export experiment", "experiment": exp_name, "Exception": e }
         _logger.error(err_msg)
-        #import traceback
-        #traceback.print_exc()
     return Result(exp_name, ok_runs, failed_runs)
     
+
+def _convert_dict_keys_to_list(obj):
+    import collections
+    if isinstance(obj, collections.abc.KeysView): # class dict_keys
+        obj = list(obj)
+    return obj
+
 
 @dataclass()
 class Result:

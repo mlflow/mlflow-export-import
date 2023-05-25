@@ -74,15 +74,19 @@ def export_all(
     )
     duration = round(time.time() - start_time, 1)
     info_attr = {
-        "stages": ALL_STAGES,
-        "export_latest_versions": export_latest_versions,
-        "export_permissions": export_permissions,
-        "notebook_formats": notebook_formats,
-        "use_threads": use_threads,
-        "output_dir": output_dir,
-        "duration": duration,
-        "models": res_models,
-        "experiments": res_exps
+        "options": {
+            "stages": ALL_STAGES,
+            "export_latest_versions": export_latest_versions,
+            "export_permissions": export_permissions,
+            "notebook_formats": notebook_formats,
+            "use_threads": use_threads,
+            "output_dir": output_dir,
+        },
+        "status": {
+            "duration": duration,
+            "models": res_models,
+            "experiments": res_exps
+        }
     }
     io_utils.write_export_file(output_dir, "manifest.json", __file__, {}, info_attr)
     _logger.info(f"Duration for entire tracking server export: {duration} seconds")

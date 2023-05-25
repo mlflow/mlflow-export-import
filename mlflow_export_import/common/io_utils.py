@@ -9,6 +9,9 @@ from mlflow_export_import.common.source_tags import ExportFields
 from mlflow_export_import.common.pkg_version import get_version
 
 
+export_file_version = "2"   
+
+
 def _mk_system_attr(script):
     """
     Create system JSON stanza containing internal export information.
@@ -18,6 +21,7 @@ def _mk_system_attr(script):
     dct = {
         "package_version": get_version(),
         "script": os.path.basename(script),
+        "export_file_version": export_file_version,
         "export_time": ts_now_seconds,
         "_export_time": ts_now_fmt_utc,
         "mlflow_version": mlflow.__version__,
