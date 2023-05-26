@@ -12,7 +12,7 @@ def opt_output_dir(function):
 
 def opt_notebook_formats(function):
     function = click.option("--notebook-formats",
-        help="Databricks notebook formats. Values are SOURCE, HTML, JUPYTER or DBC (comma seperated).",
+        help="Databricks notebook formats. Values are SOURCE, HTML, JUPYTER or DBC (comma separated).",
         type=str,  
         default="", 
         show_default=True
@@ -29,7 +29,7 @@ def opt_run_id(function):
 
 def opt_stages(function):
     function = click.option("--stages",
-        help="Stages to export (comma seperated). Default is all stages and all versions. Stages are Production, Staging, Archived and None. Mututally exclusive with option --versions.",
+        help="Stages to export (comma separated). Default is all stages and all versions. Stages are Production, Staging, Archived and None. Mututally exclusive with option --versions.",
         type=str,
         required=False
     )(function)
