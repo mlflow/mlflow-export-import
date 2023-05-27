@@ -4,6 +4,7 @@ Import a registered model and all the runs associated with each version.
 
 import os
 import click
+from urllib.parse import urlparse
 
 import mlflow
 from mlflow.exceptions import RestException
@@ -335,6 +336,14 @@ def _extract_model_path(source, run_id):
     :param run_id: Run ID in the 'source field 
     :return: relative path to the model artifact 
     """
+    if source[:5] == "s3://": # check if source is s3 bucket
+        # bucket name may contain 'artifacts', this bypasses the bucket name
+        pattern = "artifacts"
+        parsed_s3 = urlparse(source)
+        s3_path = parsed_s3.path
+        idx = s3_path.find(pattern)
+        model_path = s3_path[1+idx+len(pattern):]
+        return model_path
     idx = source.find(run_id)
     if idx == -1:
         raise MlflowExportImportException(f"Cannot find run ID '{run_id}' in registered model version source field '{source}'", http_status_code=404)
