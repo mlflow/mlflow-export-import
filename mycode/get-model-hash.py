@@ -44,10 +44,6 @@ model_dir = f"/mnt/public-blobs/dcoles/mlflow-migration-validation/{model_name}"
 
 # COMMAND ----------
 
-print(model_dir)
-
-# COMMAND ----------
-
 # DBTITLE 1,set env vars
 import os 
 from datetime import datetime
@@ -60,7 +56,7 @@ os.environ["MLFLOW_TRACKING_URI"]="databricks"
 os.environ["MLFLOW_MODEL_NAME"]=model_name
 
 # NEED FOR THE CLI CALL
-with open("/dbfs/FileStore/shared_uploads/darrell.coles@crowncastle.com/azure_databricks_credentials") as f:
+with open("/dbfs/FileStore/shared_uploads/darrell.coles@crowncastle.com/aws_databricks_credentials") as f:
   os.environ["DATABRICKS_HOST"]  = f.readline().strip("\n")
   os.environ["DATABRICKS_TOKEN"] = f.readline().strip("\n")
 
@@ -105,9 +101,10 @@ def get_dir_content(ls_path):
   subdir_paths = [get_dir_content(p.path) for p in dir_paths if p.isDir() and p.path != ls_path]
   flat_subdir_paths = [p for subdir in subdir_paths for p in subdir]
   return list(map(lambda p: p.path, dir_paths)) + flat_subdir_paths
-    
-rget_dir_filenames = lambda ls_path: [p for p in get_dir_content(ls_path) if not p.endswith("/")]
-  
+   
+# only get specific file paths
+rget_dir_filenames = lambda ls_path: [p for p in get_dir_content(ls_path) if p.endswith(("MLmodel", "conda.yaml", "model.pkl", "requirements.txt"))]
+
 try:
   # recursively get all file paths in model directory 
   filepaths = rget_dir_filenames(model_dir)
@@ -132,3 +129,7 @@ except:
 # COMMAND ----------
 
 dbutils.notebook.exit(result)
+
+# COMMAND ----------
+
+
