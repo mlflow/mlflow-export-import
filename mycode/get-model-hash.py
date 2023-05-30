@@ -105,15 +105,16 @@ def get_dir_content(ls_path):
 # only get specific file paths
 rget_dir_filenames = lambda ls_path: [p for p in get_dir_content(ls_path) if p.endswith(("MLmodel", "conda.yaml", "model.pkl", "requirements.txt"))]
 
-try:
-  # recursively get all file paths in model directory 
-  filepaths = rget_dir_filenames(model_dir)
+# recursively get all file paths in model directory 
+filepaths = rget_dir_filenames(model_dir)
+  
+if filepaths:
 
   # hash each file
   hashes = list()
   for path in filepaths:
     hashes.append(hash(path.replace("dbfs:", "/dbfs")))
-  
+
   # sort hashes to guarantee repeatability 
   hashes = sorted(hashes)
 
@@ -122,9 +123,8 @@ try:
 
   # hash the concatenated hashes
   result = f"{model_name}: {md5(bhashes).hexdigest()}"
-
-except:
-  result = f"{model_name}: No Production stages found"
+else:
+  result = f"{model_name}: No Production model files found"
 
 # COMMAND ----------
 
