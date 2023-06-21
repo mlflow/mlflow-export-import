@@ -40,7 +40,7 @@ def _import_experiments(client, input_dir, use_src_user_id):
     for exp in exps: 
         exp_input_dir = os.path.join(input_dir, "experiments", exp["id"])
         try:
-            _run_info_map = importer.import_experiment( exp["name"], exp_input_dir)
+            _run_info_map = importer.import_experiment(f'/Shared/{exp["name"]}', exp_input_dir) # MATCHING DBX PATH
             run_info_map[exp["id"]] = _run_info_map
         except Exception as e:
             exceptions.append(str(e))
