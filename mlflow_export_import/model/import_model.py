@@ -55,7 +55,6 @@ class BaseModelImporter():
         tags = src_vr["tags"]
         if self.import_source_tags:
             _set_source_tags_for_field(src_vr, tags)
-
         dst_vr = self.mlflow_client.create_model_version(
             model_name, 
             dst_source, dst_run_id, \
@@ -191,7 +190,7 @@ class AllModelImporter(BaseModelImporter):
         for vr in model_dct["versions"]:
             src_run_id = vr["run_id"]
             dst_run_id = self.run_info_map[src_run_id].run_id
-            mlflow.set_experiment(vr["_experiment_name"])
+            mlflow.set_experiment(f'/Shared/{vr["_experiment_name"]}') # MATCHING DBX PATH
             self.import_version(model_name, vr, dst_run_id, sleep_time)
         if verbose:
             model_utils.dump_model_versions(self.mlflow_client, model_name)
