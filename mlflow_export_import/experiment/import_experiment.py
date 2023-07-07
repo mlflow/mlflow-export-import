@@ -20,7 +20,8 @@ from mlflow_export_import.common import permissions_utils
 from mlflow_export_import.common.source_tags import (
     set_source_tags_for_field,
     mk_source_tags_mlflow_tag,
-    fmt_timestamps
+    fmt_timestamps,
+    add_mlflow_export_timestamp
 )
 from mlflow_export_import.run.import_run import import_run
 
@@ -58,6 +59,7 @@ def import_experiment(
     exp_dct = mlflow_dct["experiment"]
 
     tags = exp_dct["tags"] 
+    add_mlflow_export_timestamp(tags)
     if import_source_tags:
         source_tags = mk_source_tags_mlflow_tag(tags)
         tags = { **tags, **source_tags }

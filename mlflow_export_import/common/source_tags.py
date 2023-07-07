@@ -12,6 +12,8 @@ class ExportTags:
     PREFIX_FIELD = f"{PREFIX_ROOT}.field"
     PREFIX_RUN_INFO = f"{PREFIX_ROOT}.run_info"
     PREFIX_MLFLOW_TAG = f"{PREFIX_ROOT}.mlflow_tag"
+    PREFIX_ROOT    = "mlflow_exim"
+    IMPORT_TIME = f"{PREFIX_ROOT}.import_time"
 
 
 def fmt_timestamps(tag, dct, tags):
@@ -43,3 +45,8 @@ def mk_source_tags(tags, dst_prefix):
     Create source tags from destination prefix.
     """
     return { f"{dst_prefix}.{k}":str(v) for k,v in tags.items() }
+
+
+def add_mlflow_export_timestamp(tags):
+    from mlflow_export_import.common import timestamp_utils
+    tags[ExportTags.IMPORT_TIME] = timestamp_utils.ts_now_fmt_utc 

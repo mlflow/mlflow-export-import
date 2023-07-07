@@ -8,6 +8,7 @@ from tests import utils_test
 
 def compare_runs(mlflow_context, run1, run2, import_source_tags=False, output_dir=None):
     output_dir = output_dir or mlflow_context.output_dir
+    _assert_import_time_tag(run2.data.tags)
     if import_source_tags:
         _compare_runs_with_source_tags(run1, run2)
     else:
@@ -28,9 +29,11 @@ def _compare_runs_with_source_tags(run1, run2):
         if k != "run_name":
             assert str(v) == source_tags2[f"{ExportTags.PREFIX_RUN_INFO}.{k}"],f"Assert failed for RunInfo field '{k}'" # NOTE: tag values must be strings
 
+
 def compare_experiment_tags(tags1, tags2, import_source_tags=False):
+    _assert_import_time_tag(tags2)
     if not import_source_tags:
-        assert tags1 == tags2
+        assert _normalize_tags(tags1) == _normalize_tags(tags2)
         return
 
     source_tags2 = { k:v for k,v in tags2.items() if k.startswith(ExportTags.PREFIX_MLFLOW_TAG) }
@@ -73,6 +76,7 @@ def _compare_artifacts(mlflow_context, run1, run2, run_artifact_dir1, run_artifa
 
 
 def compare_models(model_src, model_dst, compare_name):
+    _assert_import_time_tag(model_dst.tags)
     if compare_name:
         assert model_src.name == model_dst.name
     else:
@@ -88,6 +92,7 @@ def compare_models_with_versions(mlflow_context, model_src, model_dst):
 
 
 def compare_versions(mlflow_context, vr_src, vr_dst):
+    _assert_import_time_tag(vr_dst.tags)
     assert vr_src.current_stage == vr_dst.current_stage
     assert vr_src.description == vr_dst.description
     assert vr_src.status == vr_dst.status
@@ -104,6 +109,14 @@ def compare_versions(mlflow_context, vr_src, vr_dst):
     run_src = mlflow_context.client_src.get_run(vr_src.run_id)
     run_dst = mlflow_context.client_dst.get_run(vr_dst.run_id)
     compare_runs(mlflow_context, run_src, run_dst)
+
+
+def _assert_import_time_tag(tags): 
+    return ExportTags.IMPORT_TIME in tags
+
+
+def _normalize_tags(tags): 
+    tags.pop(ExportTags.IMPORT_TIME, None)
 
 
 def dump_runs(run1, run2):

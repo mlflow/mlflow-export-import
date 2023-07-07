@@ -8,9 +8,12 @@ import mlflow
 import math 
 from mlflow.entities import Metric, Param, RunTag
 from mlflow_export_import.common import utils
-from mlflow_export_import.common.source_tags import ExportTags
-from mlflow_export_import.common.source_tags import mk_source_tags_mlflow_tag, mk_source_tags
-
+from mlflow_export_import.common.source_tags import (
+    ExportTags,
+    mk_source_tags_mlflow_tag, 
+    mk_source_tags, 
+    add_mlflow_export_timestamp
+)
 
 def _log_data(run_dct, run_id, batch_size, get_data, log_data, args_get_data=None):
     metadata = get_data(run_dct, args_get_data)
@@ -51,6 +54,7 @@ def _log_tags(client, run_dct, run_id, batch_size, import_source_tags, in_databr
 
     def get_data(run_dct, args):
         tags = run_dct["tags"]
+        add_mlflow_export_timestamp(tags)
         if import_source_tags:
             source_mlflow_tags = mk_source_tags_mlflow_tag(tags)
             info =  run_dct["info"]
@@ -93,4 +97,4 @@ def import_run_data(mlflow_client, run_dct, run_id, import_source_tags, src_user
 if __name__ == "__main__":
     import sys
     client = mlflow.MlflowClient()
-    _log_metrics(client, sys.argv[1],100)
+    _log_metrics(client, sys.argv[1], 100)

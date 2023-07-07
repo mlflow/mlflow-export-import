@@ -21,6 +21,7 @@ from mlflow_export_import.common import utils, io_utils, model_utils
 from mlflow_export_import.common.source_tags import set_source_tags_for_field, fmt_timestamps
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common.permissions_utils import import_permissions
+from mlflow_export_import.common.source_tags import add_mlflow_export_timestamp
 from mlflow_export_import.client.http_client import DatabricksHttpClient
 from mlflow_export_import.run.import_run import import_run
 from mlflow_export_import.bulk import rename_utils
@@ -104,6 +105,7 @@ class BaseModelImporter():
             raise MlflowExportImportException(f"'source' argument for MLflowClient.create_model_version does not exist: {dst_source}", http_status_code=404)
         kwargs = {"await_creation_for": self.await_creation_for } if self.await_creation_for else {}
         tags = src_vr["tags"]
+        add_mlflow_export_timestamp(tags)
         if self.import_source_tags:
             _set_source_tags_for_field(src_vr, tags)
 
@@ -151,6 +153,7 @@ class BaseModelImporter():
 
         try:
             tags = { e["key"]:e["value"] for e in model_dct.get("tags", {}) }
+            add_mlflow_export_timestamp(tags)
             if self.import_source_tags:
                 _set_source_tags_for_field(model_dct, tags)
             self.mlflow_client.create_registered_model(model_name, tags, model_dct.get("description"))
