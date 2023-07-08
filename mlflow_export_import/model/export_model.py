@@ -104,7 +104,7 @@ def _export_model(mlflow_client, http_client, dbx_client, model_name, output_dir
     _logger.info(f"Exporting model '{model_name}': found {len(ori_versions)} '{msg}' versions")
     versions, failed_versions = _export_versions(mlflow_client, ori_versions, output_dir, opts)
 
-    if utils.importing_into_databricks() and opts.export_permissions:
+    if utils.is_importing_into_databricks() and opts.export_permissions:
         model = http_client.get("databricks/registered-models/get", { "name": model_name })
         model2 = model.pop("registered_model_databricks", None)
         _adjust_model(model2, versions)
