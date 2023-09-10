@@ -3,7 +3,6 @@ Imports a run from a directory.
 """
 
 import os
-import tempfile
 import click
 import base64
 
@@ -21,11 +20,11 @@ from mlflow_export_import.common.click_options import (
 )
 from mlflow_export_import.common import utils, mlflow_utils, io_utils
 from mlflow_export_import.common.filesystem import mk_local_path
-from mlflow_export_import.common.find_artifacts import find_run_model_names
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.client.http_client import DatabricksHttpClient
-from mlflow_export_import.run import run_data_importer
+from . import run_data_importer
+from . import run_utils
 
 _logger = utils.getLogger(__name__)
 
@@ -89,7 +88,7 @@ def import_run(
         if os.path.exists(_filesystem.mk_local_path(path)):
             mlflow_client.log_artifacts(run_id, mk_local_path(path))
         if mlmodel_fix:
-            _update_mlmodel_run_id(mlflow_client, run_id)
+            run_utils.update_mlmodel_run_id(mlflow_client, run_id)
         mlflow_client.set_terminated(run_id, RunStatus.to_string(RunStatus.FINISHED))
         run = mlflow_client.get_run(run_id)
         if src_run_dct["info"]["lifecycle_stage"] == LifecycleStage.DELETED:
@@ -107,27 +106,6 @@ def import_run(
     res = (run, src_run_dct["tags"].get(MLFLOW_PARENT_RUN_ID, None))
     _logger.info(f"Imported run '{run.info.run_id}' into experiment '{experiment_name}'")
     return res
-
-
-def _update_mlmodel_run_id(mlflow_client, run_id):
-    """
-    Workaround to fix the run_id in the destination MLmodel file since there is no method to get all model artifacts of a run.
-    Since an MLflow run does not keep track of its models, there is no method to retrieve the artifact path to all its models.
-    This workaround recursively searches the run's root artifact directory for all MLmodel files, and assumes their directory
-    represents a path to the model.
-    """
-    mlmodel_paths = find_run_model_names(run_id)
-    for model_path in mlmodel_paths:
-        download_uri = f"runs:/{run_id}/{model_path}/MLmodel"
-        local_path = mlflow_utils.download_artifacts(mlflow_client, download_uri)
-        mlmodel = io_utils.read_file(local_path, "yaml")
-        mlmodel["run_id"] = run_id
-        with tempfile.TemporaryDirectory() as dir:
-            output_path = os.path.join(dir, "MLmodel")
-            io_utils.write_file(output_path, mlmodel, "yaml")
-            if model_path == "MLmodel":
-                model_path = ""
-            mlflow_client.log_artifact(run_id, output_path, model_path)
 
 
 def _upload_databricks_notebook(dbx_client, input_dir, src_run_dct, dst_notebook_dir):
