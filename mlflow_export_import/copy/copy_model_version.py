@@ -53,7 +53,9 @@ def _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_cl
         description = src_version.description
     )
     for alias in src_version.aliases:
-        dst_client.set_registered_model_alias(dst_model_name, alias, dst_version.version)
+        dst_client.set_registered_model_alias(dst_version.name, alias, dst_version.version)
+    if len(src_version.aliases) > 0:
+        dst_version = dst_client.get_model_version(dst_version.name, dst_version.version)
     return dst_version
 
 
