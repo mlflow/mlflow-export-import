@@ -21,7 +21,7 @@ def opt_notebook_formats(function):
 
 def opt_run_id(function):
     function = click.option("--run-id",
-        help="Experiment name or ID.",
+        help="Run ID.",
         type=str,
         required=True
     )(function)

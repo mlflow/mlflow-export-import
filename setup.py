@@ -55,7 +55,8 @@ setup(
             "import-model = mlflow_export_import.model.import_model:main",
             "download-notebook = mlflow_export_import.notebook.download_notebook:main",
             "http-client = mlflow_export_import.client.http_client:main",
-            "list-models = mlflow_export_import.tools.list_registered_models:main"
+            "list-models = mlflow_export_import.tools.list_registered_models:main",
+            "copy-model-version = mlflow_export_import.copy.copy_model_version:main"
          ]
       }
 )
