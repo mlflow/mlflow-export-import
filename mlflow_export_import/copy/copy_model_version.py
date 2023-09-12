@@ -13,7 +13,7 @@ from . click_options import (
 )
 from mlflow_export_import.common.source_tags import ExportTags
 from mlflow_export_import.common.click_options import opt_verbose
-from mlflow_export_import.common import utils, mlflow_utils
+from mlflow_export_import.common import utils
 from mlflow_export_import.run import run_utils
 _logger = utils.getLogger(__name__)
 
@@ -38,9 +38,10 @@ def copy(src_model_name,
         local_utils.dump_client(dst_client, "dst_client")
     local_utils.create_registered_model(dst_client,  dst_model_name)
     src_version = src_client.get_model_version(src_model_name, src_model_version)
-    dst_version = _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_client, dst_client)
     if verbose:
         local_utils.dump_obj(src_version, "Source ModelVersion")
+    dst_version = _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_client, dst_client)
+    if verbose:
         local_utils.dump_obj(dst_version, "Destination ModelVersion")
     dst_uri = f"models:/{dst_version.name}/{dst_version.version}"
     print(f"Copied '{src_uri}' to '{dst_uri}' in '{dst_mlflow_uri}'")
@@ -82,10 +83,12 @@ def _copy_run(src_version, dst_experiment_name, src_client, dst_client):
 
 
 def _copy_run_artifacts(src_version, dst_run_id, src_client, dst_client):
-    artifact_uri = local_utils.get_artifact_root_path(src_version)
     with tempfile.TemporaryDirectory() as download_dir:
-        mlflow_utils.download_artifacts(src_client, artifact_uri, dst_path=download_dir)
-        download_dir = os.path.join(download_dir, "artifacts")
+        mlflow.artifacts.download_artifacts(
+            run_id = src_version.run_id,
+            dst_path = download_dir,
+            tracking_uri = src_client._tracking_client.tracking_uri
+        )
         files = os.listdir(download_dir)
         for f in files:
             dst_client.log_artifact(dst_run_id, os.path.join(download_dir, f), artifact_path="")
