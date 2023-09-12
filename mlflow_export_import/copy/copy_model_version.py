@@ -11,14 +11,21 @@ from . click_options import (
     opt_dst_mlflow_uri,
     opt_dst_experiment_name
 )
-from mlflow_export_import.common.source_tags import ExportTags 
+from mlflow_export_import.common.source_tags import ExportTags
 from mlflow_export_import.common.click_options import opt_verbose
 from mlflow_export_import.common import utils, mlflow_utils
 from mlflow_export_import.run import run_utils
 _logger = utils.getLogger(__name__)
 
 
-def copy(src_model_name, src_model_version, dst_model_name, dst_experiment_name, src_mlflow_uri, dst_mlflow_uri, verbose=False):
+def copy(src_model_name, 
+        src_model_version, 
+        dst_model_name, 
+        dst_experiment_name, 
+        src_mlflow_uri, 
+        dst_mlflow_uri, 
+        verbose=False
+    ):
     """
     Copy model version to another model in same or other tracking server (workspace).
     """
@@ -41,14 +48,14 @@ def copy(src_model_name, src_model_version, dst_model_name, dst_experiment_name,
 
 
 def _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_client, dst_client):
-    dst_run = _copy_run(src_version, dst_experiment_name, src_client, dst_client) 
+    dst_run = _copy_run(src_version, dst_experiment_name, src_client, dst_client)
     mlflow_model_name = local_utils.get_model_name(src_version.source)
     source_uri = f"{dst_run.info.artifact_uri}/{mlflow_model_name}"
     tags = _add_to_version_tags(src_version, dst_run, src_client, dst_client)
     dst_version = dst_client.create_model_version(
-        name = dst_model_name, 
-        source = source_uri, 
-        run_id = dst_run.info.run_id, 
+        name = dst_model_name,
+        source = source_uri,
+        run_id = dst_run.info.run_id,
         tags = tags,
         description = src_version.description
     )
@@ -70,19 +77,20 @@ def _copy_run(src_version, dst_experiment_name, src_client, dst_client):
 
     dst_run = dst_client.create_run(dst_experiment_id, tags=tags, run_name=src_run.info.run_name)
 
-    _copy_artifacts(src_version, dst_run.info.run_id, src_client, dst_client)
+    _copy_run_artifacts(src_version, dst_run.info.run_id, src_client, dst_client)
     return dst_run
 
 
-def _copy_artifacts(src_version, dst_run_id, src_client, dst_client):
-    artifact_uri = src_version.source
+def _copy_run_artifacts(src_version, dst_run_id, src_client, dst_client):
+    artifact_uri = local_utils.get_artifact_root_path(src_version)
     with tempfile.TemporaryDirectory() as download_dir:
         mlflow_utils.download_artifacts(src_client, artifact_uri, dst_path=download_dir)
-        model_name = run_utils.get_model_name(artifact_uri)
-        download_dir2 = os.path.join(download_dir,model_name)
-        dst_client.log_artifact(dst_run_id, download_dir2, artifact_path="")
-        run_utils.update_mlmodel_run_id(dst_client, dst_run_id)
-    
+        download_dir = os.path.join(download_dir, "artifacts")
+        files = os.listdir(download_dir)
+        for f in files:
+            dst_client.log_artifact(dst_run_id, os.path.join(download_dir, f), artifact_path="")
+    run_utils.update_mlmodel_run_id(dst_client, dst_run_id)
+
 
 def _add_to_version_tags(src_version, run, src_client, dst_client):
     prefix = f"{ExportTags.PREFIX_ROOT}.src_run"

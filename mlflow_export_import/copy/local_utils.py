@@ -3,9 +3,21 @@ from mlflow.exceptions import RestException
 
 
 def get_model_name(artifact_path):
+    """
+    Return 'my-model' from '/foo/artifacts/my-model'
+    """
     idx = artifact_path.find("artifacts")
     idx += len("artifacts") + 1
     return artifact_path[idx:]
+
+
+def get_artifact_root_path(vr):
+    """
+    Return: '/foo/run_id/artifacts' from '/foo/run_id/artifacts/model'
+    """
+    idx = vr.source.find(vr.run_id)
+    idx += len(vr.run_id) + len("/artifacts")
+    return vr.source[:idx]
 
 
 def create_registered_model(client,  model_name):
