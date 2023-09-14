@@ -1,5 +1,5 @@
 import json
-from mlflow.exceptions import RestException
+from mlflow.exceptions import MlflowException
 
 
 def get_model_name(artifact_path):
@@ -11,19 +11,10 @@ def get_model_name(artifact_path):
     return artifact_path[idx:]
 
 
-def get_artifact_root_path(vr):
-    """
-    Return: '/foo/run_id/artifacts' from '/foo/run_id/artifacts/model'
-    """
-    idx = vr.source.find(vr.run_id)
-    idx += len(vr.run_id) + len("/artifacts")
-    return vr.source[:idx]
-
-
 def create_registered_model(client,  model_name):
     try:
         client.create_registered_model(model_name)
-    except RestException as e:
+    except MlflowException as e: # NOTE: for non-UC is RestException
         if e.error_code != "RESOURCE_ALREADY_EXISTS":
             raise
 
@@ -31,7 +22,7 @@ def create_registered_model(client,  model_name):
 def create_experiment(client, experiment_name):
     try:
         return client.create_experiment(experiment_name)
-    except RestException as e:
+    except MlflowException as e:
         if e.error_code != "RESOURCE_ALREADY_EXISTS":
             raise
         experiment = client.get_experiment_by_name(experiment_name)
@@ -46,8 +37,8 @@ def add_tag(src_tags, dst_tags, key, prefix):
 
 def dump_client(client, msg):
     print(f"Mlflow {msg}:")
-    print("  client.tracking_uri:    ",client.tracking_uri)
-    print("  client._registry_uri:   ",client._registry_uri)
+    print("  client.tracking_uri: ", client.tracking_uri)
+    print("  client._registry_uri:", client._registry_uri)
 
 
 def dump_obj(obj, msg=None):
