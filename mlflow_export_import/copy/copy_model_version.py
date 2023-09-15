@@ -15,7 +15,6 @@ from mlflow_export_import.common.source_tags import ExportTags
 from mlflow_export_import.common.click_options import opt_verbose
 from mlflow_export_import.common import utils
 from mlflow_export_import.run import run_utils
-from . import uc_utils 
 
 _logger = utils.getLogger(__name__)
 
@@ -43,10 +42,10 @@ def copy(src_model_name,
     local_utils.create_registered_model(dst_client,  dst_model_name)
     src_version = src_client.get_model_version(src_model_name, src_model_version)
     if verbose:
-        local_utils.dump_obj(src_version, "Source ModelVersion")
+        local_utils.dump_obj_as_json(src_version, "Source ModelVersion")
     dst_version = _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_client, dst_client)
     if verbose:
-        local_utils.dump_obj(dst_version, "Destination ModelVersion")
+        local_utils.dump_obj_as_json(dst_version, "Destination ModelVersion")
     dst_uri = f"{dst_version.name}/{dst_version.version}"
     print(f"Copied model version '{src_uri}' to '{dst_uri}'")
     return src_version, dst_version
@@ -113,7 +112,7 @@ def _add_to_version_tags(src_version, run, dst_model_name, src_client, dst_clien
     tags[f"{ExportTags.PREFIX_ROOT}.src_client.tracking_uri"] = src_client.tracking_uri
     tags[f"{ExportTags.PREFIX_ROOT}.mlflow_exim.dst_client.tracking_uri"] = dst_client.tracking_uri
 
-    if uc_utils.is_unity_catalog_model(dst_model_name): # NOTE: Databricks UC model version tags don't accept '."
+    if local_utils.is_unity_catalog_model(dst_model_name): # NOTE: Databricks UC model version tags don't accept '."
         tags = { k.replace(".","_"):v for k,v in tags.items() }
 
     return tags

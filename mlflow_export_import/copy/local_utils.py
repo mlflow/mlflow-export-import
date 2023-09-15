@@ -35,6 +35,10 @@ def add_tag(src_tags, dst_tags, key, prefix):
         dst_tags[f"{prefix}.{key}"] = val
 
 
+def is_unity_catalog_model(name):
+    return len(name.split(".")) == 3
+
+
 def dump_client(client, msg):
     print(f"Mlflow {msg}:")
     print("  client.tracking_uri: ", client.tracking_uri)
@@ -48,5 +52,28 @@ def dump_obj(obj, msg=None):
         print(f"  {k}: {v}")
 
 
+def dump_obj_as_json(obj, msg=None):
+    title = msg if msg else type(obj).__name__
+    print(title)
+    import mlflow
+    if isinstance(obj, mlflow.entities.model_registry.model_version.ModelVersion):
+        dct = adjust_model_version(obj.__dict__)
+    dump_as_json(dct, sort_keys=None)
+
+
 def dump_as_json(dct, sort_keys=None):
     print(json.dumps(dct, sort_keys=sort_keys, indent=2))
+
+
+def dict_to_json(dct):
+    return json.dumps(dct)
+
+
+def adjust_model_version(vr):
+    dct = {}
+    for k,v in vr.items():
+        if k == "_aliases": # type - google._upb._message.RepeatedScalarContainer
+            dct[k] = [ str(x) for x in v ]
+        else:
+            dct[k] = v
+    return dct
