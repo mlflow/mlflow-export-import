@@ -9,7 +9,7 @@ For more details:
 
 ## Architecture
 
-<img src="architecture.png" height="330" />
+<img src="diagrams/architecture.png" height="330" />
 
 ## Overview
 

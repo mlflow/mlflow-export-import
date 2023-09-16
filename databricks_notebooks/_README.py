@@ -19,7 +19,7 @@
 # MAGIC   
 # MAGIC #### Architecture
 # MAGIC
-# MAGIC <img src="https://github.com/amesar/mlflow-export-import/blob/master/architecture.png?raw=true"  width="700" />
+# MAGIC <img src="https://github.com/amesar/mlflow-export-import/blob/master/diagrams/architecture.png?raw=true"  width="700" />
 # MAGIC
 # MAGIC #### Notebooks 
 # MAGIC * Basic notebooks with widgets
