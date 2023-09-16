@@ -3,7 +3,8 @@
 
 # COMMAND ----------
 
-# MAGIC %pip install git+https:///github.com/mlflow/mlflow-export-import@issue-138-copy-model-version#egg=mlflow-export-import
+# %pip install git+https:///github.com/mlflow/mlflow-export-import@issue-138-copy-model-version#egg=mlflow-export-import
+%pip install /dbfs/home/andre.mesarovic@databricks.com/lib/wheels/mlflow_export_import-1.2.0-py3-none-any.whl
 
 # COMMAND ----------
 
@@ -47,12 +48,12 @@ def copy_model_version(
     ):
     from mlflow_export_import.copy.copy_model_version import copy
     from mlflow_export_import.copy.local_utils import is_unity_catalog_model 
-    
-    def mk_registry_uri(model_name):
-        return "databricks-uc" if is_unity_catalog_model(model_name) else "databricks"
+      
+    def mk_registry_uri(model_name, dst_tracking_uri):
+        return "databricks-uc" if is_unity_catalog_model(model_name) else dst_tracking_uri
 
-    src_registry_uri = mk_registry_uri(src_model_name)
-    dst_registry_uri = mk_registry_uri(dst_model_name)
+    src_registry_uri = mk_registry_uri(src_model_name, dst_tracking_uri)
+    dst_registry_uri = mk_registry_uri(dst_model_name, dst_tracking_uri)
     print("src_registry_uri:", src_registry_uri)
     print("dst_registry_uri:", dst_registry_uri)
 
