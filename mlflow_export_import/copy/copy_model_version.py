@@ -2,6 +2,7 @@ import os
 import click
 import tempfile
 import mlflow
+from mlflow.exceptions import MlflowException
 from . import local_utils
 from . click_options import (
     opt_src_model,
@@ -18,14 +19,14 @@ from mlflow_export_import.run import run_utils
 
 _logger = utils.getLogger(__name__)
 
-def copy(src_model_name, 
-        src_model_version, 
-        dst_model_name, 
-        dst_experiment_name, 
-        src_tracking_uri, 
-        dst_tracking_uri, 
-        src_registry_uri = None, 
-        dst_registry_uri = None, 
+def copy(src_model_name,
+        src_model_version,
+        dst_model_name,
+        dst_experiment_name,
+        src_tracking_uri,
+        dst_tracking_uri,
+        src_registry_uri = None,
+        dst_registry_uri = None,
         verbose = False
     ):
     """
@@ -56,6 +57,8 @@ def _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_cl
     mlflow_model_name = local_utils.get_model_name(src_version.source)
     source_uri = f"{dst_run.info.artifact_uri}/{mlflow_model_name}"
     tags = _add_to_version_tags(src_version, dst_run, dst_model_name, src_client, dst_client)
+    local_utils.dump_client(dst_client, "DST CLIENT")
+
     dst_version = dst_client.create_model_version(
         name = dst_model_name,
         source = source_uri,
@@ -63,10 +66,13 @@ def _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_cl
         tags = tags,
         description = src_version.description
     )
-    for alias in src_version.aliases:
-        dst_client.set_registered_model_alias(dst_version.name, alias, dst_version.version)
-    if len(src_version.aliases) > 0:
-        dst_version = dst_client.get_model_version(dst_version.name, dst_version.version)
+    try:
+        for alias in src_version.aliases:
+            dst_client.set_registered_model_alias(dst_version.name, alias, dst_version.version)
+        if len(src_version.aliases) > 0:
+            dst_version = dst_client.get_model_version(dst_version.name, dst_version.version)
+    except MlflowException as e: # Non-UC Databricks MLflow has removed OSS MLflow support for aliases
+        print(f"ERROR: error_code: {e.error_code}. Exception: {e}")
     return dst_version
 
 
