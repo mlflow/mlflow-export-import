@@ -1,11 +1,9 @@
 # Databricks notebook source
-# Common - copy
+# Common - copy model version
 
 # COMMAND ----------
 
 # MAGIC %pip install git+https:///github.com/mlflow/mlflow-export-import@issue-138-copy-model-version#egg=mlflow-export-import
-# MAGIC
-# MAGIC # %pip install /dbfs/home/andre.mesarovic@databricks.com/lib/wheels/mlflow_export_import-1.2.0-py3-none-any.whl
 
 # COMMAND ----------
 
@@ -14,7 +12,7 @@ print("mlflow.version:", mlflow.__version__)
 
 # COMMAND ----------
 
-from mlflow_export_import.copy.local_utils import dump_obj_as_json
+from mlflow_export_import.copy.local_utils import obj_to_dict, dict_to_json, dump_obj_as_json
 
 # COMMAND ----------
 

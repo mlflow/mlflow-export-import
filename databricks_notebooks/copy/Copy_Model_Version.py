@@ -102,3 +102,15 @@ display_registered_model_version_uri(dst_model_version.name, dst_model_version.v
 # COMMAND ----------
 
 dump_obj_as_json(dst_model_version, "Destination ModelVersion")
+
+# COMMAND ----------
+
+# MAGIC %md #### Return value
+
+# COMMAND ----------
+
+result = {
+    "src_model_version": obj_to_dict(src_model_version),
+    "dst_model_version": obj_to_dict(dst_model_version)
+}
+dbutils.notebook.exit(dict_to_json(result))
