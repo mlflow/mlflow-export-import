@@ -55,18 +55,25 @@ def dump_obj(obj, msg=None):
 def dump_obj_as_json(obj, msg=None):
     title = msg if msg else type(obj).__name__
     print(title)
+    dct = obj_to_dict(obj)
+    dump_as_json(dct)
+
+
+def dump_as_json(dct, sort_keys=None, indent=2):
+    print(dict_to_json(dct, sort_keys, indent))
+
+
+def dict_to_json(dct, sort_keys=None, indent=2):
+    return json.dumps(dct, sort_keys=sort_keys, indent=indent)
+
+
+def obj_to_dict(obj):
     import mlflow
     if isinstance(obj, mlflow.entities.model_registry.model_version.ModelVersion):
         dct = adjust_model_version(obj.__dict__)
-    dump_as_json(dct, sort_keys=None)
-
-
-def dump_as_json(dct, sort_keys=None):
-    print(json.dumps(dct, sort_keys=sort_keys, indent=2))
-
-
-def dict_to_json(dct):
-    return json.dumps(dct)
+    else:
+        dct = obj.__dict__
+    return dct
 
 
 def adjust_model_version(vr):
