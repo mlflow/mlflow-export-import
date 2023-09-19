@@ -115,13 +115,18 @@ def _add_to_version_tags(src_version, run, dst_model_name, src_client, dst_clien
         run = src_client.get_run(src_version.run_id)
 
     tags = src_version.tags
+
+    tags[f"{ExportTags.PREFIX_ROOT}.src_version.name"] =  src_version.name
+    tags[f"{ExportTags.PREFIX_ROOT}.src_version.version"] =  src_version.version
+    tags[f"{ExportTags.PREFIX_ROOT}.src_version.run_id"] =  src_version.run_id
+
+    tags[f"{ExportTags.PREFIX_ROOT}.src_client.tracking_uri"] = src_client.tracking_uri
+    tags[f"{ExportTags.PREFIX_ROOT}.mlflow_exim.dst_client.tracking_uri"] = dst_client.tracking_uri
+
     local_utils.add_tag(run.data.tags, tags, "mlflow.databricks.workspaceURL", prefix)
     local_utils.add_tag(run.data.tags, tags, "mlflow.databricks.webappURL", prefix)
     local_utils.add_tag(run.data.tags, tags, "mlflow.databricks.workspaceID", prefix)
     local_utils.add_tag(run.data.tags, tags, "mlflow.user", prefix)
-
-    tags[f"{ExportTags.PREFIX_ROOT}.src_client.tracking_uri"] = src_client.tracking_uri
-    tags[f"{ExportTags.PREFIX_ROOT}.mlflow_exim.dst_client.tracking_uri"] = dst_client.tracking_uri
 
     if local_utils.is_unity_catalog_model(dst_model_name): # NOTE: Databricks UC model version tags don't accept '."
         tags = { k.replace(".","_"):v for k,v in tags.items() }
