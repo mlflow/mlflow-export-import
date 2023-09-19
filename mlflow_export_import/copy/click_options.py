@@ -47,3 +47,12 @@ def opt_dst_experiment_name(function):
         required=False
     )(function)
     return function
+
+def opt_add_copy_system_tags(function):
+    function = click.option("--add-copy-system-tags",
+        help="Add 'copy' system tags starting with 'mlflow_exim.'",
+        type=bool,
+        default=False,
+        show_default=True
+    )(function)
+    return function

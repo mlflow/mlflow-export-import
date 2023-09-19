@@ -10,7 +10,8 @@ from . click_options import (
     opt_src_version,
     opt_src_mlflow_uri,
     opt_dst_mlflow_uri,
-    opt_dst_experiment_name
+    opt_dst_experiment_name,
+    opt_add_copy_system_tags
 )
 from mlflow_export_import.common.source_tags import ExportTags
 from mlflow_export_import.common.click_options import opt_verbose
@@ -27,6 +28,7 @@ def copy(src_model_name,
         dst_tracking_uri,
         src_registry_uri = None,
         dst_registry_uri = None,
+        add_copy_system_tags = False,
         verbose = False
     ):
     """
@@ -44,7 +46,7 @@ def copy(src_model_name,
     src_version = src_client.get_model_version(src_model_name, src_model_version)
     if verbose:
         local_utils.dump_obj_as_json(src_version, "Source ModelVersion")
-    dst_version = _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_client, dst_client)
+    dst_version = _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_client, dst_client, add_copy_system_tags)
     if verbose:
         local_utils.dump_obj_as_json(dst_version, "Destination ModelVersion")
     dst_uri = f"{dst_version.name}/{dst_version.version}"
@@ -52,11 +54,14 @@ def copy(src_model_name,
     return src_version, dst_version
 
 
-def _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_client, dst_client):
+def _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_client, dst_client, add_copy_system_tags=False):
     dst_run = _copy_run(src_version, dst_experiment_name, src_client, dst_client)
     mlflow_model_name = local_utils.get_model_name(src_version.source)
     source_uri = f"{dst_run.info.artifact_uri}/{mlflow_model_name}"
-    tags = _add_to_version_tags(src_version, dst_run, dst_model_name, src_client, dst_client)
+    if add_copy_system_tags:
+        tags = _add_to_version_tags(src_version, dst_run, dst_model_name, src_client, dst_client)
+    else:
+        tags = src_version.tags
     local_utils.dump_client(dst_client, "DST CLIENT")
 
     dst_version = dst_client.create_model_version(
@@ -131,13 +136,17 @@ def _add_to_version_tags(src_version, run, dst_model_name, src_client, dst_clien
 @opt_src_mlflow_uri
 @opt_dst_mlflow_uri
 @opt_dst_experiment_name
+@opt_add_copy_system_tags
 @opt_verbose
 
-def main(src_model, src_version, dst_model, src_mlflow_uri, dst_mlflow_uri, dst_experiment_name, verbose):
+def main(src_model, src_version, dst_model, src_mlflow_uri, dst_mlflow_uri, dst_experiment_name, add_copy_system_tags, verbose):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    copy(src_model, src_version, dst_model, dst_experiment_name, src_mlflow_uri, dst_mlflow_uri, verbose=verbose)
+    copy(src_model, src_version, dst_model, dst_experiment_name, src_mlflow_uri, dst_mlflow_uri,
+        add_copy_system_tags = add_copy_system_tags, 
+        verbose = verbose
+    )
 
 
 if __name__ == "__main__":

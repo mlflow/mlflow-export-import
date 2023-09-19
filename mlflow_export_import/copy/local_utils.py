@@ -39,7 +39,7 @@ def is_unity_catalog_model(name):
     return len(name.split(".")) == 3
 
 
-def dump_client(client, msg):
+def dump_client(client, msg=""):
     print(f"Mlflow {msg}:")
     print("  client.tracking_uri: ", client.tracking_uri)
     print("  client._registry_uri:", client._registry_uri)
