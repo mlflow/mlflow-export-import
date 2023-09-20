@@ -20,6 +20,7 @@ from mlflow_export_import.run import run_utils
 
 _logger = utils.getLogger(__name__)
 
+
 def copy(src_model_name,
         src_model_version,
         dst_model_name,
@@ -92,14 +93,14 @@ def _copy_run(src_version, dst_experiment_name, src_client, dst_client):
 
     dst_run = dst_client.create_run(dst_experiment_id, tags=tags, run_name=src_run.info.run_name)
 
-    _copy_run_artifacts(src_version, dst_run.info.run_id, src_client, dst_client)
+    _copy_run_artifacts(src_version.run_id, dst_run.info.run_id, src_client, dst_client)
     return dst_run
 
 
-def _copy_run_artifacts(src_version, dst_run_id, src_client, dst_client):
+def _copy_run_artifacts(src_run_id, dst_run_id, src_client, dst_client):
     with tempfile.TemporaryDirectory() as download_dir:
         mlflow.artifacts.download_artifacts(
-            run_id = src_version.run_id,
+            run_id = src_run_id,
             dst_path = download_dir,
             tracking_uri = src_client._tracking_client.tracking_uri
         )
