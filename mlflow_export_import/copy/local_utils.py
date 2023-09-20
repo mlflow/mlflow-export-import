@@ -59,7 +59,9 @@ def dump_obj_as_json(obj, msg=None):
     dump_as_json(dct)
 
 
-def dump_as_json(dct, sort_keys=None, indent=2):
+def dump_as_json(dct, sort_keys=None, indent=2, title=None):
+    if title:
+        print(f"{title}:")
     print(dict_to_json(dct, sort_keys, indent))
 
 
