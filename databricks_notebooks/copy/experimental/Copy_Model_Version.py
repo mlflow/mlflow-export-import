@@ -15,13 +15,29 @@
 # MAGIC * `4. Destination experiment name` - Destination experiment name. 
 # MAGIC   * If specified, will copy old version's run to a new run which the new model version will point to.
 # MAGIC   * If not specified, use old version's run for new version.
-# MAGIC * `5. Source Run Workspace` - Workspace for the run of the source model version. 
-# MAGIC   * If copying from current workspace, then leave blank or set to `databricks`.
-# MAGIC   * If copying from another workspace, then specify secrets scope and prefix per [Set up the API token for a remote registry](https://docs.databricks.com/en/machine-learning/manage-model-lifecycle/multiple-workspaces.html#set-up-the-api-token-for-a-remote-registry). 
-# MAGIC     * Example: `databricks://MY-SCOPE:MY-PREFIX`.
-# MAGIC * `6. Add copy system tags` - Add some source version system metadata as destination model version tags.
-# MAGIC * `7. Verbose`
-# MAGIC * `8. Return result` for automated testing.
+# MAGIC * `5. Destination Workspace` - Destination workspace. `databricks` for current workspace or for different workspace specify secrets scope and prefix per [Set up the API token for a remote registry](https://docs.databricks.com/en/machine-learning/manage-model-lifecycle/multiple-workspaces.html#set-up-the-api-token-for-a-remote-registry). Examples:
+# MAGIC     * `databricks` - current workspace
+# MAGIC     * `databricks://MY-SCOPE:MY-PREFIX` - other workspace
+# MAGIC * `6. Verbose`
+
+# COMMAND ----------
+
+# MAGIC
+# MAGIC %md ### Copy Model Version - Non Unity Catalog 
+# MAGIC
+# MAGIC <br/>
+# MAGIC
+# MAGIC <img src="https://github.com/mlflow/mlflow-export-import/blob/issue-138-copy-model-version/diagrams/Copy_Model_Version_NonUC.png?raw=true"  width="700" />
+# MAGIC
+# MAGIC
+
+# COMMAND ----------
+
+# MAGIC %md ### Copy Model Version - Unity Catalog
+# MAGIC
+# MAGIC <br/>
+# MAGIC
+# MAGIC <img src="https://github.com/mlflow/mlflow-export-import/blob/issue-138-copy-model-version/diagrams/Copy_Model_Version_UC.png?raw=true"  width="800" />
 
 # COMMAND ----------
 
@@ -46,27 +62,18 @@ dbutils.widgets.text("4. Destination experiment name", "")
 dst_experiment_name = dbutils.widgets.get("4. Destination experiment name")
 dst_experiment_name = dst_experiment_name if dst_experiment_name else None
 
-dbutils.widgets.text("5. Source Run Workspace", "databricks") 
-src_run_workspace = dbutils.widgets.get("5. Source Run Workspace")
-src_run_workspace = src_run_workspace or "databricks"
+dbutils.widgets.text("5. Destination Workspace", "databricks") 
+dst_tracking_uri = dbutils.widgets.get("5. Destination Workspace")
 
-dbutils.widgets.dropdown("6. Add copy system tags", "no", ["yes","no"])
-add_copy_system_tags = dbutils.widgets.get("6. Add copy system tags") == "yes"
-
-dbutils.widgets.dropdown("7. Verbose", "yes", ["yes","no"])
-verbose = dbutils.widgets.get("7. Verbose") == "yes"
-
-dbutils.widgets.dropdown("8. Return result", "no", ["yes","no"])
-return_result = dbutils.widgets.get("8. Return result") == "yes"
+dbutils.widgets.dropdown("6. Verbose", "yes", ["yes","no"])
+verbose = dbutils.widgets.get("6. Verbose") == "yes"
 
 print("src_model_name:", src_model_name)
 print("src_model_version:", src_model_version)
 print("dst_model_name:", dst_model_name)
 print("dst_experiment_name:", dst_experiment_name)
-print("src_run_workspace:", src_run_workspace)
-print("add_copy_system_tags:", add_copy_system_tags)
+print("dst_tracking_uri:", dst_tracking_uri)
 print("verbose:", verbose)
-print("return_result:", return_result)
 
 # COMMAND ----------
 
@@ -74,7 +81,7 @@ assert_widget(src_model_name, "1. Source Model")
 assert_widget(src_model_version, "2. Source Version")
 assert_widget(dst_model_name, "3. Destination Model")
 assert_widget(dst_experiment_name, "4. Destination experiment name")
-assert_widget(src_run_workspace, "5. Run Workspace")
+assert_widget(dst_tracking_uri, "5. Destination Workspace")
 
 # COMMAND ----------
 
@@ -87,8 +94,7 @@ src_model_version, dst_model_version = copy_model_version(
     src_model_version,
     dst_model_name,
     dst_experiment_name,
-    src_run_workspace = src_run_workspace,
-    add_copy_system_tags = add_copy_system_tags,
+    dst_tracking_uri = dst_tracking_uri,
     verbose = verbose
 )
 
@@ -122,9 +128,8 @@ dump_obj_as_json(dst_model_version, "Destination ModelVersion")
 
 # COMMAND ----------
 
-if return_result:
-  result = {
-      "src_model_version": obj_to_dict(src_model_version),
-      "dst_model_version": obj_to_dict(dst_model_version)
-  }
-  dbutils.notebook.exit(dict_to_json(result))
+result = {
+    "src_model_version": obj_to_dict(src_model_version),
+    "dst_model_version": obj_to_dict(dst_model_version)
+}
+dbutils.notebook.exit(dict_to_json(result))

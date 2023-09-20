@@ -42,18 +42,17 @@ def copy_model_version(
         src_model_version,
         dst_model_name,
         dst_experiment_name, 
-        src_run_workspace = "databricks",
-        add_copy_system_tags = False,
+        dst_tracking_uri = "databricks",
         verbose = False 
     ):
     from mlflow_export_import.copy.copy_model_version import copy
     from mlflow_export_import.copy.local_utils import is_unity_catalog_model 
       
-    def mk_registry_uri(model_name):
-        return "databricks-uc" if is_unity_catalog_model(model_name) else "databricks"
+    def mk_registry_uri(model_name, dst_tracking_uri):
+        return "databricks-uc" if is_unity_catalog_model(model_name) else dst_tracking_uri
 
-    src_registry_uri = mk_registry_uri(src_model_name)
-    dst_registry_uri = mk_registry_uri(dst_model_name)
+    src_registry_uri = mk_registry_uri(src_model_name, dst_tracking_uri)
+    dst_registry_uri = mk_registry_uri(dst_model_name, dst_tracking_uri)
     print("src_registry_uri:", src_registry_uri)
     print("dst_registry_uri:", dst_registry_uri)
 
@@ -62,10 +61,9 @@ def copy_model_version(
         src_model_version,
         dst_model_name,
         dst_experiment_name, 
-        src_tracking_uri = src_run_workspace,
-        dst_tracking_uri = "databricks",
+        src_tracking_uri = "databricks",  
+        dst_tracking_uri = dst_tracking_uri,
         src_registry_uri = src_registry_uri, 
         dst_registry_uri = dst_registry_uri,
-        add_copy_system_tags = add_copy_system_tags,
         verbose = verbose 
     )
