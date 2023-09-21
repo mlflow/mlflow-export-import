@@ -23,6 +23,8 @@ def assert_widget(value, name):
 # COMMAND ----------
 
 from mlflow.utils import databricks_utils
+mlflow_client = mlflow.MlflowClient()
+
 _host_name = databricks_utils.get_browser_hostname()
 print("host_name:", _host_name)
 
@@ -34,6 +36,12 @@ def display_registered_model_version_uri(model_name, version):
         else:
             uri = f"https://{_host_name}/#mlflow/models/{model_name}/versions/{version}"
         displayHTML("""<b>Registered Model Version URI:</b> <a href="{}">{}</a>""".format(uri,uri))
+
+def display_run_uri(run_id):
+    if _host_name:
+        run = mlflow_client.get_run(run_id)
+        uri = f"https://{_host_name}/#mlflow/experiments/{run.info.experiment_id}/runs/{run_id}"
+        displayHTML("""<b>Run URI:</b> <a href="{}">{}</a>""".format(uri,uri))
 
 # COMMAND ----------
 

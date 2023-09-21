@@ -28,7 +28,7 @@
 # MAGIC ##### Basic notebooks
 # MAGIC * [Single notebooks]($single/_README) - Copy one MLflow object from one tracking server (workspace) to another.
 # MAGIC * [Bulk notebooks]($bulk/_README) - Copy multiple MLflow objects. The target object name will be the same as the source object name.
-# MAGIC * [Copy notebooks]($copy) - Direct copy of model version without using intermediate storage.
+# MAGIC * [Copy notebooks]($copy/_README) - Direct copy of an MLflow object without using intermediate storage.
 # MAGIC
 # MAGIC ##### [Console Script]($scripts/_README) notebooks 
 # MAGIC * Command-line scripts using the Linux shell (%sh).
@@ -56,4 +56,4 @@
 
 # COMMAND ----------
 
-# MAGIC %md Last updated: 2023-09-19
+# MAGIC %md Last updated: 2023-09-20
