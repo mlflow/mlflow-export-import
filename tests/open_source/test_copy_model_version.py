@@ -6,6 +6,7 @@ from tests.open_source.init_tests import mlflow_context
 from tests.open_source.oss_utils_test import create_experiment
 from tests.open_source.oss_utils_test import mk_test_object_name_default
 from tests.open_source.oss_utils_test import create_version
+from tests.compare_utils import compare_runs
 
 
 def test_with_experiment(mlflow_context):
@@ -26,6 +27,7 @@ def test_with_experiment(mlflow_context):
     )
     assert vr == src_vr
     _compare_model_versions(src_vr, dst_vr)
+    _compare_runs(mlflow_context, src_vr, dst_vr)
 
     assert src_vr.run_id != dst_vr.run_id
     assert dst_vr == mlflow_context.client_dst.get_model_version(dst_vr.name, dst_vr.version)
@@ -68,6 +70,7 @@ def test_with_experiment_and_copy_tags(mlflow_context):
         verbose = False
     )
     _compare_model_versions(src_vr, dst_vr, True)
+    _compare_runs(mlflow_context, src_vr, dst_vr)
     assert src_vr.run_id != dst_vr.run_id
     assert dst_vr == mlflow_context.client_dst.get_model_version(dst_vr.name, dst_vr.version)
 
@@ -82,6 +85,10 @@ def _compare_model_versions(src_vr, dst_vr, add_copy_system_tags=False):
     else:
         assert src_vr.tags == dst_vr.tags
 
+def _compare_runs(mlflow_context, src_vr, dst_vr):
+    src_run = mlflow_context.client_src.get_run(src_vr.run_id)
+    dst_run = mlflow_context.client_dst.get_run(dst_vr.run_id)
+    compare_runs(mlflow_context, src_run, dst_run)
 
 def _create_model_version(mlflow_context):
     model_name_src = mk_test_object_name_default()
