@@ -28,7 +28,7 @@ def opt_src_mlflow_uri(function):
     function = click.option("--src-mlflow-uri",
         help="Source MLflow tracking server URI.",
         type=str,
-        required=True
+        required=False
     )(function)
     return function
 
@@ -36,7 +36,7 @@ def opt_dst_mlflow_uri(function):
     function = click.option("--dst-mlflow-uri",
         help="Destination MLflow tracking server URI.",
         type=str,
-        required=True
+        required=False
     )(function)
     return function
 

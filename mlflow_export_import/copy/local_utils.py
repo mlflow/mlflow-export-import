@@ -1,4 +1,5 @@
 import json
+import mlflow
 from mlflow.exceptions import MlflowException
 
 
@@ -70,7 +71,6 @@ def dict_to_json(dct, sort_keys=None, indent=2):
 
 
 def obj_to_dict(obj):
-    import mlflow
     if isinstance(obj, mlflow.entities.model_registry.model_version.ModelVersion):
         dct = adjust_model_version(obj.__dict__)
     else:
@@ -86,3 +86,11 @@ def adjust_model_version(vr):
         else:
             dct[k] = v
     return dct
+
+
+def mk_client(tracking_uri, registry_uri=None):
+    if not tracking_uri and not registry_uri:
+        return mlflow.MlflowClient() 
+    else:
+        return mlflow.MlflowClient(tracking_uri, registry_uri)
+

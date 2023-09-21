@@ -1,5 +1,4 @@
 import click
-import mlflow
 from mlflow.exceptions import MlflowException
 from . import copy_run
 from . import local_utils
@@ -23,8 +22,8 @@ def copy(src_model_name,
         src_model_version,
         dst_model_name,
         dst_experiment_name,
-        src_tracking_uri,
-        dst_tracking_uri,
+        src_tracking_uri = None,
+        dst_tracking_uri = None,
         src_registry_uri = None,
         dst_registry_uri = None,
         add_copy_system_tags = False,
@@ -33,8 +32,9 @@ def copy(src_model_name,
     """
     Copy model version to another model in same or other tracking server (workspace).
     """
-    src_client = mlflow.MlflowClient(src_tracking_uri, src_registry_uri)
-    dst_client = mlflow.MlflowClient(dst_tracking_uri, dst_registry_uri)
+    src_client = local_utils.mk_client(src_tracking_uri, src_registry_uri)
+    dst_client = local_utils.mk_client(dst_tracking_uri, dst_registry_uri)
+
 
     src_uri = f"{src_model_name}/{src_model_version}"
     print(f"Copying model version '{src_uri}' to '{dst_model_name}'")
