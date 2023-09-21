@@ -54,7 +54,11 @@ def copy(src_model_name,
 
 
 def _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_client, dst_client, add_copy_system_tags=False):
-    dst_run = copy_run._copy(src_version.run_id, dst_experiment_name, src_client, dst_client)
+    if dst_experiment_name:
+        dst_run = copy_run._copy(src_version.run_id, dst_experiment_name, src_client, dst_client)
+    else:
+        dst_run = src_client.get_run(src_version.run_id)
+
     mlflow_model_name = local_utils.get_model_name(src_version.source)
     source_uri = f"{dst_run.info.artifact_uri}/{mlflow_model_name}"
     if add_copy_system_tags:
