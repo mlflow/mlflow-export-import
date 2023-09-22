@@ -1,7 +1,7 @@
 import click
 from mlflow.exceptions import MlflowException
 from . import copy_run
-from . import local_utils
+from . import copy_utils
 from . click_options import (
     opt_src_model,
     opt_dst_model,
@@ -32,22 +32,22 @@ def copy(src_model_name,
     """
     Copy model version to another model in same or other tracking server (workspace).
     """
-    src_client = local_utils.mk_client(src_tracking_uri, src_registry_uri)
-    dst_client = local_utils.mk_client(dst_tracking_uri, dst_registry_uri)
+    src_client = copy_utils.mk_client(src_tracking_uri, src_registry_uri)
+    dst_client = copy_utils.mk_client(dst_tracking_uri, dst_registry_uri)
 
 
     src_uri = f"{src_model_name}/{src_model_version}"
     print(f"Copying model version '{src_uri}' to '{dst_model_name}'")
     if verbose:
-        local_utils.dump_client(src_client, "src_client")
-        local_utils.dump_client(dst_client, "dst_client")
-    local_utils.create_registered_model(dst_client,  dst_model_name)
+        copy_utils.dump_client(src_client, "src_client")
+        copy_utils.dump_client(dst_client, "dst_client")
+    copy_utils.create_registered_model(dst_client,  dst_model_name)
     src_version = src_client.get_model_version(src_model_name, src_model_version)
     if verbose:
-        local_utils.dump_obj_as_json(src_version, "Source ModelVersion")
+        copy_utils.dump_obj_as_json(src_version, "Source ModelVersion")
     dst_version = _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_client, dst_client, add_copy_system_tags)
     if verbose:
-        local_utils.dump_obj_as_json(dst_version, "Destination ModelVersion")
+        copy_utils.dump_obj_as_json(dst_version, "Destination ModelVersion")
     dst_uri = f"{dst_version.name}/{dst_version.version}"
     print(f"Copied model version '{src_uri}' to '{dst_uri}'")
     return src_version, dst_version
@@ -59,13 +59,13 @@ def _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_cl
     else:
         dst_run = src_client.get_run(src_version.run_id)
 
-    mlflow_model_name = local_utils.get_model_name(src_version.source)
+    mlflow_model_name = copy_utils.get_model_name(src_version.source)
     source_uri = f"{dst_run.info.artifact_uri}/{mlflow_model_name}"
     if add_copy_system_tags:
         tags = _add_to_version_tags(src_version, dst_run, dst_model_name, src_client, dst_client)
     else:
         tags = src_version.tags
-    local_utils.dump_client(dst_client, "DST CLIENT")
+    copy_utils.dump_client(dst_client, "DST CLIENT")
 
     dst_version = dst_client.create_model_version(
         name = dst_model_name,
@@ -98,12 +98,12 @@ def _add_to_version_tags(src_version, run, dst_model_name, src_client, dst_clien
     tags[f"{ExportTags.PREFIX_ROOT}.src_client.tracking_uri"] = src_client.tracking_uri
     tags[f"{ExportTags.PREFIX_ROOT}.mlflow_exim.dst_client.tracking_uri"] = dst_client.tracking_uri
 
-    local_utils.add_tag(run.data.tags, tags, "mlflow.databricks.workspaceURL", prefix)
-    local_utils.add_tag(run.data.tags, tags, "mlflow.databricks.webappURL", prefix)
-    local_utils.add_tag(run.data.tags, tags, "mlflow.databricks.workspaceID", prefix)
-    local_utils.add_tag(run.data.tags, tags, "mlflow.user", prefix)
+    copy_utils.add_tag(run.data.tags, tags, "mlflow.databricks.workspaceURL", prefix)
+    copy_utils.add_tag(run.data.tags, tags, "mlflow.databricks.webappURL", prefix)
+    copy_utils.add_tag(run.data.tags, tags, "mlflow.databricks.workspaceID", prefix)
+    copy_utils.add_tag(run.data.tags, tags, "mlflow.user", prefix)
 
-    if local_utils.is_unity_catalog_model(dst_model_name): # NOTE: Databricks UC model version tags don't accept '."
+    if copy_utils.is_unity_catalog_model(dst_model_name): # NOTE: Databricks UC model version tags don't accept '."
         tags = { k.replace(".","_"):v for k,v in tags.items() }
 
     return tags

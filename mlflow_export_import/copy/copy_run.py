@@ -6,7 +6,7 @@ from mlflow_export_import.run.export_run import export_run
 from mlflow_export_import.run.import_run import import_run
 from mlflow_export_import.common.click_options import opt_run_id, opt_experiment_name
 from mlflow_export_import.common import utils
-from . import local_utils
+from . import copy_utils
 from . click_options import (
     opt_src_mlflow_uri,
     opt_dst_mlflow_uri,
@@ -17,8 +17,8 @@ _logger = utils.getLogger(__name__)
 
 def copy(src_run_id, dst_experiment_name, src_mlflow_uri=None, dst_mlflow_uri=None):
     return _copy(src_run_id, dst_experiment_name, 
-        local_utils.mk_client(src_mlflow_uri), 
-        local_utils.mk_client(dst_mlflow_uri)
+        copy_utils.mk_client(src_mlflow_uri), 
+        copy_utils.mk_client(dst_mlflow_uri)
     )
 
 

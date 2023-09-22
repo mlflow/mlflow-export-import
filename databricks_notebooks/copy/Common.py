@@ -12,7 +12,7 @@ print("mlflow.version:", mlflow.__version__)
 
 # COMMAND ----------
 
-from mlflow_export_import.copy.local_utils import obj_to_dict, dict_to_json, dump_obj_as_json
+from mlflow_export_import.copy.copy_utils import obj_to_dict, dict_to_json, dump_obj_as_json
 
 # COMMAND ----------
 
@@ -55,7 +55,7 @@ def copy_model_version(
         verbose = False 
     ):
     from mlflow_export_import.copy.copy_model_version import copy
-    from mlflow_export_import.copy.local_utils import is_unity_catalog_model 
+    from mlflow_export_import.copy.copy_utils import is_unity_catalog_model 
       
     def mk_registry_uri(model_name):
         return "databricks-uc" if is_unity_catalog_model(model_name) else "databricks"
