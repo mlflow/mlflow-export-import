@@ -20,10 +20,11 @@ def importing_into_databricks(dbx_client=None):
     from mlflow_export_import.common import MlflowExportImportException
 
     global _is_importing_into_databricks
-    dbx_client = dbx_client or DatabricksHttpClient()
     if _is_importing_into_databricks is None:
+        dbx_client = dbx_client or DatabricksHttpClient()
         try:
-            dbx_client.get("workspace/foo-bar") # bogus endpoint
+            print(">> UTILS.2a:")
+            dbx_client.get("workspace/get-status") # Missing 'path' should cause status 400
             return False # Should never get here
         except MlflowExportImportException as e:
             _is_importing_into_databricks =  e.http_status_code == 400
