@@ -2,6 +2,34 @@ import os
 import pandas as pd
 from tabulate import tabulate
 
+def getLogger(name):
+    from mlflow_export_import.common import logging_utils
+    return logging_utils.get_logger(name)
+
+_logger = getLogger(__name__)
+
+
+_is_importing_into_databricks = None
+
+def importing_into_databricks(dbx_client=None):
+    """
+    Are we importing into Databricks? 
+    Check by making call to Databricks-specific API endpoint and check for 400 status code.
+    """
+    from mlflow_export_import.client.http_client import DatabricksHttpClient
+    from mlflow_export_import.common import MlflowExportImportException
+
+    global _is_importing_into_databricks
+    dbx_client = dbx_client or DatabricksHttpClient()
+    if _is_importing_into_databricks is None:
+        try:
+            dbx_client.get("workspace/foo-bar") # bogus endpoint
+            return False # Should never get here
+        except MlflowExportImportException as e:
+            _is_importing_into_databricks =  e.http_status_code == 400
+        _logger.info(f"Importing into Databricks: {_is_importing_into_databricks}")
+    return _is_importing_into_databricks
+
 
 # Databricks tags that cannot or should not be set
 _DATABRICKS_SKIP_TAGS = {
@@ -60,11 +88,6 @@ def nested_tags(dst_client, run_ids_mapping):
             dst_client.set_tag(dst_run_id, "mlflow.parentRunId", dst_parent_run_id)
 
 
-def importing_into_databricks():
-    import mlflow
-    return mlflow.tracking.get_tracking_uri().startswith("databricks")
-
-
 def show_table(title, lst, columns):
     print(title)
     df = pd.DataFrame(lst, columns = columns)
@@ -74,11 +97,6 @@ def show_table(title, lst, columns):
 def get_user():
     import getpass
     return getpass.getuser()
-
-
-def getLogger(name):
-    from mlflow_export_import.common import logging_utils
-    return logging_utils.get_logger(name)
 
 
 def get_threads(use_threads=False):
