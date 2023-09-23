@@ -1,4 +1,4 @@
-# Mlflow Export Import - Databricks Tests 
+# Mlflow Export Import - Databricks Notebook Tests 
 
 ## Overview
 
@@ -7,8 +7,7 @@
   * For know only single notebooks are tested. Bulk notebooks tests are a TODO.
 * Currently these tests are a subset of the fine-grained OSS tests. Their main purpose is to ensure that the notebooks run without errors.
 * Unlike the OSS tests which use two source and destination tracking servers, the Databricks tests use one tracking server (workspace). 
-Imported object have `_imported_` added to the end of their name. Using a source and destination workspaces is a TODO.
-*  XX
+Imported object have `_imported_` added to the end of their name. Using a source and destination workspaces is a WIP.
 
 ## Setup
 
