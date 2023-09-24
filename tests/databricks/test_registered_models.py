@@ -1,11 +1,11 @@
 from mlflow_export_import.model.export_model import export_model
 from mlflow_export_import.model.import_model import import_model
 
+from tests.core import to_MlflowContext
 from tests.compare_utils import compare_models_with_versions
 from . init_tests import workspace_dst
 from . init_tests import test_context
 from . import local_utils
-from . local_utils import to_MlflowContext
 
 def _init(test_context):
     model_name_src = local_utils.mk_test_object_name_default()

@@ -1,10 +1,10 @@
 import os
 import pytest
 import tempfile
-from collections import namedtuple
 import mlflow
 from tests import utils_test
 
+from tests.core import MlflowContext
 from mlflow_export_import.common import utils
 _logger = utils.getLogger(__name__)
 
@@ -22,10 +22,6 @@ assert uri_dst
 client_dst = mlflow.tracking.MlflowClient(uri_dst)
 _logger.info(f"client_dst: {client_dst}")
 
-MlflowContext = namedtuple(
-    "MlflowContext",
-    ["client_src", "client_dst", "output_dir", "output_run_dir"]
-)
 
 @pytest.fixture(scope="session")
 def mlflow_context():

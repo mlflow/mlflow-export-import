@@ -4,19 +4,6 @@ from tests.open_source import sklearn_utils
 from . init_tests import workspace_src
 
 
-def to_MlflowContext(test_context):
-    """
-    Convert TestContext to tests.open_source MlflowContext in order to reuse test comparisons.
-    """
-    from tests.open_source.init_tests import MlflowContext
-    return MlflowContext(
-        test_context.mlflow_client_src,
-        test_context.mlflow_client_dst,
-        test_context.output_dir,
-        test_context.output_run_dir
-    )
-
-
 def mk_experiment_name(workspace=workspace_src):
     return f"{workspace.base_dir}/{mk_test_object_name_default()}"
 

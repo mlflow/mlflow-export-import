@@ -5,8 +5,8 @@ from mlflow_export_import.copy import copy_utils
 from mlflow_export_import.copy import copy_model_version
 
 from tests.compare_utils import compare_runs
+from tests.core import MlflowContext
 from . init_tests import mlflow_context
-from . init_tests import MlflowContext
 from . oss_utils_test import mk_test_object_name_default
 from . oss_utils_test import create_experiment, create_version
 

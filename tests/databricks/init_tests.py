@@ -1,13 +1,12 @@
-from typing import Any
 import os
 import pytest
 import mlflow
-from dataclasses import dataclass
 
 from mlflow_export_import.common import utils, model_utils
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.client.http_client import DatabricksHttpClient
 from tests import utils_test
+from tests.core import TestContext
 
 _logger = utils.getLogger(__name__)
 
@@ -75,21 +74,11 @@ def _delete_directory(ws):
 def _delete_models(ws):
     filter = "name like 'test_exim_%'" 
     models = ws.mlflow_client.search_registered_models(filter_string=filter)
-    _logger.warning(f"Deleting {len(models)}")
+    _logger.info(f"Deleting {len(models)}")
     for model in models:
         #ws.mlflow_client.delete_registered_model(model.name)
-        _logger.warning(f"Deleting model '{model.name}'")
+        _logger.info(f"Deleting model '{model.name}'")
         model_utils.delete_model(ws.mlflow_client, model.name)
-
-
-@dataclass()
-class TestContext:
-    mlflow_client_src: Any
-    mlflow_client_dst: Any
-    dbx_client_src: Any
-    dbx_client_dst: Any
-    output_dir: str
-    output_run_dir: str
 
 
 @pytest.fixture(scope="session")
