@@ -7,12 +7,20 @@ from dataclasses import dataclass
 from mlflow_export_import.common import utils
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.client.http_client import DatabricksHttpClient
-
 from tests import utils_test
-from . local_utils import Dict2Class
 
 _logger = utils.getLogger(__name__)
 
+
+class Dict2Class():
+    def __init__(self, dct):
+        self.dct = dct
+        for k,v in dct.items():
+            if isinstance(v,dict):
+                v = Dict2Class(v)
+            setattr(self, k, v)
+    def __str__(self):
+        return str(self.dct)
 
 _cfg = utils_test.read_config_file()
 cfg = Dict2Class(_cfg)
@@ -37,8 +45,6 @@ workspace_dst =  Workspace(cfg.workspace_dst)
 
 utils.importing_into_databricks(workspace_dst.dbx_client)
 
-
-cfg = Dict2Class(_cfg)
 
 def init_tests():
     _init_workspace(workspace_src)

@@ -1,16 +1,11 @@
 import mlflow
-import sklearn_utils
+from tests.open_source.oss_utils_test import mk_test_object_name_default
+from . import sklearn_utils
+from . init_tests import workspace_src
 
 
-class Dict2Class():
-    def __init__(self, dct):
-        self.dct = dct
-        for k,v in dct.items():
-            if isinstance(v,dict):
-                v = Dict2Class(v)
-            setattr(self, k, v)
-    def __str__(self):
-        return str(self.dct)
+def mk_experiment_name():
+    return f"{workspace_src.base_dir}/{mk_test_object_name_default()}"
 
 
 def create_run(mlflow_client, experiment_id):

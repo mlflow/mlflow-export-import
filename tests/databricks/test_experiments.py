@@ -1,8 +1,7 @@
 from mlflow_export_import.experiment.export_experiment import export_experiment
 from mlflow_export_import.experiment.import_experiment import import_experiment
 
-from tests.open_source.oss_utils_test import mk_test_object_name_default
-from . init_tests import workspace_src, test_context
+from . init_tests import test_context
 from . compare_utils import compare_experiments
 from . import local_utils
 
@@ -10,7 +9,7 @@ _num_runs = 2
 
 
 def test_experiment(test_context):
-    exp_name = f"{workspace_src.base_dir }/{mk_test_object_name_default()}"
+    exp_name = local_utils.mk_experiment_name()
 
     client = test_context.mlflow_client_src
     exp_id = client.create_experiment(exp_name, tags={"ocean": "southern"})
