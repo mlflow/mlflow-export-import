@@ -8,7 +8,7 @@ from . init_tests import workspace_src, workspace_dst
 def _init_run_test(test_context, workspace_src, workspace_dst):
     exp_src = local_utils.create_experiment(test_context.mlflow_client_src)
     src_run = local_utils.create_run(test_context.mlflow_client_src, exp_src.experiment_id)
-    dst_exp_name = local_utils._mk_experiment_name(workspace_dst)
+    dst_exp_name = local_utils.mk_experiment_name(workspace_dst)
     dst_run = copy_run.copy(
         src_run.info.run_id,
         dst_exp_name,
