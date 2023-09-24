@@ -18,9 +18,9 @@ def create_run(mlflow_client, experiment_id):
     run = mlflow_client.create_run(experiment_id)
     model = sklearn_utils.create_sklearn_model(max_depth)
 
-    path = "out/model.pkl"
-    _write_model(model, path)
-    mlflow_client.log_artifact(run.info.run_id, path, "model")
+    model_path = "model.pkl"
+    _write_model(model, model_path)
+    mlflow_client.log_artifact(run.info.run_id, model_path, "model")
 
     mlflow_client.log_param(run.info.run_id, "max_depth",max_depth)
     mlflow_client.set_terminated(run.info.run_id)
