@@ -1,11 +1,10 @@
-import mlflow
 from tests.open_source.oss_utils_test import mk_test_object_name_default
 from . import sklearn_utils
 from . init_tests import workspace_src
 
 
-def _mk_experiment_name():
-    return f"{workspace_src.base_dir}/{mk_test_object_name_default()}"
+def _mk_experiment_name(workspace=workspace_src):
+    return f"{workspace.base_dir}/{mk_test_object_name_default()}"
 
 
 def create_experiment(mlflow_client):
@@ -23,8 +22,11 @@ def create_run(mlflow_client, experiment_id):
     mlflow_client.log_artifact(run.info.run_id, model_path, "model")
 
     mlflow_client.log_param(run.info.run_id, "max_depth",max_depth)
+    mlflow_client.log_metric(run.info.run_id, "rmse",0.789)
+
     mlflow_client.set_terminated(run.info.run_id)
-    return run.info.run_id
+    return mlflow_client.get_run(run.info.run_id)
+
 
 def _write_model(model, path):
     import cloudpickle as pickle

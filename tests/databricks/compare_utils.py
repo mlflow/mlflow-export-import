@@ -6,7 +6,7 @@ def compare_experiments(exp1, exp2, client1, client2, num_runs):
     assert len(runs1) == num_runs
     assert len(runs1) == len(runs2)
     for run1,run2 in zip(runs1, runs2):
-        _compare_runs(run1, run2)
+        compare_runs(run1, run2)
 
 def _compare_experiment_tags(tags1, tags2):
     _assert_tag("mlflow.ownerEmail", tags1, tags2)
@@ -14,7 +14,7 @@ def _compare_experiment_tags(tags1, tags2):
     _compare_non_mlflow_tags(tags1, tags2)
 
 
-def _compare_runs(run1, run2):
+def compare_runs(run1, run2):
     _compare_non_mlflow_tags(run1.data.tags, run1.data.tags)
     assert run1.data.params == run2.data.params 
     assert run1.data.metrics == run2.data.metrics 
