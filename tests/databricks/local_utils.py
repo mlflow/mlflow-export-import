@@ -4,8 +4,13 @@ from . import sklearn_utils
 from . init_tests import workspace_src
 
 
-def mk_experiment_name():
+def _mk_experiment_name():
     return f"{workspace_src.base_dir}/{mk_test_object_name_default()}"
+
+
+def create_experiment(mlflow_client):
+    exp_id = mlflow_client.create_experiment(_mk_experiment_name(), tags={"ocean": "southern"})
+    return mlflow_client.get_experiment(exp_id)
 
 
 def create_run(mlflow_client, experiment_id):
@@ -25,23 +30,3 @@ def _write_model(model, path):
     import cloudpickle as pickle
     with open(path,"wb") as f:
         pickle.dump(model, f)
-
-
-def _create_run(mlflow_client, experiment_id):
-    max_depth = 4
-
-    ori_tracking_uri = mlflow.tracking.get_tracking_uri()
-    mlflow.set_tracking_uri(mlflow_client.tracking_uri)
-
-    run = mlflow_client.create_run(experiment_id)
-    model = sklearn_utils.create_sklearn_model(max_depth)
-    mlflow_client.log_param(run.info.run_id, "max_depth",max_depth)
-    mlflow_client.log_metric("auc", .789)
-    mlflow_client.set_tag("south_america", "aconcagua")
-    mlflow_client.set_tag("north_america", "denali")
-    mlflow.sklearn.log_model(model,"model")
-
-    mlflow.set_tracking_uri(ori_tracking_uri)
-
-    mlflow_client.set_terminated(run.info.run_id)
-    return run.info.run_id
