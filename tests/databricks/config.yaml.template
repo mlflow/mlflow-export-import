@@ -1,0 +1,8 @@
+
+workspace_src:
+  profile: databricks://ws_src_profile
+  base_dir: /tmp/test-mlflow-expot-import
+
+workspace_dst:
+  profile: databricks://ws_dst_profile
+  base_dir: /tmp/test-mlflow-expot-import
