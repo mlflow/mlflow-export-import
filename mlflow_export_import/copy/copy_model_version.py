@@ -21,7 +21,7 @@ _logger = utils.getLogger(__name__)
 def copy(src_model_name,
         src_model_version,
         dst_model_name,
-        dst_experiment_name,
+        dst_experiment_name = None,
         src_tracking_uri = None,
         dst_tracking_uri = None,
         src_registry_uri = None,
@@ -34,7 +34,6 @@ def copy(src_model_name,
     """
     src_client = copy_utils.mk_client(src_tracking_uri, src_registry_uri)
     dst_client = copy_utils.mk_client(dst_tracking_uri, dst_registry_uri)
-
 
     src_uri = f"{src_model_name}/{src_model_version}"
     print(f"Copying model version '{src_uri}' to '{dst_model_name}'")
