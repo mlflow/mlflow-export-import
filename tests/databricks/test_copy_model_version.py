@@ -1,9 +1,5 @@
-#from mlflow_export_import.copy import copy_run
-#from . import compare_utils
-
-from tests.core import to_MlflowContext, TestContext
-from mlflow_export_import.common.object_utils import dump_obj
 from mlflow_export_import.copy import copy_model_version
+from tests.core import to_MlflowContext, TestContext
 from tests.open_source.test_copy_model_version import compare_model_versions, compare_runs
 from . init_tests import workspace_src, workspace_dst
 from . import local_utils
@@ -12,7 +8,7 @@ from . init_tests import test_context
 
 def test_two_workspaces(test_context):
     src_model_name = local_utils.mk_test_object_name_default()
-    src_vr, src_model = local_utils.create_version(test_context.mlflow_client_src, src_model_name, "Production")
+    src_vr, _ = local_utils.create_version(test_context.mlflow_client_src, src_model_name, "Production")
     dst_exp_name = local_utils.mk_experiment_name(workspace=workspace_dst)
     _src_vr, dst_vr = copy_model_version.copy(
         src_model_name = src_vr.name,
@@ -32,7 +28,7 @@ def test_two_workspaces(test_context):
 def test_one_workspace_with_experiment(test_context):
     src_model_name = local_utils.mk_test_object_name_default()
     dst_model_name = local_utils.mk_test_object_name_default()
-    src_vr, src_model = local_utils.create_version(test_context.mlflow_client_src, src_model_name, "Production")
+    src_vr, _ = local_utils.create_version(test_context.mlflow_client_src, src_model_name, "Production")
     dst_exp_name = local_utils.mk_experiment_name(workspace=workspace_dst)
     _src_vr, dst_vr = copy_model_version.copy(
         src_model_name = src_vr.name,
@@ -53,8 +49,7 @@ def test_one_workspace_with_experiment(test_context):
 def test_one_workspace_without_experiment(test_context):
     src_model_name = local_utils.mk_test_object_name_default()
     dst_model_name = local_utils.mk_test_object_name_default()
-    src_vr, src_model = local_utils.create_version(test_context.mlflow_client_src, src_model_name, "Production")
-    dst_exp_name = local_utils.mk_experiment_name(workspace=workspace_dst)
+    src_vr, _ = local_utils.create_version(test_context.mlflow_client_src, src_model_name, "Production")
     _src_vr, dst_vr = copy_model_version.copy(
         src_model_name = src_vr.name,
         src_model_version = src_vr.version,

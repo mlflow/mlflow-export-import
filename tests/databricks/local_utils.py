@@ -41,4 +41,5 @@ def create_version(client, model_name, stage=None, archive_existing_versions=Fal
     vr = client.create_model_version(model_name, source, run.info.run_id, description=desc, tags=tags)
     if stage:
         vr = client.transition_model_version_stage(model_name, vr.version, stage, archive_existing_versions)
+    vr = client.get_model_version(model_name, vr.version) # NOTE: since transition_model_version_stage returns no tags!
     return vr, model
