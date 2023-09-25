@@ -4,7 +4,7 @@ from mlflow_export_import.common.source_tags import ExportTags
 from mlflow_export_import.copy import copy_utils
 from mlflow_export_import.copy import copy_model_version
 
-from tests.compare_utils import compare_runs
+from tests import compare_utils
 from tests.core import MlflowContext
 from . init_tests import mlflow_context
 from . oss_utils_test import mk_test_object_name_default
@@ -28,8 +28,8 @@ def test_with_experiment(mlflow_context):
         verbose = False
     )
     assert vr == src_vr
-    _compare_model_versions(src_vr, dst_vr)
-    _compare_runs(mlflow_context, src_vr, dst_vr)
+    compare_model_versions(src_vr, dst_vr)
+    compare_runs(mlflow_context, src_vr, dst_vr)
 
     assert src_vr.run_id != dst_vr.run_id
     assert dst_vr == mlflow_context.client_dst.get_model_version(dst_vr.name, dst_vr.version)
@@ -48,7 +48,7 @@ def test_without_experiment(mlflow_context):
         verbose = False
     )
     assert vr == src_vr
-    _compare_model_versions(src_vr, dst_vr)
+    compare_model_versions(src_vr, dst_vr)
     assert src_vr.run_id == dst_vr.run_id
     assert dst_vr == mlflow_context.client_src.get_model_version(dst_vr.name, dst_vr.version)
 
@@ -74,9 +74,9 @@ def test_without_dst_tracking_uri(mlflow_context):
         os.path.join(mlflow_context.output_dir,"run")
     )
     assert vr == src_vr
-    _compare_model_versions(src_vr, dst_vr)
+    compare_model_versions(src_vr, dst_vr)
     assert src_vr.run_id != dst_vr.run_id
-    _compare_runs(mlflow_context, src_vr, dst_vr)
+    compare_runs(mlflow_context, src_vr, dst_vr)
     assert dst_vr == mlflow_context.client_dst.get_model_version(dst_vr.name, dst_vr.version)
 
 
@@ -97,13 +97,13 @@ def test_with_experiment_and_copy_tags(mlflow_context):
         add_copy_system_tags = True,
         verbose = False
     )
-    _compare_model_versions(src_vr, dst_vr, True)
-    _compare_runs(mlflow_context, src_vr, dst_vr)
+    compare_model_versions(src_vr, dst_vr, True)
+    compare_runs(mlflow_context, src_vr, dst_vr)
     assert src_vr.run_id != dst_vr.run_id
     assert dst_vr == mlflow_context.client_dst.get_model_version(dst_vr.name, dst_vr.version)
 
 
-def _compare_model_versions(src_vr, dst_vr, add_copy_system_tags=False):
+def compare_model_versions(src_vr, dst_vr, add_copy_system_tags=False):
     assert src_vr.description == dst_vr.description
     assert src_vr.aliases == dst_vr.aliases
     if add_copy_system_tags:
@@ -113,10 +113,10 @@ def _compare_model_versions(src_vr, dst_vr, add_copy_system_tags=False):
     else:
         assert src_vr.tags == dst_vr.tags
 
-def _compare_runs(mlflow_context, src_vr, dst_vr):
+def compare_runs(mlflow_context, src_vr, dst_vr):
     src_run = mlflow_context.client_src.get_run(src_vr.run_id)
     dst_run = mlflow_context.client_dst.get_run(dst_vr.run_id)
-    compare_runs(mlflow_context, src_run, dst_run)
+    compare_utils.compare_runs(mlflow_context, src_run, dst_run)
 
 def _create_model_version(mlflow_context):
     model_name_src = mk_test_object_name_default()
