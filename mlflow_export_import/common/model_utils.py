@@ -21,12 +21,12 @@ def delete_model(client, model_name, sleep_time=5):
     try:
         versions = SearchModelVersionsIterator(client, filter=f"name='{model_name}'")
         _logger.info(f"Deleting model '{model_name}' and its versions")
-        for v in versions:
-            _logger.info(f"  version={v.version} status={v.status} stage={v.current_stage} run_id={v.run_id}")
-            if not is_unity_catalog_model(model_name):
-                client.transition_model_version_stage (model_name, v.version, "Archived")
-            time.sleep(sleep_time) # Wait until stage transition takes hold
-            client.delete_model_version(model_name, v.version)
+        for vr in versions:
+            _logger.info(f"  Deleting: version={vr.version} status={vr.status} stage={vr.current_stage} run_id={vr.run_id}")
+            if not is_unity_catalog_model(model_name) and vr.current_stage != "Archived":
+                client.transition_model_version_stage (model_name, vr.version, "Archived")
+                time.sleep(sleep_time) # Wait until stage transition takes hold
+            client.delete_model_version(model_name, vr.version)
         client.delete_registered_model(model_name)
     except RestException:
         pass
