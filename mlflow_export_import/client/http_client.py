@@ -34,6 +34,7 @@ class HttpClient():
                 "MLflow tracking URI (MLFLOW_TRACKING_URI environment variable) is not configured correctly",
                 http_status_code=401)
 
+        self.host = host
         self.api_uri = os.path.join(host, api_name)
         self.token = token
         
