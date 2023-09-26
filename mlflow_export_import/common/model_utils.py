@@ -12,6 +12,10 @@ from mlflow_export_import.common import filesystem as _filesystem
 _logger = utils.getLogger(__name__)
 
 
+def is_unity_catalog_model(name):
+    return len(name.split(".")) == 3
+
+
 def delete_model(client, model_name, sleep_time=5):
     """ Delete a model and all its versions. """
     try:
@@ -19,7 +23,8 @@ def delete_model(client, model_name, sleep_time=5):
         _logger.info(f"Deleting model '{model_name}' and its versions")
         for v in versions:
             _logger.info(f"  version={v.version} status={v.status} stage={v.current_stage} run_id={v.run_id}")
-            client.transition_model_version_stage (model_name, v.version, "Archived")
+            if not is_unity_catalog_model(model_name):
+                client.transition_model_version_stage (model_name, v.version, "Archived")
             time.sleep(sleep_time) # Wait until stage transition takes hold
             client.delete_model_version(model_name, v.version)
         client.delete_registered_model(model_name)

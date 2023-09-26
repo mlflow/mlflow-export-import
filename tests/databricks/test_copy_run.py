@@ -12,8 +12,8 @@ def _init_run_test(test_context, workspace_src, workspace_dst):
     dst_run = copy_run.copy(
         src_run.info.run_id,
         dst_exp_name,
-        workspace_src.cfg_ws.profile,
-        workspace_dst.cfg_ws.profile
+        workspace_src.cfg.profile,
+        workspace_dst.cfg.profile
     )
     return src_run, dst_run
 

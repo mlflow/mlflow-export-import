@@ -2,11 +2,13 @@ import os
 import pytest
 import mlflow
 
-from mlflow_export_import.common import utils, model_utils
 from mlflow_export_import.common import MlflowExportImportException
+from mlflow_export_import.common import utils, model_utils
 from mlflow_export_import.client.http_client import DatabricksHttpClient
 from tests import utils_test
 from tests.core import TestContext
+from tests.databricks.unity_catalog_client import UnityCatalogClient
+#from . unity_catalog_client import UnityCatalogClient
 
 _logger = utils.getLogger(__name__)
 
@@ -27,14 +29,21 @@ cfg = Dict2Class(_cfg)
 
 class Workspace():
     def __init__(self, cfg_ws):
-        self.cfg_ws = cfg_ws
-        self.base_dir = cfg_ws.base_dir
-        self.mlflow_client = mlflow.MlflowClient(cfg_ws.profile)
+        self.cfg = cfg_ws
+        self.base_dir = self.cfg.base_dir
+        tracking_profile = self.cfg.profile.replace("databricks-uc","databricks")
+        self.mlflow_client = mlflow.MlflowClient(tracking_profile, self.cfg.profile)
         self.dbx_client = DatabricksHttpClient(self.mlflow_client.tracking_uri)
+        self.uc_dbx_client = UnityCatalogClient(self.dbx_client)
 
-        _logger.info(f"base_dir: {self.base_dir}")
-        _logger.info(f"mlflow_client: {self.mlflow_client}")
-        _logger.info(f"dbx_client: {self.dbx_client}")
+        self.is_uc = self.cfg.profile.startswith("databricks-uc")
+        self.uc_catalog_name, self.uc_schema_name = self.cfg.uc_schema.split(".")
+
+        _logger.info("Workspace:")
+        _logger.info(f"  base_dir: {self.base_dir}")
+        _logger.info(f"  mlflow_client: {self.mlflow_client}")
+        _logger.info(f"  dbx_client: {self.dbx_client}")
+        _logger.info(f"  is_uc: {self.is_uc}")
 
     def __repr__(self):
         return str({ k:v for k,v in self.__dict__.items() })
@@ -49,10 +58,18 @@ def init_tests():
     _init_workspace(workspace_src)
     _init_workspace(workspace_dst)
 
+
 def _init_workspace(ws):
     _delete_directory(ws)
     _create_base_dir(ws)
-    _delete_models(ws)
+    if ws.is_uc:
+        try:
+            ws.uc_dbx_client.create_schema(ws.uc_catalog_name, ws.uc_schema_name)
+        except MlflowExportImportException:
+            _logger.warning(f"{ws.uc_dbx_client}: schema exists: '{ws.cfg.uc_schema}'")
+        _delete_models_uc(ws)
+    else:
+        _delete_models_non_uc(ws)
 
 
 def _create_base_dir(ws):
@@ -61,6 +78,7 @@ def _create_base_dir(ws):
     _logger.info(f"{ws.dbx_client}: Creating {ws.base_dir}")
     ws.dbx_client.post("workspace/mkdirs", params)
 
+
 def _delete_directory(ws):
     """ Deletes notebooks in test based directory """
     params = { "path": ws.base_dir, "recursive": True }
@@ -68,17 +86,24 @@ def _delete_directory(ws):
     try:
         ws.dbx_client.post("workspace/delete", params)
     except MlflowExportImportException as e:
-        _logger.warning(f"Delete workspace API call: {e}")
+        _logger.warning(f"{ws.dbx_client}: Delete workspace API call: {e}")
 
 
-def _delete_models(ws):
+def _delete_models_non_uc(ws):
     filter = "name like 'test_exim_%'" 
     models = ws.mlflow_client.search_registered_models(filter_string=filter)
-    _logger.info(f"Deleting {len(models)}")
+    _logger.info(f"{ws.dbx_client}: Deleting {len(models)} non-UC models")
     for model in models:
-        #ws.mlflow_client.delete_registered_model(model.name)
-        _logger.info(f"Deleting model '{model.name}'")
+        _logger.info(f"{ws.dbx_client}: Deleting model '{model.name}'")
         model_utils.delete_model(ws.mlflow_client, model.name)
+
+
+def _delete_models_uc(ws):
+    model_names = ws.uc_dbx_client.list_model_names(ws.uc_catalog_name, ws.uc_schema_name)
+    _logger.info(f"{ws.dbx_client}: Deleting {len(model_names)} UC model")
+    for name in model_names:
+        _logger.info(f"{ws.dbx_client}: Deleting model '{name}'")
+        model_utils.delete_model(ws.mlflow_client, name)
 
 
 @pytest.fixture(scope="session")

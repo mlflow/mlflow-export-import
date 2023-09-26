@@ -1,6 +1,16 @@
 import os
 import shutil
 import yaml
+import shortuuid
+
+
+TEST_OBJECT_PREFIX = "test_exim"
+
+def mk_test_object_name_default():
+    return f"{TEST_OBJECT_PREFIX}_{mk_uuid()}"
+
+def mk_uuid():
+    return shortuuid.uuid()
 
 
 def create_output_dir(output_dir):

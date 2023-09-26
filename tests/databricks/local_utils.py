@@ -1,4 +1,7 @@
 import mlflow
+from mlflow.models.signature import infer_signature
+
+from mlflow_export_import.common.model_utils import is_unity_catalog_model
 from tests.open_source.oss_utils_test import mk_test_object_name_default
 from tests.open_source import sklearn_utils
 from . init_tests import workspace_src
@@ -16,13 +19,16 @@ def create_experiment(client):
 def create_run(client, experiment_id):
     max_depth = 4
     model = sklearn_utils.create_sklearn_model(max_depth)
+    predictions = model.predict(sklearn_utils._X_test)
+    signature = infer_signature(sklearn_utils._X_train, predictions)
+
     ori_tracking_uri = mlflow.tracking.get_tracking_uri()
     mlflow.set_tracking_uri(client.tracking_uri)
     with mlflow.start_run(experiment_id=experiment_id) as run:
         mlflow.log_param("max_depth",max_depth)
         mlflow.log_metric("rmse", 0.789)
         mlflow.set_tag("my_tag", "my_val")
-        mlflow.sklearn.log_model(model, "model")
+        mlflow.sklearn.log_model(model, "model",  signature=signature)
         mlflow.set_tag("south_america", "aconcagua")
         with open("info.txt", "w", encoding="utf-8") as f:
             f.write("Hi artifact")
@@ -37,9 +43,20 @@ def create_version(client, model_name, stage=None, archive_existing_versions=Fal
     source = f"{run.info.artifact_uri}/model"
     desc = "My model desc"
     tags = { "city": "yaxchilan" }
-    model = client.create_registered_model(model_name, tags, desc)
+    if is_unity_catalog_model(model_name):
+        model = _create_registered_model(client, model_name, tags, desc)
+    else:
+        model = client.create_registered_model(model_name, tags, desc)
     vr = client.create_model_version(model_name, source, run.info.run_id, description=desc, tags=tags)
-    if stage:
+    if not is_unity_catalog_model(model_name) and stage:
         vr = client.transition_model_version_stage(model_name, vr.version, stage, archive_existing_versions)
     vr = client.get_model_version(model_name, vr.version) # NOTE: since transition_model_version_stage returns no tags!
     return vr, model
+
+
+def _create_registered_model(client,  model_name, tags, desc):
+    from mlflow.exceptions import RestException
+    try:
+        return client.create_registered_model(model_name, tags, desc)
+    except RestException:
+        return client.get_registered_model(model_name)

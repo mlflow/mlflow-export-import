@@ -1,6 +1,6 @@
 from mlflow_export_import.copy import copy_model_version
 from tests.core import to_MlflowContext, TestContext
-from tests.open_source.test_copy_model_version import compare_model_versions, compare_runs
+from tests.compare_model_version_utils import compare_model_versions, compare_runs
 from . init_tests import workspace_src, workspace_dst
 from . import local_utils
 from . init_tests import test_context
@@ -15,8 +15,8 @@ def test_two_workspaces(test_context):
         src_model_version = src_vr.version,
         dst_model_name = src_vr.name,
         dst_experiment_name = dst_exp_name,
-        src_tracking_uri = workspace_src.cfg_ws.profile,
-        dst_tracking_uri = workspace_dst.cfg_ws.profile,
+        src_tracking_uri = workspace_src.cfg.profile,
+        dst_tracking_uri = workspace_dst.cfg.profile,
         verbose = True
     )
     assert src_vr == _src_vr
@@ -35,8 +35,8 @@ def test_one_workspace_with_experiment(test_context):
         src_model_version = src_vr.version,
         dst_model_name = dst_model_name,
         dst_experiment_name = dst_exp_name,
-        src_tracking_uri = workspace_src.cfg_ws.profile,
-        dst_tracking_uri = workspace_src.cfg_ws.profile,
+        src_tracking_uri = workspace_src.cfg.profile,
+        dst_tracking_uri = workspace_src.cfg.profile,
         verbose = True
     )
     assert src_vr == _src_vr
@@ -55,8 +55,8 @@ def test_one_workspace_without_experiment(test_context):
         src_model_version = src_vr.version,
         dst_model_name = dst_model_name,
         dst_experiment_name = None,
-        src_tracking_uri = workspace_src.cfg_ws.profile,
-        dst_tracking_uri = workspace_src.cfg_ws.profile,
+        src_tracking_uri = workspace_src.cfg.profile,
+        dst_tracking_uri = workspace_src.cfg.profile,
         verbose = True
     )
     assert src_vr == _src_vr

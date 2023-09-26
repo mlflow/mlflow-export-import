@@ -1,8 +1,9 @@
-import shortuuid
 import time
 import mlflow
+
 from mlflow_export_import.common import utils, model_utils
 from mlflow.utils.mlflow_tags import MLFLOW_RUN_NOTE # NOTE: ""mlflow.note.content" - used for Experiment Description too!
+
 from tests import utils_test
 from tests.open_source import sklearn_utils
 
@@ -19,13 +20,8 @@ def now():
     return round(time.time())
 
 
-def mk_uuid():
-    return shortuuid.uuid()
-
-TEST_OBJECT_PREFIX = "test_exim" 
-
 def mk_test_object_name_default():
-    return f"{TEST_OBJECT_PREFIX}_{mk_uuid()}"
+    return utils_test.mk_test_object_name_default()
 
 
 def mk_dst_experiment_name(experiment_name):
@@ -42,7 +38,7 @@ def create_experiment(client, mk_test_object_name=mk_test_object_name_default):
     mlflow.set_experiment(exp_name)
     exp = client.get_experiment_by_name(exp_name)
     client.set_experiment_tag(exp.experiment_id, "version_mlflow", mlflow.__version__)
-    client.set_experiment_tag(exp.experiment_id, MLFLOW_RUN_NOTE, f"Description_{mk_uuid()}")
+    client.set_experiment_tag(exp.experiment_id, MLFLOW_RUN_NOTE, f"Description_{utils_test.mk_uuid()}")
     exp = client.get_experiment(exp.experiment_id)
     for info in client.search_runs(exp.experiment_id):
         client.delete_run(info.run_id)
@@ -67,7 +63,7 @@ def _create_simple_run(client, run_name=None, model_artifact="model", use_metric
         else:
             mlflow.log_metric("rmse", 0.789)
         mlflow.set_tag("my_tag", "my_val")
-        mlflow.set_tag("my_uuid",mk_uuid())
+        mlflow.set_tag("my_uuid",utils_test.mk_uuid())
         mlflow.sklearn.log_model(model, model_artifact)
         with open("info.txt", "w", encoding="utf-8") as f:
             f.write("Hi artifact")
@@ -96,7 +92,7 @@ def create_version(client, model_name, stage=None, archive_existing_versions=Fal
 
 
 def list_experiments(client):
-    return [ exp for exp in client.search_experiments() if exp.name.startswith(TEST_OBJECT_PREFIX) ]
+    return [ exp for exp in client.search_experiments() if exp.name.startswith(utils_test.TEST_OBJECT_PREFIX) ]
 
 
 def delete_experiment(client, exp):

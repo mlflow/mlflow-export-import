@@ -1,11 +1,11 @@
 import os
 
-from mlflow_export_import.common.source_tags import ExportTags
 from mlflow_export_import.copy import copy_utils
 from mlflow_export_import.copy import copy_model_version
 
-from tests import compare_utils
 from tests.core import MlflowContext
+from tests.compare_model_version_utils import compare_model_versions, compare_runs
+
 from . init_tests import mlflow_context
 from . oss_utils_test import mk_test_object_name_default
 from . oss_utils_test import create_experiment, create_version
@@ -102,21 +102,6 @@ def test_with_experiment_and_copy_tags(mlflow_context):
     assert src_vr.run_id != dst_vr.run_id
     assert dst_vr == mlflow_context.client_dst.get_model_version(dst_vr.name, dst_vr.version)
 
-
-def compare_model_versions(src_vr, dst_vr, add_copy_system_tags=False):
-    assert src_vr.description == dst_vr.description
-    assert src_vr.aliases == dst_vr.aliases
-    if add_copy_system_tags:
-        src_tags = { k:v for k,v in src_vr.tags.items() if not k.startswith(ExportTags.PREFIX_ROOT) }
-        dst_tags = { k:v for k,v in dst_vr.tags.items() if not k.startswith(ExportTags.PREFIX_ROOT) }
-        assert src_tags == dst_tags
-    else:
-        assert src_vr.tags == dst_vr.tags
-
-def compare_runs(mlflow_context, src_vr, dst_vr):
-    src_run = mlflow_context.client_src.get_run(src_vr.run_id)
-    dst_run = mlflow_context.client_dst.get_run(dst_vr.run_id)
-    compare_utils.compare_runs(mlflow_context, src_run, dst_run)
 
 def _create_model_version(mlflow_context):
     model_name_src = mk_test_object_name_default()

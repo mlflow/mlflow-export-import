@@ -9,9 +9,9 @@ from mlflow_export_import.bulk.import_experiments import import_experiments
 from tests.open_source import sklearn_utils
 from tests.open_source.init_tests import mlflow_context
 from tests.compare_utils import compare_runs
+from tests.utils_test import mk_uuid
 from tests.open_source.oss_utils_test import (
     init_output_dirs,
-    mk_uuid,
     delete_experiments_and_models,
     mk_test_object_name_default
 )

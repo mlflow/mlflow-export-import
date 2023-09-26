@@ -11,13 +11,13 @@ from mlflow_export_import.common.iterators import (
     #SearchModelVersionsIterator,
     SearchRunsIterator
 )
+from tests.utils_test import TEST_OBJECT_PREFIX
 from tests.open_source.oss_utils_test import (
     list_experiments, 
     create_experiment, 
     delete_experiments, 
     delete_models,
     mk_test_object_name_default, 
-    TEST_OBJECT_PREFIX
 )
 
 client = mlflow.MlflowClient()
