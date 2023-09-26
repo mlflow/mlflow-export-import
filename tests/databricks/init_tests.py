@@ -2,6 +2,7 @@ import os
 import pytest
 import mlflow
 
+from mlflow_export_import.common.iterators import SearchRegisteredModelsIterator
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common import utils, model_utils
 from mlflow_export_import.client.http_client import DatabricksHttpClient
@@ -37,7 +38,8 @@ class Workspace():
         self.uc_dbx_client = UnityCatalogClient(self.dbx_client)
 
         self.is_uc = self.cfg.profile.startswith("databricks-uc")
-        self.uc_catalog_name, self.uc_schema_name = self.cfg.uc_schema.split(".")
+        if hasattr(self.cfg, "uc_schema"):
+            self.uc_catalog_name, self.uc_schema_name = self.cfg.uc_schema.split(".")
 
         _logger.info("Workspace:")
         _logger.info(f"  base_dir: {self.base_dir}")
@@ -91,7 +93,8 @@ def _delete_directory(ws):
 
 def _delete_models_non_uc(ws):
     filter = "name like 'test_exim_%'" 
-    models = ws.mlflow_client.search_registered_models(filter_string=filter)
+    models = SearchRegisteredModelsIterator(ws.mlflow_client, filter=filter)
+    models = list(models)
     _logger.info(f"{ws.dbx_client}: Deleting {len(models)} non-UC models")
     for model in models:
         _logger.info(f"{ws.dbx_client}: Deleting model '{model.name}'")
