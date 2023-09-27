@@ -73,14 +73,15 @@ def _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_cl
         tags = tags,
         description = src_version.description
     )
+    dst_client.transition_model_version_stage(dst_model_name, dst_version.version, src_version.current_stage)
+
     try:
         for alias in src_version.aliases:
             dst_client.set_registered_model_alias(dst_version.name, alias, dst_version.version)
-        if len(src_version.aliases) > 0:
-            dst_version = dst_client.get_model_version(dst_version.name, dst_version.version)
     except MlflowException as e: # Non-UC Databricks MLflow has for some reason removed OSS MLflow support for aliases
         print(f"ERROR: error_code: {e.error_code}. Exception: {e}")
-    return dst_version
+
+    return dst_client.get_model_version(dst_version.name, dst_version.version)
 
 
 def _add_to_version_tags(src_version, run, dst_model_name, src_client, dst_client):
@@ -123,7 +124,7 @@ def main(src_model, src_version, dst_model, src_mlflow_uri, dst_mlflow_uri, dst_
     for k,v in locals().items():
         print(f"  {k}: {v}")
     copy(src_model, src_version, dst_model, dst_experiment_name, src_mlflow_uri, dst_mlflow_uri,
-        add_copy_system_tags = add_copy_system_tags, 
+        add_copy_system_tags = add_copy_system_tags,
         verbose = verbose
     )
 
