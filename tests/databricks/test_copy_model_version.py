@@ -69,7 +69,6 @@ def test_one_workspace_without_experiment(test_context):
 def _compare_versions(test_context, src_vr, dst_vr):
     compare_model_versions(src_vr, dst_vr)
     compare_runs(to_MlflowContext(test_context), src_vr, dst_vr)
-# XX
 
 def _mk_one_workspace_context(test_context):
     return TestContext(

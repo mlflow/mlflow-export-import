@@ -119,6 +119,7 @@ def test_context():
             utils_test.create_output_dir(output_dir)
         else:
             output_dir = tmpdir
+        _logger.info(f"output_dir: {output_dir}")
         yield TestContext(
             workspace_src.mlflow_client, 
             workspace_dst.mlflow_client, 
