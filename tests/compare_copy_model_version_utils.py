@@ -1,5 +1,4 @@
 from mlflow_export_import.common.source_tags import ExportTags
-from . utils_test import mk_test_object_name_default
 from . import compare_utils
 
 

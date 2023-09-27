@@ -1,6 +1,6 @@
 from mlflow_export_import.copy import copy_model_version
 from tests.core import to_MlflowContext, TestContext
-from tests.compare_model_version_utils import compare_model_versions, compare_runs
+from tests.compare_copy_model_version_utils import compare_model_versions, compare_runs
 from . init_tests import workspace_src, workspace_dst
 from . import local_utils
 from . init_tests import test_context
@@ -67,9 +67,9 @@ def test_one_workspace_without_experiment(test_context):
 
 
 def _compare_versions(test_context, src_vr, dst_vr):
-    mlflow_context = to_MlflowContext(test_context)
     compare_model_versions(src_vr, dst_vr)
-    compare_runs(mlflow_context, src_vr, dst_vr)
+    compare_runs(to_MlflowContext(test_context), src_vr, dst_vr)
+# XX
 
 def _mk_one_workspace_context(test_context):
     return TestContext(
