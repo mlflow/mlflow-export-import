@@ -1,6 +1,6 @@
 import os
 
-from mlflow_export_import.copy import copy_utils
+from mlflow_export_import.common.dump_utils import dump_mlflow_client
 from mlflow_export_import.copy import copy_model_version
 
 from tests.core import MlflowContext
@@ -12,8 +12,8 @@ from . oss_utils_test import create_experiment, create_version
 
 
 def test_with_experiment(mlflow_context):
-    copy_utils.dump_client(mlflow_context.client_src,"SRC CLIENT")
-    copy_utils.dump_client(mlflow_context.client_dst,"DST CLIENT")
+    dump_mlflow_client(mlflow_context.client_src,"SRC CLIENT")
+    dump_mlflow_client(mlflow_context.client_dst,"DST CLIENT")
     dst_exp = create_experiment(mlflow_context.client_src)
     vr, _ = _create_model_version(mlflow_context)
     dst_model_name = mk_test_object_name_default()
@@ -81,8 +81,8 @@ def test_without_dst_tracking_uri(mlflow_context):
 
 
 def test_with_experiment_and_copy_tags(mlflow_context):
-    copy_utils.dump_client(mlflow_context.client_src,"SRC CLIENT")
-    copy_utils.dump_client(mlflow_context.client_dst,"DST CLIENT")
+    dump_mlflow_client(mlflow_context.client_src,"SRC CLIENT")
+    dump_mlflow_client(mlflow_context.client_dst,"DST CLIENT")
     dst_exp = create_experiment(mlflow_context.client_src)
     vr, _ = _create_model_version(mlflow_context)
     dst_model_name = mk_test_object_name_default()

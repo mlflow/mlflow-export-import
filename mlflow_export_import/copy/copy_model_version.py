@@ -13,7 +13,7 @@ from . click_options import (
 )
 from mlflow_export_import.common.source_tags import ExportTags
 from mlflow_export_import.common.click_options import opt_verbose
-from mlflow_export_import.common import utils
+from mlflow_export_import.common import utils, dump_utils
 
 _logger = utils.getLogger(__name__)
 
@@ -38,15 +38,15 @@ def copy(src_model_name,
     src_uri = f"{src_model_name}/{src_model_version}"
     print(f"Copying model version '{src_uri}' to '{dst_model_name}'")
     if verbose:
-        copy_utils.dump_client(src_client, "src_client")
-        copy_utils.dump_client(dst_client, "dst_client")
+        dump_utils.dump_mlflow_client(src_client, "src_client")
+        dump_utils.dump_mlflow_client(dst_client, "dst_client")
     copy_utils.create_registered_model(dst_client,  dst_model_name)
     src_version = src_client.get_model_version(src_model_name, src_model_version)
     if verbose:
-        copy_utils.dump_obj_as_json(src_version, "Source ModelVersion")
+        dump_utils.dump_obj_as_json(src_version, "Source ModelVersion")
     dst_version = _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_client, dst_client, add_copy_system_tags)
     if verbose:
-        copy_utils.dump_obj_as_json(dst_version, "Destination ModelVersion")
+        dump_utils.dump_obj_as_json(dst_version, "Destination ModelVersion")
     dst_uri = f"{dst_version.name}/{dst_version.version}"
     print(f"Copied model version '{src_uri}' to '{dst_uri}'")
     return src_version, dst_version
@@ -64,7 +64,7 @@ def _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_cl
         tags = _add_to_version_tags(src_version, dst_run, dst_model_name, src_client, dst_client)
     else:
         tags = src_version.tags
-    copy_utils.dump_client(dst_client, "DST CLIENT")
+    dump_utils.dump_mlflow_client(dst_client, "DST CLIENT")
 
     dst_version = dst_client.create_model_version(
         name = dst_model_name,
