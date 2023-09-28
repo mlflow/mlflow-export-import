@@ -37,15 +37,17 @@ class Workspace():
         self.dbx_client = DatabricksHttpClient(self.mlflow_client.tracking_uri)
         self.uc_dbx_client = UnityCatalogClient(self.dbx_client)
 
-        self.is_uc = self.cfg.profile.startswith("databricks-uc")
-        if hasattr(self.cfg, "uc_schema"):
-            self.uc_catalog_name, self.uc_schema_name = self.cfg.uc_schema.split(".")
-
         _logger.info("Workspace:")
         _logger.info(f"  base_dir: {self.base_dir}")
         _logger.info(f"  mlflow_client: {self.mlflow_client}")
         _logger.info(f"  dbx_client: {self.dbx_client}")
+
+        self.is_uc = self.cfg.profile.startswith("databricks-uc")
         _logger.info(f"  is_uc: {self.is_uc}")
+        if hasattr(self.cfg, "uc_schema"):
+            self.uc_catalog_name, self.uc_schema_name = self.cfg.uc_schema.split(".")
+            self.uc_full_schema_name = self.cfg.uc_schema
+            _logger.info(f"  uc_full_schema_name: {self.uc_full_schema_name}")
 
     def __repr__(self):
         return str({ k:v for k,v in self.__dict__.items() })
