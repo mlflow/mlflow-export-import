@@ -33,11 +33,16 @@ def delete_model(client, model_name, sleep_time=5):
 
 
 def list_model_versions(client, model_name, get_latest_versions=False):
-    """ List 'all' or the 'latest' versions of registered model. """
-    if get_latest_versions:
-        return client.get_latest_versions(model_name)
-    else:
+    """
+    List 'all' or the 'latest' versions of registered model.
+    """
+    if is_unity_catalog_model(model_name):
         return list(SearchModelVersionsIterator(client, filter=f"name='{model_name}'"))
+    else:
+        if get_latest_versions:
+            return client.get_latest_versions(model_name)
+        else:
+            return list(SearchModelVersionsIterator(client, filter=f"name='{model_name}'"))
 
 
 def wait_until_version_is_ready(client, model_name, model_version, sleep_time=1, iterations=100):
@@ -64,7 +69,7 @@ def export_version_model(client, version, output_dir):
     """
 
     download_uri = client.get_model_version_download_uri(version.name, version.version)
-    dst_path = os.path.join(output_dir, "version_models", version.version) 
+    dst_path = os.path.join(output_dir, "version_models", version.version)
     _logger.info(f"Exporting model version 'cached model' to: '{dst_path}'")
     mlflow.artifacts.download_artifacts(
         artifact_uri = download_uri,
@@ -80,8 +85,8 @@ def show_versions(model_name, versions, msg):
     from tabulate import tabulate
     versions = [ [
            int(vr.version),
-           vr.current_stage, 
-           vr.status, 
+           vr.current_stage,
+           vr.status,
            vr.run_id,
            fmt_ts_millis(vr.creation_timestamp),
            fmt_ts_millis(vr.last_updated_timestamp),
@@ -90,8 +95,8 @@ def show_versions(model_name, versions, msg):
     df = pd.DataFrame(versions, columns = [
         "version",
         "current_stage",
-        "status", 
-        "run_id", 
+        "status",
+        "run_id",
         "creation_timestamp",
         "last_updated_timestamp",
         "description"
@@ -103,7 +108,8 @@ def show_versions(model_name, versions, msg):
 
 def dump_model_versions(client, model_name):
     """ Display as table 'latest' and 'all' registered model versions. """
-    versions = client.get_latest_versions(model_name)
-    show_versions(model_name, versions, "Latest")
+    if not is_unity_catalog_model(model_name):
+        versions = client.get_latest_versions(model_name)
+        show_versions(model_name, versions, "Latest")
     versions = SearchModelVersionsIterator(client, filter=f"name='{model_name}'")
     show_versions(model_name, list(versions), "All")
