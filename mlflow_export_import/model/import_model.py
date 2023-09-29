@@ -103,22 +103,26 @@ class BaseModelImporter():
         if not dst_source.startswith("dbfs:") and not os.path.exists(dst_source):
             raise MlflowExportImportException(f"'source' argument for MLflowClient.create_model_version does not exist: {dst_source}", http_status_code=404)
         kwargs = {"await_creation_for": self.await_creation_for } if self.await_creation_for else {}
+
         tags = src_vr["tags"]
         if self.import_source_tags:
             _set_source_tags_for_field(src_vr, tags)
 
         dst_vr = self.mlflow_client.create_model_version(
-            model_name,
-            dst_source, dst_run_id, \
-            description=src_vr["description"],
-            tags=tags, **kwargs
+            name = model_name,
+            source = dst_source,
+            run_id = dst_run_id,
+            description = src_vr.get("description"),
+            tags = tags, 
+            **kwargs
         )
-
         model_utils.wait_until_version_is_ready(self.mlflow_client, model_name, dst_vr, sleep_time=sleep_time)
         src_current_stage = src_vr["current_stage"]
         _logger.info(f"Importing model '{model_name}' version {dst_vr.version} stage '{src_current_stage}'")
-        if src_current_stage != "None": # fails for Databricks but not OSS
-            self.mlflow_client.transition_model_version_stage(model_name, dst_vr.version, src_current_stage)
+
+        if not model_utils.is_unity_catalog_model(model_name):
+            if src_current_stage and src_current_stage != "None": # fails for Databricks  but not OSS
+                self.mlflow_client.transition_model_version_stage(model_name, dst_vr.version, src_current_stage)
 
 
     def _import_model(self,
