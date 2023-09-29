@@ -2,11 +2,15 @@ import json
 
 
 def dump_mlflow_client(client, msg=""):
+    import mlflow
     print(f"MlflowClient {msg}:")
     print("  client.tracking_uri: ", client.tracking_uri)
     print("  client._registry_uri:", client._registry_uri)
     creds = client._tracking_client.store.get_host_creds()
     dump_obj(creds, "Credentials", "  ")
+    print("mlflow:")
+    print("  mlflow.tracking_uri: ", mlflow.get_tracking_uri())
+    print("  mlflow.registry_uri: ", mlflow.get_registry_uri())
 
 
 def dump_obj(obj, title=None, indent=""):
