@@ -37,7 +37,9 @@ def list_model_versions(client, model_name, get_latest_versions=False):
     List 'all' or the 'latest' versions of registered model.
     """
     if is_unity_catalog_model(model_name):
-        return list(SearchModelVersionsIterator(client, filter=f"name='{model_name}'"))
+        versions = SearchModelVersionsIterator(client, filter=f"name='{model_name}'")
+        # JIRA: ES-834105 - UC-ML MLflow search_registered_models and search_model_versions do not return tags and aliases - 2023-08-21
+        return [ client.get_model_version(vr.name, vr.version) for vr in versions ]
     else:
         if get_latest_versions:
             return client.get_latest_versions(model_name)
