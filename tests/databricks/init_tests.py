@@ -13,6 +13,9 @@ from tests.databricks.unity_catalog_client import UnityCatalogClient
 
 _logger = utils.getLogger(__name__)
 
+# Skip Databricks cleanup calls to avoid 429
+_skip_cleanup  = os.environ.get("MLFLOW_EXPORT_IMPORT_SKIP_CLEANUP")
+_logger.info(f"_skip_cleanup: {_skip_cleanup}")
 
 class Dict2Class():
     def __init__(self, dct):
@@ -59,13 +62,15 @@ utils.importing_into_databricks(workspace_dst.dbx_client)
 
 
 def init_tests():
-    _init_workspace(workspace_src)
-    _init_workspace(workspace_dst)
-
+    if _skip_cleanup:
+        _logger.warning("Skipping Databricks cleanup")
+    else:
+        _init_workspace(workspace_src)
+        _init_workspace(workspace_dst)
 
 def _init_workspace(ws):
     _delete_directory(ws)
-    _create_base_dir(ws)
+    _create_base_directory(ws)
     if ws.is_uc:
         try:
             ws.uc_dbx_client.create_schema(ws.uc_catalog_name, ws.uc_schema_name)
@@ -76,7 +81,7 @@ def _init_workspace(ws):
         _delete_models_non_uc(ws)
 
 
-def _create_base_dir(ws):
+def _create_base_directory(ws):
     """ Create test base directory """
     params = { "path": ws.base_dir }
     _logger.info(f"{ws.dbx_client}: Creating {ws.base_dir}")
