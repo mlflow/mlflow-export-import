@@ -160,7 +160,8 @@ class BaseModelImporter():
             self.mlflow_client.create_registered_model(model_name, tags, model_dct.get("description"))
             _logger.info(f"Created new registered model '{model_name}'")
         except RestException as e:
-            if not "RESOURCE_ALREADY_EXISTS: Registered Model" in str(e):
+            from mlflow_export_import.common import mlflow_utils
+            if e.error_code != "RESOURCE_ALREADY_EXISTS":
                 raise e
             _logger.info(f"Registered model '{model_name}' already exists")
 
