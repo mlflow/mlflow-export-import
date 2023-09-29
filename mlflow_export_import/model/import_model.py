@@ -212,7 +212,6 @@ class ModelImporter(BaseModelImporter):
         :return: Model import manifest.
         """
         model_dct = self._import_model(model_name, input_dir, delete_model)
-        mlflow.set_experiment(experiment_name)
         _logger.info("Importing versions:")
         for vr in model_dct["versions"]:
             try:
