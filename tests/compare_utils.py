@@ -81,8 +81,10 @@ def compare_models(model_src, model_dst, compare_name):
     assert model_src.tags.items() <= model_dst.tags.items()
 
 
-def compare_models_with_versions(mlflow_context, model_src, model_dst):
-    compare_models(model_src, model_dst, mlflow_context.client_src!=mlflow_context.client_dst)
+def compare_models_with_versions(mlflow_context, model_src, model_dst, compare_name=None):
+    if compare_name is None:
+        compare_name = mlflow_context.client_src!=mlflow_context.client_dst
+    compare_models(model_src, model_dst, compare_name)
     for (vr_src, vr_dst) in zip(model_src.latest_versions, model_dst.latest_versions):
         compare_versions(mlflow_context, vr_src, vr_dst)
 

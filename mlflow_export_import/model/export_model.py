@@ -1,5 +1,5 @@
 """
-Export a registered model and the run associated with each version.
+Exports a registered model, its versions and the version's run.
 """
 
 import os
@@ -9,8 +9,7 @@ from dataclasses import dataclass
 import mlflow
 from mlflow.exceptions import RestException
 
-from mlflow_export_import.client.http_client import MlflowHttpClient
-from mlflow_export_import.client.http_client import DatabricksHttpClient
+from mlflow_export_import.client.http_client import create_http_client, create_dbx_client
 from mlflow_export_import.common.click_options import (
     opt_model,
     opt_output_dir,
@@ -23,7 +22,7 @@ from mlflow_export_import.common.click_options import (
     opt_export_version_model
 )
 
-from mlflow_export_import.common import utils, io_utils, model_utils 
+from mlflow_export_import.common import utils, io_utils, model_utils
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
 from mlflow_export_import.common import permissions_utils
 from mlflow_export_import.common import MlflowExportImportException
@@ -40,6 +39,7 @@ class Options:
     export_version_model: bool
     export_permissions: bool
     notebook_formats: []
+
 
 def export_model(
         model_name,
@@ -68,8 +68,8 @@ def export_model(
     """
 
     mlflow_client = mlflow_client or mlflow.MlflowClient()
-    http_client = MlflowHttpClient(mlflow_client.tracking_uri) 
-    dbx_client = DatabricksHttpClient(mlflow_client.tracking_uri)
+    http_client = create_http_client(mlflow_client, model_name)
+    dbx_client = create_dbx_client(mlflow_client)
 
     stages = _normalize_stages(stages)
     versions = versions if versions else []
@@ -140,19 +140,21 @@ def _export_versions(mlflow_client, versions, output_dir, opts):
 
 
 def _export_version(mlflow_client, vr, output_dir, output_versions, failed_versions, j, num_versions, opts):
-    opath = os.path.join(output_dir, vr.run_id)
+    _output_dir = os.path.join(output_dir, vr.run_id)
     msg = { "name": vr.name, "version": vr.version, "stage": vr.current_stage }
-    _logger.info(f"Exporting model verson {j+1}/{num_versions}: {msg} to '{opath}'")
+    _logger.info(f"Exporting model verson {j+1}/{num_versions}: {msg} to '{_output_dir}'")
 
     try:
-        export_run(vr.run_id, opath, 
-            export_deleted_runs = opts.export_deleted_runs, 
-            notebook_formats = opts.notebook_formats
+        export_run(vr.run_id,
+            _output_dir,
+            export_deleted_runs = opts.export_deleted_runs,
+            notebook_formats = opts.notebook_formats,
+            mlflow_client = mlflow_client
         )
         run = mlflow_client.get_run(vr.run_id)
         vr_dct = dict(vr)
         vr_dct["_run_artifact_uri"] = run.info.artifact_uri
-        experiment = mlflow.get_experiment(run.info.experiment_id)
+        experiment = mlflow_client.get_experiment(run.info.experiment_id)
         vr_dct["_experiment_name"] = experiment.name
         if opts.export_version_model:
             vr_dct["_download_uri"] = model_utils.export_version_model(mlflow_client, vr, output_dir)
@@ -215,9 +217,9 @@ def _normalize_stages(stages):
 @opt_export_permissions
 @opt_notebook_formats
 
-def main(model, output_dir, 
-        stages, versions, export_latest_versions, 
-        export_deleted_runs, 
+def main(model, output_dir,
+        stages, versions, export_latest_versions,
+        export_deleted_runs,
         export_version_model,
         export_permissions,
         notebook_formats

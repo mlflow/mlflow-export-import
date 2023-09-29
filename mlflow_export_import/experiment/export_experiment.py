@@ -1,4 +1,4 @@
-""" 
+"""
 Exports an experiment to a directory.
 """
 
@@ -8,7 +8,7 @@ import mlflow
 
 from mlflow_export_import.common.click_options import (
     opt_experiment,
-    opt_output_dir,  
+    opt_output_dir,
     opt_notebook_formats,
     opt_export_permissions,
     opt_run_start_time,
@@ -18,7 +18,7 @@ from mlflow_export_import.common.iterators import SearchRunsIterator
 from mlflow_export_import.common import utils, io_utils, mlflow_utils
 from mlflow_export_import.common import permissions_utils
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis, utc_str_to_millis
-from mlflow_export_import.client.http_client import DatabricksHttpClient
+from mlflow_export_import.client.http_client import create_dbx_client
 from mlflow_export_import.run.export_run import export_run
 
 _logger = utils.getLogger(__name__)
@@ -44,9 +44,9 @@ def export_experiment(
     :param: mlflow_client: MLflow client.
     :return: Number of successful and number of failed runs.
     """
-    
+
     mlflow_client = mlflow_client or mlflow.MlflowClient()
-    dbx_client = DatabricksHttpClient(mlflow_client.tracking_uri)
+    dbx_client = create_dbx_client(mlflow_client)
 
     run_start_time_str = run_start_time
     if run_start_time:
@@ -56,7 +56,7 @@ def export_experiment(
     msg = { "name": exp.name, "id": exp.experiment_id,
         "mlflow.experimentType": exp.tags.get("mlflow.experimentType", None),
         "lifecycle_stage": exp.lifecycle_stage
-    } 
+    }
     _logger.info(f"Exporting experiment: {msg}")
     ok_run_ids = []
     failed_run_ids = []
@@ -70,7 +70,7 @@ def export_experiment(
     else:
         kwargs = {}
         if run_start_time:
-            kwargs["filter"] = f"start_time > {run_start_time}" 
+            kwargs["filter"] = f"start_time > {run_start_time}"
         if export_deleted_runs:
             from mlflow.entities import ViewType
             kwargs["view_type"] = ViewType.ALL
@@ -85,7 +85,7 @@ def export_experiment(
         "num_failed_runs": len(failed_run_ids),
         "failed_runs": failed_run_ids
     }
-    exp_dct = utils.strip_underscores(exp) 
+    exp_dct = utils.strip_underscores(exp)
     exp_dct["_creation_time"] = fmt_ts_millis(exp.creation_time)
     exp_dct["_last_update_time"] = fmt_ts_millis(exp.last_update_time)
     exp_dct["tags"] = dict(sorted(exp_dct["tags"].items()))
@@ -103,7 +103,7 @@ def export_experiment(
     else:
         _logger.info(f"{len(ok_run_ids)}/{j} runs succesfully exported {msg}")
         _logger.info(f"{len(failed_run_ids)}/{j} runs failed {msg}")
-    return len(ok_run_ids), len(failed_run_ids) 
+    return len(ok_run_ids), len(failed_run_ids)
 
 
 def _export_run(mlflow_client, run, output_dir, ok_run_ids, failed_run_ids,
@@ -111,11 +111,11 @@ def _export_run(mlflow_client, run, output_dir, ok_run_ids, failed_run_ids,
         export_deleted_runs, notebook_formats
     ):
     if run_start_time and run.info.start_time < run_start_time:
-        msg = { 
-            "run_id": {run.info.run_id}, 
+        msg = {
+            "run_id": {run.info.run_id},
             "experiment_id": {run.info.experiment_id},
             "start_time": fmt_ts_millis(run.info.start_time),
-            "run_start_time": run_start_time_str 
+            "run_start_time": run_start_time_str
         }
         _logger.info(f"Not exporting run: {msg}")
         return

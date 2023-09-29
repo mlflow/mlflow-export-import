@@ -17,7 +17,7 @@ from mlflow.exceptions import RestException
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
-from mlflow_export_import.client.http_client import DatabricksHttpClient
+from mlflow_export_import.client.http_client import create_dbx_client
 from mlflow_export_import.notebook.download_notebook import download_notebook
 
 from mlflow.utils.mlflow_tags import MLFLOW_DATABRICKS_NOTEBOOK_PATH
@@ -42,10 +42,11 @@ def export_run(
     :return: bool whether run was exported.
     """
 
+    mlflow_client = mlflow_client or mlflow.MlflowClient()
+    dbx_client = create_dbx_client(mlflow_client)
+
     if notebook_formats is None:
         notebook_formats = []
-    mlflow_client = mlflow_client or mlflow.MlflowClient()
-    dbx_client = DatabricksHttpClient(mlflow_client.tracking_uri)
 
     experiment_id = None
     try:

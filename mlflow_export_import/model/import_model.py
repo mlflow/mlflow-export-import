@@ -1,5 +1,5 @@
 """
-Import a registered model and all the runs associated with each version.
+Imports a registered model, its versions and the version's run.
 """
 
 import os
@@ -21,7 +21,7 @@ from mlflow_export_import.common import utils, io_utils, model_utils
 from mlflow_export_import.common.source_tags import set_source_tags_for_field, fmt_timestamps
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common.permissions_utils import import_permissions
-from mlflow_export_import.client.http_client import DatabricksHttpClient
+from mlflow_export_import.client.http_client import create_dbx_client
 from mlflow_export_import.run.import_run import import_run
 from mlflow_export_import.bulk import rename_utils
 
@@ -78,11 +78,11 @@ class BaseModelImporter():
         :param await_creation_for: Seconds to wait for model version crreation.
         """
         self.mlflow_client = mlflow_client or mlflow.MlflowClient()
-        self.dbx_client = DatabricksHttpClient(self.mlflow_client.tracking_uri)
+        self.dbx_client = create_dbx_client(self.mlflow_client)
         self.import_source_tags=import_source_tags
-        self.import_permissions = import_permissions 
-        self.import_source_tags = import_source_tags 
-        self.await_creation_for = await_creation_for 
+        self.import_permissions = import_permissions
+        self.import_source_tags = import_source_tags
+        self.await_creation_for = await_creation_for
 
 
     def _import_version(self,
@@ -332,8 +332,8 @@ def _extract_model_path(source, run_id):
     """
     Extract relative path to model artifact from version source field
     :param source: 'source' field of registered model version
-    :param run_id: Run ID in the 'source field 
-    :return: relative path to the model artifact 
+    :param run_id: Run ID in the 'source field
+    :return: relative path to the model artifact
     """
     idx = source.find(run_id)
     if idx == -1:
@@ -353,7 +353,7 @@ def _path_join(x, y):
     """ Account for DOS backslash """
     path = os.path.join(x, y)
     if path.startswith("dbfs:"):
-        path = path.replace("\\","/") 
+        path = path.replace("\\","/")
     return path
 
 
@@ -377,7 +377,7 @@ def _path_join(x, y):
 )
 @opt_verbose
 
-def main(input_dir, model, experiment_name, delete_model, import_permissions, import_source_tags, 
+def main(input_dir, model, experiment_name, delete_model, import_permissions, import_source_tags,
         await_creation_for, sleep_time, verbose
     ):
     _logger.info("Options:")

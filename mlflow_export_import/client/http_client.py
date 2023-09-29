@@ -71,7 +71,7 @@ class BaseHttpClient(metaclass=ABCMeta):
 
 
 class HttpClient(BaseHttpClient):
-    """ 
+    """
     Wrapper for HTTP calls for MLflow Databricks APIs.
     """
     def __init__(self, api_name, host=None, token=None):
@@ -81,7 +81,7 @@ class HttpClient(BaseHttpClient):
         :param token: Databricks token if using Databricks.
         """
         if host:
-            # Assume 'host' is a Databricks profile 
+            # Assume 'host' is a Databricks profile
             if not host.startswith("http"):
                 profile = host.replace("databricks://","")
                 (host, token) = databricks_cli_utils.get_host_token_for_profile(profile)
@@ -96,7 +96,7 @@ class HttpClient(BaseHttpClient):
         self.host = host
         self.api_uri = os.path.join(host, api_name)
         self.token = token
-        
+
 
     def _get(self, resource, params=None):
         uri = self._mk_uri(resource)
@@ -215,7 +215,7 @@ class MlflowHttpClient(HttpClient):
 class UnityCatalogHttpClient(BaseHttpClient):
     """
     Composite client that supports Databricks Unity Catalog API.
-    Contains two underlying clients: standard MLflow API client 'api/2.0/mlflow' 
+    Contains two underlying clients: standard MLflow API client 'api/2.0/mlflow'
     and UC client for calls to 'api/2.0/mlflow/unity-catalog'.
     """
     uc_resources = {
@@ -284,7 +284,28 @@ def get_mlflow_client():
     """
     Returns either a UC-enabled client or not, depending if MLFLOW_REGISTRY_URI is set to 'databricks-uc://e2_demo'
     """
-    return UnityCatalogHttpClient() if is_unity_catalog() else MlflowHttpClient() 
+    return UnityCatalogHttpClient() if is_unity_catalog() else MlflowHttpClient()
+
+
+def create_http_client(mlflow_client, model_name=None):
+    """
+    Create MLflow HTTP client from MlflowClient.
+    If model_name is a Unity Catalog (UC) model, returned client is UC-enabled.
+    """
+    from mlflow_export_import.common import model_utils
+    creds = mlflow_client._tracking_client.store.get_host_creds()
+    if model_name and model_utils.is_unity_catalog_model(model_name):
+        return HttpClient("api/2.0/mlflow/unity-catalog", creds.host, creds.token)
+    else:
+        return MlflowHttpClient(creds.host, creds.token)
+
+
+def create_dbx_client(mlflow_client):
+    """
+    Create Databricks HTTP client from MlflowClient.
+    """
+    creds = mlflow_client._tracking_client.store.get_host_creds()
+    return DatabricksHttpClient(creds.host, creds.token)
 
 
 def is_unity_catalog():

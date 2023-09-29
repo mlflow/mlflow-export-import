@@ -22,7 +22,7 @@ from mlflow_export_import.common import utils, mlflow_utils, io_utils
 from mlflow_export_import.common.filesystem import mk_local_path
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import MlflowExportImportException
-from mlflow_export_import.client.http_client import DatabricksHttpClient
+from mlflow_export_import.client.http_client import create_dbx_client
 from . import run_data_importer
 from . import run_utils
 
@@ -54,16 +54,15 @@ def import_run(
     """
 
     def _mk_ex(src_run_dct, dst_run_id, exp_name):
-        return { "message": "Cannot import run", 
-            "src_run_dct": src_run_dct["info"].get("run_id",None), 
+        return { "message": "Cannot import run",
+            "src_run_dct": src_run_dct["info"].get("run_id",None),
             "dst_run_dct": dst_run_id,
             "experiment": exp_name
     }
 
     mlflow_client = mlflow_client or mlflow.MlflowClient()
-    dbx_client = DatabricksHttpClient(mlflow_client.tracking_uri)
+    dbx_client = create_dbx_client(mlflow_client)
 
-    #_logger.debug(f"importing_into_databricks: {utils.importing_into_databricks()}")
     _logger.info(f"Importing run from '{input_dir}'")
 
     exp = mlflow_utils.set_experiment(mlflow_client, dbx_client, experiment_name)

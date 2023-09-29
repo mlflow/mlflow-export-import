@@ -1,12 +1,13 @@
 """
-Module to account for importing MLflow run data (params, metrics and tags) 
+Module to handle importing MLflow run data (params, metrics and tags).
 Focus is on data that exceed API limits.
 See: https://www.mlflow.org/docs/latest/rest-api.html#request-limits.
 """
 
+import math
 import mlflow
-import math 
 from mlflow.entities import Metric, Param, RunTag
+
 from mlflow_export_import.common import utils
 from mlflow_export_import.common.source_tags import ExportTags
 from mlflow_export_import.common.source_tags import mk_source_tags_mlflow_tag, mk_source_tags
@@ -17,12 +18,12 @@ def _log_data(run_dct, run_id, batch_size, get_data, log_data, args_get_data=Non
     num_batches = int(math.ceil(len(metadata) / batch_size))
     res = []
     for j in range(0,num_batches):
-        start = j * batch_size 
+        start = j * batch_size
         end = start + batch_size
         batch = metadata[start:end]
         log_data(run_id, batch)
         res = res + batch
-    
+
 
 def _log_params(client, run_dct, run_id, batch_size):
     def get_data(run_dct, args):
@@ -66,7 +67,7 @@ def _log_tags(client, run_dct, run_id, batch_size, import_source_tags, in_databr
         client.log_batch(run_id, tags=tags)
 
     args_get = {
-        "in_databricks": in_databricks, 
+        "in_databricks": in_databricks,
         "src_user_id": src_user_id,
         "use_src_user_id": use_src_user_id
     }

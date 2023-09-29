@@ -1,4 +1,4 @@
-""" 
+"""
 Exports an experiment to a directory.
 """
 
@@ -14,7 +14,7 @@ from mlflow_export_import.common.click_options import (
     opt_use_src_user_id,
     opt_dst_notebook_dir
 )
-from mlflow_export_import.client.http_client import DatabricksHttpClient
+from mlflow_export_import.client.http_client import create_dbx_client
 from mlflow_export_import.common import utils, mlflow_utils, io_utils
 from mlflow_export_import.common import permissions_utils
 from mlflow_export_import.common.source_tags import (
@@ -49,7 +49,8 @@ def import_experiment(
     """
 
     mlflow_client = mlflow_client or mlflow.MlflowClient()
-    dbx_client = DatabricksHttpClient(mlflow_client.tracking_uri)
+    dbx_client = create_dbx_client(mlflow_client)
+
 
     path = io_utils.mk_manifest_json_path(input_dir, "experiment.json")
     root_dct = io_utils.read_file(path)
@@ -57,7 +58,7 @@ def import_experiment(
     mlflow_dct = io_utils.get_mlflow(root_dct)
     exp_dct = mlflow_dct["experiment"]
 
-    tags = exp_dct["tags"] 
+    tags = exp_dct["tags"]
     if import_source_tags:
         source_tags = mk_source_tags_mlflow_tag(tags)
         tags = { **tags, **source_tags }
