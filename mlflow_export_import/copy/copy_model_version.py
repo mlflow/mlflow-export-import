@@ -13,7 +13,7 @@ from . click_options import (
 )
 from mlflow_export_import.common.source_tags import ExportTags
 from mlflow_export_import.common.click_options import opt_verbose
-from mlflow_export_import.common import utils, dump_utils
+from mlflow_export_import.common import utils, model_utils, dump_utils
 
 _logger = utils.getLogger(__name__)
 
@@ -103,7 +103,7 @@ def _add_to_version_tags(src_version, run, dst_model_name, src_client, dst_clien
     copy_utils.add_tag(run.data.tags, tags, "mlflow.databricks.workspaceID", prefix)
     copy_utils.add_tag(run.data.tags, tags, "mlflow.user", prefix)
 
-    if copy_utils.is_unity_catalog_model(dst_model_name): # NOTE: Databricks UC model version tags don't accept '."
+    if model_utils.is_unity_catalog_model(dst_model_name): # NOTE: Databricks UC model version tags don't accept '."
         tags = { k.replace(".","_"):v for k,v in tags.items() }
 
     return tags

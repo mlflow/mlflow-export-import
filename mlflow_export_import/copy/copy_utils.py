@@ -35,10 +35,6 @@ def add_tag(src_tags, dst_tags, key, prefix):
         dst_tags[f"{prefix}.{key}"] = val
 
 
-def is_unity_catalog_model(name):
-    return len(name.split(".")) == 3
-
-
 def obj_to_dict(obj):
     if isinstance(obj, mlflow.entities.model_registry.model_version.ModelVersion):
         dct = adjust_model_version(obj.__dict__)
@@ -59,7 +55,6 @@ def adjust_model_version(vr):
 
 def mk_client(tracking_uri, registry_uri=None):
     if not tracking_uri and not registry_uri:
-        return mlflow.MlflowClient() 
+        return mlflow.MlflowClient()
     else:
         return mlflow.MlflowClient(tracking_uri, registry_uri)
-
