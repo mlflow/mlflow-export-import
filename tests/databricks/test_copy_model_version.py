@@ -1,5 +1,5 @@
 from mlflow_export_import.copy import copy_model_version
-from tests.core import to_MlflowContext, TestContext
+from tests.core import to_MlflowContext
 from tests.compare_copy_model_version_utils import compare_model_versions, compare_runs
 from . init_tests import workspace_src, workspace_dst
 from . import local_utils
@@ -40,7 +40,7 @@ def test_one_workspace_with_experiment(test_context):
         verbose = True
     )
     assert src_vr == _src_vr
-    test_context2 = _mk_one_workspace_context(test_context)
+    test_context2 = local_utils.mk_one_workspace_test_context(test_context)
     _compare_versions(test_context2, src_vr, dst_vr)
     assert src_vr.run_id != dst_vr.run_id
     assert dst_vr == test_context2.mlflow_client_dst.get_model_version(dst_vr.name, dst_vr.version)
@@ -60,7 +60,7 @@ def test_one_workspace_without_experiment(test_context):
         verbose = True
     )
     assert src_vr == _src_vr
-    test_context2 = _mk_one_workspace_context(test_context)
+    test_context2 = local_utils.mk_one_workspace_test_context(test_context)
     _compare_versions(test_context2, src_vr, dst_vr)
     assert src_vr.run_id == dst_vr.run_id
     assert dst_vr == test_context2.mlflow_client_dst.get_model_version(dst_vr.name, dst_vr.version)
@@ -69,13 +69,3 @@ def test_one_workspace_without_experiment(test_context):
 def _compare_versions(test_context, src_vr, dst_vr):
     compare_model_versions(src_vr, dst_vr)
     compare_runs(to_MlflowContext(test_context), src_vr, dst_vr)
-
-def _mk_one_workspace_context(test_context):
-    return TestContext(
-        test_context.mlflow_client_src,
-        test_context.mlflow_client_src,
-        test_context.dbx_client_src,
-        test_context.dbx_client_src,
-        test_context.output_dir,
-        test_context.output_run_dir
-    )

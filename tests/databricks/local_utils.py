@@ -5,6 +5,7 @@ from mlflow_export_import.common.model_utils import is_unity_catalog_model
 from tests.open_source.oss_utils_test import mk_test_object_name_default
 from tests.open_source import sklearn_utils
 from . init_tests import workspace_src
+from tests.core import TestContext
 
 
 def mk_experiment_name(workspace=workspace_src):
@@ -64,3 +65,14 @@ def _create_registered_model(client,  model_name, tags, desc):
         return client.create_registered_model(model_name, tags, desc)
     except RestException:
         return client.get_registered_model(model_name)
+
+
+def mk_one_workspace_test_context(test_context):
+    return TestContext(
+        test_context.mlflow_client_src,
+        test_context.mlflow_client_src,
+        test_context.dbx_client_src,
+        test_context.dbx_client_src,
+        test_context.output_dir,
+        test_context.output_run_dir
+    )
