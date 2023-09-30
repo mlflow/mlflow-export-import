@@ -81,8 +81,8 @@ def test_without_dst_tracking_uri(mlflow_context):
 
 
 def test_with_experiment_and_copy_tags(mlflow_context):
-    dump_mlflow_client(mlflow_context.client_src,"SRC CLIENT")
-    dump_mlflow_client(mlflow_context.client_dst,"DST CLIENT")
+    dump_mlflow_client(mlflow_context.client_src, "SRC CLIENT")
+    dump_mlflow_client(mlflow_context.client_dst, "DST CLIENT")
     dst_exp = create_experiment(mlflow_context.client_src)
     vr, _ = _create_model_version(mlflow_context)
     dst_model_name = mk_test_object_name_default()

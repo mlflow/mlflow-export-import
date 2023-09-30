@@ -34,7 +34,7 @@ def mk_dst_experiment_name(experiment_name):
 def mk_dst_model_name(model_name):
     return model_name
 
-    
+
 def create_experiment(client, mk_test_object_name=mk_test_object_name_default):
     exp_name = mk_test_object_name()
     mlflow.set_experiment(exp_name)
@@ -66,7 +66,7 @@ def _create_simple_run(client, run_name=None, model_artifact="model", use_metric
             else:
                 mlflow.log_metric("rmse", 0.789)
             mlflow.set_tag("my_tag", "my_val")
-            mlflow.set_tag("my_uuid",utils_test.mk_uuid())
+            mlflow.set_tag("my_uuid", utils_test.mk_uuid())
             mlflow.sklearn.log_model(model, model_artifact)
             with open("info.txt", "w", encoding="utf-8") as f:
                 f.write("Hi artifact")
@@ -87,11 +87,11 @@ def create_version(client, model_name, stage=None, archive_existing_versions=Fal
     _, run = create_simple_run(client)
     source = f"{run.info.artifact_uri}/model"
     desc = "My version desc"
-    tags = { "city": "yaxchilan" }
+    tags = { "city": "yaxchilan", "uuid": utils_test.mk_uuid() }
     vr = client.create_model_version(model_name, source, run.info.run_id, description=desc, tags=tags)
     if stage:
         vr = client.transition_model_version_stage(model_name, vr.version, stage, archive_existing_versions)
-    return vr, run 
+    return vr, run
 
 
 def list_experiments(client):

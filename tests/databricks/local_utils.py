@@ -4,8 +4,9 @@ from mlflow.models.signature import infer_signature
 from mlflow_export_import.common.model_utils import is_unity_catalog_model
 from tests.open_source.oss_utils_test import mk_test_object_name_default
 from tests.open_source import sklearn_utils
-from . init_tests import workspace_src
 from tests.core import TestContext
+from tests import utils_test
+from . init_tests import workspace_src
 
 
 def mk_experiment_name(workspace=workspace_src):
@@ -48,11 +49,9 @@ def create_version(client, model_name, stage=None, archive_existing_versions=Fal
     source = f"{run.info.artifact_uri}/model"
     desc = "My model desc"
     tags = { "city": "copan" }
-    if is_unity_catalog_model(model_name):
-        model = _create_registered_model(client, model_name, tags, desc)
-    else:
-        model = client.create_registered_model(model_name, tags, desc)
-    vr = client.create_model_version(model_name, source, run.info.run_id, description="my version", tags={ "city": "yaxchilan" })
+    model = _create_registered_model(client, model_name, tags, desc)
+    tags = { "city": "yaxchilan", "uuid": utils_test.mk_uuid() }
+    vr = client.create_model_version(model_name, source, run.info.run_id, description="my version", tags=tags)
     if not is_unity_catalog_model(model_name) and stage:
         vr = client.transition_model_version_stage(model_name, vr.version, stage, archive_existing_versions)
     vr = client.get_model_version(model_name, vr.version) # NOTE: since transition_model_version_stage returns no tags!

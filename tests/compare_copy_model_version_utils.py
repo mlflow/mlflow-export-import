@@ -17,5 +17,3 @@ def compare_runs(mlflow_context, src_vr, dst_vr):
     src_run = mlflow_context.client_src.get_run(src_vr.run_id)
     dst_run = mlflow_context.client_dst.get_run(dst_vr.run_id)
     compare_utils.compare_runs(mlflow_context, src_run, dst_run)
-
-

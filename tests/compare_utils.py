@@ -4,7 +4,9 @@ Compare MLflow object utilities.
 
 from mlflow_export_import.common import utils
 from mlflow_export_import.common.source_tags import ExportTags
+from mlflow_export_import.common.model_utils import is_unity_catalog_model
 from tests import utils_test
+
 
 def compare_runs(mlflow_context, run1, run2, import_source_tags=False, output_dir=None):
     output_dir = output_dir or mlflow_context.output_dir
@@ -83,9 +85,17 @@ def compare_models(model_src, model_dst, compare_name):
 
 def compare_models_with_versions(mlflow_context, model_src, model_dst, compare_name=None):
     if compare_name is None:
-        compare_name = mlflow_context.client_src!=mlflow_context.client_dst
+        compare_name = mlflow_context.client_src != mlflow_context.client_dst
     compare_models(model_src, model_dst, compare_name)
-    for (vr_src, vr_dst) in zip(model_src.latest_versions, model_dst.latest_versions):
+    if not is_unity_catalog_model(model_src.name) and not is_unity_catalog_model(model_dst.name):
+        for (vr_src, vr_dst) in zip(model_src.latest_versions, model_dst.latest_versions):
+            compare_versions(mlflow_context, vr_src, vr_dst)
+    vrs_src = mlflow_context.client_src.search_model_versions(f"name='{model_src.name}'")
+    vrs_dst = mlflow_context.client_dst.search_model_versions(f"name='{model_dst.name}'")
+    vrs_src = { vr.tags["uuid"]:vr for vr in vrs_src }
+    for vr_dst in vrs_dst:
+        vr_src = vrs_src.get(vr_dst.tags["uuid"])
+        assert vr_src
         compare_versions(mlflow_context, vr_src, vr_dst)
 
 
