@@ -14,6 +14,7 @@ from . click_options import (
 from mlflow_export_import.common.source_tags import ExportTags
 from mlflow_export_import.common.click_options import opt_verbose
 from mlflow_export_import.common import utils, model_utils, dump_utils
+from mlflow_export_import.common.mlflow_utils import MlflowTrackingUriTweak
 
 _logger = utils.getLogger(__name__)
 
@@ -66,14 +67,16 @@ def _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_cl
         tags = src_version.tags
     dump_utils.dump_mlflow_client(dst_client, "DST CLIENT")
 
-    dst_version = dst_client.create_model_version(
-        name = dst_model_name,
-        source = source_uri,
-        run_id = dst_run.info.run_id,
-        tags = tags,
-        description = src_version.description
-    )
-    dst_client.transition_model_version_stage(dst_model_name, dst_version.version, src_version.current_stage)
+    with MlflowTrackingUriTweak(dst_client):
+        dst_version = dst_client.create_model_version(
+            name = dst_model_name,
+            source = source_uri,
+            run_id = dst_run.info.run_id,
+            tags = tags,
+            description = src_version.description
+        )
+    if not model_utils.is_unity_catalog_model(dst_version.name):
+        dst_client.transition_model_version_stage(dst_version.name, dst_version.version, src_version.current_stage)
 
     try:
         for alias in src_version.aliases:
