@@ -18,6 +18,7 @@ from mlflow_export_import.common.click_options import (
     opt_verbose
 )
 from mlflow_export_import.common import utils, io_utils, model_utils
+from mlflow_export_import.common.mlflow_utils import MlflowTrackingUriTweak
 from mlflow_export_import.common.source_tags import set_source_tags_for_field, fmt_timestamps
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common.permissions_utils import import_permissions
@@ -108,14 +109,18 @@ class BaseModelImporter():
         if self.import_source_tags:
             _set_source_tags_for_field(src_vr, tags)
 
-        dst_vr = self.mlflow_client.create_model_version(
-            name = model_name,
-            source = dst_source,
-            run_id = dst_run_id,
-            description = src_vr.get("description"),
-            tags = tags, 
-            **kwargs
-        )
+        # NOTE: MLflow UC bug: 
+        # The client's tracking_uri is not honored. Instead MlflowClient.create_model_version()
+        # seems to use mlflow.tracking_uri internally to download run artifacts for UC models.
+        with MlflowTrackingUriTweak(self.mlflow_client):
+            dst_vr = self.mlflow_client.create_model_version(
+                name = model_name,
+                source = dst_source,
+                run_id = dst_run_id,
+                description = src_vr.get("description"),
+                tags = tags, 
+                **kwargs
+            )
         model_utils.wait_until_version_is_ready(self.mlflow_client, model_name, dst_vr, sleep_time=sleep_time)
         src_current_stage = src_vr["current_stage"]
         _logger.info(f"Importing model '{model_name}' version {dst_vr.version} stage '{src_current_stage}'")
@@ -160,7 +165,6 @@ class BaseModelImporter():
             self.mlflow_client.create_registered_model(model_name, tags, model_dct.get("description"))
             _logger.info(f"Created new registered model '{model_name}'")
         except RestException as e:
-            from mlflow_export_import.common import mlflow_utils
             if e.error_code != "RESOURCE_ALREADY_EXISTS":
                 raise e
             _logger.info(f"Registered model '{model_name}' already exists")

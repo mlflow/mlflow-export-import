@@ -1,8 +1,9 @@
 import time
 import mlflow
+from mlflow.utils.mlflow_tags import MLFLOW_RUN_NOTE # NOTE: ""mlflow.note.content" - used for Experiment Description too!
 
 from mlflow_export_import.common import utils, model_utils
-from mlflow.utils.mlflow_tags import MLFLOW_RUN_NOTE # NOTE: ""mlflow.note.content" - used for Experiment Description too!
+from mlflow_export_import.common.mlflow_utils import MlflowTrackingUriTweak
 
 from tests import utils_test
 from tests.open_source import sklearn_utils
@@ -10,6 +11,7 @@ from tests.open_source import sklearn_utils
 _logger = utils.getLogger(__name__)
 
 _logger.info(f"MLflow version: {mlflow.__version__}")
+
 
 def init_output_dirs(output_dir):
     utils_test.create_output_dir(output_dir)
@@ -55,21 +57,22 @@ def _create_simple_run(client, run_name=None, model_artifact="model", use_metric
     " Create run without creating experiment "
     max_depth = 4
     model = sklearn_utils.create_sklearn_model(max_depth)
-    with mlflow.start_run(run_name=run_name) as run:
-        mlflow.log_param("max_depth",max_depth)
-        if use_metric_steps:
-            for j in range(0,5):
-                mlflow.log_metric("rmse",.789+j,j)
-        else:
-            mlflow.log_metric("rmse", 0.789)
-        mlflow.set_tag("my_tag", "my_val")
-        mlflow.set_tag("my_uuid",utils_test.mk_uuid())
-        mlflow.sklearn.log_model(model, model_artifact)
-        with open("info.txt", "w", encoding="utf-8") as f:
-            f.write("Hi artifact")
-        mlflow.log_artifact("info.txt")
-        mlflow.log_artifact("info.txt", "dir2")
-        mlflow.log_metric("m1", 0.1)
+    with MlflowTrackingUriTweak(client):
+        with mlflow.start_run(run_name=run_name) as run:
+            mlflow.log_param("max_depth",max_depth)
+            if use_metric_steps:
+                for j in range(0,5):
+                    mlflow.log_metric("rmse",.789+j,j)
+            else:
+                mlflow.log_metric("rmse", 0.789)
+            mlflow.set_tag("my_tag", "my_val")
+            mlflow.set_tag("my_uuid",utils_test.mk_uuid())
+            mlflow.sklearn.log_model(model, model_artifact)
+            with open("info.txt", "w", encoding="utf-8") as f:
+                f.write("Hi artifact")
+            mlflow.log_artifact("info.txt")
+            mlflow.log_artifact("info.txt", "dir2")
+            mlflow.log_metric("m1", 0.1)
     return client.get_run(run.info.run_id)
 
 

@@ -75,29 +75,52 @@ def create_workspace_dir(dbx_client, workspace_dir):
     _logger.info(f"Creating Databricks workspace directory '{workspace_dir}'")
     dbx_client.post("workspace/mkdirs", { "path": workspace_dir })
 
+
+# == Context Manager
+
+class MlflowTrackingUriTweak:
+    """
+    There is a bug in several MLflow methods related to downloading artifacts.
+    This manifests itself in two places:
+      1. mlflow.MlflowClient.create_model_version
+         The client's tracking_uri is not honored. Instead create_model_version
+         uses mlflow.tracking_uri internally to download run artifacts.
+      2. mlflow.artifacts.download_artifacts
+        See download_artifacts() below.
+    """
+    def __init__(self, client):
+        self.client = client
+        self.original_tracking_uri = mlflow.get_tracking_uri()
+        mlflow.set_tracking_uri(client.tracking_uri)
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        mlflow.set_tracking_uri(self.original_tracking_uri)
+
+
 # == Download artifact issue
 
 def download_artifacts(client, download_uri, dst_path=None, fix=True):
     """ 
     Apparently the tracking_uri argument is not honored for mlflow.artifacts.download_artifacts().
     It seems that tracking_uri is ignored and the global mlflow.get_tracking_uri() is always used.
-    If the two happen to be the same operation will succeed.
+    If the two happen to be the same, the operation will succeed.
     If not, it fails.
     Issue: Merge pull request #104 from mingyu89/fix-download-artifacts
     """ 
     if fix:
-        previous_tracking_uri = mlflow.get_tracking_uri()
-        mlflow.set_tracking_uri(client._tracking_client.tracking_uri)
-        local_path = mlflow.artifacts.download_artifacts(
-            artifact_uri = download_uri,
-            dst_path = dst_path,
-        )
-        mlflow.set_tracking_uri(previous_tracking_uri)
+        with MlflowTrackingUriTweak(client):
+            local_path = mlflow.artifacts.download_artifacts(
+                artifact_uri = download_uri,
+                dst_path = dst_path,
+            )
     else:
         local_path = mlflow.artifacts.download_artifacts(
             artifact_uri = download_uri,
             dst_path = dst_path,
-            tracking_uri = client._tracking_client.tracking_uri
+            tracking_uri = client.tracking_uri
         )
     return local_path
 

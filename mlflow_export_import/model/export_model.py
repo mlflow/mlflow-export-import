@@ -84,7 +84,7 @@ def export_model(
         return True, model_name
     except RestException as e:
         err_msg = { "model": model_name, "RestException": e.json  }
-        if e.json.get("error_code",None) == "RESOURCE_DOES_NOT_EXIST":
+        if e.json.get("error_code") == "RESOURCE_DOES_NOT_EXIST":
             _logger.error({ **{"message": "Model does not exist"}, **err_msg})
         else:
             _logger.error({**{"message": "Model cannot be exported"}, **err_msg})
@@ -162,7 +162,7 @@ def _export_version(mlflow_client, vr, output_dir, output_versions, failed_versi
 
     except RestException as e:
         err_msg = { "model": vr.name, "version": vr.version, "run_id": vr.run_id, "RestException": e.json  }
-        if e.json.get("error_code",None) == "RESOURCE_DOES_NOT_EXIST":
+        if e.json.get("error_code") == "RESOURCE_DOES_NOT_EXIST":
             err_msg = { **{"message": "Version run probably does not exist"}, **err_msg}
             _logger.error(err_msg)
         else:
@@ -188,7 +188,7 @@ def _adjust_model(model, versions):
 
 
 def _adjust_timestamp(dct, attr):
-    dct[f"_{attr}"] = fmt_ts_millis(dct.get(attr,None))
+    dct[f"_{attr}"] = fmt_ts_millis(dct.get(attr))
 
 
 def _normalize_stages(stages):
