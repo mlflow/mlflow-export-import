@@ -52,7 +52,7 @@ def import_experiments(
     exps = dct["experiments"]
     _logger.info("Importing experiments:")
     for exp in exps:
-        _logger.info(f"  {exp}")
+        _logger.info(f"  Importing experiment: {exp}")
 
     max_workers = utils.get_threads(use_threads)
     futures = []

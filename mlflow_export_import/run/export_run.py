@@ -88,7 +88,7 @@ def export_run(
             if len(notebook_formats) > 0:
                 _export_notebook(dbx_client, output_dir, notebook, notebook_formats, run, fs)
         elif len(notebook_formats) > 0:
-            _logger.warning(f"Cannot export notebook for run '{run_id}' since tag '{MLFLOW_DATABRICKS_NOTEBOOK_PATH}' is not set.")
+            _logger.warning(f"No notebooks to export for run '{run_id}' since tag '{MLFLOW_DATABRICKS_NOTEBOOK_PATH}' is not set.")
         return True
 
     except RestException as e:
