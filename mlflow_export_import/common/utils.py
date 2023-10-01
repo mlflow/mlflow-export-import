@@ -63,6 +63,10 @@ def strip_underscores(obj):
     return { k[1:]:v for (k,v) in obj.__dict__.items() }
 
 
+def get_obj_key_values(obj, keys):
+    return { k:v for k,v in strip_underscores(obj).items() if k in keys }
+
+
 def string_to_list(list_as_string):
     if list_as_string is None:
         return []

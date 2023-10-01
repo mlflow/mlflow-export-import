@@ -16,8 +16,26 @@ def is_unity_catalog_model(name):
     return len(name.split(".")) == 3
 
 
+def create_model(client, model_name, tags=None, description=None):
+    """ 
+    Creates a registered model if it does not exist and returns model.
+    """
+    client = client or mlflow.MlflowClient()
+    try:
+        model = client.create_registered_model(model_name, tags, description)
+        _logger.info(f"Created new registered model '{model_name}'")
+        return model
+    except RestException as e:
+        if e.error_code != "RESOURCE_ALREADY_EXISTS":
+            raise e
+        _logger.info(f"Registered model '{model_name}' already exists")
+        return client.get_registered_model(model_name)
+
+
 def delete_model(client, model_name, sleep_time=5):
-    """ Delete a model and all its versions. """
+    """ 
+    Delete a registered model and all its versions.
+    """
     try:
         versions = SearchModelVersionsIterator(client, filter=f"name='{model_name}'")
         _logger.info(f"Deleting model '{model_name}' and its versions")
