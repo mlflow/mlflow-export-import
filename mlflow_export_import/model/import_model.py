@@ -122,10 +122,11 @@ class BaseModelImporter():
                 **kwargs
             )
         model_utils.wait_until_version_is_ready(self.mlflow_client, model_name, dst_vr, sleep_time=sleep_time)
-        src_current_stage = src_vr["current_stage"]
-        _logger.info(f"Importing model '{model_name}' version {dst_vr.version} stage '{src_current_stage}'")
+        msg = utils.get_obj_key_values(dst_vr, [ "name", "version", "current_stage", "status" ])
+        _logger.info(f"Importing model version: {msg}")
 
         if not model_utils.is_unity_catalog_model(model_name):
+            src_current_stage = src_vr["current_stage"]
             if src_current_stage and src_current_stage != "None": # fails for Databricks  but not OSS
                 self.mlflow_client.transition_model_version_stage(model_name, dst_vr.version, src_current_stage)
 
@@ -264,7 +265,7 @@ class ModelImporter(BaseModelImporter):
         return dst_run_id
 
 
-    def import_version(self, model_name, src_vr, dst_run_id, sleep_time):
+    def import_version(self, model_name, src_vr, dst_run_id, sleep_time=10):
         dst_run = self.mlflow_client.get_run(dst_run_id)
         model_path = _extract_model_path(src_vr["source"], src_vr["run_id"])
         dst_source = f"{dst_run.info.artifact_uri}/{model_path}"
@@ -319,7 +320,6 @@ class BulkModelImporter(BaseModelImporter):
                 dst_run_id = dst_run_info.run_id
                 exp_name = rename_utils.rename(vr["_experiment_name"], self.experiment_renames, "experiment")
                 try:
-#XX
                     with MlflowTrackingUriTweak(self.mlflow_client):
                         mlflow.set_experiment(exp_name)
                     self.import_version(model_name, vr, dst_run_id, sleep_time)

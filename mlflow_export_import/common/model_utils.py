@@ -18,7 +18,7 @@ def is_unity_catalog_model(name):
 
 def create_model(client, model_name, tags=None, description=None):
     """ 
-    Creates a registered model if it does not exist and returns model.
+    Creates a registered model if it does not exist, and returns the model in either case.
     """
     client = client or mlflow.MlflowClient()
     try:
@@ -66,12 +66,15 @@ def list_model_versions(client, model_name, get_latest_versions=False):
 
 
 def wait_until_version_is_ready(client, model_name, model_version, sleep_time=1, iterations=100):
-    """ Due to blob eventual consistency, wait until a newly created version is in READY state. """
+    """ 
+    Due to blob eventual consistency, wait until a newly created version is in READY state.
+    """
     start = time.time()
     for _ in range(iterations):
         vr = client.get_model_version(model_name, model_version.version)
         status = ModelVersionStatus.from_string(vr.status)
-        _logger.info(f"Version: id={vr.version} status={vr.status} state={vr.current_stage}")
+        msg = utils.get_obj_key_values(vr, [ "name", "version", "current_stage", "status" ])
+        _logger.info(f"Model version transition: {msg}")
         if status == ModelVersionStatus.READY:
             break
         time.sleep(sleep_time)
@@ -100,7 +103,9 @@ def export_version_model(client, version, output_dir):
 
 
 def show_versions(model_name, versions, msg):
-    """ Display as table registered model versions. """
+    """ 
+    Display as table registered model versions.
+     """
     import pandas as pd
     from tabulate import tabulate
     versions = [ [
@@ -127,7 +132,9 @@ def show_versions(model_name, versions, msg):
 
 
 def dump_model_versions(client, model_name):
-    """ Display as table 'latest' and 'all' registered model versions. """
+    """ 
+    Display as table 'latest' and 'all' registered model versions.
+    """
     if not is_unity_catalog_model(model_name):
         versions = client.get_latest_versions(model_name)
         show_versions(model_name, versions, "Latest")
