@@ -101,7 +101,7 @@ def opt_input_dir(function):
 
 def opt_import_source_tags(function):
     function = click.option("--import-source-tags",
-        help="Import source information for registered model and its versions ad tags in destination object.",
+        help="Import source information for registered model and its versions and tags in destination object.",
         type=bool,
         default=False,
         show_default=True
