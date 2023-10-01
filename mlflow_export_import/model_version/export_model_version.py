@@ -6,10 +6,12 @@ import os
 import click
 import mlflow
 
+from mlflow_export_import.common import model_utils
 from mlflow_export_import.common.click_options import (
     opt_model,
     opt_output_dir,
     opt_notebook_formats,
+    opt_export_version_model
 )
 from . click_options import (
     opt_version,
@@ -26,6 +28,7 @@ def export_model_version(
         model_name,
         version,
         output_dir,
+        export_version_model = False,
         notebook_formats = None,
         mlflow_client = None
     ):
@@ -35,7 +38,7 @@ def export_model_version(
     :param output_dir: Export directory.
     :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
     :param mlflow_client: MlflowClient
-    :return: Returns bool and the model name (if export succeeded).
+    :return: Returns model version
     """
 
     mlflow_client = mlflow_client or mlflow.MlflowClient()
@@ -50,11 +53,18 @@ def export_model_version(
         mlflow_client = mlflow_client
     )
 
+    vr_dict = dict(vr)
+    if export_version_model:
+        _output_dir = os.path.join(output_dir, "mlflow_model")
+        vr_dict["_download_uri"] = model_utils.export_version_model(mlflow_client, vr, _output_dir)
+
     info_attr = {}
-    mlflow_attr = { "model_version": _adjust_version(dict(vr)) }
+    mlflow_attr = { "model_version": _adjust_version(vr_dict) }
     msg = utils.get_obj_key_values(vr, [ "name", "version", "current_stage", "status", "run_id" ])
     _logger.info(f"Exporting model verson: {msg}")
+
     io_utils.write_export_file(output_dir, "model_version.json", __file__, mlflow_attr, info_attr)
+    return vr
 
 
 def _adjust_version(vr):
@@ -72,11 +82,12 @@ def _adjust_version(vr):
 @opt_model
 @opt_version
 @opt_output_dir
+@opt_export_version_model
 @opt_notebook_formats
-
 def main(model,
         version,
         output_dir,
+        export_version_model,
         notebook_formats,
     ):
     """
@@ -89,6 +100,7 @@ def main(model,
         model_name = model,
         version = version,
         output_dir = output_dir,
+        export_version_model = export_version_model,
         notebook_formats = notebook_formats
     )
 

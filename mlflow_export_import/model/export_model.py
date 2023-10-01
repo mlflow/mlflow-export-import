@@ -157,7 +157,8 @@ def _export_version(mlflow_client, vr, output_dir, output_versions, failed_versi
         experiment = mlflow_client.get_experiment(run.info.experiment_id)
         vr_dct["_experiment_name"] = experiment.name
         if opts.export_version_model:
-            vr_dct["_download_uri"] = model_utils.export_version_model(mlflow_client, vr, output_dir)
+            _output_dir = os.path.join(output_dir, "version_models", vr.version) 
+            vr_dct["_download_uri"] = model_utils.export_version_model(mlflow_client, vr, _output_dir)
         output_versions.append(vr_dct)
 
     except RestException as e:
