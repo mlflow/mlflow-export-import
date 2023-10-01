@@ -248,7 +248,7 @@ class ModelImporter(BaseModelImporter):
         model_artifact = _extract_model_path(source, run_id)
         _logger.info(f"      model_artifact:   {model_artifact}")
 
-        dst_run,_ = import_run(
+        dst_run, _ = import_run(
             input_dir = run_dir,
             experiment_name = experiment_name,
             import_source_tags = self.import_source_tags,
@@ -319,7 +319,9 @@ class BulkModelImporter(BaseModelImporter):
                 dst_run_id = dst_run_info.run_id
                 exp_name = rename_utils.rename(vr["_experiment_name"], self.experiment_renames, "experiment")
                 try:
-                    mlflow.set_experiment(exp_name)
+#XX
+                    with MlflowTrackingUriTweak(self.mlflow_client):
+                        mlflow.set_experiment(exp_name)
                     self.import_version(model_name, vr, dst_run_id, sleep_time)
                 except RestException as e:
                     msg = { "model": model_name, "version": vr["version"], "experiment": exp_name, "run_id": dst_run_id, "exception": str(e) }
