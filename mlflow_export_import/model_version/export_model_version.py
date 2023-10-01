@@ -52,7 +52,7 @@ def export_model_version(
 
     info_attr = {}
     mlflow_attr = { "model_version": _adjust_version(dict(vr)) }
-    msg = { "name": vr.name, "version": vr.version, "current_stage": vr.current_stage, "run_id": vr.run_id }
+    msg = utils.get_obj_key_values(vr, [ "name", "version", "current_stage", "status", "run_id" ])
     _logger.info(f"Exporting model verson: {msg}")
     io_utils.write_export_file(output_dir, "model_version.json", __file__, mlflow_attr, info_attr)
 
@@ -79,6 +79,9 @@ def main(model,
         output_dir,
         notebook_formats,
     ):
+    """
+    Exports a registered model version and its run.
+    """
     _logger.info("Options:")
     for k,v in locals().items():
         _logger.info(f"  {k}: {v}")
