@@ -52,11 +52,15 @@ def export_model_version(
 
     info_attr = {}
     mlflow_attr = { "model_version": _adjust_version(dict(vr)) }
+    msg = { "name": vr.name, "version": vr.version, "current_stage": vr.current_stage, "run_id": vr.run_id }
+    _logger.info(f"Exporting model verson: {msg}")
     io_utils.write_export_file(output_dir, "model_version.json", __file__, mlflow_attr, info_attr)
 
 
 def _adjust_version(vr):
-    """ Add nicely formatted timestamps and for aesthetic reasons order the dict attributes"""
+    """
+    Add nicely formatted timestamps and for aesthetic reasons order the dict attributes
+    """
     def _adjust_timestamp(dct, attr):
         dct[f"_{attr}"] = fmt_ts_millis(dct.get(attr))
     _adjust_timestamp(vr, "creation_timestamp")
@@ -70,7 +74,7 @@ def _adjust_version(vr):
 @opt_output_dir
 @opt_notebook_formats
 
-def main(model, 
+def main(model,
         version,
         output_dir,
         notebook_formats,
@@ -82,7 +86,7 @@ def main(model,
         model_name = model,
         version = version,
         output_dir = output_dir,
-        notebook_formats = notebook_formats,
+        notebook_formats = notebook_formats
     )
 
 
