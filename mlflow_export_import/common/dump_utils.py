@@ -14,6 +14,10 @@ def dump_mlflow_client(client, msg=""):
 
 
 def dump_obj(obj, title=None, indent=""):
+    if isinstance(obj, dict) or isinstance(obj, list):
+        #dump_dict(obj, title)
+        dump_as_json(obj, title)
+        return
     if obj:
         title = title if title else type(obj).__name__
         print(f"{indent}{title}")
@@ -38,7 +42,7 @@ def dump_obj_as_json(obj, title=None):
     dump_as_json(obj_to_dict(obj))
 
 
-def dump_as_json(dct,  title=None, sort_keys=None, indent=2):
+def dump_as_json(dct, title=None, sort_keys=None, indent=2):
     if title:
         print(f"{title}:")
     print(dict_to_json(dct, sort_keys, indent))
