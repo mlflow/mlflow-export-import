@@ -129,6 +129,25 @@ def show_versions(model_name, versions, msg):
     print(tabulate(df, headers="keys", tablefmt="psql", showindex=False))
 
 
+def model_version_to_dict(version):
+    """
+    Convert a ModelVersion to a dictionary.
+    1. Per doc, aliases are supposed to be a list of strings but are acutally a ProtoBuf and therefore
+       JSON serialization fails.
+       https://mlflow.org/docs/latest/python_api/mlflow.entities.html#mlflow.entities.model_registry.ModelVersion.aliases
+    2. Wot! Difference between ModelVersion property 'creation_timestamp' and attribute 'creation_timestamp'
+    """
+    dct = {}
+    for k,v in utils.strip_underscores(version).items():
+        if k == "aliases": # type is google._upb._message.RepeatedScalarContainer
+            dct[k] = [ str(x) for x in v ]
+        else:
+            if k == "creation_time":  # Wot!
+                k = "creation_timestamp"
+            dct[k] = v
+    return dct
+
+
 def dump_model_versions(client, model_name):
     """ 
     Display as table 'latest' and 'all' registered model versions.
