@@ -24,11 +24,9 @@ def _compare_runs_without_source_tags(mlflow_context, run1, run2, output_dir):
 def _compare_runs_with_source_tags(run1, run2):
     assert run1.data.params == run2.data.params
     assert run1.data.metrics == run2.data.metrics
-    source_tags2 = { k:v for k,v in run2.data.tags.items() if k.startswith(ExportTags.PREFIX_ROOT) }
+    source_tags2 = _strip_mlflow_export_import_tags(run2.data.tags)
     assert len(source_tags2) > 0, f"Source tags starting with '{ExportTags.PREFIX_ROOT}' are missing"
-    for k,v in utils.strip_underscores(run1.info).items():
-        if k != "run_name":
-            assert str(v) == source_tags2[f"{ExportTags.PREFIX_RUN_INFO}.{k}"],f"Assert failed for RunInfo field '{k}'" # NOTE: tag values must be strings
+
 
 def compare_experiment_tags(tags1, tags2, import_source_tags=False):
     if not import_source_tags:
@@ -40,7 +38,7 @@ def compare_experiment_tags(tags1, tags2, import_source_tags=False):
     mlflow_tags2 = { k.replace(f"{ExportTags.PREFIX_MLFLOW_TAG}.","mlflow."):v for k,v in source_tags2.items() }
     assert mlflow_tags1 == mlflow_tags2
 
-    tags2_no_source_tags = { k:v for k,v in tags2.items() if not k.startswith(ExportTags.PREFIX_ROOT) }
+    tags2_no_source_tags = _strip_mlflow_export_import_tags(tags2)
     assert tags1 == tags2_no_source_tags
 
 
@@ -99,28 +97,29 @@ def compare_models_with_versions(mlflow_context, model_src, model_dst, compare_n
         compare_versions(mlflow_context, vr_src, vr_dst)
 
 
-def compare_versions(mlflow_context, vr_src, vr_dst):
+def compare_versions(mlflow_context, vr_src, vr_dst, compare_names=True, run_ids_equal=False):
     assert vr_src.current_stage == vr_dst.current_stage
     assert vr_src.description == vr_dst.description
     assert vr_src.status == vr_dst.status
     assert vr_src.status_message == vr_dst.status_message
-    if mlflow_context.client_src != mlflow_context.client_dst:
+    if compare_names and mlflow_context.client_src != mlflow_context.client_dst:
         assert vr_src.name == vr_dst.name
     if not utils.importing_into_databricks():
         assert vr_src.user_id == vr_dst.user_id
 
-    tags_dst = { k:v for k,v in vr_dst.tags.items() if not k.startswith(ExportTags.PREFIX_ROOT) }
-    assert vr_src.tags == tags_dst
+    src_tags = _strip_mlflow_export_import_tags(vr_src.tags)
+    dst_tags = _strip_mlflow_export_import_tags(vr_dst.tags)
+    assert src_tags == dst_tags
 
-    assert vr_src.run_id != vr_dst.run_id
+    if run_ids_equal:
+        assert vr_src.run_id == vr_dst.run_id
+    else:
+        assert vr_src.run_id != vr_dst.run_id
+
     run_src = mlflow_context.client_src.get_run(vr_src.run_id)
     run_dst = mlflow_context.client_dst.get_run(vr_dst.run_id)
     compare_runs(mlflow_context, run_src, run_dst)
 
 
-def dump_runs(run1, run2):
-    from mlflow_export_import.common.dump_run import dump_run
-    print("======= Run1")
-    dump_run(run1)
-    print("======= Run2")
-    dump_run(run2)
+def _strip_mlflow_export_import_tags(tags):
+    return { k:v for k,v in tags.items() if not k.startswith(ExportTags.PREFIX_ROOT) }

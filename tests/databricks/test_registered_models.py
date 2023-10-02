@@ -8,24 +8,24 @@ from . init_tests import test_context
 from . import local_utils
 
 def _init(test_context):
-    model_name_src = local_utils.mk_test_object_name_default()
-    _, model_src = local_utils.create_version(test_context.mlflow_client_src, model_name_src, "Production")
+    src_model_name = local_utils.mk_test_object_name_default()
+    _, src_model = local_utils.create_version(test_context.mlflow_client_src, src_model_name, "Production")
     export_model(
         mlflow_client = test_context.mlflow_client_src,
-        model_name = model_src.name,
+        model_name = src_model.name,
         output_dir = test_context.output_dir
     )
-    model_name_dst = model_src.name
+    dst_model_name = src_model.name
     import_model(
         mlflow_client = test_context.mlflow_client_dst,
-        model_name = model_name_dst,
+        model_name = dst_model_name,
         experiment_name = local_utils.mk_experiment_name(workspace=workspace_dst),
         input_dir = test_context.output_dir
     )
-    model_dst = test_context.mlflow_client_dst.get_registered_model(model_name_dst)
-    return model_src, model_dst
+    dst_model = test_context.mlflow_client_dst.get_registered_model(dst_model_name)
+    return src_model, dst_model
 
 
 def test_registered_model(test_context):
-    model_src, model_dst = _init(test_context)
-    compare_models_with_versions(to_MlflowContext(test_context), model_src, model_dst)
+    src_model, dst_model = _init(test_context)
+    compare_models_with_versions(to_MlflowContext(test_context), src_model, dst_model)
