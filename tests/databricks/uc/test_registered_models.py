@@ -4,8 +4,7 @@ from mlflow_export_import.common import dump_utils
 from mlflow_export_import.common import model_utils
 
 from tests.core import to_MlflowContext
-from tests.compare_utils import compare_models
-from tests.compare_copy_model_version_utils import compare_model_versions, compare_runs
+from tests.compare_utils import compare_models_with_versions
 from tests.databricks.init_tests import workspace_src, workspace_dst
 from tests.databricks.init_tests import test_context
 from tests.databricks import local_utils
@@ -34,12 +33,9 @@ def _init(test_context):
     dst_vr = dst_vrs[0]
     dump_utils.dump_obj(dst_vr, "DST Version")
 
-    return src_model, src_vr, dst_model, dst_vr
+    return src_model, dst_model
 
 
 def test_registered_model(test_context):
-    src_model, src_vr, dst_model, dst_vr  = _init(test_context)
-    compare_models(src_model, dst_model, compare_name=False)
-    compare_model_versions(src_vr, dst_vr)
-    compare_runs(to_MlflowContext(test_context), src_vr, dst_vr)
-
+    src_model, dst_model = _init(test_context)
+    compare_models_with_versions(to_MlflowContext(test_context), src_model, dst_model, compare_names=False)

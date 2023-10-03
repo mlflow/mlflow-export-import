@@ -2,7 +2,7 @@
 Compare MLflow object utilities.
 """
 
-from mlflow_export_import.common import utils
+from mlflow_export_import.common import utils, model_utils
 from mlflow_export_import.common.source_tags import ExportTags
 from mlflow_export_import.common.model_utils import is_unity_catalog_model
 from tests import utils_test
@@ -72,8 +72,8 @@ def _compare_artifacts(mlflow_context, run1, run2, run_artifact_dir1, run_artifa
     assert utils_test.compare_dirs(path1, path2)
 
 
-def compare_models(model_src, model_dst, compare_name):
-    if compare_name:
+def compare_models(model_src, model_dst, compare_names):
+    if compare_names:
         assert model_src.name == model_dst.name
     else:
         assert model_src.name != model_dst.name # When testing against Databricks, for now we use one tracking server and thus the model names are different
@@ -81,20 +81,20 @@ def compare_models(model_src, model_dst, compare_name):
     assert model_src.tags.items() <= model_dst.tags.items()
 
 
-def compare_models_with_versions(mlflow_context, model_src, model_dst, compare_name=None):
-    if compare_name is None:
-        compare_name = mlflow_context.client_src != mlflow_context.client_dst
-    compare_models(model_src, model_dst, compare_name)
+def compare_models_with_versions(mlflow_context, model_src, model_dst, compare_names=None):
+    if compare_names is None:
+        compare_names = mlflow_context.client_src != mlflow_context.client_dst
+    compare_models(model_src, model_dst, compare_names)
     if not is_unity_catalog_model(model_src.name) and not is_unity_catalog_model(model_dst.name):
         for (vr_src, vr_dst) in zip(model_src.latest_versions, model_dst.latest_versions):
-            compare_versions(mlflow_context, vr_src, vr_dst)
-    vrs_src = mlflow_context.client_src.search_model_versions(f"name='{model_src.name}'")
-    vrs_dst = mlflow_context.client_dst.search_model_versions(f"name='{model_dst.name}'")
+            compare_versions(mlflow_context, vr_src, vr_dst, compare_names)
+    vrs_src = model_utils.search_model_versions(mlflow_context.client_src, f"name='{model_src.name}'")
+    vrs_dst = model_utils.search_model_versions(mlflow_context.client_dst, f"name='{model_dst.name}'")
     vrs_src = { vr.tags["uuid"]:vr for vr in vrs_src }
     for vr_dst in vrs_dst:
         vr_src = vrs_src.get(vr_dst.tags["uuid"])
         assert vr_src
-        compare_versions(mlflow_context, vr_src, vr_dst)
+        compare_versions(mlflow_context, vr_src, vr_dst, compare_names)
 
 
 def compare_versions(mlflow_context, vr_src, vr_dst, compare_names=True, run_ids_equal=False):
