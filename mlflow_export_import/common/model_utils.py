@@ -16,7 +16,7 @@ def is_unity_catalog_model(name):
 
 
 def create_model(client, model_name, tags=None, description=None):
-    """ 
+    """
     Creates a registered model if it does not exist, and returns the model in either case.
     """
     client = client or mlflow.MlflowClient()
@@ -32,7 +32,7 @@ def create_model(client, model_name, tags=None, description=None):
 
 
 def delete_model(client, model_name, sleep_time=5):
-    """ 
+    """
     Delete a registered model and all its versions.
     """
     try:
@@ -65,8 +65,19 @@ def list_model_versions(client, model_name, get_latest_versions=False):
             return list(SearchModelVersionsIterator(client, filter=f"name='{model_name}'"))
 
 
+def search_model_versions(client, filter):
+    """
+    Wrapper around MlflowClient.search_model_versions to account for missing aliases and tags in returned ModelVersion.
+    Makes a call to MlflowClient.get_model_version for each version. Hardly performant.
+     - Missing aliases - https://github.com/mlflow/mlflow/issues/9783 - [BUG] MlflowClient.search_model_versions does not return aliases
+     - Missing tags - ES-834105 - UC-ML MLflow search_registered_models and search_model_versions do not return tags and aliases
+    """
+    versions = client.search_model_versions(filter)
+    return [ client.get_model_version(vr.name, vr.version) for vr in versions ]
+
+
 def wait_until_version_is_ready(client, model_name, model_version, sleep_time=1, iterations=100):
-    """ 
+    """
     Due to blob eventual consistency, wait until a newly created version is in READY state.
     """
     start = time.time()
@@ -101,7 +112,7 @@ def export_version_model(client, version, output_dir):
 
 
 def show_versions(model_name, versions, msg):
-    """ 
+    """
     Display as table registered model versions.
      """
     import pandas as pd
@@ -149,7 +160,7 @@ def model_version_to_dict(version):
 
 
 def dump_model_versions(client, model_name):
-    """ 
+    """
     Display as table 'latest' and 'all' registered model versions.
     """
     if not is_unity_catalog_model(model_name):
