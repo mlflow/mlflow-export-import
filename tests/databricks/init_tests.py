@@ -8,24 +8,16 @@ from mlflow_export_import.common import utils, model_utils
 from mlflow_export_import.client.http_client import DatabricksHttpClient
 from tests import utils_test
 from tests.core import TestContext
-from tests.databricks.unity_catalog_client import UnityCatalogClient
-#from . unity_catalog_client import UnityCatalogClient
+from . unity_catalog_client import UnityCatalogClient
+from . includes import Dict2Class
 
 _logger = utils.getLogger(__name__)
+
 
 # Skip Databricks cleanup calls to avoid 429
 _skip_cleanup  = os.environ.get("MLFLOW_EXPORT_IMPORT_SKIP_CLEANUP")
 _logger.info(f"_skip_cleanup: {_skip_cleanup}")
 
-class Dict2Class():
-    def __init__(self, dct):
-        self.dct = dct
-        for k,v in dct.items():
-            if isinstance(v,dict):
-                v = Dict2Class(v)
-            setattr(self, k, v)
-    def __str__(self):
-        return str(self.dct)
 
 _cfg = utils_test.read_config_file()
 cfg = Dict2Class(_cfg)
@@ -35,7 +27,7 @@ class Workspace():
     def __init__(self, cfg_ws):
         self.cfg = cfg_ws
         self.base_dir = self.cfg.base_dir
-        tracking_profile = self.cfg.profile.replace("databricks-uc","databricks")
+        tracking_profile = self.cfg.profile.replace("databricks-uc","databricks") # no "-uc" for tracking
         self.mlflow_client = mlflow.MlflowClient(tracking_profile, self.cfg.profile)
         self.dbx_client = DatabricksHttpClient(self.mlflow_client.tracking_uri)
         self.uc_dbx_client = UnityCatalogClient(self.dbx_client)
@@ -99,7 +91,7 @@ def _delete_directory(ws):
 
 
 def _delete_models_non_uc(ws):
-    filter = "name like 'test_exim_%'" 
+    filter = "name like 'test_exim_%'"
     models = SearchRegisteredModelsIterator(ws.mlflow_client, filter=filter)
     models = list(models)
     _logger.info(f"{ws.dbx_client}: Deleting {len(models)} non-UC models")
@@ -128,11 +120,11 @@ def test_context():
             output_dir = tmpdir
         _logger.info(f"output_dir: {output_dir}")
         yield TestContext(
-            workspace_src.mlflow_client, 
-            workspace_dst.mlflow_client, 
-            workspace_src.dbx_client, 
-            workspace_dst.dbx_client, 
-            output_dir, 
+            workspace_src.mlflow_client,
+            workspace_dst.mlflow_client,
+            workspace_src.dbx_client,
+            workspace_dst.dbx_client,
+            output_dir,
             os.path.join(output_dir,"run")
         )
 
