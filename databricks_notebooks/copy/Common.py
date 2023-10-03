@@ -12,7 +12,7 @@ print("mlflow.version:", mlflow.__version__)
 
 # COMMAND ----------
 
-from mlflow_export_import.copy.copy_utils import obj_to_dict, dict_to_json, dump_obj_as_json
+from mlflow_export_import.common.dump_utils import obj_to_dict, dict_to_json, dump_obj_as_json
 
 # COMMAND ----------
 
