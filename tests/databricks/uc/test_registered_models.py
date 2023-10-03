@@ -9,11 +9,16 @@ from tests.databricks.init_tests import workspace_src, workspace_dst
 from tests.databricks.init_tests import test_context
 from tests.databricks import local_utils
 
+num_versions = 3
 
 def _init(test_context):
     src_model_name = local_utils.mk_uc_model_name(workspace_src)
-    src_vr, src_model = local_utils.create_version(test_context.mlflow_client_src, src_model_name)
-    dump_utils.dump_obj(src_vr, "SRC Version")
+
+    src_vrs = [ local_utils.create_version(test_context.mlflow_client_src, src_model_name) for _ in range(num_versions) ]
+    src_model = src_vrs[0][1]
+    src_vrs = [ vr[0] for vr in src_vrs ]
+    for vr in src_vrs:
+        dump_utils.dump_obj(vr, f"SRC Version {vr.version}")
 
     export_model(
         mlflow_client = test_context.mlflow_client_src,
@@ -29,9 +34,9 @@ def _init(test_context):
     )
     dst_model = test_context.mlflow_client_dst.get_registered_model(dst_model_name)
     dst_vrs = model_utils.list_model_versions(test_context.mlflow_client_dst, dst_model.name)
-    assert len(dst_vrs) == 1
-    dst_vr = dst_vrs[0]
-    dump_utils.dump_obj(dst_vr, "DST Version")
+    assert len(dst_vrs) == num_versions
+    for vr in dst_vrs:
+        dump_utils.dump_obj(vr, f"DST Version {vr.version}")
 
     return src_model, dst_model
 
