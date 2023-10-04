@@ -125,6 +125,9 @@ class BaseModelImporter():
         msg = utils.get_obj_key_values(dst_vr, [ "name", "version", "current_stage", "status" ])
         _logger.info(f"Importing model version: {msg}")
 
+        for alias in src_vr.get("aliases",[]):
+            self.mlflow_client.set_registered_model_alias(model_name, alias, dst_vr.version)
+
         if not model_utils.is_unity_catalog_model(model_name):
             src_current_stage = src_vr["current_stage"]
             if src_current_stage and src_current_stage != "None": # fails for Databricks  but not OSS
@@ -174,8 +177,8 @@ class BaseModelImporter():
             perms_dct = model_dct["permissions"]
             if perms_dct:
                 _model = self.dbx_client.get("mlflow/databricks/registered-models/get", { "name": model_name })
-                _model2 = _model["registered_model_databricks"]
-                model_id = _model2["id"]
+                _model = _model["registered_model_databricks"]
+                model_id = _model["id"]
                 import_permissions(self.dbx_client, perms_dct, "model", model_name, model_id)
 
         return model_dct

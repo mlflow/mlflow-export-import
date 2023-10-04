@@ -102,17 +102,22 @@ def _export_model(mlflow_client, http_client, dbx_client, model_name, output_dir
     ori_versions = model_utils.list_model_versions(mlflow_client, model_name, opts.export_latest_versions)
     msg = "latest" if opts.export_latest_versions else "all"
     _logger.info(f"Exporting model '{model_name}': found {len(ori_versions)} '{msg}' versions")
-    versions, failed_versions = _export_versions(mlflow_client, ori_versions, output_dir, opts)
 
     if utils.importing_into_databricks() and opts.export_permissions:
-        model = http_client.get("databricks/registered-models/get", { "name": model_name })
-        model2 = model.pop("registered_model_databricks", None)
-        _adjust_model(model2, versions)
-        model2["permissions"] = permissions_utils.get_model_permissions(dbx_client, model2["id"])
-        model["registered_model"] = model2
+        _model = http_client.get("databricks/registered-models/get", { "name": model_name })
+        model = _model.pop("registered_model_databricks", None)
+        permissions = permissions_utils.get_model_permissions(dbx_client, model["id"])
+        _model["registered_model"] = model
     else:
-        model = http_client.get("registered-models/get", {"name": model_name})
-        _adjust_model(model["registered_model"], versions)
+        _model = http_client.get("registered-models/get", {"name": model_name})
+        model = _model["registered_model"]
+        permissions = None
+
+    versions, failed_versions = _export_versions(mlflow_client, model, ori_versions, output_dir, opts)
+
+    _adjust_model(model, versions)
+    if permissions:
+        model["permissions"] = permissions
 
     info_attr = {
         "num_target_stages": len(opts.stages),
@@ -123,25 +128,30 @@ def _export_model(mlflow_client, http_client, dbx_client, model_name, output_dir
         "export_latest_versions": opts.export_latest_versions,
         "export_permissions": opts.export_permissions
     }
-    io_utils.write_export_file(output_dir, "model.json", __file__, model, info_attr)
+    _model = { "registered_model": model }
+    io_utils.write_export_file(output_dir, "model.json", __file__, _model, info_attr)
     _logger.info(f"Exported {len(versions)}/{len(ori_versions)} '{msg}' versions for model '{model_name}'")
 
 
-def _export_versions(mlflow_client, versions, output_dir, opts):
+def _export_versions(mlflow_client, model_dct, versions, output_dir, opts):
+    aliases = model_dct.get("aliases", [])
+    version_aliases = {}
+    [ version_aliases.setdefault(x["version"], []).append(x["alias"]) for x in aliases ] # map of version => its aliases
+
     output_versions, failed_versions = ([], [])
     for j,vr in enumerate(versions):
         if len(opts.stages) > 0 and not vr.current_stage.lower() in opts.stages:
             continue
         if len(opts.versions) > 0 and not vr.version in opts.versions:
             continue
-        _export_version(mlflow_client, vr, output_dir, output_versions, failed_versions, j, len(versions), opts)
+        _export_version(mlflow_client, vr, output_dir, version_aliases.get(vr.version,[]), output_versions, failed_versions, j, len(versions), opts)
     output_versions.sort(key=lambda x: x["version"], reverse=False)
     return output_versions, failed_versions
 
 
-def _export_version(mlflow_client, vr, output_dir, output_versions, failed_versions, j, num_versions, opts):
+def _export_version(mlflow_client, vr, output_dir, aliases, output_versions, failed_versions, j, num_versions, opts):
     _output_dir = os.path.join(output_dir, vr.run_id)
-    msg = { "name": vr.name, "version": vr.version, "stage": vr.current_stage }
+    msg = { "name": vr.name, "version": vr.version, "stage": vr.current_stage, "aliases": aliases }
     _logger.info(f"Exporting model verson {j+1}/{num_versions}: {msg} to '{_output_dir}'")
 
     try:
@@ -151,14 +161,17 @@ def _export_version(mlflow_client, vr, output_dir, output_versions, failed_versi
             notebook_formats = opts.notebook_formats,
             mlflow_client = mlflow_client
         )
+        vr_dct = model_utils.model_version_to_dict(vr)
+        vr_dct["aliases"] = aliases
+
         run = mlflow_client.get_run(vr.run_id)
-        vr_dct = dict(vr)
         vr_dct["_run_artifact_uri"] = run.info.artifact_uri
         experiment = mlflow_client.get_experiment(run.info.experiment_id)
         vr_dct["_experiment_name"] = experiment.name
         if opts.export_version_model:
-            _output_dir = os.path.join(output_dir, "version_models", vr.version) 
+            _output_dir = os.path.join(output_dir, "version_models", vr.version)
             vr_dct["_download_uri"] = model_utils.export_version_model(mlflow_client, vr, _output_dir)
+
         output_versions.append(vr_dct)
 
     except RestException as e:
@@ -175,24 +188,47 @@ def _export_version(mlflow_client, vr, output_dir, output_versions, failed_versi
 
 
 def _adjust_model(model, versions):
-    """ Add nicely formatted timestamps and for aesthetic reasons order the dict attributes"""
-    _adjust_timestamp(model, "creation_timestamp")
-    _adjust_timestamp(model, "last_updated_timestamp")
-    tags = model.pop("tags", None)
-    if tags:
-        model["tags"] = tags
-    for vr in versions:
-        _adjust_timestamp(vr, "creation_timestamp")
-        _adjust_timestamp(vr, "last_updated_timestamp")
+    """
+    1. Add human friendly timestamps to model and versions
+    2. For aesthetic reasons reorder dict keys
+    3. Rename ModelVersion 'latest_versions' (if it exists) to 'versions' key
+    """
+
+    def _reorder(model, key):
+        val = model.pop(key, None)
+        if val:
+            model[key] = val
+
+    def _adjust_timestamp(dct, key):
+        dct[f"_{key}"] = fmt_ts_millis(dct.get(key))
+
+    # add human friendly timestamps
+    def _adjust_timestamps(dct):
+        _adjust_timestamp(dct, "creation_timestamp")
+        _adjust_timestamp(dct, "last_updated_timestamp")
+
+    # add human friendly timestamps for model
+    _adjust_timestamps(model)
+
+    # reorder tags and aliases keys
+    _reorder(model, "tags")
+    _reorder(model, "aliases")
+
+    # rename ModelVersion 'latest_versions' (if it exists) to 'versions'
     model["versions"] = versions
     model.pop("latest_versions", None)
 
-
-def _adjust_timestamp(dct, attr):
-    dct[f"_{attr}"] = fmt_ts_millis(dct.get(attr))
+    # add human friendly timestamps for versions
+    for vr in versions:
+        _adjust_timestamps(vr)
 
 
 def _normalize_stages(stages):
+    """
+    Normalize polymorphic 'stages' variable. Fun stuff. ;)
+    :param stages: Can be a string stage, string comma-delimited list of stages or None.
+    :return: Returns list of stages as strings.
+    """
     from mlflow.entities.model_registry import model_version_stages
     if stages is None:
         return []

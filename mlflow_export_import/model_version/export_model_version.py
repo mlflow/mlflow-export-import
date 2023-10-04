@@ -16,7 +16,6 @@ from mlflow_export_import.common.click_options import (
 from . click_options import (
     opt_version,
 )
-
 from mlflow_export_import.common import utils, io_utils
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
 from mlflow_export_import.run.export_run import export_run
@@ -44,6 +43,7 @@ def export_model_version(
     mlflow_client = mlflow_client or mlflow.MlflowClient()
 
     vr = mlflow_client.get_model_version(model_name, version)
+    vr_dct = model_utils.model_version_to_dict(vr)
 
     export_run(
         run_id = vr.run_id,
@@ -52,14 +52,13 @@ def export_model_version(
         export_deleted_runs = True, # NOTE: Important since default is not export a deleted run
         mlflow_client = mlflow_client
     )
-
-    vr_dict = dict(vr)
+    info_attr = { }
     if export_version_model:
         _output_dir = os.path.join(output_dir, "mlflow_model")
-        vr_dict["_download_uri"] = model_utils.export_version_model(mlflow_client, vr, _output_dir)
+        vr_dct["_download_uri"] = model_utils.export_version_model(mlflow_client, vr, _output_dir)
+        info_attr["export_version_model"] = True
 
-    info_attr = {}
-    mlflow_attr = { "model_version": _adjust_version(vr_dict) }
+    mlflow_attr = { "model_version": _adjust_version(vr_dct) }
     msg = utils.get_obj_key_values(vr, [ "name", "version", "current_stage", "status", "run_id" ])
     _logger.info(f"Exporting model verson: {msg}")
 
