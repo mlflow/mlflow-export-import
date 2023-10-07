@@ -22,7 +22,7 @@ from mlflow_export_import.common import utils, mlflow_utils, io_utils
 from mlflow_export_import.common.filesystem import mk_local_path
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import MlflowExportImportException
-from mlflow_export_import.client.http_client import create_dbx_client
+from mlflow_export_import.client.http_client import create_dbx_client, create_http_client
 from . import run_data_importer
 from . import run_utils
 
@@ -61,6 +61,7 @@ def import_run(
     }
 
     mlflow_client = mlflow_client or mlflow.MlflowClient()
+    http_client = create_http_client(mlflow_client)
     dbx_client = create_dbx_client(mlflow_client)
 
     _logger.info(f"Importing run from '{input_dir}'")
@@ -69,7 +70,6 @@ def import_run(
     src_run_path = os.path.join(input_dir, "run.json")
     src_run_dct = io_utils.read_file_mlflow(src_run_path)
     in_databricks = "DATABRICKS_RUNTIME_VERSION" in os.environ
-    #_logger.debug(f"in_databricks: {in_databricks}")
 
     run = mlflow_client.create_run(exp.experiment_id)
     run_id = run.info.run_id
@@ -83,6 +83,8 @@ def import_run(
             use_src_user_id,
             in_databricks
         )
+        _import_inputs(http_client, src_run_dct, run_id)
+
         path = os.path.join(input_dir, "artifacts")
         if os.path.exists(_filesystem.mk_local_path(path)):
             mlflow_client.log_artifacts(run_id, mk_local_path(path))
@@ -139,6 +141,12 @@ def _upload_databricks_notebook(dbx_client, input_dir, src_run_dct, dst_notebook
         dbx_client._post("workspace/import", data)
     except MlflowExportImportException as e:
         _logger.warning(f"Cannot save notebook '{dst_notebook_path}'. {e}")
+
+
+def _import_inputs(http_client, src_run_dct, run_id):
+    inputs = src_run_dct.get("inputs")
+    dct = { "run_id": run_id, "datasets": inputs }
+    http_client.post("runs/log-inputs", dct)
 
 
 @click.command()

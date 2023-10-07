@@ -67,7 +67,8 @@ def export_run(
             "info": info,
             "params": run.data.params,
             "metrics": _get_metrics_with_steps(mlflow_client, run),
-            "tags": tags
+            "tags": tags,
+            "inputs": _inputs_to_dict(run.inputs)
         }
         io_utils.write_export_file(output_dir, "run.json", __file__, mlflow_attr)
         fs = _filesystem.get_filesystem(".")
@@ -128,6 +129,15 @@ def _export_notebook(dbx_client, output_dir, notebook, notebook_formats, run, fs
     path = os.path.join(notebook_dir, "manifest.json")
     io_utils.write_file(path, manifest)
     download_notebook(notebook_dir, notebook, revision_id, notebook_formats, dbx_client)
+
+
+def _inputs_to_dict(inputs):
+    def to_dict(ds):
+        return {
+            "dataset": utils.strip_underscores(ds.dataset),
+            "tags": [ utils.strip_underscores(tag) for tag in ds.tags ]
+        }
+    return [ to_dict(x) for x in inputs.dataset_inputs ]
 
 
 @click.command()
