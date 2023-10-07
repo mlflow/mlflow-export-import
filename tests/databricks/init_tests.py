@@ -8,8 +8,8 @@ from mlflow_export_import.common import utils, model_utils
 from mlflow_export_import.client.http_client import DatabricksHttpClient
 from tests import utils_test
 from tests.core import TestContext
-from . unity_catalog_client import UnityCatalogClient
-from . includes import Dict2Class
+from tests.databricks.unity_catalog_client import UnityCatalogClient
+from tests.databricks.includes import Dict2Class
 
 _logger = utils.getLogger(__name__)
 

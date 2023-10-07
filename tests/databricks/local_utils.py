@@ -52,8 +52,12 @@ def create_version(client, model_name, stage=None, archive_existing_versions=Fal
     model = _create_registered_model(client, model_name, tags, desc)
     tags = { "city": "yaxchilan", "uuid": utils_test.mk_uuid() }
     vr = client.create_model_version(model_name, source, run.info.run_id, description="my version", tags=tags)
-    if not is_unity_catalog_model(model_name) and stage:
-        vr = client.transition_model_version_stage(model_name, vr.version, stage, archive_existing_versions)
+    if is_unity_catalog_model("model_name"): # Aliases are disabled for Non-UC Databricks MLflow :(
+        alias = f"alias_{utils_test.mk_uuid()}"
+        client.set_registered_model_alias(model_name, utils_test, vr.version)
+    else:
+        if stage:
+            vr = client.transition_model_version_stage(model_name, vr.version, stage, archive_existing_versions)
     vr = client.get_model_version(model_name, vr.version) # NOTE: since transition_model_version_stage returns no tags!
     return vr, model
 
