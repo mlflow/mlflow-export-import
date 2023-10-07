@@ -2,7 +2,9 @@ import os
 import shutil
 import yaml
 import shortuuid
-
+import pandas as pd 
+import mlflow
+from tests.open_source import sklearn_utils
 
 TEST_OBJECT_PREFIX = "test_exim"
 
@@ -44,6 +46,12 @@ def create_run_artifact_dir(output_dir, run_name):
     dir = os.path.join(output_dir, "artifacts", run_name)
     create_output_dir(dir)
     return dir
+
+
+def create_iris_dataset():
+    data_path = "in_memory"
+    df = pd.DataFrame(data=sklearn_utils._X_train, columns=sklearn_utils.feature_names)
+    return mlflow.data.from_pandas(df, source=data_path)
 
 
 def read_config_file(path="config.yaml"):

@@ -17,15 +17,21 @@ def compare_runs(mlflow_context, run1, run2, import_source_tags=False, output_di
 
 
 def _compare_runs_without_source_tags(mlflow_context, run1, run2, output_dir):
+    _compare_runs_common(run1, run2)
     _compare_common_tags(run1, run2)
     _compare_runs_without_tags(mlflow_context, run1, run2, output_dir)
 
 
 def _compare_runs_with_source_tags(run1, run2):
-    assert run1.data.params == run2.data.params
-    assert run1.data.metrics == run2.data.metrics
+    _compare_runs_common(run1, run2)
     source_tags2 = _strip_mlflow_export_import_tags(run2.data.tags)
     assert len(source_tags2) > 0, f"Source tags starting with '{ExportTags.PREFIX_ROOT}' are missing"
+
+
+def _compare_runs_common(run1, run2):
+    assert run1.data.params == run2.data.params
+    assert run1.data.metrics == run2.data.metrics
+    assert run1.inputs == run2.inputs
 
 
 def compare_experiment_tags(tags1, tags2, import_source_tags=False):
@@ -102,6 +108,7 @@ def compare_versions(mlflow_context, vr_src, vr_dst, compare_names=True, run_ids
     assert vr_src.description == vr_dst.description
     assert vr_src.status == vr_dst.status
     assert vr_src.status_message == vr_dst.status_message
+    assert vr_src.aliases == vr_dst.aliases
     if compare_names and mlflow_context.client_src != mlflow_context.client_dst:
         assert vr_src.name == vr_dst.name
     if not utils.importing_into_databricks():

@@ -57,6 +57,7 @@ def _create_simple_run(client, run_name=None, model_artifact="model", use_metric
     " Create run without creating experiment "
     max_depth = 4
     model = sklearn_utils.create_sklearn_model(max_depth)
+
     with MlflowTrackingUriTweak(client):
         with mlflow.start_run(run_name=run_name) as run:
             mlflow.log_param("max_depth",max_depth)
@@ -73,6 +74,8 @@ def _create_simple_run(client, run_name=None, model_artifact="model", use_metric
             mlflow.log_artifact("info.txt")
             mlflow.log_artifact("info.txt", "dir2")
             mlflow.log_metric("m1", 0.1)
+            mlflow.log_input(utils_test.create_iris_dataset(), context="test_training")
+
     return client.get_run(run.info.run_id)
 
 
@@ -89,6 +92,8 @@ def create_version(client, model_name, stage=None, archive_existing_versions=Fal
     desc = "My version desc"
     tags = { "city": "yaxchilan", "uuid": utils_test.mk_uuid() }
     vr = client.create_model_version(model_name, source, run.info.run_id, description=desc, tags=tags)
+    alias = f"alias_{utils_test.mk_uuid()}"
+    client.set_registered_model_alias(model_name, alias, vr.version)
     if stage:
         vr = client.transition_model_version_stage(model_name, vr.version, stage, archive_existing_versions)
     return vr, run
