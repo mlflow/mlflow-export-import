@@ -2,8 +2,9 @@ import mlflow
 from mlflow.models.signature import infer_signature
 
 from mlflow_export_import.common.model_utils import is_unity_catalog_model
-from tests.open_source.oss_utils_test import mk_test_object_name_default
-from tests.open_source import sklearn_utils
+from mlflow_export_import.common.mlflow_utils import MlflowTrackingUriTweak
+from tests.utils_test import mk_test_object_name_default
+from tests import sklearn_utils
 from tests.core import TestContext
 from tests import utils_test
 from . init_tests import workspace_src
@@ -25,21 +26,19 @@ def create_experiment(client):
 def create_run(client, experiment_id):
     max_depth = 4
     model = sklearn_utils.create_sklearn_model(max_depth)
-    predictions = model.predict(sklearn_utils._X_test)
-    signature = infer_signature(sklearn_utils._X_train, predictions)
+    predictions = model.predict(sklearn_utils.X_test)
+    signature = infer_signature(sklearn_utils.X_train, predictions)
 
-    ori_tracking_uri = mlflow.tracking.get_tracking_uri()
-    mlflow.set_tracking_uri(client.tracking_uri)
-    with mlflow.start_run(experiment_id=experiment_id) as run:
-        mlflow.log_param("max_depth",max_depth)
-        mlflow.log_metric("rmse", 0.789)
-        mlflow.set_tag("my_tag", "my_val")
-        mlflow.sklearn.log_model(model, "model",  signature=signature)
-        mlflow.set_tag("south_america", "aconcagua")
-        with open("info.txt", "w", encoding="utf-8") as f:
-            f.write("Hi artifact")
-        mlflow.log_artifact("info.txt")
-    mlflow.set_tracking_uri(ori_tracking_uri)
+    with MlflowTrackingUriTweak(client):
+        with mlflow.start_run(experiment_id=experiment_id) as run:
+            mlflow.log_param("max_depth",max_depth)
+            mlflow.log_metric("rmse", 0.789)
+            mlflow.set_tag("my_tag", "my_val")
+            mlflow.sklearn.log_model(model, "model",  signature=signature)
+            mlflow.set_tag("south_america", "aconcagua")
+            with open("info.txt", "w", encoding="utf-8") as f:
+                f.write("Hi artifact")
+            mlflow.log_artifact("info.txt")
     return client.get_run(run.info.run_id)
 
 
@@ -54,7 +53,7 @@ def create_version(client, model_name, stage=None, archive_existing_versions=Fal
     vr = client.create_model_version(model_name, source, run.info.run_id, description="my version", tags=tags)
     if is_unity_catalog_model("model_name"): # Aliases are disabled for Non-UC Databricks MLflow :(
         alias = f"alias_{utils_test.mk_uuid()}"
-        client.set_registered_model_alias(model_name, utils_test, vr.version)
+        client.set_registered_model_alias(model_name, alias, vr.version)
     else:
         if stage:
             vr = client.transition_model_version_stage(model_name, vr.version, stage, archive_existing_versions)

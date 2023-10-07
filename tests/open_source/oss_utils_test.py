@@ -5,8 +5,7 @@ from mlflow.utils.mlflow_tags import MLFLOW_RUN_NOTE # NOTE: ""mlflow.note.conte
 from mlflow_export_import.common import utils, model_utils
 from mlflow_export_import.common.mlflow_utils import MlflowTrackingUriTweak
 
-from tests import utils_test
-from tests.open_source import sklearn_utils
+from tests import utils_test, sklearn_utils
 
 _logger = utils.getLogger(__name__)
 

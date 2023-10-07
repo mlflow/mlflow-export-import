@@ -34,7 +34,7 @@ def test_run_basic_with_dst_mlflow_uri(mlflow_context):
 
 # == Test for source and exported model prediction equivalence
 
-from tests.open_source import sklearn_utils
+from tests.sklearn_utils import X_test
 import cloudpickle as pickle
 import numpy as np
 
@@ -53,7 +53,6 @@ def test_model_predictions(mlflow_context):
     with open(path2, "rb") as f:
         model2 = pickle.load(f)
 
-    X_test = sklearn_utils.get_prediction_data()
     predictions1 = model1.predict(X_test)
     predictions2 = model2.predict(X_test)
     assert np.array_equal(predictions1, predictions2)
