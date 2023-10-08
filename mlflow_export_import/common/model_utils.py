@@ -159,6 +159,12 @@ def model_version_to_dict(version):
     return dct
 
 
+def dump_model_version(version, title=None):
+    from mlflow_export_import.common import dump_utils
+    dct = model_version_to_dict(version)
+    dump_utils.dump_as_json(dct, title)
+
+
 def dump_model_versions(client, model_name):
     """
     Display as table 'latest' and 'all' registered model versions.
