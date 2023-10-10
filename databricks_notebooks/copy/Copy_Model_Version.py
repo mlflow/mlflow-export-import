@@ -1,20 +1,26 @@
 # Databricks notebook source
 # MAGIC %md ## Copy Model Version
 # MAGIC
-# MAGIC ##### Overview
+# MAGIC #### Overview
 # MAGIC
-# MAGIC Copy a model version and its run to a new model version. 
+# MAGIC Copies a model version and its run (deep copy) to a new model version.
 # MAGIC
-# MAGIC The source version's run can also be copied if you specifiy a destination experiment.
+# MAGIC The new model version can be either in the same workspace or in another.
 # MAGIC
-# MAGIC ##### Widgets
+# MAGIC Supports both standard Workspace registry and the new Unity Catalog (UC) model registry.
+# MAGIC
+# MAGIC Databricks registry URIs should be Databricks secrets tuples per [Specify a remote registry](https://docs.databricks.com/en/machine-learning/manage-model-lifecycle/multiple-workspaces.html).
+# MAGIC * Example: `registry_uri = f'databricks://<scope>:<prefix>'`
+# MAGIC
+# MAGIC
+# MAGIC #### Widgets
 # MAGIC
 # MAGIC * `1. Source Model` - Source model name.
 # MAGIC * `2. Source Version` - Source model version.
 # MAGIC * `3. Destination Model` - Destination model name.
 # MAGIC * `4. Destination experiment name` - Destination experiment name. 
-# MAGIC   * If specified, will copy old version's run to a new run which the new model version will point to.
-# MAGIC   * If not specified, use old version's run for new version.
+# MAGIC   * If specified, copies source version's run to a new run which the new model version points to.
+# MAGIC   * If not specified, the new run uses the source version's run.
 # MAGIC * `5. Source Run Workspace` - Workspace for the run of the source model version. 
 # MAGIC   * If copying from current workspace, then leave blank or set to `databricks`.
 # MAGIC   * If copying from another workspace, then specify secrets scope and prefix per [Set up the API token for a remote registry](https://docs.databricks.com/en/machine-learning/manage-model-lifecycle/multiple-workspaces.html#set-up-the-api-token-for-a-remote-registry). 
@@ -22,6 +28,27 @@
 # MAGIC * `6. Add copy system tags` - Add some source version system metadata as destination model version tags.
 # MAGIC * `7. Verbose`
 # MAGIC * `8. Return result` for automated testing.
+
+# COMMAND ----------
+
+# MAGIC %md ### Diagrams
+# MAGIC
+# MAGIC In the two diagram below, the left shallow copy is **_bad_**, and the right deep copy is **_good_**.
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC
+# MAGIC ### Unity Catalog Model Registry
+# MAGIC
+# MAGIC  <img src="https://github.com/mlflow/mlflow-export-import/blob/issue-138-copy-model-version/diagrams/Copy_Model_Version_UC.png?raw=true"  width="700" />
+
+# COMMAND ----------
+
+# MAGIC  %md ### Workspace Model Registry
+# MAGIC
+# MAGIC  <img src="https://github.com/mlflow/mlflow-export-import/blob/issue-138-copy-model-version/diagrams/Copy_Model_Version_NonUC.png?raw=true"  width="700" />
+# MAGIC
 
 # COMMAND ----------
 

@@ -3,9 +3,9 @@
 # MAGIC
 # MAGIC Copy an MLflow object to either the current or to another workspace.
 # MAGIC
-# MAGIC **Notebooks**
+# MAGIC ##### Notebooks
 # MAGIC * [Copy_Model_Version]($Copy_Model_Version) - Copy an MLflow model version.
 # MAGIC * [Copy_Run]($Copy_Run) - Copy an MLflow run.
 # MAGIC
 # MAGIC
-# MAGIC **Last updated:** 2023-10-03
+# MAGIC ##### Last updated: _2023-10-09_
