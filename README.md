@@ -67,6 +67,10 @@ Full object referential integrity is maintained (e.g. an imported registered mod
 [Databricks notebooks](databricks_notebooks/README.md)
 simply invoke the corresponding Python classes.
 
+Copy tools simply invoke the appropriate export and import on a temporary directory.
+## New Copy Tools
+
+See [README_copy](README_copy.md) on how to copy model versions or runs.
 
 ## Limitations
 
