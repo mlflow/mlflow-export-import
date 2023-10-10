@@ -6,10 +6,10 @@ from . click_options import (
     opt_src_model,
     opt_dst_model,
     opt_src_version,
-    opt_src_mlflow_uri,
-    opt_dst_mlflow_uri,
+    opt_src_registry_uri,
+    opt_dst_registry_uri,
     opt_dst_experiment_name,
-    opt_add_copy_system_tags
+    opt_copy_lineage_tags
 )
 from mlflow_export_import.common.source_tags import ExportTags
 from mlflow_export_import.common.click_options import opt_verbose
@@ -27,7 +27,7 @@ def copy(src_model_name,
         dst_tracking_uri = None,
         src_registry_uri = None,
         dst_registry_uri = None,
-        add_copy_system_tags = False,
+        copy_lineage_tags = False,
         verbose = False
     ):
     """
@@ -39,12 +39,13 @@ def copy(src_model_name,
     src_uri = f"{src_model_name}/{src_model_version}"
     print(f"Copying model version '{src_uri}' to '{dst_model_name}'")
     if verbose:
-        dump_utils.dump_mlflow_client(src_client, "src_client")
+        dump_utils.dump_mlflow_client(src_client, "SRC")
+        dump_utils.dump_mlflow_client(dst_client, "DST")
     copy_utils.create_registered_model(dst_client,  dst_model_name)
     src_version = src_client.get_model_version(src_model_name, src_model_version)
     if verbose:
         model_utils.dump_model_version(src_version, "Source Model Version")
-    dst_version = _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_client, dst_client, add_copy_system_tags)
+    dst_version = _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_client, dst_client, copy_lineage_tags)
     if verbose:
         model_utils.dump_model_version(dst_version, "Destination Model Version")
     dst_uri = f"{dst_version.name}/{dst_version.version}"
@@ -52,7 +53,7 @@ def copy(src_model_name,
     return src_version, dst_version
 
 
-def _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_client, dst_client, add_copy_system_tags=False):
+def _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_client, dst_client, copy_lineage_tags=False):
     if dst_experiment_name:
         dst_run = copy_run._copy(src_version.run_id, dst_experiment_name, src_client, dst_client)
     else:
@@ -60,11 +61,10 @@ def _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_cl
 
     mlflow_model_name = copy_utils.get_model_name(src_version.source)
     source_uri = f"{dst_run.info.artifact_uri}/{mlflow_model_name}"
-    if add_copy_system_tags:
-        tags = _add_to_version_tags(src_version, dst_run, dst_model_name, src_client, dst_client)
+    if copy_lineage_tags:
+        tags = _add_lineage_tags(src_version, dst_run, dst_model_name, src_client, dst_client)
     else:
         tags = src_version.tags
-    dump_utils.dump_mlflow_client(dst_client, "DST CLIENT")
 
     with MlflowTrackingUriTweak(dst_client):
         dst_version = dst_client.create_model_version(
@@ -86,7 +86,7 @@ def _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_cl
     return dst_client.get_model_version(dst_version.name, dst_version.version)
 
 
-def _add_to_version_tags(src_version, run, dst_model_name, src_client, dst_client):
+def _add_lineage_tags(src_version, run, dst_model_name, src_client, dst_client):
     prefix = f"{ExportTags.PREFIX_ROOT}.src_run"
     if src_version.run_id != run.info.run_id:
         run = src_client.get_run(src_version.run_id)
@@ -115,18 +115,42 @@ def _add_to_version_tags(src_version, run, dst_model_name, src_client, dst_clien
 @opt_src_model
 @opt_src_version
 @opt_dst_model
-@opt_src_mlflow_uri
-@opt_dst_mlflow_uri
+@opt_src_registry_uri
+@opt_dst_registry_uri
 @opt_dst_experiment_name
-@opt_add_copy_system_tags
+@opt_copy_lineage_tags
 @opt_verbose
 
-def main(src_model, src_version, dst_model, src_mlflow_uri, dst_mlflow_uri, dst_experiment_name, add_copy_system_tags, verbose):
+def main(src_model, src_version, dst_model, src_registry_uri, dst_registry_uri, dst_experiment_name, copy_lineage_tags, verbose):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
-    copy(src_model, src_version, dst_model, dst_experiment_name, src_mlflow_uri, dst_mlflow_uri,
-        add_copy_system_tags = add_copy_system_tags,
+
+    def mk_tracking_uri(registry_uri):
+        if not registry_uri:
+            return None
+        if registry_uri.startswith("databricks-uc"):
+            return registry_uri.replace("databricks-uc","databricks")
+        else:
+            return registry_uri
+
+    src_tracking_uri = mk_tracking_uri(src_registry_uri)
+    dst_tracking_uri = mk_tracking_uri(dst_registry_uri)
+
+    print("Effective MLflow URIs:")
+    print("  src_tracking_uri:", src_tracking_uri)
+    print("  dst_tracking_uri:", dst_tracking_uri)
+    print("  src_registry_uri:", src_registry_uri)
+    print("  dst_registry_uri:", dst_registry_uri)
+    copy(
+        src_model,
+        src_version, dst_model,
+        dst_experiment_name,
+        src_tracking_uri,
+        dst_tracking_uri,
+        src_registry_uri,
+        dst_registry_uri,
+        copy_lineage_tags = copy_lineage_tags,
         verbose = verbose
     )
 

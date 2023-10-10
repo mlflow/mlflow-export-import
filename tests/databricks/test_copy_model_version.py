@@ -37,6 +37,7 @@ def test_one_workspace_with_experiment(test_context):
         dst_experiment_name = dst_exp_name,
         src_tracking_uri = workspace_src.cfg.profile,
         dst_tracking_uri = workspace_src.cfg.profile,
+        copy_lineage_tags = True,
         verbose = True
     )
     assert src_vr == _src_vr

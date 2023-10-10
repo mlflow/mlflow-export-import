@@ -93,7 +93,7 @@ def test_with_experiment_and_copy_tags(mlflow_context):
         dst_experiment_name = dst_exp.name,
         src_tracking_uri = mlflow_context.client_src.tracking_uri,
         dst_tracking_uri = mlflow_context.client_dst.tracking_uri,
-        add_copy_system_tags = True,
+        copy_lineage_tags = True,
         verbose = False
     )
     compare_versions(mlflow_context, src_vr, dst_vr, False, False)

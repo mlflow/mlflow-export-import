@@ -1,4 +1,4 @@
-import click 
+import click
 
 def opt_src_model(function):
     function = click.option("--src-model",
@@ -40,6 +40,22 @@ def opt_dst_mlflow_uri(function):
     )(function)
     return function
 
+def opt_src_registry_uri(function):
+    function = click.option("--src-registry-uri",
+        help="Source MLflow registry URI.",
+        type=str,
+        required=True
+    )(function)
+    return function
+
+def opt_dst_registry_uri(function):
+    function = click.option("--dst-registry-uri",
+        help="Destination MLflow registry URI.",
+        type=str,
+        required=True
+    )(function)
+    return function
+
 def opt_dst_experiment_name(function):
     function = click.option("--dst-experiment-name",
         help="Destination experiment name. If specified, will copy old version's run to a new run. Else, use old version's run for new version.",
@@ -48,9 +64,9 @@ def opt_dst_experiment_name(function):
     )(function)
     return function
 
-def opt_add_copy_system_tags(function):
-    function = click.option("--add-copy-system-tags",
-        help="Add 'copy' system tags starting with 'mlflow_exim.'",
+def opt_copy_lineage_tags(function):
+    function = click.option("--copy-lineage-tags",
+        help="Add source lineage info to destination version as tags starting with 'mlflow_exim'.",
         type=bool,
         default=False,
         show_default=True
