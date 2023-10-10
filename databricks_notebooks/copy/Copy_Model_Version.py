@@ -25,7 +25,7 @@
 # MAGIC   * If copying from current workspace, then leave blank or set to `databricks`.
 # MAGIC   * If copying from another workspace, then specify secrets scope and prefix per [Set up the API token for a remote registry](https://docs.databricks.com/en/machine-learning/manage-model-lifecycle/multiple-workspaces.html#set-up-the-api-token-for-a-remote-registry). 
 # MAGIC     * Example: `databricks://MY-SCOPE:MY-PREFIX`.
-# MAGIC * `6. Add copy system tags` - Add some source version system metadata as destination model version tags.
+# MAGIC * `6. Copy lineage tags` - Add source lineage info to destination version as tags starting with 'mlflow_exim'.
 # MAGIC * `7. Verbose`
 # MAGIC * `8. Return result` for automated testing.
 
@@ -77,8 +77,8 @@ dbutils.widgets.text("5. Source Run Workspace", "databricks")
 src_run_workspace = dbutils.widgets.get("5. Source Run Workspace")
 src_run_workspace = src_run_workspace or "databricks"
 
-dbutils.widgets.dropdown("6. Add copy system tags", "no", ["yes","no"])
-add_copy_system_tags = dbutils.widgets.get("6. Add copy system tags") == "yes"
+dbutils.widgets.dropdown("6. Copy lineage tags", "no", ["yes","no"])
+copy_lineage_tags = dbutils.widgets.get("6. Copy lineage tags") == "yes"
 
 dbutils.widgets.dropdown("7. Verbose", "yes", ["yes","no"])
 verbose = dbutils.widgets.get("7. Verbose") == "yes"
@@ -91,7 +91,7 @@ print("src_model_version:", src_model_version)
 print("dst_model_name:", dst_model_name)
 print("dst_experiment_name:", dst_experiment_name)
 print("src_run_workspace:", src_run_workspace)
-print("add_copy_system_tags:", add_copy_system_tags)
+print("copy_lineage_tags:", copy_lineage_tags)
 print("verbose:", verbose)
 print("return_result:", return_result)
 
@@ -115,7 +115,7 @@ src_model_version, dst_model_version = copy_model_version(
     dst_model_name,
     dst_experiment_name,
     src_run_workspace = src_run_workspace,
-    add_copy_system_tags = add_copy_system_tags,
+    copy_lineage_tags = copy_lineage_tags,
     verbose = verbose
 )
 

@@ -51,7 +51,7 @@ def copy_model_version(
         dst_model_name,
         dst_experiment_name, 
         src_run_workspace = "databricks",
-        add_copy_system_tags = False,
+        copy_lineage_tags = False,
         verbose = False 
     ):
     from mlflow_export_import.common.model_utils import is_unity_catalog_model 
@@ -74,6 +74,6 @@ def copy_model_version(
         dst_tracking_uri = "databricks",
         src_registry_uri = src_registry_uri, 
         dst_registry_uri = dst_registry_uri,
-        add_copy_system_tags = add_copy_system_tags,
+        copy_lineage_tags = copy_lineage_tags,
         verbose = verbose 
     )
