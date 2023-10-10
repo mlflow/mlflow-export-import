@@ -1,0 +1,163 @@
+{
+  "system": {
+    "package_version": "1.2.0",
+    "script": "export_model.py",
+    "export_file_version": "2",
+    "export_time": 1696936903,
+    "_export_time": "2023-10-10 11:21:43",
+    "mlflow_version": "2.7.1",
+    "mlflow_tracking_uri": "databricks://e2_demo",
+    "platform": {
+      "python_version": "3.8.16",
+      "system": "Darwin",
+      "processor": "i386"
+    },
+    "user": "andre"
+  },
+  "info": {
+    "num_target_stages": 0,
+    "num_target_versions": 0,
+    "num_src_versions": 0,
+    "num_dst_versions": 0,
+    "failed_versions": [
+      {
+        "message": "Version run probably does not exist",
+        "model": "Sklearn_Wine",
+        "version": "1",
+        "run_id": "3c0b2decc41c4dc0becd3d60bc814a4d",
+        "RestException": {
+          "error_code": "RESOURCE_DOES_NOT_EXIST",
+          "message": "Run '3c0b2decc41c4dc0becd3d60bc814a4d' not found."
+        }
+      },
+      {
+        "message": "Version cannot be exported",
+        "model": "Sklearn_Wine",
+        "version": "4",
+        "run_id": "b37b10ec773a425b9ac9cec93b786443",
+        "RestException": {
+          "error_code": "BAD_REQUEST",
+          "message": "For input string: \"e090757fcb8f49cb9822f65f2fe7ed91\""
+        }
+      },
+      {
+        "message": "Version run probably does not exist",
+        "model": "Sklearn_Wine",
+        "version": "3",
+        "run_id": "1e764e678e9b47acb11d2fa64d1e8c1f",
+        "RestException": {
+          "error_code": "RESOURCE_DOES_NOT_EXIST",
+          "message": "Run '1e764e678e9b47acb11d2fa64d1e8c1f' not found."
+        }
+      },
+      {
+        "message": "Version run probably does not exist",
+        "model": "Sklearn_Wine",
+        "version": "2",
+        "run_id": "a3a68a4c68f642919430689c682b89c5",
+        "RestException": {
+          "error_code": "RESOURCE_DOES_NOT_EXIST",
+          "message": "Run 'a3a68a4c68f642919430689c682b89c5' not found."
+        }
+      }
+    ],
+    "export_latest_versions": true,
+    "export_permissions": true
+  },
+  "mlflow": {
+    "registered_model": {
+      "name": "Sklearn_Wine",
+      "creation_timestamp": 1681518898830,
+      "last_updated_timestamp": 1686167816077,
+      "user_id": "andre@mycompany.com",
+      "id": "7a803419ce4a455aaff1ebf6a494bfea",
+      "permission_level": "CAN_MANAGE",
+      "_creation_timestamp": "2023-04-15 00:34:59",
+      "_last_updated_timestamp": "2023-06-07 19:56:56",
+      "tags": [
+        {
+          "key": "mlflow.version",
+          "value": "2.2.1"
+        }
+      ],
+      "versions": [],
+      "permissions": {
+        "permission_levels": [
+          {
+            "permission_level": "CAN_READ",
+            "description": "Can view the details of the registered model and its model versions, and use the model versions."
+          },
+          {
+            "permission_level": "CAN_EDIT",
+            "description": "Can view and edit the details of a registered model and its model versions (except stage changes), and add new model versions."
+          },
+          {
+            "permission_level": "CAN_MANAGE_STAGING_VERSIONS",
+            "description": "Can view and edit the details of a registered model and its model versions, add new model versions, and manage stage transitions between non-Production stages."
+          },
+          {
+            "permission_level": "CAN_MANAGE_PRODUCTION_VERSIONS",
+            "description": "Can view and edit the details of a registered model and its model versions, add new model versions, and manage stage transitions between any stages."
+          },
+          {
+            "permission_level": "CAN_MANAGE",
+            "description": "Can manage permissions on, view all details of, and perform all actions on the registered model and its model versions."
+          }
+        ],
+        "permissions": {
+          "object_id": "/registered-models/7a803419ce4a455aaff1ebf6a494bfea",
+          "object_type": "registered-model",
+          "access_control_list": [
+            {
+              "user_name": "andre@mycompany.com",
+              "display_name": "Andre",
+              "all_permissions": [
+                {
+                  "permission_level": "CAN_MANAGE",
+                  "inherited": false
+                }
+              ]
+            },
+            {
+              "service_principal_name": "031812d4-e5ec-4594-b6cf-12055b91fee1",
+              "display_name": "service-principal-e2-demo-west-ws-do-not-delete",
+              "all_permissions": [
+                {
+                  "permission_level": "CAN_MANAGE",
+                  "inherited": true,
+                  "inherited_from_object": [
+                    "/registered-models/"
+                  ]
+                }
+              ]
+            },
+            {
+              "group_name": "users",
+              "all_permissions": [
+                {
+                  "permission_level": "CAN_MANAGE",
+                  "inherited": true,
+                  "inherited_from_object": [
+                    "/registered-models/"
+                  ]
+                }
+              ]
+            },
+            {
+              "group_name": "admins",
+              "all_permissions": [
+                {
+                  "permission_level": "CAN_MANAGE",
+                  "inherited": true,
+                  "inherited_from_object": [
+                    "/registered-models/"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}
