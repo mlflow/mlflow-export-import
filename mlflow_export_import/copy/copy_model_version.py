@@ -1,3 +1,4 @@
+from copy import deepcopy
 import click
 from mlflow.exceptions import MlflowException
 from . import copy_run
@@ -91,7 +92,7 @@ def _add_lineage_tags(src_version, run, dst_model_name, src_client, dst_client):
     if src_version.run_id != run.info.run_id:
         run = src_client.get_run(src_version.run_id)
 
-    tags = src_version.tags
+    tags = deepcopy(src_version.tags)
 
     tags[f"{ExportTags.PREFIX_ROOT}.src_version.name"] =  src_version.name
     tags[f"{ExportTags.PREFIX_ROOT}.src_version.version"] =  src_version.version

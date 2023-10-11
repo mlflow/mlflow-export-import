@@ -5,7 +5,6 @@ from . init_tests import workspace_src, workspace_dst
 from . import local_utils
 from . init_tests import test_context
 
-
 def test_two_workspaces(test_context):
     src_model_name = local_utils.mk_test_object_name_default()
     src_vr, _ = local_utils.create_version(test_context.mlflow_client_src, src_model_name, "Production")

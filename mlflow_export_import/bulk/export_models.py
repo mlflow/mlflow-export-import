@@ -77,7 +77,8 @@ def export_models(
         use_threads = use_threads,
         export_latest_versions = export_latest_versions,
         export_version_model = export_version_model,
-        export_permissions = export_permissions
+        export_permissions = export_permissions,
+        export_deleted_runs = export_deleted_runs
     )
     duration = round(time.time()-start_time, 1)
     _logger.info(f"Duration for total registered models and versions' runs export: {duration} seconds")
@@ -109,7 +110,8 @@ def _export_models(
         use_threads = False,
         export_latest_versions = False,
         export_version_model = False,
-        export_permissions = False
+        export_permissions = False,
+        export_deleted_runs = False
     ):
     max_workers = utils.get_threads(use_threads)
     start_time = time.time()
@@ -129,6 +131,7 @@ def _export_models(
                 export_latest_versions = export_latest_versions,
                 export_version_model = export_version_model,
                 export_permissions = export_permissions,
+                export_deleted_runs = export_deleted_runs,
                 notebook_formats = notebook_formats,
                 mlflow_client = mlflow_client,
             )
@@ -183,8 +186,8 @@ def _export_models(
 @opt_notebook_formats
 @opt_use_threads
 
-def main(models, output_dir, stages, export_latest_versions, export_all_runs, 
-        export_permissions, export_deleted_runs, export_version_model, 
+def main(models, output_dir, stages, export_latest_versions, export_all_runs,
+        export_permissions, export_deleted_runs, export_version_model,
         notebook_formats, use_threads
     ):
     _logger.info("Options:")

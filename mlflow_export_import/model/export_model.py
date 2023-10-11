@@ -154,37 +154,46 @@ def _export_version(mlflow_client, vr, output_dir, aliases, output_versions, fai
     msg = { "name": vr.name, "version": vr.version, "stage": vr.current_stage, "aliases": aliases }
     _logger.info(f"Exporting model verson {j+1}/{num_versions}: {msg} to '{_output_dir}'")
 
+    vr_dct = model_utils.model_version_to_dict(vr)
+    vr_dct["aliases"] = aliases
     try:
-        export_run(vr.run_id,
-            _output_dir,
-            export_deleted_runs = opts.export_deleted_runs,
-            notebook_formats = opts.notebook_formats,
-            mlflow_client = mlflow_client
-        )
-        vr_dct = model_utils.model_version_to_dict(vr)
-        vr_dct["aliases"] = aliases
-
-        run = mlflow_client.get_run(vr.run_id)
-        vr_dct["_run_artifact_uri"] = run.info.artifact_uri
-        experiment = mlflow_client.get_experiment(run.info.experiment_id)
-        vr_dct["_experiment_name"] = experiment.name
         if opts.export_version_model:
             _output_dir = os.path.join(output_dir, "version_models", vr.version)
             vr_dct["_download_uri"] = model_utils.export_version_model(mlflow_client, vr, _output_dir)
 
-        output_versions.append(vr_dct)
+        run = export_run(vr.run_id,
+            _output_dir,
+            export_deleted_runs = opts.export_deleted_runs,
+            notebook_formats = opts.notebook_formats,
+            mlflow_client = mlflow_client,
+            raise_exception = True
+        )
+        if not run and not opts.export_deleted_runs:
+            failed_msg = { "message": "deleted run",  "version": vr_dct }
+            failed_versions.append(failed_msg)
+        else:
+            _add_metadata_to_version(mlflow_client, vr_dct, run)
+            output_versions.append(vr_dct)
 
     except RestException as e:
         err_msg = { "model": vr.name, "version": vr.version, "run_id": vr.run_id, "RestException": e.json  }
         if e.json.get("error_code") == "RESOURCE_DOES_NOT_EXIST":
             err_msg = { **{"message": "Version run probably does not exist"}, **err_msg}
-            _logger.error(err_msg)
+            _logger.error(f"Version export failed (1): {err_msg}")
         else:
             err_msg = { **{"message": "Version cannot be exported"}, **err_msg}
+            _logger.error(f"Version export failed (2): {err_msg}")
             _logger.error(err_msg)
             import traceback
             traceback.print_exc()
-        failed_versions.append(err_msg)
+        failed_msg = { "version": vr_dct, "RestException": e.json  }
+        failed_versions.append(failed_msg)
+
+
+def _add_metadata_to_version(mlflow_client, vr_dct, run):
+    vr_dct["_run_artifact_uri"] = run.info.artifact_uri
+    experiment = mlflow_client.get_experiment(run.info.experiment_id)
+    vr_dct["_experiment_name"] = experiment.name
 
 
 def _adjust_model(model, versions):
