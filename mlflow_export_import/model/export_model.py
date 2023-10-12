@@ -162,7 +162,7 @@ def _export_version(mlflow_client, vr, output_dir, aliases, output_versions, fai
             vr_dct["_download_uri"] = model_utils.export_version_model(mlflow_client, vr, _output_dir)
 
         run = export_run(vr.run_id,
-            _output_dir,
+            output_dir = os.path.join(output_dir, vr.run_id),
             export_deleted_runs = opts.export_deleted_runs,
             notebook_formats = opts.notebook_formats,
             mlflow_client = mlflow_client,
