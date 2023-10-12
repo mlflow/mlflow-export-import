@@ -8,9 +8,9 @@ def dump_mlflow_client(client, msg=""):
     print("  client._registry_uri:", client._registry_uri)
     creds = client._tracking_client.store.get_host_creds()
     dump_obj(creds, "Credentials", "  ")
-    print("mlflow:")
-    print("  mlflow.tracking_uri: ", mlflow.get_tracking_uri())
-    print("  mlflow.registry_uri: ", mlflow.get_registry_uri())
+    print("  mlflow fluent:")
+    print("    mlflow.tracking_uri: ", mlflow.get_tracking_uri())
+    print("    mlflow.registry_uri: ", mlflow.get_registry_uri())
 
 
 def dump_obj(obj, title=None, indent=""):
