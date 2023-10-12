@@ -13,8 +13,10 @@ See sample JSON export files [here](README_export_format.md#sample-export-json-f
 
 | MLflow Object | Documentation | Code |
 |-------|-------|---|
-| Model | [export-model](#Export-Registered-model) | [code](mlflow_export_import/model/export_model.py) |
+| Registered Model | [export-model](#Export-Registered-model) | [code](mlflow_export_import/model/export_model.py) |
 |    | [import-model](#Import-registered-model) | [code](mlflow_export_import/model/import_model.py) |
+| Model Version | [export-model-version](#Export-Model-Version) | [code](mlflow_export_import/model_version/export_model_version.py) |
+|    | [import-model-version](#Import-model-version) | [code](mlflow_export_import/model_version/import_model_version.py) |
 | Experiment | [export-experiment](#Export-Experiment) | [code](mlflow_export_import/experiment/export_experiment.py) |
 |    | [import-experiment](#Import-Experiment) | [code](mlflow_export_import/experiment/import_experiment.py) |
 | Run | [export-run](#Export-run) | [code](mlflow_export_import/run/export_run.py) |
@@ -72,13 +74,13 @@ export DATABRICKS_TOKEN=MY_TOKEN
 export-experiment \
   --experiment /Users/me@mycompany.com/SklearnWine \
   --output-dir out \
-  --notebook-formats DBC,SOURCE 
+  --notebook-formats DBC,SOURCE
 ```
 
-#### Export directory structure 
+#### Export directory structure
 
 The [export directory](samples/oss_mlflow/single/experiments/basic) contains a [JSON export file](samples/oss_mlflow/single/experiments/basic/experiment.json)
-for the experiment and a subdirectory for each run. 
+for the experiment and a subdirectory for each run.
 The [run directory](samples/oss_mlflow/single/experiments/basic/eb66c160957d4a28b11d3f1b968df9cd) contains a [JSON export file](samples/oss_mlflow/single/experiments/basic/eb66c160957d4a28b11d3f1b968df9cd/run.json) containing run metadata and an artifact folder directory.
 
 Sample export directory
@@ -101,12 +103,12 @@ Sample export directory
 
 Import an experiment from a directory. Reads the manifest file to import the expirement and its runs.
 
-The experiment will be created if it does not exist in the destination tracking server. 
+The experiment will be created if it does not exist in the destination tracking server.
 If the destination experiment already exists, the source runs will be added to it.
 
 #### Usage
 ```
-import-experiment --help 
+import-experiment --help
 
 Options:
   --experiment-name TEXT        Destination experiment name  [required]
@@ -259,7 +261,7 @@ Source: [export_model.py](mlflow_export_import/model/export_model.py).
 ```
 export-model --help
 
-Options:                          
+Options:
   --model TEXT                    Registered model name.  [required]
   --output-dir TEXT               Output directory.  [required]
   --notebook-formats TEXT         Databricks notebook formats. Values are
@@ -306,7 +308,7 @@ Output export directory example.
 |   | +-model.pkl
 |   | +-conda.yaml
 |   | +-MLmodel
-|   |  
+|   |
 +-model.json
 ```
 
@@ -389,4 +391,77 @@ Importing versions:
       source:       file:///opt/mlflow/server/mlruns/13/03d0cfae60774ec99f949c42e1575532/artifacts/sklearn-model
 Version: id=1 status=READY state=None
 Waited 0.01 seconds
+```
+
+## Model Version Tools
+
+### Export Model Version
+
+Export a model version to a directory.
+
+Source: [export_model_version.py](mlflow_export_import/model_version/export_model_version.py).
+
+#### Example
+```
+export-model-version \
+  --model Sklearn_Wine_best \
+  --version 1 \
+  --export-version-model True \
+  --output-dir out
+```
+
+#### Usage
+```
+export-model-version \
+
+Usage: export-model-version
+           [OPTIONS]
+
+  Exports a registered model version and its run.
+
+Options:
+  --model TEXT                    Registered model name.  [required]
+  --version TEXT                  Registered model version.  [required]
+  --output-dir TEXT               Output directory.  [required]
+  --export-version-model BOOLEAN  Export registered model version's 'cached'
+                                  MLflow model.  [default: False]
+  --notebook-formats TEXT         Databricks notebook formats. Values are
+                                  SOURCE, HTML, JUPYTER or DBC (comma
+                                  separated).
+```
+
+### Import Model Version
+
+import a model version.
+
+Source: [import_model_version.py](mlflow_import_import/model_version/import_model_version.py).
+
+#### Example
+```
+import-model-version \
+  --input-dir out \
+  --model Skelarn_Wine \
+  --create-model True \
+  --experiment-name /Users/me@mycompany.com/SklearnWine \
+```
+
+#### Usage
+```
+import-model-version --help\
+
+Usage: import-model-version
+           [OPTIONS]
+
+  Imports a registered model version and its run.
+
+Options:
+  --input-dir TEXT              Input directory.  [required]
+  --model TEXT                  Registered model name.  [required]
+  --create-model BOOLEAN        Create an empty registered model before
+                                creating model version.
+  --experiment-name TEXT        Destination experiment name for the version's
+                                run.  [required]
+  --import-source-tags BOOLEAN  Import source information for registered model
+                                and its versions and tags in destination
+                                object.  [default: False]
 ```
