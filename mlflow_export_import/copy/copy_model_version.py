@@ -76,7 +76,8 @@ def _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_cl
             description = src_version.description
         )
     if not model_utils.is_unity_catalog_model(dst_version.name):
-        dst_client.transition_model_version_stage(dst_version.name, dst_version.version, src_version.current_stage)
+        if src_version.current_stage != "None":
+            dst_client.transition_model_version_stage(dst_version.name, dst_version.version, src_version.current_stage)
 
     try:
         for alias in src_version.aliases:
