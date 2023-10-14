@@ -1,5 +1,5 @@
 # Databricks notebook source
-# Common - copy model version
+# Common - copy model  - WIP
 
 # COMMAND ----------
 
@@ -50,7 +50,7 @@ def copy_model_version(
         src_model_version,
         dst_model_name,
         dst_experiment_name, 
-        src_run_workspace = "databricks",
+        dst_run_workspace = "databricks",
         copy_lineage_tags = False,
         verbose = False 
     ):
@@ -59,21 +59,27 @@ def copy_model_version(
       
     def mk_registry_uri(model_name):
         return "databricks-uc" if is_unity_catalog_model(model_name) else "databricks"
+    
+    print(">> dst_run_workspace:", dst_run_workspace)
+    print(">> dst_model_name:", dst_model_name)
 
     src_registry_uri = mk_registry_uri(src_model_name)
     dst_registry_uri = mk_registry_uri(dst_model_name)
-    print("src_registry_uri:", src_registry_uri)
-    print("dst_registry_uri:", dst_registry_uri)
+    print(">> src_registry_uri:", src_registry_uri)
+    print(">> dst_registry_uri:", dst_registry_uri)
 
     return copy(
         src_model_name,
         src_model_version,
         dst_model_name,
         dst_experiment_name, 
-        src_tracking_uri = src_run_workspace,
-        dst_tracking_uri = "databricks",
+        src_tracking_uri = "databricks",
+        dst_tracking_uri = dst_run_workspace,
         src_registry_uri = src_registry_uri, 
         dst_registry_uri = dst_registry_uri,
         copy_lineage_tags = copy_lineage_tags,
         verbose = verbose 
     )
+
+# COMMAND ----------
+

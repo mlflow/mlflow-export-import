@@ -21,7 +21,7 @@
 # MAGIC * `4. Destination experiment name` - Destination experiment name. 
 # MAGIC   * If specified, copies source version's run to a new run which the new model version points to.
 # MAGIC   * If not specified, the new run uses the source version's run.
-# MAGIC * `5. Source Run Workspace` - Workspace for the run of the source model version. 
+# MAGIC * `5. Destination Run Workspace` - Workspace for the run of the destination model version. 
 # MAGIC   * If copying from current workspace, then leave blank or set to `databricks`.
 # MAGIC   * If copying from another workspace, then specify secrets scope and prefix per [Set up the API token for a remote registry](https://docs.databricks.com/en/machine-learning/manage-model-lifecycle/multiple-workspaces.html#set-up-the-api-token-for-a-remote-registry). 
 # MAGIC     * Example: `databricks://MY-SCOPE:MY-PREFIX`.

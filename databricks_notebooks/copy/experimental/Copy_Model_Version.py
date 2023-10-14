@@ -1,43 +1,51 @@
 # Databricks notebook source
 # MAGIC %md ## Copy Model Version
 # MAGIC
-# MAGIC ##### Overview
+# MAGIC #### Overview
 # MAGIC
-# MAGIC Copy a model version and its run to a new model version. 
+# MAGIC * Copies a model version and its run (deep copy) to a new model version.
+# MAGIC * The new model version can be either in the same workspace or in another.
+# MAGIC * Supports both standard Workspace registry and the new Unity Catalog (UC) model registry.
+# MAGIC * Databricks registry URIs should be Databricks secrets tuples per [Specify a remote registry](https://docs.databricks.com/en/machine-learning/manage-model-lifecycle/multiple-workspaces.html).
+# MAGIC   * Example: `registry_uri = f'databricks://<scope>:<prefix>'`
 # MAGIC
-# MAGIC The source version's run can also be copied if you specifiy a destination experiment.
 # MAGIC
-# MAGIC ##### Widgets
+# MAGIC #### Widgets
 # MAGIC
 # MAGIC * `1. Source Model` - Source model name.
 # MAGIC * `2. Source Version` - Source model version.
 # MAGIC * `3. Destination Model` - Destination model name.
 # MAGIC * `4. Destination experiment name` - Destination experiment name. 
-# MAGIC   * If specified, will copy old version's run to a new run which the new model version will point to.
-# MAGIC   * If not specified, use old version's run for new version.
-# MAGIC * `5. Destination Workspace` - Destination workspace. `databricks` for current workspace or for different workspace specify secrets scope and prefix per [Set up the API token for a remote registry](https://docs.databricks.com/en/machine-learning/manage-model-lifecycle/multiple-workspaces.html#set-up-the-api-token-for-a-remote-registry). Examples:
-# MAGIC     * `databricks` - current workspace
-# MAGIC     * `databricks://MY-SCOPE:MY-PREFIX` - other workspace
-# MAGIC * `6. Verbose`
+# MAGIC   * If specified, copies source version's run to a new run which the new model version points to.
+# MAGIC   * If not specified, the new run uses the source version's run.
+# MAGIC * `5. Source Run Workspace` - Workspace for the run of the source model version. 
+# MAGIC   * If copying from current workspace, then leave blank or set to `databricks`.
+# MAGIC   * If copying from another workspace, then specify secrets scope and prefix per [Set up the API token for a remote registry](https://docs.databricks.com/en/machine-learning/manage-model-lifecycle/multiple-workspaces.html#set-up-the-api-token-for-a-remote-registry). 
+# MAGIC     * Example: `databricks://MY-SCOPE:MY-PREFIX`.
+# MAGIC * `6. Copy lineage tags` - Add source lineage info to destination version as tags starting with 'mlflow_exim'.
+# MAGIC * `7. Verbose`
+# MAGIC * `8. Return result` for automated testing.
 
 # COMMAND ----------
 
+# MAGIC %md ### Diagrams
 # MAGIC
-# MAGIC %md ### Copy Model Version - Non Unity Catalog 
-# MAGIC
-# MAGIC <br/>
-# MAGIC
-# MAGIC <img src="https://github.com/mlflow/mlflow-export-import/blob/issue-138-copy-model-version/diagrams/Copy_Model_Version_NonUC.png?raw=true"  width="700" />
-# MAGIC
-# MAGIC
+# MAGIC In the two diagram below, the left shallow copy is **_bad_**, and the right deep copy is **_good_**.
 
 # COMMAND ----------
 
-# MAGIC %md ### Copy Model Version - Unity Catalog
+# MAGIC %md
 # MAGIC
-# MAGIC <br/>
+# MAGIC ### Unity Catalog Model Registry
 # MAGIC
-# MAGIC <img src="https://github.com/mlflow/mlflow-export-import/blob/issue-138-copy-model-version/diagrams/Copy_Model_Version_UC.png?raw=true"  width="800" />
+# MAGIC  <img src="https://github.com/mlflow/mlflow-export-import/blob/issue-138-copy-model-version/diagrams/Copy_Model_Version_UC.png?raw=true"  width="700" />
+
+# COMMAND ----------
+
+# MAGIC  %md ### Workspace Model Registry
+# MAGIC
+# MAGIC  <img src="https://github.com/mlflow/mlflow-export-import/blob/issue-138-copy-model-version/diagrams/Copy_Model_Version_NonUC.png?raw=true"  width="700" />
+# MAGIC
 
 # COMMAND ----------
 
@@ -62,18 +70,27 @@ dbutils.widgets.text("4. Destination experiment name", "")
 dst_experiment_name = dbutils.widgets.get("4. Destination experiment name")
 dst_experiment_name = dst_experiment_name if dst_experiment_name else None
 
-dbutils.widgets.text("5. Destination Workspace", "databricks") 
-dst_tracking_uri = dbutils.widgets.get("5. Destination Workspace")
+dbutils.widgets.text("5. Source Run Workspace", "databricks") 
+src_run_workspace = dbutils.widgets.get("5. Source Run Workspace")
+src_run_workspace = src_run_workspace or "databricks"
 
-dbutils.widgets.dropdown("6. Verbose", "yes", ["yes","no"])
-verbose = dbutils.widgets.get("6. Verbose") == "yes"
+dbutils.widgets.dropdown("6. Copy lineage tags", "no", ["yes","no"])
+copy_lineage_tags = dbutils.widgets.get("6. Copy lineage tags") == "yes"
+
+dbutils.widgets.dropdown("7. Verbose", "yes", ["yes","no"])
+verbose = dbutils.widgets.get("7. Verbose") == "yes"
+
+dbutils.widgets.dropdown("8. Return result", "no", ["yes","no"])
+return_result = dbutils.widgets.get("8. Return result") == "yes"
 
 print("src_model_name:", src_model_name)
 print("src_model_version:", src_model_version)
 print("dst_model_name:", dst_model_name)
 print("dst_experiment_name:", dst_experiment_name)
-print("dst_tracking_uri:", dst_tracking_uri)
+print("src_run_workspace:", src_run_workspace)
+print("copy_lineage_tags:", copy_lineage_tags)
 print("verbose:", verbose)
+print("return_result:", return_result)
 
 # COMMAND ----------
 
@@ -81,7 +98,7 @@ assert_widget(src_model_name, "1. Source Model")
 assert_widget(src_model_version, "2. Source Version")
 assert_widget(dst_model_name, "3. Destination Model")
 assert_widget(dst_experiment_name, "4. Destination experiment name")
-assert_widget(dst_tracking_uri, "5. Destination Workspace")
+assert_widget(src_run_workspace, "5. Run Workspace")
 
 # COMMAND ----------
 
@@ -94,7 +111,8 @@ src_model_version, dst_model_version = copy_model_version(
     src_model_version,
     dst_model_name,
     dst_experiment_name,
-    dst_tracking_uri = dst_tracking_uri,
+    src_run_workspace = src_run_workspace,
+    copy_lineage_tags = copy_lineage_tags,
     verbose = verbose
 )
 
@@ -128,8 +146,9 @@ dump_obj_as_json(dst_model_version, "Destination ModelVersion")
 
 # COMMAND ----------
 
-result = {
-    "src_model_version": obj_to_dict(src_model_version),
-    "dst_model_version": obj_to_dict(dst_model_version)
-}
-dbutils.notebook.exit(dict_to_json(result))
+if return_result:
+  result = {
+      "src_model_version": obj_to_dict(src_model_version),
+      "dst_model_version": obj_to_dict(dst_model_version)
+  }
+  dbutils.notebook.exit(dict_to_json(result))
