@@ -38,7 +38,7 @@ def copy(src_model_name,
     dst_client = copy_utils.mk_client(dst_tracking_uri, dst_registry_uri)
 
     src_uri = f"{src_model_name}/{src_model_version}"
-    print(f"Copying model version '{src_uri}' to '{dst_model_name}'")
+    _logger.info(f"Copying model version '{src_uri}' to '{dst_model_name}'")
     if verbose:
         dump_utils.dump_mlflow_client(src_client, "SRC")
         dump_utils.dump_mlflow_client(dst_client, "DST")
@@ -50,7 +50,7 @@ def copy(src_model_name,
     if verbose:
         model_utils.dump_model_version(dst_version, "Destination Model Version")
     dst_uri = f"{dst_version.name}/{dst_version.version}"
-    print(f"Copied model version '{src_uri}' to '{dst_uri}'")
+    _logger.info(f"Copied model version '{src_uri}' to '{dst_uri}'")
     return src_version, dst_version
 
 
@@ -75,7 +75,7 @@ def _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_cl
             tags = tags,
             description = src_version.description
         )
-    if not model_utils.is_unity_catalog_model(dst_version.name):
+    if not model_utils.is_unity_catalog_model(dst_version.name) and not model_utils.is_unity_catalog_model(src_version.name):
         if src_version.current_stage != "None":
             dst_client.transition_model_version_stage(dst_version.name, dst_version.version, src_version.current_stage)
 
@@ -83,7 +83,7 @@ def _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_cl
         for alias in src_version.aliases:
             dst_client.set_registered_model_alias(dst_version.name, alias, dst_version.version)
     except MlflowException as e: # Non-UC Databricks MLflow has for some reason removed OSS MLflow support for aliases
-        print(f"ERROR: error_code: {e.error_code}. Exception: {e}")
+        _logger.error(f"error_code: {e.error_code}. Exception: {e}")
 
     return dst_client.get_model_version(dst_version.name, dst_version.version)
 
