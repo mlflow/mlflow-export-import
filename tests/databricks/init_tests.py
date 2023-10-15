@@ -50,44 +50,45 @@ class Workspace():
 workspace_src =  Workspace(cfg.workspace_src)
 workspace_dst =  Workspace(cfg.workspace_dst)
 
-utils.importing_into_databricks(workspace_dst.dbx_client)
+utils.is_importing_into_databricks = True
 
 
 def init_tests():
-    if _skip_cleanup:
-        _logger.warning("Skipping Databricks cleanup")
-    else:
-        _init_workspace(workspace_src)
-        _init_workspace(workspace_dst)
+    _init_workspace(workspace_src)
+    _init_workspace(workspace_dst)
 
 def _init_workspace(ws):
-    _delete_directory(ws)
     _create_base_directory(ws)
     if ws.is_uc:
         try:
             ws.uc_dbx_client.create_schema(ws.uc_catalog_name, ws.uc_schema_name)
         except MlflowExportImportException:
             _logger.warning(f"{ws.uc_dbx_client}: schema exists: '{ws.cfg.uc_schema}'")
-        _delete_models_uc(ws)
-    else:
-        _delete_models_non_uc(ws)
 
 
 def _create_base_directory(ws):
-    """ Create test base directory """
+    """ Create test base workspace directory for experiments """
     params = { "path": ws.base_dir }
     _logger.info(f"{ws.dbx_client}: Creating {ws.base_dir}")
     ws.dbx_client.post("workspace/mkdirs", params)
 
 
-def _delete_directory(ws):
-    """ Deletes notebooks in test based directory """
-    params = { "path": ws.base_dir, "recursive": True }
-    _logger.info(f"{ws.dbx_client}: Deleting {ws.base_dir}")
-    try:
-        ws.dbx_client.post("workspace/delete", params)
-    except MlflowExportImportException as e:
-        _logger.warning(f"{ws.dbx_client}: Delete workspace API call: {e}")
+def _cleanup():
+    """ Delete all test models and experiments """
+    if not _skip_cleanup:
+        _logger.info("Databricks cleanup")
+        _cleanup_ws(workspace_src)
+        _cleanup_ws(workspace_dst)
+    else:
+        _logger.warning("Skipping Databricks cleanup")
+
+
+def _cleanup_ws(ws):
+    _delete_directory(ws)
+    if ws.is_uc:
+        _delete_models_uc(ws)
+    else:
+        _delete_models_non_uc(ws)
 
 
 def _delete_models_non_uc(ws):
@@ -106,6 +107,16 @@ def _delete_models_uc(ws):
     for name in model_names:
         _logger.info(f"{ws.dbx_client}: Deleting model '{name}'")
         model_utils.delete_model(ws.mlflow_client, name)
+
+
+def _delete_directory(ws):
+    """ Deletes notebooks in test based directory """
+    params = { "path": ws.base_dir, "recursive": True }
+    _logger.info(f"{ws.dbx_client}: Deleting {ws.base_dir}")
+    try:
+        ws.dbx_client.post("workspace/delete", params)
+    except MlflowExportImportException as e:
+        _logger.warning(f"{ws.dbx_client}: Delete workspace API call: {e}")
 
 
 @pytest.fixture(scope="session")
@@ -127,6 +138,7 @@ def test_context():
             output_dir,
             os.path.join(output_dir,"run")
         )
+    _cleanup()
 
 
 # Initialize the testing world
