@@ -9,26 +9,26 @@ def getLogger(name):
 _logger = getLogger(__name__)
 
 
-_is_importing_into_databricks = None
+is_importing_into_databricks = None
 
 def importing_into_databricks(dbx_client=None):
     """
-    Are we importing into Databricks? 
+    Are we importing into Databricks?
     Check by making call to Databricks-specific API endpoint and check for 400 status code.
     """
     from mlflow_export_import.client.http_client import DatabricksHttpClient
     from mlflow_export_import.common import MlflowExportImportException
 
-    global _is_importing_into_databricks
-    if _is_importing_into_databricks is None:
+    global is_importing_into_databricks
+    if is_importing_into_databricks is None:
         dbx_client = dbx_client or DatabricksHttpClient()
         try:
             dbx_client.get("workspace/get-status") # Missing 'path' should cause status 400
             return False # Should never get here
         except MlflowExportImportException as e:
-            _is_importing_into_databricks =  e.http_status_code == 400
-        _logger.info(f"Importing into Databricks: {_is_importing_into_databricks}")
-    return _is_importing_into_databricks
+            is_importing_into_databricks =  e.http_status_code == 400
+        _logger.info(f"Importing into Databricks: {is_importing_into_databricks}")
+    return is_importing_into_databricks
 
 
 # Databricks tags that cannot or should not be set
@@ -36,13 +36,13 @@ _DATABRICKS_SKIP_TAGS = {
     "mlflow.user",
     "mlflow.log-model.history",
     "mlflow.rootRunId",
-    "mlflow.experiment.sourceType", 
+    "mlflow.experiment.sourceType",
     "mlflow.experiment.sourceId"
 }
 
 
 def create_mlflow_tags_for_databricks_import(tags):
-    if importing_into_databricks(): 
+    if importing_into_databricks():
         tags = { k:v for k,v in tags.items() if not k in _DATABRICKS_SKIP_TAGS }
     return tags
 
@@ -56,7 +56,7 @@ def set_dst_user_id(tags, user_id, use_src_user_id):
     tags.append(RunTag(MLFLOW_USER,user_id ))
 
 
-# Miscellaneous 
+# Miscellaneous
 
 
 def strip_underscores(obj):
