@@ -109,7 +109,7 @@ class BaseModelImporter():
         if self.import_source_tags:
             _set_source_tags_for_field(src_vr, tags)
 
-        # NOTE: MLflow UC bug: 
+        # NOTE: MLflow UC bug:
         # The client's tracking_uri is not honored. Instead MlflowClient.create_model_version()
         # seems to use mlflow.tracking_uri internally to download run artifacts for UC models.
         with MlflowTrackingUriTweak(self.mlflow_client):
@@ -118,7 +118,7 @@ class BaseModelImporter():
                 source = dst_source,
                 run_id = dst_run_id,
                 description = src_vr.get("description"),
-                tags = tags, 
+                tags = tags,
                 **kwargs
             )
         model_utils.wait_until_version_is_ready(self.mlflow_client, model_name, dst_vr, sleep_time=sleep_time)
@@ -126,12 +126,14 @@ class BaseModelImporter():
         _logger.info(f"Importing model version: {msg}")
 
         for alias in src_vr.get("aliases",[]):
-            self.mlflow_client.set_registered_model_alias(model_name, alias, dst_vr.version)
+            self.mlflow_client.set_registered_model_alias(dst_vr.name, alias, dst_vr.version)
 
         if not model_utils.is_unity_catalog_model(model_name):
             src_current_stage = src_vr["current_stage"]
             if src_current_stage and src_current_stage != "None": # fails for Databricks  but not OSS
                 self.mlflow_client.transition_model_version_stage(model_name, dst_vr.version, src_current_stage)
+
+        return self.mlflow_client.get_model_version(dst_vr.name, dst_vr.version)
 
 
     def _import_model(self,
@@ -272,7 +274,7 @@ class ModelImporter(BaseModelImporter):
         dst_run = self.mlflow_client.get_run(dst_run_id)
         model_path = _extract_model_path(src_vr["source"], src_vr["run_id"])
         dst_source = f"{dst_run.info.artifact_uri}/{model_path}"
-        self._import_version(model_name, src_vr, dst_run_id, dst_source, sleep_time)
+        return self._import_version(model_name, src_vr, dst_run_id, dst_source, sleep_time)
 
 
 class BulkModelImporter(BaseModelImporter):
@@ -338,7 +340,7 @@ class BulkModelImporter(BaseModelImporter):
         model_path = _extract_model_path(src_vr["source"], src_run_id) # get path to model artifact
         dst_artifact_uri = self.run_info_map[src_run_id].artifact_uri
         dst_source = f"{dst_artifact_uri}/{model_path}"
-        self._import_version(model_name, src_vr, dst_run_id, dst_source, sleep_time)
+        return self._import_version(model_name, src_vr, dst_run_id, dst_source, sleep_time)
 
 
 def _extract_model_path(source, run_id):
