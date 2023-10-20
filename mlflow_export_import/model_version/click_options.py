@@ -16,7 +16,7 @@ def opt_version(function):
 
 def opt_create_model(function):
     function = click.option("--create-model",
-        help="Create an empty registered model before creating model version.",
+        help="Create new registered model before creating model version.",
         type=bool,
         show_default=True,
         required=False
@@ -30,3 +30,13 @@ def opt_experiment_name(function):
         required=True
     )(function)
     return function
+
+def opt_import_metadata(function):
+    function = click.option("--import-metadata",
+        help="Import registered model and experiment metadata (description and tags).",
+        type=bool,
+        default=False,
+        show_default=False,
+    )(function)
+    return function
+

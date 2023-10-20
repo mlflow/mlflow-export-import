@@ -42,6 +42,7 @@ def export_model_version(
 
     mlflow_client = mlflow_client or mlflow.MlflowClient()
 
+    _model = mlflow_client.get_registered_model(model_name)
     vr = mlflow_client.get_model_version(model_name, version)
     vr_dct = model_utils.model_version_to_dict(vr)
 
@@ -80,7 +81,7 @@ def export_experiment(mlflow_client, experiment_id, output_dir):
 
     _adjust_timestamp(exp, "creation_time")
     _adjust_timestamp(exp, "last_update_time")
-    mlflow_attr = { "experiment": exp } 
+    mlflow_attr = { "experiment": exp }
     io_utils.write_export_file(output_dir, "experiment.json", __file__, mlflow_attr, {})
 
 
@@ -89,14 +90,13 @@ def _export_model(mlflow_client, model_name, output_dir):
     model = http_client.get("registered-models/get", {"name": model_name})
     model = model.pop("registered_model")
     model.pop("latest_versions", None)
-    model.pop("aliases", None)
     msg = {"name": model["name"] }
     _logger.info(f"Exporting registered model: {msg}")
 
     _adjust_timestamp(model, "creation_timestamp")
     _adjust_timestamp(model, "last_updated_timestamp")
 
-    mlflow_attr = { "model": model } 
+    mlflow_attr = { "model": model }
     io_utils.write_export_file(output_dir, "registered_model.json", __file__, mlflow_attr, {})
 
 

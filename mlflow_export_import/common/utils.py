@@ -56,6 +56,23 @@ def set_dst_user_id(tags, user_id, use_src_user_id):
     tags.append(RunTag(MLFLOW_USER,user_id ))
 
 
+# Tags
+
+def mk_tags_dict(tags_array):
+    """
+    Transform a list of key/value items to a dict.
+    """
+    return mk_key_value_array_dict(tags_array, "key", "value")
+
+def mk_key_value_array_dict(kv_array, key_name, value_name):
+    """
+    Transforms a list of 2 item dicts to a dict.
+    Example:  [{'key': 'k1', 'value': 'v1'}, {'key': 'k2', 'value': 'v2'}] ==> {'k1': 'v1', 'k2': 'v2' }
+    """
+    if kv_array is None:
+        return {}
+    return { x[key_name]:x[value_name] for x in kv_array }
+
 # Miscellaneous
 
 
