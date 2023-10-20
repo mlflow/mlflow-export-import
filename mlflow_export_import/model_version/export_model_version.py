@@ -6,7 +6,10 @@ import os
 import click
 import mlflow
 
-from mlflow_export_import.common import model_utils
+from mlflow_export_import.client.http_client import create_http_client
+from mlflow_export_import.common import utils, io_utils, model_utils
+from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
+from mlflow_export_import.run.export_run import export_run
 from mlflow_export_import.common.click_options import (
     opt_model,
     opt_output_dir,
@@ -16,9 +19,6 @@ from mlflow_export_import.common.click_options import (
 from . click_options import (
     opt_version,
 )
-from mlflow_export_import.common import utils, io_utils
-from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
-from mlflow_export_import.run.export_run import export_run
 
 _logger = utils.getLogger(__name__)
 
@@ -45,20 +45,25 @@ def export_model_version(
     vr = mlflow_client.get_model_version(model_name, version)
     vr_dct = model_utils.model_version_to_dict(vr)
 
-    export_run(
+    run = export_run(
         run_id = vr.run_id,
         output_dir = os.path.join(output_dir, "run"),
         notebook_formats = notebook_formats,
         export_deleted_runs = True, # NOTE: Important since default is not export a deleted run
         mlflow_client = mlflow_client
     )
-    info_attr = { }
+    info_attr = {}
     if export_version_model:
         _output_dir = os.path.join(output_dir, "mlflow_model")
         vr_dct["_download_uri"] = model_utils.export_version_model(mlflow_client, vr, _output_dir)
         info_attr["export_version_model"] = True
 
-    mlflow_attr = { "model_version": _adjust_version(vr_dct) }
+    export_experiment(mlflow_client, run.info.experiment_id, output_dir)
+    _export_model(mlflow_client, model_name, output_dir)
+
+    _adjust_timestamp(vr_dct, "creation_timestamp")
+    _adjust_timestamp(vr_dct, "last_updated_timestamp")
+    mlflow_attr = { "model_version": vr_dct}
     msg = utils.get_obj_key_values(vr, [ "name", "version", "current_stage", "status", "run_id" ])
     _logger.info(f"Exporting model verson: {msg}")
 
@@ -66,15 +71,47 @@ def export_model_version(
     return vr
 
 
+def export_experiment(mlflow_client, experiment_id, output_dir):
+    http_client = create_http_client(mlflow_client)
+    exp = http_client.get("experiments/get", {"experiment_id": experiment_id})
+    exp = exp["experiment"]
+    msg = { "name": exp["name"], "experiment_id": exp["experiment_id"] }
+    _logger.info(f"Exporting experiment: {msg}")
+
+    _adjust_timestamp(exp, "creation_time")
+    _adjust_timestamp(exp, "last_update_time")
+    mlflow_attr = { "experiment": exp } 
+    io_utils.write_export_file(output_dir, "experiment.json", __file__, mlflow_attr, {})
+
+
+def _export_model(mlflow_client, model_name, output_dir):
+    http_client = create_http_client(mlflow_client, model_name)
+    model = http_client.get("registered-models/get", {"name": model_name})
+    model = model.pop("registered_model")
+    model.pop("latest_versions", None)
+    model.pop("aliases", None)
+    msg = {"name": model["name"] }
+    _logger.info(f"Exporting registered model: {msg}")
+
+    _adjust_timestamp(model, "creation_timestamp")
+    _adjust_timestamp(model, "last_updated_timestamp")
+
+    mlflow_attr = { "model": model } 
+    io_utils.write_export_file(output_dir, "registered_model.json", __file__, mlflow_attr, {})
+
+
 def _adjust_version(vr):
     """
     Add nicely formatted timestamps and for aesthetic reasons order the dict attributes
     """
-    def _adjust_timestamp(dct, attr):
-        dct[f"_{attr}"] = fmt_ts_millis(dct.get(attr))
     _adjust_timestamp(vr, "creation_timestamp")
     _adjust_timestamp(vr, "last_updated_timestamp")
     return vr
+
+
+def _adjust_timestamp(dct, key):
+    if key in dct:
+        dct[f"_{key}"] = fmt_ts_millis(dct.get(key))
 
 
 @click.command()
