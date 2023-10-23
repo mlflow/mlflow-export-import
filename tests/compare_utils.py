@@ -103,8 +103,9 @@ def compare_models_with_versions(mlflow_context, model_src, model_dst, compare_n
         compare_versions(mlflow_context, vr_src, vr_dst, compare_names)
 
 
-def compare_versions(mlflow_context, vr_src, vr_dst, compare_names=True, run_ids_equal=False):
-    assert vr_src.current_stage == vr_dst.current_stage
+def compare_versions(mlflow_context, vr_src, vr_dst, compare_names=True, run_ids_equal=False, compare_stages=True):
+    if compare_stages:
+        assert vr_src.current_stage == vr_dst.current_stage
     assert vr_src.description == vr_dst.description
     assert vr_src.status == vr_dst.status
     assert vr_src.status_message == vr_dst.status_message
