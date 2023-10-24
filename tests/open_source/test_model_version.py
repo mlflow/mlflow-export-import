@@ -1,31 +1,31 @@
-from mlflow_export_import.common.dump_utils import dump_mlflow_client
-from mlflow_export_import.model_version.export_model_version import export_model_version 
-from mlflow_export_import.model_version.import_model_version import import_model_version 
+from mlflow_export_import.common.mlflow_utils import get_experiment_description
+from mlflow_export_import.model_version.export_model_version import export_model_version
+from mlflow_export_import.model_version.import_model_version import import_model_version
 
 from tests.compare_utils import compare_versions
 from . init_tests import mlflow_context
 from . oss_utils_test import mk_test_object_name_default
-from . oss_utils_test import create_experiment, create_version
+from . oss_utils_test import create_version
 
 
 def test_import_metadata_false(mlflow_context):
-    src_model, dst_model = run_test(mlflow_context, import_metadata=False)
+    src_model, dst_model, src_exp, dst_exp = run_test(mlflow_context, import_metadata=False)
     assert src_model.description != dst_model.description
     assert src_model.tags != dst_model.tags
+    assert get_experiment_description(src_exp) != get_experiment_description(dst_exp)
+    assert src_exp.tags != dst_exp.tags
 
 def test_import_metadata_true(mlflow_context):
-    src_model, dst_model = run_test(mlflow_context, import_metadata=True)
+    src_model, dst_model, src_exp, dst_exp = run_test(mlflow_context, import_metadata=True)
     assert src_model.description == dst_model.description
     assert src_model.tags == dst_model.tags
+    assert get_experiment_description(src_exp) == get_experiment_description(dst_exp)
+    assert src_exp.tags == dst_exp.tags
 
 
 def run_test(mlflow_context, import_metadata):
-    dump_mlflow_client(mlflow_context.client_src,"SRC Client")
-
-    dump_mlflow_client(mlflow_context.client_src,"SRC Client")
-    dump_mlflow_client(mlflow_context.client_dst,"DST Client")
-    dst_exp = create_experiment(mlflow_context.client_src)
-    src_vr, _ = create_model_version(mlflow_context)
+    dst_exp_name = mk_test_object_name_default()
+    src_vr, src_run = create_model_version(mlflow_context)
     dst_model_name = mk_test_object_name_default()
 
     export_model_version(
@@ -38,7 +38,7 @@ def run_test(mlflow_context, import_metadata):
 
     dst_vr = import_model_version(
         model_name = dst_model_name,
-        experiment_name = dst_exp.name,
+        experiment_name = dst_exp_name,
         input_dir = mlflow_context.output_dir,
         create_model = True,
         import_source_tags = False,
@@ -49,7 +49,10 @@ def run_test(mlflow_context, import_metadata):
 
     src_model = mlflow_context.client_src.get_registered_model(src_vr.name)
     dst_model = mlflow_context.client_dst.get_registered_model(dst_vr.name)
-    return src_model, dst_model
+    src_exp = mlflow_context.client_src.get_experiment(src_run.info.experiment_id)
+    dst_exp = mlflow_context.client_dst.get_experiment_by_name(dst_exp_name)
+
+    return src_model, dst_model, src_exp, dst_exp
 
 
 def create_model_version(mlflow_context):

@@ -21,7 +21,7 @@ def get_experiment(mlflow_client, exp_id_or_name):
 
 def set_experiment(mlflow_client, dbx_client, exp_name, tags=None):
     """
-    Set experiment name. 
+    Set experiment name.
     For Databricks, create the workspace directory if it doesn't exist.
     :return: Experiment
     """
@@ -68,6 +68,10 @@ def get_last_run(mlflow_client, exp_id_or_name):
     return runs[0]
 
 
+def get_experiment_description(experiment):
+    return experiment.tags.get("mlflow.note.content")
+
+
 def create_workspace_dir(dbx_client, workspace_dir):
     """
     Create Databricks workspace directory.
@@ -103,13 +107,13 @@ class MlflowTrackingUriTweak:
 # == Download artifact issue
 
 def download_artifacts(client, download_uri, dst_path=None, fix=True):
-    """ 
+    """
     Apparently the tracking_uri argument is not honored for mlflow.artifacts.download_artifacts().
     It seems that tracking_uri is ignored and the global mlflow.get_tracking_uri() is always used.
     If the two happen to be the same, the operation will succeed.
     If not, it fails.
     Issue: Merge pull request #104 from mingyu89/fix-download-artifacts
-    """ 
+    """
     if fix:
         with MlflowTrackingUriTweak(client):
             local_path = mlflow.artifacts.download_artifacts(
@@ -158,4 +162,4 @@ def _dump_exception(ex, msg=""):
 def _dump_MlflowException(ex, msg=""):
     _dump_exception(ex, msg)
     _logger.info(f"  get_http_status_code(): {ex.get_http_status_code()}")
-    _logger.info(f"  serialize_as_json():    {ex.serialize_as_json()}") 
+    _logger.info(f"  serialize_as_json():    {ex.serialize_as_json()}")
