@@ -1,6 +1,8 @@
 import os
 import mlflow
+from mlflow.utils.mlflow_tags import MLFLOW_RUN_NOTE
 from mlflow.exceptions import RestException
+
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common.iterators import SearchModelVersionsIterator
 from mlflow_export_import.common import utils
@@ -69,7 +71,11 @@ def get_last_run(mlflow_client, exp_id_or_name):
 
 
 def get_experiment_description(experiment):
-    return experiment.tags.get("mlflow.note.content")
+    return experiment.tags.get(MLFLOW_RUN_NOTE)
+
+
+def set_experiment_description(client, experiment_id, description):
+    client.set_experiment_tag(experiment_id, MLFLOW_RUN_NOTE, description)
 
 
 def create_workspace_dir(dbx_client, workspace_dir):
