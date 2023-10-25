@@ -11,15 +11,14 @@ def opt_version(function):
     )(function)
     return function
 
-
 # == Import model version
 
 def opt_create_model(function):
     function = click.option("--create-model",
-        help="Create new registered model before creating model version.",
+        help="Create registered model before creating model version.",
         type=bool,
-        show_default=True,
-        required=False
+        default=False,
+        show_default=True
     )(function)
     return function
 
@@ -36,7 +35,6 @@ def opt_import_metadata(function):
         help="Import registered model and experiment metadata (description and tags).",
         type=bool,
         default=False,
-        show_default=False,
+        show_default=True
     )(function)
     return function
-

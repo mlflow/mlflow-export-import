@@ -397,27 +397,22 @@ Waited 0.01 seconds
 
 ### Export Model Version
 
-Export a model version to a directory.
+Exports a registered model version and its run.
+Also exports registered model and experiment metadata (description and tags).
 
 Source: [export_model_version.py](mlflow_export_import/model_version/export_model_version.py).
 
 #### Example
 ```
 export-model-version \
-  --model Sklearn_Wine_best \
+  --model my_catalog.models.Sklearn_Wine \
   --version 1 \
-  --export-version-model True \
-  --output-dir out
+  --output-dir dbfs:/mnt/mlflow-export-import/Sklearn_Wine
 ```
 
 #### Usage
 ```
-export-model-version \
-
-Usage: export-model-version
-           [OPTIONS]
-
-  Exports a registered model version and its run.
+export-model-version --help
 
 Options:
   --model TEXT                    Registered model name.  [required]
@@ -432,22 +427,25 @@ Options:
 
 ### Import Model Version
 
-import a model version.
+Imports a registered model version and its run. 
+
+Optionally import the registered model and experiment metadata (description and tags) only if they are being created for the first time.
+Will not modify metadata of an existing registered model and experiment.
 
 Source: [import_model_version.py](mlflow_import_import/model_version/import_model_version.py).
 
 #### Example
 ```
 import-model-version \
-  --input-dir out \
-  --model Skelarn_Wine \
+  --input-dir dbfs:/mnt/mlflow-export-import/Sklearn_Wine \
+  --model my_catalog.models.Sklearn_Wine \
   --create-model True \
-  --experiment-name /Users/me@mycompany.com/SklearnWine \
+  --experiment-name /Users/me@mycompany.com/SklearnWine
 ```
 
 #### Usage
 ```
-import-model-version --help\
+import-model-version --help
 
 Usage: import-model-version
            [OPTIONS]
@@ -457,11 +455,13 @@ Usage: import-model-version
 Options:
   --input-dir TEXT              Input directory.  [required]
   --model TEXT                  Registered model name.  [required]
-  --create-model BOOLEAN        Create an empty registered model before
-                                creating model version.
+  --create-model BOOLEAN        Create registered model before creating model
+                                version.  [default: False]
   --experiment-name TEXT        Destination experiment name for the version's
                                 run.  [required]
   --import-source-tags BOOLEAN  Import source information for registered model
                                 and its versions and tags in destination
                                 object.  [default: False]
+  --import-metadata BOOLEAN     Import registered model and experiment
+                                metadata (description and tags).```
 ```
