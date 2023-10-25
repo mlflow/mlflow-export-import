@@ -18,6 +18,13 @@ def mk_uc_model_name(workspace=workspace_src):
     return f"{workspace.uc_full_schema_name}.{mk_test_object_name_default()}"
 
 
+def mk_model_name(workspace, is_uc=False):
+    if is_uc:
+        return mk_uc_model_name(workspace)
+    else:
+        return mk_test_object_name_default()
+
+
 def create_experiment(client):
     exp_id = client.create_experiment(mk_experiment_name(), tags={"ocean": "southern"})
     return client.get_experiment(exp_id)
