@@ -11,8 +11,8 @@ from tests.databricks import local_utils
 
 num_versions = 3
 
-def _init(test_context):
-    src_model_name = local_utils.mk_uc_model_name(workspace_src)
+def _init(test_context, is_uc):
+    src_model_name = local_utils.mk_model_name(workspace_src, is_uc)
 
     src_vrs = [ local_utils.create_version(test_context.mlflow_client_src, src_model_name) for _ in range(num_versions) ]
     src_model = src_vrs[0][1]
@@ -25,7 +25,7 @@ def _init(test_context):
         model_name = src_model.name,
         output_dir = test_context.output_dir
     )
-    dst_model_name = local_utils.mk_uc_model_name(workspace_dst)
+    dst_model_name = local_utils.mk_model_name(workspace_dst, is_uc)
     import_model(
         mlflow_client = test_context.mlflow_client_dst,
         model_name = dst_model_name,
@@ -41,6 +41,6 @@ def _init(test_context):
     return src_model, dst_model
 
 
-def test_registered_model(test_context):
-    src_model, dst_model = _init(test_context)
+def test_registered_model(test_context, is_uc):
+    src_model, dst_model = _init(test_context, is_uc)
     compare_models_with_versions(to_MlflowContext(test_context), src_model, dst_model, compare_names=False)
