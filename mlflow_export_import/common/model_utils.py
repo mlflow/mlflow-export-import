@@ -1,7 +1,6 @@
 import time
 import mlflow
 from mlflow.exceptions import RestException
-from mlflow.entities.model_registry.model_version_status import ModelVersionStatus
 
 from mlflow_export_import.common.iterators import SearchModelVersionsIterator
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
@@ -74,23 +73,6 @@ def search_model_versions(client, filter):
     """
     versions = client.search_model_versions(filter)
     return [ client.get_model_version(vr.name, vr.version) for vr in versions ]
-
-
-def wait_until_version_is_ready(client, model_name, model_version, sleep_time=1, iterations=100):
-    """
-    Due to blob eventual consistency, wait until a newly created version is in READY state.
-    """
-    start = time.time()
-    for _ in range(iterations):
-        vr = client.get_model_version(model_name, model_version.version)
-        status = ModelVersionStatus.from_string(vr.status)
-        msg = utils.get_obj_key_values(vr, [ "name", "version", "current_stage", "status" ])
-        _logger.info(f"Model version transition: {msg}")
-        if status == ModelVersionStatus.READY:
-            break
-        time.sleep(sleep_time)
-    end = time.time()
-    _logger.info(f"Waited {round(end-start,2)} seconds")
 
 
 def export_version_model(client, version, output_dir):
