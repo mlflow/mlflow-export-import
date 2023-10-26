@@ -26,6 +26,9 @@ from mlflow_export_import.client.http_client import create_dbx_client
 from mlflow_export_import.run.import_run import import_run
 from mlflow_export_import.bulk import rename_utils
 
+from mlflow_export_import.model_version.import_model_version import _import_model_version
+
+
 _logger = utils.getLogger(__name__)
 
 
@@ -44,7 +47,6 @@ def import_model(
         import_source_tags = False,
         verbose=False,
         await_creation_for = None,
-        sleep_time = 30,
         mlflow_client = None
     ):
     importer = ModelImporter(
@@ -58,8 +60,7 @@ def import_model(
         input_dir = input_dir,
         experiment_name = experiment_name,
         delete_model = delete_model,
-        verbose = verbose,
-        sleep_time = sleep_time
+        verbose = verbose
     )
 
 
@@ -86,56 +87,6 @@ class BaseModelImporter():
         self.await_creation_for = await_creation_for
 
 
-    def _import_version(self,
-            model_name,
-            src_vr,
-            dst_run_id,
-            dst_source,
-            sleep_time
-        ):
-        """
-        :param model_name: Model name.
-        :param src_vr: Source model version.
-        :param dst_run: Destination run.
-        :param dst_source: Destination version 'source' field.
-        :param sleep_time: Seconds to wait for model version crreation.
-        """
-        dst_source = dst_source.replace("file://","") # OSS MLflow
-        if not dst_source.startswith("dbfs:") and not os.path.exists(dst_source):
-            raise MlflowExportImportException(f"'source' argument for MLflowClient.create_model_version does not exist: {dst_source}", http_status_code=404)
-        kwargs = {"await_creation_for": self.await_creation_for } if self.await_creation_for else {}
-
-        tags = src_vr["tags"]
-        if self.import_source_tags:
-            _set_source_tags_for_field(src_vr, tags)
-
-        # NOTE: MLflow UC bug:
-        # The client's tracking_uri is not honored. Instead MlflowClient.create_model_version()
-        # seems to use mlflow.tracking_uri internally to download run artifacts for UC models.
-        with MlflowTrackingUriTweak(self.mlflow_client):
-            dst_vr = self.mlflow_client.create_model_version(
-                name = model_name,
-                source = dst_source,
-                run_id = dst_run_id,
-                description = src_vr.get("description"),
-                tags = tags,
-                **kwargs
-            )
-        model_utils.wait_until_version_is_ready(self.mlflow_client, model_name, dst_vr, sleep_time=sleep_time)
-        msg = utils.get_obj_key_values(dst_vr, [ "name", "version", "current_stage", "status" ])
-        _logger.info(f"Importing model version: {msg}")
-
-        for alias in src_vr.get("aliases",[]):
-            self.mlflow_client.set_registered_model_alias(dst_vr.name, alias, dst_vr.version)
-
-        if not model_utils.is_unity_catalog_model(model_name):
-            src_current_stage = src_vr["current_stage"]
-            if src_current_stage and src_current_stage != "None": # fails for Databricks  but not OSS
-                self.mlflow_client.transition_model_version_stage(model_name, dst_vr.version, src_current_stage)
-
-        return self.mlflow_client.get_model_version(dst_vr.name, dst_vr.version)
-
-
     def _import_model(self,
             model_name,
             input_dir,
@@ -146,7 +97,6 @@ class BaseModelImporter():
         :param input_dir: Input directory.
         :param delete_model: Delete current model before importing versions.
         :param verbose: Verbose.
-        :param sleep_time: Seconds to wait for model version crreation.
         :return: Model import manifest.
         """
         path = os.path.join(input_dir, "model.json")
@@ -208,8 +158,7 @@ class ModelImporter(BaseModelImporter):
             input_dir,
             experiment_name,
             delete_model = False,
-            verbose = False,
-            sleep_time = 30
+            verbose = False
         ):
         """
         :param model_name: Model name.
@@ -218,7 +167,6 @@ class ModelImporter(BaseModelImporter):
         :param delete_model: Delete current model before importing versions.
         :param import_source_tags: Import source information for registered model and its versions ad tags in destination object.
         :param verbose: Verbose.
-        :param sleep_time: Seconds to wait for model version crreation.
         :return: Model import manifest.
         """
         model_dct = self._import_model(model_name, input_dir, delete_model)
@@ -227,7 +175,7 @@ class ModelImporter(BaseModelImporter):
             try:
                 run_id = self._import_run(input_dir, experiment_name, vr)
                 if run_id:
-                    self.import_version(model_name, vr, run_id, sleep_time)
+                    self.import_version(model_name, vr, run_id)
             except RestException as e:
                 msg = { "model": model_name, "version": vr["version"], "src_run_id": vr["run_id"], "experiment": experiment_name, "RestException": str(e) }
                 _logger.error(f"Failed to import model version: {msg}")
@@ -270,11 +218,18 @@ class ModelImporter(BaseModelImporter):
         return dst_run_id
 
 
-    def import_version(self, model_name, src_vr, dst_run_id, sleep_time=10):
+    def import_version(self, model_name, src_vr, dst_run_id):
         dst_run = self.mlflow_client.get_run(dst_run_id)
         model_path = _extract_model_path(src_vr["source"], src_vr["run_id"])
         dst_source = f"{dst_run.info.artifact_uri}/{model_path}"
-        return self._import_version(model_name, src_vr, dst_run_id, dst_source, sleep_time)
+        return _import_model_version(
+            mlflow_client = self.mlflow_client, 
+            model_name = model_name, 
+            src_vr = src_vr, 
+            dst_run_id = dst_run_id, 
+            dst_source = dst_source,
+            import_source_tags = self.import_source_tags
+        )
 
 
 class BulkModelImporter(BaseModelImporter):
@@ -302,15 +257,13 @@ class BulkModelImporter(BaseModelImporter):
             model_name,
             input_dir,
             delete_model = False,
-            verbose = False,
-            sleep_time = 30
+            verbose = False
         ):
         """
         :param model_name: Model name.
         :param input_dir: Input directory.
         :param delete_model: Delete current model before importing versions.
         :param verbose: Verbose.
-        :param sleep_time: Seconds to wait for model version crreation.
         :return: Model import manifest.
         """
         model_dct = self._import_model(model_name, input_dir, delete_model)
@@ -327,7 +280,7 @@ class BulkModelImporter(BaseModelImporter):
                 try:
                     with MlflowTrackingUriTweak(self.mlflow_client):
                         mlflow.set_experiment(exp_name)
-                    self.import_version(model_name, vr, dst_run_id, sleep_time)
+                    self.import_version(model_name, vr, dst_run_id)
                 except RestException as e:
                     msg = { "model": model_name, "version": vr["version"], "experiment": exp_name, "run_id": dst_run_id, "exception": str(e) }
                     _logger.error(f"Failed to import model version: {msg}")
@@ -335,12 +288,19 @@ class BulkModelImporter(BaseModelImporter):
             model_utils.dump_model_versions(self.mlflow_client, model_name)
 
 
-    def import_version(self, model_name, src_vr, dst_run_id, sleep_time):
+    def import_version(self, model_name, src_vr, dst_run_id):
         src_run_id = src_vr["run_id"]
         model_path = _extract_model_path(src_vr["source"], src_run_id) # get path to model artifact
         dst_artifact_uri = self.run_info_map[src_run_id].artifact_uri
         dst_source = f"{dst_artifact_uri}/{model_path}"
-        return self._import_version(model_name, src_vr, dst_run_id, dst_source, sleep_time)
+        return _import_model_version(
+            mlflow_client = self.mlflow_client, 
+            model_name = model_name, 
+            src_vr = src_vr, 
+            dst_run_id = dst_run_id, 
+            dst_source = dst_source,
+            import_source_tags = self.import_source_tags
+        )
 
 
 def _extract_model_path(source, run_id):
@@ -385,15 +345,10 @@ def _path_join(x, y):
     default=None,
     show_default=True
 )
-@click.option("--sleep-time",
-    help="Sleep time for polling until version.status==READY.",
-    type=int,
-    default=5,
-)
 @opt_verbose
 
 def main(input_dir, model, experiment_name, delete_model, import_permissions, import_source_tags,
-        await_creation_for, sleep_time, verbose
+        await_creation_for, verbose
     ):
     _logger.info("Options:")
     for k,v in locals().items():
@@ -406,7 +361,6 @@ def main(input_dir, model, experiment_name, delete_model, import_permissions, im
         import_permissions = import_permissions,
         import_source_tags = import_source_tags,
         await_creation_for = await_creation_for,
-        sleep_time = sleep_time,
         verbose = verbose
     )
 

@@ -353,8 +353,6 @@ Options:
                                 and its versions ad tags in destination
                                 object.  [default: False]
   --await-creation-for INTEGER  Await creation for specified seconds.
-  --sleep-time INTEGER          Sleep time for polling until
-                                version.status==READY.
   --verbose BOOLEAN             Verbose.  [default: False]
 ```
 

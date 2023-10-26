@@ -17,6 +17,7 @@ def _init(test_context, is_uc):
     src_vrs = [ local_utils.create_version(test_context.mlflow_client_src, src_model_name) for _ in range(num_versions) ]
     src_model = src_vrs[0][1]
     src_vrs = [ vr[0] for vr in src_vrs ]
+    dump_utils.dump_obj(src_model, "SRC MODEL")
     for vr in src_vrs:
         dump_utils.dump_obj(vr, f"SRC Version {vr.version}")
 
@@ -33,6 +34,7 @@ def _init(test_context, is_uc):
         input_dir = test_context.output_dir
     )
     dst_model = test_context.mlflow_client_dst.get_registered_model(dst_model_name)
+    dump_utils.dump_obj(dst_model, "DST MODEL")
     dst_vrs = model_utils.list_model_versions(test_context.mlflow_client_dst, dst_model.name)
     assert len(dst_vrs) == num_versions
     for vr in dst_vrs:

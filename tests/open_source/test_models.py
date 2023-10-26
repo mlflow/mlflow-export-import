@@ -158,7 +158,6 @@ def _run_test_export_import_model_stages(mlflow_context, stages=None, versions=N
         input_dir = mlflow_context.output_dir,
         import_source_tags = True,
         delete_model = True,
-        sleep_time = 10,
         mlflow_client = mlflow_context.client_dst
     )
 
