@@ -10,6 +10,7 @@ from . click_options import (
     opt_src_registry_uri,
     opt_dst_registry_uri,
     opt_dst_experiment_name,
+    opt_copy_stages_and_aliases,
     opt_copy_lineage_tags
 )
 from mlflow_export_import.common.source_tags import ExportTags
@@ -28,6 +29,7 @@ def copy(src_model_name,
         dst_tracking_uri = None,
         src_registry_uri = None,
         dst_registry_uri = None,
+        copy_stages_and_aliases = False,
         copy_lineage_tags = False,
         verbose = False
     ):
@@ -46,7 +48,8 @@ def copy(src_model_name,
     src_version = src_client.get_model_version(src_model_name, src_model_version)
     if verbose:
         model_utils.dump_model_version(src_version, "Source Model Version")
-    dst_version = _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_client, dst_client, copy_lineage_tags)
+    dst_version = _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_client, dst_client, \
+        copy_stages_and_aliases, copy_lineage_tags)
     if verbose:
         model_utils.dump_model_version(dst_version, "Destination Model Version")
     dst_uri = f"{dst_version.name}/{dst_version.version}"
@@ -54,7 +57,8 @@ def copy(src_model_name,
     return src_version, dst_version
 
 
-def _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_client, dst_client, copy_lineage_tags=False):
+def _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_client, dst_client, \
+        copy_stages_and_aliases=False, copy_lineage_tags=False):
     if dst_experiment_name:
         dst_run = copy_run._copy(src_version.run_id, dst_experiment_name, src_client, dst_client)
     else:
@@ -75,15 +79,16 @@ def _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_cl
             tags = tags,
             description = src_version.description
         )
-    if not model_utils.is_unity_catalog_model(dst_version.name) and not model_utils.is_unity_catalog_model(src_version.name):
-        if src_version.current_stage != "None":
-            dst_client.transition_model_version_stage(dst_version.name, dst_version.version, src_version.current_stage)
+    if copy_stages_and_aliases:
+        if not model_utils.is_unity_catalog_model(dst_version.name) and not model_utils.is_unity_catalog_model(src_version.name):
+            if src_version.current_stage != "None":
+                dst_client.transition_model_version_stage(dst_version.name, dst_version.version, src_version.current_stage)
 
-    try:
-        for alias in src_version.aliases:
-            dst_client.set_registered_model_alias(dst_version.name, alias, dst_version.version)
-    except MlflowException as e: # Non-UC Databricks MLflow has for some reason removed OSS MLflow support for aliases
-        _logger.error(f"error_code: {e.error_code}. Exception: {e}")
+        try:
+            for alias in src_version.aliases:
+                dst_client.set_registered_model_alias(dst_version.name, alias, dst_version.version)
+        except MlflowException as e: # Non-UC Databricks MLflow has for some reason removed OSS MLflow support for aliases
+            _logger.error(f"error_code: {e.error_code}. Exception: {e}")
 
     return dst_client.get_model_version(dst_version.name, dst_version.version)
 
@@ -120,10 +125,12 @@ def _add_lineage_tags(src_version, run, dst_model_name, src_client, dst_client):
 @opt_src_registry_uri
 @opt_dst_registry_uri
 @opt_dst_experiment_name
+@opt_copy_stages_and_aliases
 @opt_copy_lineage_tags
 @opt_verbose
 
-def main(src_model, src_version, dst_model, src_registry_uri, dst_registry_uri, dst_experiment_name, copy_lineage_tags, verbose):
+def main(src_model, src_version, dst_model, src_registry_uri, dst_registry_uri, \
+        dst_experiment_name, copy_stages_and_aliases, copy_lineage_tags, verbose):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
@@ -152,6 +159,7 @@ def main(src_model, src_version, dst_model, src_registry_uri, dst_registry_uri, 
         dst_tracking_uri,
         src_registry_uri,
         dst_registry_uri,
+        copy_stages_and_aliases = copy_stages_and_aliases,
         copy_lineage_tags = copy_lineage_tags,
         verbose = verbose
     )

@@ -64,6 +64,15 @@ def opt_dst_experiment_name(function):
     )(function)
     return function
 
+def opt_copy_stages_and_aliases(function):
+    function = click.option("--copy-stages-and-aliases",
+        help="Import stages and aliases.",
+        type=bool,
+        default=False,
+        show_default=True
+    )(function)
+    return function
+
 def opt_copy_lineage_tags(function):
     function = click.option("--copy-lineage-tags",
         help="Add source lineage info to destination version as tags starting with 'mlflow_exim'.",

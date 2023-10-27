@@ -106,10 +106,10 @@ def compare_models_with_versions(mlflow_context, model_src, model_dst, compare_n
 def compare_versions(mlflow_context, vr_src, vr_dst, compare_names=True, run_ids_equal=False, compare_stages=True):
     if compare_stages:
         assert vr_src.current_stage == vr_dst.current_stage
+        assert vr_src.aliases == vr_dst.aliases
     assert vr_src.description == vr_dst.description
     assert vr_src.status == vr_dst.status
     assert vr_src.status_message == vr_dst.status_message
-    assert vr_src.aliases == vr_dst.aliases
     if compare_names and mlflow_context.client_src != mlflow_context.client_dst:
         assert vr_src.name == vr_dst.name
     if not utils.importing_into_databricks():
