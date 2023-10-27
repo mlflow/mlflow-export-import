@@ -15,7 +15,8 @@ from mlflow_export_import.common.click_options import (
 from . click_options import (
     opt_create_model,
     opt_experiment_name,
-    opt_import_metadata
+    opt_import_metadata,
+    opt_import_stages_and_aliases
 )
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common import utils, io_utils, mlflow_utils, model_utils
@@ -33,6 +34,7 @@ def import_model_version(
         input_dir,
         create_model = False,
         import_source_tags = False,
+        import_stages_and_aliases = True,
         import_metadata = False,
         await_creation_for = None,
         mlflow_client = None
@@ -74,6 +76,8 @@ def import_model_version(
         src_vr = src_vr,
         dst_run_id = dst_run.info.run_id,
         dst_source = dst_source,
+        import_stages_and_aliases = import_stages_and_aliases,
+        import_source_tags = import_source_tags,
         await_creation_for = await_creation_for
     )
     return dst_vr
@@ -85,6 +89,7 @@ def _import_model_version(
         src_vr,
         dst_run_id,
         dst_source,
+        import_stages_and_aliases = True,
         import_source_tags = False,
         await_creation_for = None
     ):
@@ -111,13 +116,14 @@ def _import_model_version(
     msg = utils.get_obj_key_values(dst_vr, [ "name", "version", "current_stage", "status" ])
     _logger.info(f"Importing model version: {msg}")
 
-    for alias in src_vr.get("aliases",[]):
-        mlflow_client.set_registered_model_alias(dst_vr.name, alias, dst_vr.version)
+    if import_stages_and_aliases:
+        for alias in src_vr.get("aliases",[]):
+            mlflow_client.set_registered_model_alias(dst_vr.name, alias, dst_vr.version)
 
-    if not model_utils.is_unity_catalog_model(model_name):
-        src_current_stage = src_vr["current_stage"]
-        if src_current_stage and src_current_stage != "None": # fails for Databricks  but not OSS
-            mlflow_client.transition_model_version_stage(model_name, dst_vr.version, src_current_stage)
+        if not model_utils.is_unity_catalog_model(model_name):
+            src_current_stage = src_vr["current_stage"]
+            if src_current_stage and src_current_stage != "None": # fails for Databricks  but not OSS
+                mlflow_client.transition_model_version_stage(model_name, dst_vr.version, src_current_stage)
 
     return mlflow_client.get_model_version(dst_vr.name, dst_vr.version)
 
@@ -155,9 +161,10 @@ def _set_source_tags_for_field(dct, tags):
 @opt_create_model
 @opt_experiment_name
 @opt_import_source_tags
+@opt_import_stages_and_aliases
 @opt_import_metadata
 
-def main(input_dir, model, experiment_name, create_model, import_source_tags, import_metadata):
+def main(input_dir, model, experiment_name, create_model, import_source_tags, import_stages_and_aliases, import_metadata):
     """
     Imports a registered model version and its run.
     """
@@ -170,6 +177,7 @@ def main(input_dir, model, experiment_name, create_model, import_source_tags, im
         input_dir = input_dir,
         create_model = create_model,
         import_source_tags = import_source_tags,
+        import_stages_and_aliases = import_stages_and_aliases,
         import_metadata = import_metadata
     )
 

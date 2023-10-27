@@ -30,6 +30,15 @@ def opt_experiment_name(function):
     )(function)
     return function
 
+def opt_import_stages_and_aliases(function):
+    function = click.option("--import-stages-and-aliases",
+        help="Import stages and aliases.",
+        type=bool,
+        default=False,
+        show_default=True
+    )(function)
+    return function
+
 def opt_import_metadata(function):
     function = click.option("--import-metadata",
         help="Import registered model and experiment metadata (description and tags).",
