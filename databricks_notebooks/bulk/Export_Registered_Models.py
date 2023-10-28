@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %md ## Export Models
+# MAGIC %md ## Export Registered Models
 # MAGIC
 # MAGIC Export specified models, their version runs and the experiments that the runs belong to.
 # MAGIC

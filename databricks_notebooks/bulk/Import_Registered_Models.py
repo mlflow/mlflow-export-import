@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %md ## Import Models
+# MAGIC %md ## Import Registered Models
 # MAGIC
 # MAGIC Widgets 
 # MAGIC * `1. Input directory` - directory of exported models. 
