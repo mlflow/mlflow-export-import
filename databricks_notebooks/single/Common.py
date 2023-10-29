@@ -107,3 +107,5 @@ def activate_unity_catalog(model_name):
     if model_utils.is_unity_catalog_model(model_name):
         mlflow.set_registry_uri("databricks-uc")
         print("Unity Catalog mode activated")
+    else:
+        mlflow.set_registry_uri("databricks")

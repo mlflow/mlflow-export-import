@@ -1,7 +1,7 @@
 # Databricks notebook source
 # MAGIC %md ## MLflow Export Import - Single Notebooks
 # MAGIC
-# MAGIC Export and import one MLflow object and specify its destination name.
+# MAGIC Export and import one MLflow object.
 # MAGIC
 # MAGIC **Notebooks**
 # MAGIC * Run
@@ -14,8 +14,8 @@
 # MAGIC   * [Export_Registered_Model]($./Export_Registered_Model) - export a registered model, its versions and their runs.
 # MAGIC   * [Import_Registered_Model]($./Import_Registered_Model)
 # MAGIC * Model Version
-# MAGIC   * [Export_Version]($./Export_Version) - export a model version and its run.
-# MAGIC   * [Import_Version]($./Import_Version) - import model version.
+# MAGIC   * [Export_Model_Version]($./Export_Model_Version) - export a model version and its run.
+# MAGIC   * [Import_Model_Version]($./Import_Model_Version) - import a model version.
 # MAGIC * [Common]($./Common) - helper utility methods.
 # MAGIC
 # MAGIC **More information**
@@ -25,4 +25,4 @@
 
 # COMMAND ----------
 
-# MAGIC %md ##### Last updated: _2023-10-28_
+# MAGIC %md ##### Last updated: _2023-10-29_
