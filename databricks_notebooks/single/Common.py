@@ -1,13 +1,18 @@
 # Databricks notebook source
-# MAGIC %sh 
-# MAGIC #pip install mlflow-export-import
-# MAGIC pip install git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
+# MAGIC %pip install git+https:///github.com/mlflow/mlflow-export-import@issue-138-copy-model-version#egg=mlflow-export-import
+# MAGIC
+# MAGIC # pip install mlflow-export-import
 
 # COMMAND ----------
 
 import mlflow
 mlflow_client = mlflow.MlflowClient()
 print("mlflow.version:", mlflow.__version__)
+
+# COMMAND ----------
+
+from mlflow_export_import.common.dump_utils import dump_obj 
+from mlflow_export_import.common import model_utils 
 
 # COMMAND ----------
 
@@ -52,7 +57,11 @@ def display_run_uri(run_id):
 
 def display_registered_model_uri(model_name):
     if host_name:
-        uri = f"https://{host_name}/#mlflow/models/{model_name}"
+        if model_utils.is_unity_catalog_model(model_name):
+            model_name = model_name.replace(".","/")
+            uri = f"https://{host_name}/explore/data/models/{model_name}"
+        else:
+            uri = f"https://{host_name}/#mlflow/models/{model_name}"
         displayHTML("""<b>Registered Model URI:</b> <a href="{}">{}</a>""".format(uri,uri))
 
 # COMMAND ----------
@@ -91,3 +100,10 @@ def _display_experiment_info(experiment):
     </table>
      </font>
     """)
+
+# COMMAND ----------
+
+def activate_unity_catalog(model_name):
+    if model_utils.is_unity_catalog_model(model_name):
+        mlflow.set_registry_uri("databricks-uc")
+        print("Unity Catalog mode activated")
