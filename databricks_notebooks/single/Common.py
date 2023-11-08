@@ -1,7 +1,5 @@
 # Databricks notebook source
-# MAGIC %pip install git+https:///github.com/mlflow/mlflow-export-import@issue-138-copy-model-version#egg=mlflow-export-import
-# MAGIC
-# MAGIC # pip install mlflow-export-import
+# MAGIC %pip install git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
 
 # COMMAND ----------
 
