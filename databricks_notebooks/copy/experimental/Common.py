@@ -63,9 +63,6 @@ def copy_model_version(
     def mk_registry_uri(model_name):
         return "databricks-uc" if is_unity_catalog_model(model_name) else "databricks"
     
-    print(">> src_run_workspace:", src_run_workspace)
-    print(">> src_model_name:", src_model_name)
-    
     if src_run_workspace in [ "databricks", "databricks-uc"]:
         src_registry_uri = mk_registry_uri(src_model_name)
     elif is_unity_catalog_model(src_model_name):
@@ -74,8 +71,6 @@ def copy_model_version(
         src_registry_uri = src_run_workspace
         
     dst_registry_uri = mk_registry_uri(dst_model_name)
-    print(">> src_registry_uri:", src_registry_uri)
-    print(">> dst_registry_uri:", dst_registry_uri)
 
     return copy(
         src_model_name,
