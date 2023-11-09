@@ -21,7 +21,8 @@ from mlflow_export_import.common.mlflow_utils import MlflowTrackingUriTweak
 _logger = utils.getLogger(__name__)
 
 
-def copy(src_model_name,
+def copy(
+        src_model_name,
         src_model_version,
         dst_model_name,
         dst_experiment_name = None,
@@ -34,7 +35,25 @@ def copy(src_model_name,
         verbose = False
     ):
     """
-    Copy model version to another model in same or other tracking server (workspace).
+    Copies a model version to another model in same or other tracking server (workspace).
+
+    :param src_model_name: Source registered model name.
+    :param src_model_version: Source version.
+    :param dst_model_name: Destination registered model name.
+
+    :param dst_experiment_name: Destination experiment name.
+    :param dst_experiment_name: Destination experiment name.
+        If specified, will copy source version's run to a destination run.
+        Otherwise, use source version's run for destination version.
+    :param src_tracking_uri: Source tracking URI.
+    :param dst_tracking_uri: Destination tracking URI.
+    :param src_registry_uri: Source registry URI.
+    :param dst_registry_uri: Destination registry URI.
+    :param copy_stages_and_aliases: Copy stages and aliases. If turned on may have side effects on another version's stage or aliases.
+    :param copy_lineage_tags: Copy source version's metadata information as tags starting with 'mlflow_exim'. See README_copy.md.
+    :param verbose: Verbose.
+
+    :return: The source and destination ModelVersion objects.
     """
     src_client = copy_utils.mk_client(src_tracking_uri, src_registry_uri)
     dst_client = copy_utils.mk_client(dst_tracking_uri, dst_registry_uri)

@@ -2,22 +2,22 @@
 
 ## Overview
 
-Copy MLflow objects to either the current or to another MLflow server (Databricks workspace).
+* Copy MLflow objects to either the current or to another MLflow server (Databricks workspace).
+* Currently only copy model version and copy run are supported.
+* See also [Databricks notebooks](databricks_notebooks/copy).
 
-Currently only model version and run copy are supported.
+Last updated: 2023-11-08.
 
 
 ## Copy Model Version
 
-Copies a model version and its run (deep copy).
+Oversion:
+* Copies a model version and its run (deep copy).
+* The new model version can be either in the same MLflow registry server  or in another.
+* For Databricks, supports both standard Workspace (WS) and new Unity Catalog (UC) model registries.
+* Databricks registry URIs should be [Databricks profiles](https://docs.databricks.com/en/dev-tools/cli/profiles.html).
 
-The new model version can be either in the same MLflow registry server  or in another.
-
-For Databricks, supports both standard Workspace (WS) and new Unity Catalog (UC) model registries.
-
-Databricks registry URIs should be [Databricks profiles](https://docs.databricks.com/en/dev-tools/cli/profiles.html).
-
-In the two diagram below, the left _shallow copy_ is bad, the right _deep copy_ is good.
+In the two diagram below, the left _shallow copy_ is bad, while the right _deep copy_ is good.
 
 ### Unity Catalog Model Registry
 

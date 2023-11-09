@@ -4,18 +4,31 @@ import mlflow
 
 from mlflow_export_import.run.export_run import export_run
 from mlflow_export_import.run.import_run import import_run
-from mlflow_export_import.common.click_options import opt_run_id, opt_experiment_name
 from mlflow_export_import.common import utils
+from mlflow_export_import.common.click_options import opt_run_id, opt_experiment_name
 from . import copy_utils
-from . click_options import (
-    opt_src_mlflow_uri,
-    opt_dst_mlflow_uri,
-)
+from . click_options import opt_src_mlflow_uri, opt_dst_mlflow_uri
 
 _logger = utils.getLogger(__name__)
 
 
-def copy(src_run_id, dst_experiment_name, src_mlflow_uri=None, dst_mlflow_uri=None):
+def copy(
+        src_run_id, 
+        dst_experiment_name, 
+        src_mlflow_uri = None, 
+        dst_mlflow_uri = None
+    ):
+    """
+    Copies a run to another tracking server (workspace).
+
+    :param src_run_id: Source run ID.
+    :param dst_experiment_name: Destination experiment name.
+    :param : src_mlflow_uri: Source tracking server (workspace) URI.
+    :param : dst_mlflow_uri: Destination tracking server (workspace) URI.
+
+    :return: Destination Run object.
+    """
+
     return _copy(src_run_id, dst_experiment_name, 
         copy_utils.mk_client(src_mlflow_uri), 
         copy_utils.mk_client(dst_mlflow_uri)

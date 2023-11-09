@@ -16,9 +16,7 @@ from mlflow_export_import.common.click_options import (
     opt_notebook_formats,
     opt_export_version_model
 )
-from . click_options import (
-    opt_version,
-)
+from . click_options import opt_version
 
 _logger = utils.getLogger(__name__)
 
@@ -32,12 +30,16 @@ def export_model_version(
         mlflow_client = None
     ):
     """
+    Exports model version.
+
     :param model_name: Registered model name.
-    :param model_name: Registered model version.
+    :param version: Registered model version.
     :param output_dir: Export directory.
-    :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
-    :param mlflow_client: MlflowClient
-    :return: Returns model version
+    :param export_version_model: Export model version's 'cached" MLflow model clone..
+    :param notebook_formats: List of Databricks notebook formats. Values are SOURCE, HTML, JUPYTER or DBC (comma separated)
+    :param mlflow_client: MlflowClient (optional).
+
+    :return: Returns model version object.
     """
 
     mlflow_client = mlflow_client or mlflow.MlflowClient()

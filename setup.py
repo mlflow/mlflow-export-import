@@ -58,7 +58,7 @@ setup(
             "http-client = mlflow_export_import.client.http_client:main",
             "list-models = mlflow_export_import.tools.list_registered_models:main",
             "copy-model-version = mlflow_export_import.copy.copy_model_version:main",
-            "copy-run= mlflow_export_import.copy.copy_run:main"
+            "copy-run = mlflow_export_import.copy.copy_run:main"
          ]
       }
 )

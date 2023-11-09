@@ -19,18 +19,19 @@ There are two types of notebooks:
 
 **Single Notebooks**
 
-Copy one MLflow object and control its destination object name.
+Exports and imports one MLflow object.
 
 | Export | Import |
 |----------|----------|
 | [Export_Run](single/Export_Run.py) | [Import_Run](single/Import_Run.py) |
 | [Export_Experiment](single/Export_Experiment.py) | [Import_Experiment.py](single/Import_Experiment.py) |
 | [Export_Model](single/Export_Model.py) | [Import_Model.py](single/Import_Model.py) |
+| [Export_Model_Version](single/Export_Model_Version.py) | [Import_Model_Version.py](single/Import_Model_Version.py) |
 
 
 **Bulk notebooks**
 
-Copy multiple MLflow objects. The target object name will be the same as the source object.
+Exports and imports multiple MLflow objects.
 
 | Export | Import |
 | ---- | ---- |
