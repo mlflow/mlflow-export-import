@@ -8,7 +8,7 @@
 # MAGIC * The new model version's run can be either in the current workspace or in another workspace.
 # MAGIC * Can be used to migrate non-UC model versions to UC model versions provided the source model vervion has a signature.
 # MAGIC * Databricks registry URIs should be Databricks secrets tuples per [Specify a remote registry](https://docs.databricks.com/en/machine-learning/manage-model-lifecycle/multiple-workspaces.html).
-# MAGIC   * Example: `registry_uri = f'databricks://<scope>:<prefix>'`
+# MAGIC   * Example: `registry_uri = 'databricks://<scope>:<prefix>'`
 # MAGIC * See https://github.com/mlflow/mlflow-export-import/blob/master/README_copy.md#copy-model-version.
 # MAGIC
 # MAGIC ##### Usage
@@ -31,14 +31,17 @@
 # MAGIC   * If copying to another workspace, then specify secrets scope and prefix per [Set up the API token for a remote registry](https://docs.databricks.com/en/machine-learning/manage-model-lifecycle/multiple-workspaces.html#set-up-the-api-token-for-a-remote-registry). 
 # MAGIC     * Example: `databricks://MY-SCOPE:MY-PREFIX`.
 # MAGIC * `6. Copy lineage tags` - Add source lineage info to destination version as tags starting with 'mlflow_exim'.
-# MAGIC * `7. Verbose`
-# MAGIC * `8. Return result` only used for [automated testing]($tests/Test_Copy_Model_Version).
+# MAGIC * `7. Verbose` - show more details.
+# MAGIC * `8. Return result` - Only for automated testing with [Test_Copy_Model_Version]($tests/Test_Copy_Model_Version).
+# MAGIC
+# MAGIC ##### Github
+# MAGIC * https://github.com/mlflow/mlflow-export-import/blob/master/databricks_notebooks/copy/Copy_Model_Version.py
 
 # COMMAND ----------
 
 # MAGIC %md ### Diagrams
 # MAGIC
-# MAGIC In the two diagram below, the left shallow copy is **_bad_**, and the right deep copy is **_good_**.
+# MAGIC In the two diagrams below, the left shallow copy is **_not so good_**, while the right deep copy is **_good_**.
 
 # COMMAND ----------
 
@@ -134,7 +137,7 @@ display_registered_model_version_uri(src_model_version.name, src_model_version.v
 
 # COMMAND ----------
 
-dump_obj_as_json(src_model_version, "Source ModelVersion")
+dump_obj_as_json(src_model_version, "Source Model Version")
 
 # COMMAND ----------
 
@@ -146,7 +149,7 @@ display_registered_model_version_uri(dst_model_version.name, dst_model_version.v
 
 # COMMAND ----------
 
-dump_obj_as_json(dst_model_version, "Destination ModelVersion")
+dump_obj_as_json(dst_model_version, "Destination Model Version")
 
 # COMMAND ----------
 
