@@ -1,27 +1,28 @@
 # Databricks notebook source
 # MAGIC %md ## Copy Model Version
 # MAGIC
-# MAGIC #### Overview
+# MAGIC ##### Overview
 # MAGIC
 # MAGIC * Copies a model version and its run (deep copy) to a new model version.
-# MAGIC * Supports both standard Workspace registry (WS) and the new Unity Catalog (UC) model registry.
+# MAGIC * Supports both standard Workspace model registry (WS) and the new Unity Catalog (UC) model registry.
 # MAGIC * The new model version's run can be either in the current workspace or in another workspace.
-# MAGIC * Can be used to migrate non-UC models to UC models provided the model has a signature.
+# MAGIC * Can be used to migrate non-UC model versions to UC model versions provided the source model vervion has a signature.
 # MAGIC * Databricks registry URIs should be Databricks secrets tuples per [Specify a remote registry](https://docs.databricks.com/en/machine-learning/manage-model-lifecycle/multiple-workspaces.html).
 # MAGIC   * Example: `registry_uri = f'databricks://<scope>:<prefix>'`
+# MAGIC * See https://github.com/mlflow/mlflow-export-import/blob/master/README_copy.md#copy-model-version.
 # MAGIC
-# MAGIC #### Usage
-# MAGIC   * Copy WS model version to a WS model version.
-# MAGIC   * Copy WS model version to a UC model version (provided the WS MLflow model has a signature)
-# MAGIC   * Copy UC model version to a UC model version.
-# MAGIC   * Copy UC model version to a WS model version.
+# MAGIC ##### Usage
+# MAGIC   * Copies WS model version to a WS model version.
+# MAGIC   * Copies WS model version to a UC model version (provided the WS MLflow model has a signature)
+# MAGIC   * Copies UC model version to a UC model version.
+# MAGIC   * Copies UC model version to a WS model version.
 # MAGIC
-# MAGIC #### Widgets
+# MAGIC ##### Widgets
 # MAGIC
 # MAGIC * `1. Source Model` - Source model name.
 # MAGIC * `2. Source Version` - Source model version.
 # MAGIC * `3. Destination Model` - Destination model name.
-# MAGIC * `4. Destination experiment name` - Destination experiment name. 
+# MAGIC * `4. Destination experiment name` - Destination experiment name (workspace path). 
 # MAGIC   * If specified, copies source version's run to a new run which the new model version points to.
 # MAGIC   * If not specified, the new run uses the source version's run (shallow copy).
 # MAGIC   * Both source and destination workspaces must share the same UC metastore.
@@ -31,7 +32,7 @@
 # MAGIC     * Example: `databricks://MY-SCOPE:MY-PREFIX`.
 # MAGIC * `6. Copy lineage tags` - Add source lineage info to destination version as tags starting with 'mlflow_exim'.
 # MAGIC * `7. Verbose`
-# MAGIC * `8. Return result` for automated testing.
+# MAGIC * `8. Return result` only used for [automated testing]($tests/Test_Copy_Model_Version).
 
 # COMMAND ----------
 
