@@ -6,7 +6,12 @@ Remote tests using the Databricks MLflow REST API.
 
 ## Setup
 
-Configuration is simple. 
+For Unity Catalog tests do the following:
+```
+pip install -U mlflow[databricks]
+```
+
+Configuration is straightforward. 
 Copy [config.yaml.template](config.yaml.template) to `config.yaml` and adjust.
 
 For both source and destination workspaces, set the following attributes:
