@@ -7,20 +7,23 @@ For more details:
 * [JSON export file format](README_export_format.md).
 * [MLflow Object Relationships](https://github.com/amesar/mlflow-resources/blob/master/slides/Databricks_MLflow_Object_Relationships.pdf) slide deck.
 
-## Architecture
+Last updated: _2023-12-10_.
+
+## High Level Architecture
 
 <img src="diagrams/architecture.png" height="330" />
 
 ## Overview
 
 ### Why use MLflow Export Import?
-  * Enable an MLOps pipeline by promoting MLflow objects (runs, experiments or registered models) from one MLflow tracking server to another.
+  * Enable an MLOps pipeline by promoting MLflow objects (runs, experiments or registered models) from one MLflow tracking server (Datbricks workspace) to another.
     * Copy a the best run (model) from the development to the test tracking server.
     * After the run passes tests, then promote it to the production tracking server.
   * Share and collaborate with other data scientists in the same or another MLflow tracking server (Databricks workspace).
     * For example, copy an experiment from one user to another.
   * Backup your MLflow objects to external storage so they can be restored if needed.
   * Disaster recovery. Save your MLflow objects to external storage so they can be replicated to another tracking server.
+  * Supports new Databricks Unity Catalog models.
 
 ### MLflow Export Import scenarios
 
@@ -79,12 +82,16 @@ See [README_limitations.md](README_limitations.md).
 
 ## Quick Start
 
-Setup
+#### Setup
 ```
 pip install mlflow-export-import
 ```
+or the latest - _recommended_
+```
+pip install git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
+```
 
-Export experiment
+#### Export experiment
 ```
 export MLFLOW_TRACKING_URI=http://localhost:5000
 
@@ -93,7 +100,7 @@ export-experiment \
   --output-dir /tmp/export
 ```
 
-Import experiment
+#### Import experiment
 ```
 export MLFLOW_TRACKING_URI=http://localhost:5001
 
@@ -257,6 +264,7 @@ See [tests/README](tests/README.md) for details.
 * [README.md](README.md)
 * [README_single.md](README_single.md)
 * [README_bulk.md](README_bulk.md)
+* [README_copy.md.md](README_copy.md)
 * [README_tools.md](README_tools.md)
 * [README_limitations.md](README_limitations.md)
 * [README_options.md](README_options.md)
