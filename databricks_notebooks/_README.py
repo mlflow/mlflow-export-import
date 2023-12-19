@@ -8,7 +8,7 @@
 # MAGIC   * No out-of-the-box way to do this today.
 # MAGIC   * Customer MLflow object data is currently locked into a workspace and not portable.
 # MAGIC * In order to copy MLflow objects between workspaces, you will need to either:
-# MAGIC   * Set up a shared cloud bucket mounted on each workspace's DBFS.
+# MAGIC   * Set up a shared cloud object location mounted on each workspace's DBFS.
 # MAGIC   * Or use a volume shared by both workspaces using the same Unity Catalog metastore.
 # MAGIC
 # MAGIC #### Details

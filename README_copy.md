@@ -3,12 +3,12 @@
 ## Overview
 
 * Copies MLflow objects to the current or to another MLflow server (Databricks workspace) or Databricks Unity Catalog metastore.
-* Currently only model versions and runs are supported.
+* Available notebooks:
   *  [Copy Model Version](#copy-model-version)
   *  [Copy Run](#copy-run)
-* See also [Databricks notebooks](databricks_notebooks/copy) for copy notebooks.
+* See also [Databricks copy notebooks](databricks_notebooks/copy).
 
-Last updated: _2023-12-10_.
+Last updated: _2023-12-19_.
 
 
 ## Copy Model Version
@@ -25,7 +25,9 @@ Last updated: _2023-12-10_.
 * For UC registry, the destination model version can be either in the same UC metastore or in another  UC metastore.
 * Databricks registry URIs should be [Databricks profiles](https://docs.databricks.com/en/dev-tools/cli/profiles.html).
 * Note MLflow 2.8.0 introduced [MlflowClient.copy_model_version](https://mlflow.org/docs/latest/python_api/mlflow.client.html#mlflow.client.MlflowClient.copy_model_version). However it is only a shallow copy and does not work across external workspaces or UC metastores.
-* Source code: [Copy_Model_Version.py](mlflow_export_import/copy/Copy_Model_Version.py).
+* Source: 
+  * [Copy_Model_Version.py](mlflow_export_import/copy/Copy_Model_Version.py) - Python script
+  * [Copy_Model_Version](databricks_notebooks/copy/Copy_Model_Version.py) - Databricks notebook
 
 Copy model version scenarios:
 * Copy UC model version int the same UC metastore

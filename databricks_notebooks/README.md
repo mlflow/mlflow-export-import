@@ -3,23 +3,23 @@
 
 ## Overview
 
-* Set of Databricks notebooks to perform MLflow export and import operations.
+* Databricks notebooks to perform MLflow export and import operations.
 * Use these notebooks when you want to copy MLflow objects from one Databricks workspace (tracking server) to another.
 * In order to copy MLflow objects between workspaces, you will need to set up a shared cloud bucket mounted on each workspace's DBFS.
 * The notebooks use [Git integration with Databricks Repos](https://docs.databricks.com/repos/index.html) though they can be run as a simple non-Repo workspace folder.
-* See the [_README.py](_README.py) for more details.
+* See [_README.py](_README.py) for more details.
 
 ## Databricks notebooks
 
 There are two types of notebooks:
 * Standard widget-based notebooks that call the MLflow Export Import API.
-* Console script notebooks that use the shell to call the standard call Python scripts specified [here](https://github.com/mlflow/mlflow-export-import/blob/master/setup.py#L35).
+* Console script notebooks that use the shell to call the standard call Python scripts specified [here](https://github.com/mlflow/mlflow-export-import/blob/master/setup.py#L35). Slightly experimental.
 
 ### Standard widget-based notebooks
 
-**Single Notebooks**
+#### Single Notebooks
 
-Exports and imports one MLflow object.
+Export and import one MLflow object.
 
 | Export | Import |
 |----------|----------|
@@ -28,8 +28,14 @@ Exports and imports one MLflow object.
 | [Export_Model](single/Export_Model.py) | [Import_Model.py](single/Import_Model.py) |
 | [Export_Model_Version](single/Export_Model_Version.py) | [Import_Model_Version.py](single/Import_Model_Version.py) |
 
+Copy an MLflow object.
+| MLflow object |
+|------|
+| [Copy_Model_Version](copy/Copy_Model_Version.py) | 
+| [Copy_Run](copy/Copy_Run.py) | 
 
-**Bulk notebooks**
+
+#### Bulk notebooks
 
 Exports and imports multiple MLflow objects.
 
@@ -40,6 +46,8 @@ Exports and imports multiple MLflow objects.
 | [Export_All](bulk/Export_All.py) | Use [Import_Models](bulk/Import_Models.py) |
 
 ### Console script shell notebooks
+
+**_Experimental_**
 
 Using Databricks `%sh` cell mode, you can execute MLflow Export Import scripts from the Linux shell.
 See the [_README.py](scripts/_README.py) and and [Console_Scripts](scripts/Console_Scripts.py) notebook.
