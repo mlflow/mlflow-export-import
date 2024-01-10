@@ -6,10 +6,9 @@ import os
 import click
 from dataclasses import dataclass
 
-import mlflow
 from mlflow.exceptions import RestException
 
-from mlflow_export_import.client.http_client import create_http_client, create_dbx_client
+from mlflow_export_import.client.client_utils import create_mlflow_client, create_http_client, create_dbx_client
 from mlflow_export_import.common.click_options import (
     opt_model,
     opt_output_dir,
@@ -67,7 +66,7 @@ def export_model(
     :return: Returns bool and the model name (if export succeeded).
     """
 
-    mlflow_client = mlflow_client or mlflow.MlflowClient()
+    mlflow_client = mlflow_client or create_mlflow_client()
     http_client = create_http_client(mlflow_client, model_name)
     dbx_client = create_dbx_client(mlflow_client)
 

@@ -4,9 +4,8 @@ Exports a registered model version and its run.
 
 import os
 import click
-import mlflow
 
-from mlflow_export_import.client.http_client import create_http_client
+from mlflow_export_import.client.client_utils import create_mlflow_client, create_http_client
 from mlflow_export_import.common import utils, io_utils, model_utils
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
 from mlflow_export_import.run.export_run import export_run
@@ -42,7 +41,7 @@ def export_model_version(
     :return: Returns model version object.
     """
 
-    mlflow_client = mlflow_client or mlflow.MlflowClient()
+    mlflow_client = mlflow_client or create_mlflow_client()
 
     _model = mlflow_client.get_registered_model(model_name)
     vr = mlflow_client.get_model_version(model_name, version)

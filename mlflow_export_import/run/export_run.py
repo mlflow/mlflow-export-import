@@ -17,7 +17,7 @@ from mlflow.exceptions import RestException
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
-from mlflow_export_import.client.http_client import create_dbx_client
+from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client
 from mlflow_export_import.notebook.download_notebook import download_notebook
 
 from mlflow.utils.mlflow_tags import MLFLOW_DATABRICKS_NOTEBOOK_PATH
@@ -44,7 +44,7 @@ def export_run(
     :return: Run or None if the run was not exported due to export_deleted_runs or errors.
     """
 
-    mlflow_client = mlflow_client or mlflow.MlflowClient()
+    mlflow_client = mlflow_client or create_mlflow_client()
     dbx_client = create_dbx_client(mlflow_client)
 
     if notebook_formats is None:

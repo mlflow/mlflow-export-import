@@ -4,7 +4,6 @@ Exports an experiment to a directory.
 
 import os
 import click
-import mlflow
 
 from mlflow_export_import.common.click_options import (
     opt_experiment_name,
@@ -14,7 +13,7 @@ from mlflow_export_import.common.click_options import (
     opt_use_src_user_id,
     opt_dst_notebook_dir
 )
-from mlflow_export_import.client.http_client import create_dbx_client
+from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client
 from mlflow_export_import.common import utils, mlflow_utils, io_utils
 from mlflow_export_import.common import permissions_utils
 from mlflow_export_import.common.source_tags import (
@@ -48,7 +47,7 @@ def import_experiment(
     :return: Dictionary of source run_id (key) to destination run.info object (value).
     """
 
-    mlflow_client = mlflow_client or mlflow.MlflowClient()
+    mlflow_client = mlflow_client or create_mlflow_client()
     dbx_client = create_dbx_client(mlflow_client)
 
     path = io_utils.mk_manifest_json_path(input_dir, "experiment.json")

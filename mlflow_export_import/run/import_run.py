@@ -6,7 +6,6 @@ import os
 import click
 import base64
 
-import mlflow
 from mlflow.entities.lifecycle_stage import LifecycleStage
 from mlflow.entities import RunStatus
 from mlflow.utils.mlflow_tags import MLFLOW_PARENT_RUN_ID
@@ -22,7 +21,7 @@ from mlflow_export_import.common import utils, mlflow_utils, io_utils
 from mlflow_export_import.common.filesystem import mk_local_path
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import MlflowExportImportException
-from mlflow_export_import.client.http_client import create_dbx_client, create_http_client
+from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client, create_http_client
 from . import run_data_importer
 from . import run_utils
 
@@ -60,7 +59,7 @@ def import_run(
             "experiment": exp_name
     }
 
-    mlflow_client = mlflow_client or mlflow.MlflowClient()
+    mlflow_client = mlflow_client or create_mlflow_client()
     http_client = create_http_client(mlflow_client)
     dbx_client = create_dbx_client(mlflow_client)
 

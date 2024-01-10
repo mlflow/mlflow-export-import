@@ -22,7 +22,7 @@ from mlflow_export_import.common.mlflow_utils import MlflowTrackingUriTweak
 from mlflow_export_import.common.source_tags import set_source_tags_for_field, fmt_timestamps
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common.permissions_utils import import_permissions
-from mlflow_export_import.client.http_client import create_dbx_client
+from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client
 from mlflow_export_import.run.import_run import import_run
 from mlflow_export_import.bulk import rename_utils
 
@@ -79,7 +79,7 @@ class BaseModelImporter():
         :param import_source_tags: Import source information for MLFlow objects and create tags in destination object.
         :param await_creation_for: Seconds to wait for model version crreation.
         """
-        self.mlflow_client = mlflow_client or mlflow.MlflowClient()
+        self.mlflow_client = mlflow_client or create_mlflow_client()
         self.dbx_client = create_dbx_client(self.mlflow_client)
         self.import_source_tags=import_source_tags
         self.import_permissions = import_permissions

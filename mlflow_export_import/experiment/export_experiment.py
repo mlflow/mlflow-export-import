@@ -4,7 +4,6 @@ Exports an experiment to a directory.
 
 import os
 import click
-import mlflow
 
 from mlflow_export_import.common.click_options import (
     opt_experiment,
@@ -18,7 +17,7 @@ from mlflow_export_import.common.iterators import SearchRunsIterator
 from mlflow_export_import.common import utils, io_utils, mlflow_utils
 from mlflow_export_import.common import permissions_utils
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis, utc_str_to_millis
-from mlflow_export_import.client.http_client import create_dbx_client
+from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client
 from mlflow_export_import.run.export_run import export_run
 
 _logger = utils.getLogger(__name__)
@@ -45,7 +44,7 @@ def export_experiment(
     :return: Number of successful and number of failed runs.
     """
 
-    mlflow_client = mlflow_client or mlflow.MlflowClient()
+    mlflow_client = mlflow_client or create_mlflow_client()
     dbx_client = create_dbx_client(mlflow_client)
 
     run_start_time_str = run_start_time

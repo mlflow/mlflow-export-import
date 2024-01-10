@@ -5,7 +5,6 @@ Optionally import registered model and experiment metadata.
 
 import os
 import click
-import mlflow
 
 from mlflow_export_import.common.click_options import (
     opt_input_dir,
@@ -23,7 +22,7 @@ from mlflow_export_import.common import utils, io_utils, mlflow_utils, model_uti
 from mlflow_export_import.common.mlflow_utils import MlflowTrackingUriTweak
 from mlflow_export_import.common.source_tags import set_source_tags_for_field, fmt_timestamps
 from mlflow_export_import.run.import_run import import_run
-from mlflow_export_import.client.http_client import create_dbx_client
+from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client
 
 _logger = utils.getLogger(__name__)
 
@@ -53,7 +52,7 @@ def import_model_version(
     :return: Returns model version object.
     """
 
-    mlflow_client = mlflow_client or mlflow.MlflowClient()
+    mlflow_client = mlflow_client or create_mlflow_client()
 
     path = os.path.join(input_dir, "model_version.json")
     src_vr = io_utils.read_file_mlflow(path)["model_version"]
