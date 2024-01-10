@@ -172,7 +172,7 @@ class HttpClient(BaseHttpClient):
         return json.dumps(data) if data else None
 
     def _mk_headers(self):
-        headers = { "User-Agent": USER_AGENT }
+        headers = { "User-Agent": USER_AGENT, "Content-Type": "application/json" }
         if self.token:
             headers["Authorization"] = f"Bearer {self.token}"
         return headers
