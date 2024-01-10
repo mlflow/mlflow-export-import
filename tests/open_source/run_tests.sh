@@ -84,13 +84,16 @@ run() {
 }
 
 run_all() {
+  mlflow_version=`mlflow --version | sed -e "s/mlflow, version //" `
+  echo "MLFLOW.VERSION:  $mlflow_version"
   time -p run
   echo
   echo "******************************************************"
   echo
-  echo "LOG_FILE    : $LOG_FILE"
-  echo "JUNIT REPORT: $JUNIT_FILE"
-  echo "HTML REPORT : $HTML_FILE"
+  echo "MLFLOW.VERSION:  $mlflow_version"
+  echo "LOG_FILE:        $LOG_FILE"
+  echo "JUNIT REPORT:    $JUNIT_FILE"
+  echo "HTML REPORT :    $HTML_FILE"
   echo
 }
 
