@@ -21,7 +21,7 @@ from mlflow_export_import.common import utils, io_utils, model_utils
 from mlflow_export_import.common.mlflow_utils import MlflowTrackingUriTweak
 from mlflow_export_import.common.source_tags import set_source_tags_for_field, fmt_timestamps
 from mlflow_export_import.common import MlflowExportImportException
-from mlflow_export_import.common.permissions_utils import import_permissions
+from mlflow_export_import.common import ws_permissions_utils, uc_permissions_utils
 from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client
 from mlflow_export_import.run.import_run import import_run
 from mlflow_export_import.bulk import rename_utils
@@ -120,18 +120,26 @@ class BaseModelImporter():
                 _set_source_tags_for_field(model_dct, tags)
             self.mlflow_client.create_registered_model(model_name, tags, model_dct.get("description"))
             _logger.info(f"Created new registered model '{model_name}'")
+            creating_new_model = True
         except RestException as e:
             if e.error_code != "RESOURCE_ALREADY_EXISTS":
                 raise e
             _logger.info(f"Registered model '{model_name}' already exists")
+            creating_new_model = False
 
-        if self.import_permissions:
-            perms_dct = model_dct["permissions"]
-            if perms_dct:
-                _model = self.dbx_client.get("mlflow/databricks/registered-models/get", { "name": model_name })
-                _model = _model["registered_model_databricks"]
-                model_id = _model["id"]
-                import_permissions(self.dbx_client, perms_dct, "model", model_name, model_id)
+        if creating_new_model and self.import_permissions:
+            perms = model_dct["permissions"]
+            if perms:
+                _logger.info(f"Updating permissions for registered model '{model_name}'")
+                if model_utils.is_unity_catalog_model(model_name):
+                    uc_permissions_utils.update_permissions(self.mlflow_client, model_name, perms)
+                else:
+                    _model = self.dbx_client.get("mlflow/databricks/registered-models/get", { "name": model_name })
+                    _model = _model["registered_model_databricks"]
+                    model_id = _model["id"]
+                    ws_permissions_utils.update_permissions(self.dbx_client, perms, "model", model_name, model_id)
+            else:
+                _logger.info(f"No permissions to update for registered model '{model_name}'")
 
         return model_dct
 
@@ -223,10 +231,10 @@ class ModelImporter(BaseModelImporter):
         model_path = _extract_model_path(src_vr["source"], src_vr["run_id"])
         dst_source = f"{dst_run.info.artifact_uri}/{model_path}"
         return _import_model_version(
-            mlflow_client = self.mlflow_client, 
-            model_name = model_name, 
-            src_vr = src_vr, 
-            dst_run_id = dst_run_id, 
+            mlflow_client = self.mlflow_client,
+            model_name = model_name,
+            src_vr = src_vr,
+            dst_run_id = dst_run_id,
             dst_source = dst_source,
             import_source_tags = self.import_source_tags
         )
@@ -294,10 +302,10 @@ class BulkModelImporter(BaseModelImporter):
         dst_artifact_uri = self.run_info_map[src_run_id].artifact_uri
         dst_source = f"{dst_artifact_uri}/{model_path}"
         return _import_model_version(
-            mlflow_client = self.mlflow_client, 
-            model_name = model_name, 
-            src_vr = src_vr, 
-            dst_run_id = dst_run_id, 
+            mlflow_client = self.mlflow_client,
+            model_name = model_name,
+            src_vr = src_vr,
+            dst_run_id = dst_run_id,
             dst_source = dst_source,
             import_source_tags = self.import_source_tags
         )

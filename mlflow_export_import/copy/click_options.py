@@ -81,3 +81,12 @@ def opt_copy_lineage_tags(function):
         show_default=True
     )(function)
     return function
+
+def opt_copy_permissions(function):
+    function = click.option("--copy-permissions",
+        help="Update target model (only if it doesn't exist) with source model permissions.",
+        type=bool,
+        default=False,
+        show_default=True
+    )(function)
+    return function

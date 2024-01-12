@@ -30,7 +30,7 @@ def _call_get(dbx_client, resource):
 
 # == Import permissions
 
-def import_permissions(dbx_client, perms_get_format, object_type, object_name, object_id):
+def update_permissions(dbx_client, perms_get_format, object_type, object_name, object_id):
     """
     :param perms_get_format: Dict of permissions in GET format
     :param object_type: 'experiment' or 'registered_model'

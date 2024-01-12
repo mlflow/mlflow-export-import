@@ -12,11 +12,16 @@ def get_model_name(artifact_path):
 
 
 def create_registered_model(client,  model_name):
+    """
+    Return True if model already exists, False otherwise.
+    """
     try:
         client.create_registered_model(model_name)
+        return False
     except MlflowException as e: # NOTE: for non-UC is RestException
         if e.error_code != "RESOURCE_ALREADY_EXISTS":
             raise
+        return True
 
 
 def create_experiment(client, experiment_name):

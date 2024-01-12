@@ -19,7 +19,7 @@ def update_mlmodel_run_id(mlflow_client, run_id):
     This workaround recursively searches the run's root artifact directory for all MLmodel files, and assumes their directory
     represents a path to the model.
     """
-    mlmodel_paths = find_run_model_names(run_id)
+    mlmodel_paths = find_run_model_names(mlflow_client, run_id)
     for model_path in mlmodel_paths:
         download_uri = f"runs:/{run_id}/{model_path}/MLmodel"
         local_path = mlflow_utils.download_artifacts(mlflow_client, download_uri)

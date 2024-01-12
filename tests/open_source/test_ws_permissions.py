@@ -1,5 +1,7 @@
-from mlflow_export_import.common.permissions_utils import _map_acl_element, map_acl
+from mlflow_export_import.common.ws_permissions_utils import _map_acl_element, map_acl
 
+
+# == Setup data
 
 group_name_element = {
   "group_name": "admins",
@@ -44,11 +46,13 @@ user_name_element_2 = {
   ]
 }
 
-mixed_acl = [ group_name_element, user_name_element ] 
-mixed_acl_2 = [ group_name_element, user_name_element_2 ] 
+mixed_acl = [ group_name_element, user_name_element ]
+mixed_acl_2 = [ group_name_element, user_name_element_2 ]
 
 
-def _test_acl_element_group_name():
+# == Tests
+
+def test_acl_element_group_name():
     acl2 = _map_acl_element(group_name_element)
     assert acl2 == [
       {
@@ -57,7 +61,7 @@ def _test_acl_element_group_name():
       }
     ]
 
-def _test_acl_element_user_name():
+def test_acl_element_user_name():
     acl2 = _map_acl_element(user_name_element)
     assert acl2 == [
       {
@@ -67,7 +71,7 @@ def _test_acl_element_user_name():
     ]
 
 
-def _test_acl_element_user_name_2():
+def test_acl_element_user_name_2():
     acl2 = _map_acl_element(user_name_element_2)
     assert acl2 == [
       {
@@ -81,7 +85,7 @@ def _test_acl_element_user_name_2():
     ]
 
 
-def _test_acl_mixed():
+def test_acl_mixed():
     assert map_acl(mixed_acl) == [
       {
         "group_name": "admins",
@@ -94,7 +98,7 @@ def _test_acl_mixed():
     ]
 
 
-def _test_acl_mixed_2():
+def test_acl_mixed_2():
     assert map_acl(mixed_acl_2) == [
       {
         "group_name": "admins",
