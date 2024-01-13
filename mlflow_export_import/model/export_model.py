@@ -142,7 +142,7 @@ def _export_versions(mlflow_client, model_dct, versions, output_dir, opts):
 
     output_versions, failed_versions = ([], [])
     for j,vr in enumerate(versions):
-        if len(opts.stages) > 0 and not vr.current_stage.lower() in opts.stages:
+        if vr.current_stage and (len(opts.stages) > 0 and not vr.current_stage.lower() in opts.stages):
             continue
         if len(opts.versions) > 0 and not vr.version in opts.versions:
             continue

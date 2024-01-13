@@ -8,22 +8,23 @@ import click
 import mlflow
 
 from mlflow_export_import.common.click_options import (
-    opt_output_dir, 
+    opt_output_dir,
     opt_export_latest_versions,
     opt_stages,
     opt_export_permissions,
     opt_run_start_time,
     opt_export_deleted_runs,
     opt_export_version_model,
-    opt_notebook_formats, 
+    opt_notebook_formats,
     opt_use_threads,
 )
 from mlflow_export_import.common.iterators import SearchExperimentsIterator
 from mlflow_export_import.common import utils, io_utils
+from mlflow_export_import.client.client_utils import create_mlflow_client
 from mlflow_export_import.bulk.export_models import export_models
 from mlflow_export_import.bulk.export_experiments import export_experiments
 
-ALL_STAGES = "Production,Staging,Archived,None" 
+ALL_STAGES = "Production,Staging,Archived,None"
 
 _logger = utils.getLogger(__name__)
 
@@ -40,11 +41,11 @@ def export_all(
         use_threads  =  False,
         mlflow_client = None
     ):
-    mlflow_client = mlflow_client or mlflow.MlflowClient()
+    mlflow_client = mlflow_client or create_mlflow_client()
     start_time = time.time()
     res_models = export_models(
         mlflow_client = mlflow_client,
-        model_names = "all", 
+        model_names = "all",
         output_dir = output_dir,
         stages = stages,
         export_latest_versions = export_latest_versions,
@@ -52,7 +53,7 @@ def export_all(
         export_deleted_runs = export_deleted_runs,
         export_permissions = export_permissions,
         export_version_model = export_version_model,
-        notebook_formats = notebook_formats, 
+        notebook_formats = notebook_formats,
         use_threads = use_threads
     )
 
@@ -103,8 +104,8 @@ def export_all(
 @opt_notebook_formats
 @opt_use_threads
 
-def main(output_dir, stages, export_latest_versions, run_start_time, 
-        export_deleted_runs, 
+def main(output_dir, stages, export_latest_versions, run_start_time,
+        export_deleted_runs,
         export_version_model,
         export_permissions,
         notebook_formats, use_threads
@@ -113,14 +114,14 @@ def main(output_dir, stages, export_latest_versions, run_start_time,
     for k,v in locals().items():
         _logger.info(f"  {k}: {v}")
     export_all(
-        output_dir = output_dir, 
+        output_dir = output_dir,
         stages = stages,
-        run_start_time = run_start_time, 
+        run_start_time = run_start_time,
         export_latest_versions = export_latest_versions,
-        export_deleted_runs = export_deleted_runs, 
-        export_version_model = export_version_model, 
-        export_permissions = export_permissions, 
-        notebook_formats = notebook_formats, 
+        export_deleted_runs = export_deleted_runs,
+        export_version_model = export_version_model,
+        export_permissions = export_permissions,
+        notebook_formats = notebook_formats,
         use_threads = use_threads
     )
 

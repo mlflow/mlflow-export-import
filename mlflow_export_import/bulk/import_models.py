@@ -21,6 +21,7 @@ from mlflow_export_import.common.click_options import (
     opt_use_threads
 )
 from mlflow_export_import.common import utils, io_utils
+from mlflow_export_import.client.client_utils import create_mlflow_client
 from mlflow_export_import.model.import_model import BulkModelImporter
 from mlflow_export_import.bulk.import_experiments import import_experiments
 from mlflow_export_import.bulk import rename_utils
@@ -40,7 +41,7 @@ def import_models(
         use_threads = False,
         mlflow_client = None
     ):
-    mlflow_client = mlflow_client or mlflow.MlflowClient()
+    mlflow_client = mlflow_client or create_mlflow_client()
     experiment_renames = rename_utils.get_renames(experiment_renames)
     model_renames = rename_utils.get_renames(model_renames)
     start_time = time.time()
@@ -115,10 +116,10 @@ def _import_experiments(mlflow_client,
         _logger.warning(f"Errors: {num_exceptions}")
     _logger.info(f"Duration: {duration} seconds")
 
-    return exp_run_info_map_ok, { 
+    return exp_run_info_map_ok, {
         "experiments": len(exp_run_info_map),
         "exceptions": num_exceptions,
-        "duration": duration 
+        "duration": duration
     }
 
 
@@ -146,7 +147,7 @@ def _import_models(mlflow_client,
         import_source_tags = import_source_tags,
         experiment_renames = experiment_renames
     )
-    
+
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for model_name in model_names:
             dir = os.path.join(models_dir, model_name)

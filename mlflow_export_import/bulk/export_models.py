@@ -20,6 +20,7 @@ from mlflow_export_import.common.click_options import (
     opt_use_threads
 )
 from mlflow_export_import.common import utils, io_utils
+from mlflow_export_import.client.client_utils import create_mlflow_client
 from mlflow_export_import.model.export_model import export_model
 from mlflow_export_import.bulk import export_experiments
 from mlflow_export_import.bulk.model_utils import get_experiments_runs_of_models
@@ -53,7 +54,7 @@ def export_models(
         with open(model_names, "r", encoding="utf-8") as f:
             model_names = f.read().splitlines()
 
-    mlflow_client = mlflow_client or mlflow.MlflowClient()
+    mlflow_client = mlflow_client or create_mlflow_client()
     exps_and_runs = get_experiments_runs_of_models(mlflow_client, model_names)
     exp_ids = exps_and_runs.keys()
     start_time = time.time()
