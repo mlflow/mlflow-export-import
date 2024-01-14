@@ -3,7 +3,7 @@ import mlflow
 from mlflow.exceptions import RestException
 
 from mlflow_export_import.common.iterators import SearchModelVersionsIterator
-from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
+from mlflow_export_import.common.timestamp_utils import fmt_ts_millis, adjust_timestamps
 from mlflow_export_import.common import utils
 from mlflow_export_import.common import filesystem as _filesystem
 
@@ -144,6 +144,8 @@ def model_version_to_dict(version):
 def dump_model_version(version, title=None):
     from mlflow_export_import.common import dump_utils
     dct = model_version_to_dict(version)
+    dct = model_version_to_dict(version)
+    adjust_timestamps(dct, ["creation_timestamp", "last_updated_timestamp"])
     dump_utils.dump_as_json(dct, title)
 
 

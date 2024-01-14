@@ -20,7 +20,7 @@ from mlflow_export_import.common.click_options import (
     opt_export_version_model
 )
 from mlflow_export_import.common import utils, io_utils, model_utils
-from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
+from mlflow_export_import.common.timestamp_utils import adjust_timestamps
 from mlflow_export_import.common import ws_permissions_utils, uc_permissions_utils
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.run.export_run import export_run
@@ -202,7 +202,7 @@ def _adjust_model(model, versions):
     """
     1. Add human friendly timestamps to model and versions
     2. For aesthetic reasons reorder dict keys
-    3. Rename ModelVersion 'latest_versions' (if it exists) to 'versions' key
+    3. Rename ModelVersion 'latest_versions' key (if it exists) to 'versions'
     """
 
     def _reorder(model, key):
@@ -210,16 +210,7 @@ def _adjust_model(model, versions):
         if val:
             model[key] = val
 
-    def _adjust_timestamp(dct, key):
-        dct[f"_{key}"] = fmt_ts_millis(dct.get(key))
-
-    # add human friendly timestamps
-    def _adjust_timestamps(dct):
-        _adjust_timestamp(dct, "creation_timestamp")
-        _adjust_timestamp(dct, "last_updated_timestamp")
-
-    # add human friendly timestamps for model
-    _adjust_timestamps(model)
+    adjust_timestamps(model, ["creation_timestamp", "last_updated_timestamp"])
 
     # reorder tags and aliases keys
     _reorder(model, "tags")
@@ -231,7 +222,7 @@ def _adjust_model(model, versions):
 
     # add human friendly timestamps for versions
     for vr in versions:
-        _adjust_timestamps(vr)
+        adjust_timestamps(vr, ["creation_timestamp", "last_updated_timestamp"])
 
 
 def _normalize_stages(stages):

@@ -16,7 +16,7 @@ from mlflow_export_import.common.click_options import (
 from mlflow.exceptions import RestException
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import io_utils
-from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
+from mlflow_export_import.common.timestamp_utils import adjust_timestamps
 from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client
 from mlflow_export_import.notebook.download_notebook import download_notebook
 
@@ -63,8 +63,7 @@ def export_run(
         tags = dict(sorted(tags.items()))
 
         info = utils.strip_underscores(run.info)
-        info["_start_time"] = fmt_ts_millis(run.info.start_time)
-        info["_end_time"] = fmt_ts_millis(run.info.end_time)
+        adjust_timestamps(info, ["start_time", "end_time"])
         mlflow_attr = {
             "info": info,
             "params": run.data.params,

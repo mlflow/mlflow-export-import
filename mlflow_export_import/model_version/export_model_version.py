@@ -7,7 +7,7 @@ import click
 
 from mlflow_export_import.client.client_utils import create_mlflow_client, create_http_client
 from mlflow_export_import.common import utils, io_utils, model_utils
-from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
+from mlflow_export_import.common.timestamp_utils import adjust_timestamps
 from mlflow_export_import.run.export_run import export_run
 from mlflow_export_import.common.click_options import (
     opt_model,
@@ -63,8 +63,7 @@ def export_model_version(
     export_experiment(mlflow_client, run.info.experiment_id, output_dir)
     _export_model(mlflow_client, model_name, output_dir)
 
-    _adjust_timestamp(vr_dct, "creation_timestamp")
-    _adjust_timestamp(vr_dct, "last_updated_timestamp")
+    adjust_timestamps(vr_dct, ["creation_timestamp", "last_updated_timestamp"])
     mlflow_attr = { "model_version": vr_dct}
     msg = utils.get_obj_key_values(vr, [ "name", "version", "current_stage", "status", "run_id" ])
     _logger.info(f"Exporting model verson: {msg}")
@@ -80,8 +79,7 @@ def export_experiment(mlflow_client, experiment_id, output_dir):
     msg = { "name": exp["name"], "experiment_id": exp["experiment_id"] }
     _logger.info(f"Exporting experiment: {msg}")
 
-    _adjust_timestamp(exp, "creation_time")
-    _adjust_timestamp(exp, "last_update_time")
+    adjust_timestamps(exp, ["creation_time", "last_update_time"])
     mlflow_attr = { "experiment": exp }
     io_utils.write_export_file(output_dir, "experiment.json", __file__, mlflow_attr, {})
 
@@ -94,25 +92,10 @@ def _export_model(mlflow_client, model_name, output_dir):
     msg = {"name": model["name"] }
     _logger.info(f"Exporting registered model: {msg}")
 
-    _adjust_timestamp(model, "creation_timestamp")
-    _adjust_timestamp(model, "last_updated_timestamp")
+    adjust_timestamps(model, ["creation_timestamp", "last_updated_timestamp"])
 
     mlflow_attr = { "model": model }
     io_utils.write_export_file(output_dir, "registered_model.json", __file__, mlflow_attr, {})
-
-
-def _adjust_version(vr):
-    """
-    Add nicely formatted timestamps and for aesthetic reasons order the dict attributes
-    """
-    _adjust_timestamp(vr, "creation_timestamp")
-    _adjust_timestamp(vr, "last_updated_timestamp")
-    return vr
-
-
-def _adjust_timestamp(dct, key):
-    if key in dct:
-        dct[f"_{key}"] = fmt_ts_millis(dct.get(key))
 
 
 @click.command()
