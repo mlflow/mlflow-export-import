@@ -1,11 +1,17 @@
+"""
+Registered model utilities.
+"""
+
 import time
 import mlflow
 from mlflow.exceptions import RestException
 
 from mlflow_export_import.common.iterators import SearchModelVersionsIterator
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis, adjust_timestamps
-from mlflow_export_import.common import utils
+from mlflow_export_import.common import utils, model_utils
 from mlflow_export_import.common import filesystem as _filesystem
+from mlflow_export_import.common import ws_permissions_utils, uc_permissions_utils
+from mlflow_export_import.client.client_utils import create_mlflow_client, create_http_client, create_dbx_client
 
 _logger = utils.getLogger(__name__)
 
@@ -158,3 +164,30 @@ def dump_model_versions(client, model_name):
         show_versions(model_name, versions, "Latest")
     versions = SearchModelVersionsIterator(client, filter=f"name='{model_name}'")
     show_versions(model_name, list(versions), "All")
+
+
+def get_registered_model(mlflow_client, model_name, get_permissions=False):
+    """
+    Get registered model and optionally its permissions.
+    """
+    http_client = create_http_client(mlflow_client, model_name)
+    if get_permissions and utils.importing_into_databricks():
+        if model_utils.is_unity_catalog_model(model_name):
+            _model = http_client.get("registered-models/get", {"name": model_name})
+            model = _model["registered_model"]
+            permissions = uc_permissions_utils.get_permissions(mlflow_client, model_name)
+        else:
+            dbx_client = create_dbx_client(mlflow_client)
+            _model = http_client.get("databricks/registered-models/get", { "name": model_name })
+            model = _model.pop("registered_model_databricks", None)
+            permissions = ws_permissions_utils.get_model_permissions(dbx_client, model["id"])
+            _model["registered_model"] = model
+    else:
+        _model = http_client.get("registered-models/get", {"name": model_name})
+        model = _model["registered_model"]
+        permissions = None
+    adjust_timestamps(model, ["creation_timestamp", "last_updated_timestamp"])
+    if permissions:
+        model["permissions"] = permissions
+    model.pop("latest_versions", None)
+    return model

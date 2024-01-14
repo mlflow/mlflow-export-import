@@ -26,7 +26,7 @@ def create_dbx_client(mlflow_client):
 
 def create_mlflow_client():
     """
-    Create MLflowClient. If MLFLOW_TRACKING_URI is a UC
+    Create MLflowClient. If MLFLOW_TRACKING_URI is UC, then set MlflowClient.tracking_uri to the non-UC variant.
     """
     tracking_uri = os.environ.get("MLFLOW_TRACKING_URI")
     if tracking_uri:

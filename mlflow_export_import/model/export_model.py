@@ -7,7 +7,7 @@ import click
 from dataclasses import dataclass
 from mlflow.exceptions import RestException
 
-from mlflow_export_import.client.client_utils import create_mlflow_client, create_http_client, create_dbx_client
+from mlflow_export_import.client.client_utils import create_mlflow_client
 from mlflow_export_import.common.click_options import (
     opt_model,
     opt_output_dir,
@@ -21,7 +21,6 @@ from mlflow_export_import.common.click_options import (
 )
 from mlflow_export_import.common import utils, io_utils, model_utils
 from mlflow_export_import.common.timestamp_utils import adjust_timestamps
-from mlflow_export_import.common import ws_permissions_utils, uc_permissions_utils
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.run.export_run import export_run
 
@@ -65,8 +64,6 @@ def export_model(
     """
 
     mlflow_client = mlflow_client or create_mlflow_client()
-    http_client = create_http_client(mlflow_client, model_name)
-    dbx_client = create_dbx_client(mlflow_client)
 
     stages = _normalize_stages(stages)
     versions = versions if versions else []
@@ -77,7 +74,7 @@ def export_model(
     opts = Options(stages, versions, export_latest_versions, export_deleted_runs, export_version_model, export_permissions, notebook_formats)
 
     try:
-        _export_model(mlflow_client, http_client, dbx_client, model_name, output_dir, opts)
+        _export_model(mlflow_client, model_name, output_dir, opts)
         return True, model_name
     except RestException as e:
         err_msg = { "model": model_name, "RestException": e.json  }
@@ -95,31 +92,14 @@ def export_model(
         return False, model_name
 
 
-def _export_model(mlflow_client, http_client, dbx_client, model_name, output_dir, opts):
+def _export_model(mlflow_client, model_name, output_dir, opts):
     ori_versions = model_utils.list_model_versions(mlflow_client, model_name, opts.export_latest_versions)
     msg = "latest" if opts.export_latest_versions else "all"
     _logger.info(f"Exporting model '{model_name}': found {len(ori_versions)} '{msg}' versions")
 
-    if utils.importing_into_databricks() and opts.export_permissions:
-        if model_utils.is_unity_catalog_model(model_name):
-            _model = http_client.get("registered-models/get", {"name": model_name})
-            model = _model["registered_model"]
-            permissions = uc_permissions_utils.get_permissions(mlflow_client, model_name)
-        else:
-            _model = http_client.get("databricks/registered-models/get", { "name": model_name })
-            model = _model.pop("registered_model_databricks", None)
-            permissions = ws_permissions_utils.get_model_permissions(dbx_client, model["id"])
-            _model["registered_model"] = model
-    else:
-        _model = http_client.get("registered-models/get", {"name": model_name})
-        model = _model["registered_model"]
-        permissions = None
-
+    model = model_utils.get_registered_model(mlflow_client, model_name, get_permissions=opts.export_permissions)
     versions, failed_versions = _export_versions(mlflow_client, model, ori_versions, output_dir, opts)
-
     _adjust_model(model, versions)
-    if permissions:
-        model["permissions"] = permissions
 
     info_attr = {
         "num_target_stages": len(opts.stages),
@@ -223,6 +203,11 @@ def _adjust_model(model, versions):
     # add human friendly timestamps for versions
     for vr in versions:
         adjust_timestamps(vr, ["creation_timestamp", "last_updated_timestamp"])
+
+    # add permissions to the end
+    permissions = model.pop("permissions", None)
+    if permissions:
+        model["permissions"] = permissions
 
 
 def _normalize_stages(stages):
