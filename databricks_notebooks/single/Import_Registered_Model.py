@@ -83,12 +83,12 @@ assert_widget(input_dir, "3. Input directory")
 from mlflow_export_import.model.import_model import import_model
 
 import_model(
-  model_name =model_name, 
-  experiment_name = experiment_name, 
-  input_dir = input_dir, 
-  delete_model = delete_model,
-  import_permissions = import_permissions,
-  import_source_tags = import_source_tags
+    model_name =model_name, 
+    experiment_name = experiment_name, 
+    input_dir = input_dir, 
+    delete_model = delete_model,
+    import_permissions = import_permissions,
+    import_source_tags = import_source_tags
 )
 
 # COMMAND ----------
@@ -102,9 +102,3 @@ display_registered_model_uri(model_name)
 # COMMAND ----------
 
 display_experiment_info(experiment_name)
-
-# COMMAND ----------
-
-run = mlflow_client.get_run("ecdee570b07544cb8dca0b69d13ff38d")
-exp = mlflow_client.get_experiment(run.info.experiment_id)
-exp
