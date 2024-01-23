@@ -16,7 +16,7 @@
 
 # COMMAND ----------
 
-# MAGIC %md ### Include setup
+# MAGIC %md #### Include setup
 
 # COMMAND ----------
 
@@ -24,7 +24,7 @@
 
 # COMMAND ----------
 
-# MAGIC %md ### Widget setup
+# MAGIC %md #### Widget setup
 
 # COMMAND ----------
 
@@ -64,7 +64,7 @@ assert_widget(input_dir, "3. Input directory")
 
 # COMMAND ----------
 
-# MAGIC %md ### Display model files to be imported
+# MAGIC %md #### Display model files to be imported
 
 # COMMAND ----------
 
@@ -76,7 +76,7 @@ assert_widget(input_dir, "3. Input directory")
 
 # COMMAND ----------
 
-# MAGIC %md ### Import model
+# MAGIC %md #### Import model
 
 # COMMAND ----------
 
@@ -93,11 +93,15 @@ import_model(
 
 # COMMAND ----------
 
-# MAGIC %md ### Display UI links
+# MAGIC %md #### Display Registered Model UI link
 
 # COMMAND ----------
 
 display_registered_model_uri(model_name)
+
+# COMMAND ----------
+
+# MAGIC %md #### Display Experiment UI link
 
 # COMMAND ----------
 
