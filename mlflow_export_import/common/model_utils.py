@@ -8,10 +8,10 @@ from mlflow.exceptions import RestException
 
 from mlflow_export_import.common.iterators import SearchModelVersionsIterator
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis, adjust_timestamps
-from mlflow_export_import.common import utils, model_utils
+from mlflow_export_import.common import utils
 from mlflow_export_import.common import filesystem as _filesystem
 from mlflow_export_import.common import ws_permissions_utils, uc_permissions_utils
-from mlflow_export_import.client.client_utils import create_mlflow_client, create_http_client, create_dbx_client
+from mlflow_export_import.client.client_utils import create_http_client, create_dbx_client
 
 _logger = utils.getLogger(__name__)
 
@@ -20,20 +20,23 @@ def is_unity_catalog_model(name):
     return len(name.split(".")) == 3
 
 
-def create_model(client, model_name, tags=None, description=None):
+def create_model(client, model_name, model_dct, import_metadata):
     """
     Creates a registered model if it does not exist, and returns the model in either case.
     """
-    client = client or mlflow.MlflowClient()
     try:
-        model = client.create_registered_model(model_name, tags, description)
+        if import_metadata:
+            tags = utils.mk_tags_dict(model_dct.get("tags"))
+            client.create_registered_model(model_name, tags, model_dct.get("description"))
+        else:
+            client.create_registered_model(model_name)
         _logger.info(f"Created new registered model '{model_name}'")
-        return model
+        return True
     except RestException as e:
         if e.error_code != "RESOURCE_ALREADY_EXISTS":
             raise e
         _logger.info(f"Registered model '{model_name}' already exists")
-        return client.get_registered_model(model_name)
+        return False
 
 
 def delete_model(client, model_name, sleep_time=5):
@@ -172,7 +175,7 @@ def get_registered_model(mlflow_client, model_name, get_permissions=False):
     """
     http_client = create_http_client(mlflow_client, model_name)
     if get_permissions and utils.importing_into_databricks():
-        if model_utils.is_unity_catalog_model(model_name):
+        if is_unity_catalog_model(model_name):
             _model = http_client.get("registered-models/get", {"name": model_name})
             model = _model["registered_model"]
             permissions = uc_permissions_utils.get_permissions(mlflow_client, model_name)
@@ -191,3 +194,17 @@ def get_registered_model(mlflow_client, model_name, get_permissions=False):
         model["permissions"] = permissions
     model.pop("latest_versions", None)
     return model
+
+
+def update_registered_model(mlflow_client, dbx_client, model_name, perms):
+    if perms:
+        _logger.info(f"Updating permissions for registered model '{model_name}'")
+        if is_unity_catalog_model(model_name):
+            uc_permissions_utils.update_permissions(mlflow_client, model_name, perms)
+        else:
+            _model = dbx_client.get("mlflow/databricks/registered-models/get", { "name": model_name })
+            _model = _model["registered_model_databricks"]
+            model_id = _model["id"]
+            ws_permissions_utils.update_permissions(dbx_client, perms, "model", model_name, model_id)
+    else:
+        _logger.info(f"No permissions to update for registered model '{model_name}'")

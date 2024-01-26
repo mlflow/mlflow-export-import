@@ -74,12 +74,8 @@ def import_model_version(
 
     if create_model:
         path = os.path.join(input_dir, "registered_model.json")
-        mm = io_utils.read_file_mlflow(path)["model"]
-        if import_metadata:
-            tags = utils.mk_tags_dict(mm.get("tags"))
-            model_utils.create_model(mlflow_client, model_name, tags, mm.get("description"))
-        else:
-            model_utils.create_model(mlflow_client, model_name)
+        model_dct = io_utils.read_file_mlflow(path)["model"]
+        model_utils.create_model(mlflow_client, model_name, model_dct, import_metadata)
 
     model_path = _extract_model_path(src_vr["source"], src_vr["run_id"])
     dst_source = f"{dst_run.info.artifact_uri}/{model_path}"

@@ -21,7 +21,6 @@ from mlflow_export_import.common import utils, io_utils, model_utils
 from mlflow_export_import.common.mlflow_utils import MlflowTrackingUriTweak
 from mlflow_export_import.common.source_tags import set_source_tags_for_field, fmt_timestamps
 from mlflow_export_import.common import MlflowExportImportException
-from mlflow_export_import.common import ws_permissions_utils, uc_permissions_utils
 from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client
 from mlflow_export_import.run.import_run import import_run
 from mlflow_export_import.bulk import rename_utils
@@ -114,32 +113,10 @@ class BaseModelImporter():
         if delete_model:
             model_utils.delete_model(self.mlflow_client, model_name)
 
-        try:
-            tags = { e["key"]:e["value"] for e in model_dct.get("tags", {}) }
-            if self.import_source_tags:
-                _set_source_tags_for_field(model_dct, tags)
-            self.mlflow_client.create_registered_model(model_name, tags, model_dct.get("description"))
-            _logger.info(f"Created new registered model '{model_name}'")
-            creating_new_model = True
-        except RestException as e:
-            if e.error_code != "RESOURCE_ALREADY_EXISTS":
-                raise e
-            _logger.info(f"Registered model '{model_name}' already exists")
-            creating_new_model = False
-
-        if creating_new_model and self.import_permissions:
-            perms = model_dct["permissions"]
-            if perms:
-                _logger.info(f"Updating permissions for registered model '{model_name}'")
-                if model_utils.is_unity_catalog_model(model_name):
-                    uc_permissions_utils.update_permissions(self.mlflow_client, model_name, perms)
-                else:
-                    _model = self.dbx_client.get("mlflow/databricks/registered-models/get", { "name": model_name })
-                    _model = _model["registered_model_databricks"]
-                    model_id = _model["id"]
-                    ws_permissions_utils.update_permissions(self.dbx_client, perms, "model", model_name, model_id)
-            else:
-                _logger.info(f"No permissions to update for registered model '{model_name}'")
+        created_new_model = model_utils.create_model(self.mlflow_client, model_name, model_dct, True)
+        perms = model_dct.get("permissions")
+        if created_new_model and self.import_permissions:
+            model_utils.update_registered_model(self.mlflow_client, self.dbx_client, model_name, perms)
 
         return model_dct
 
@@ -187,6 +164,8 @@ class ModelImporter(BaseModelImporter):
             except RestException as e:
                 msg = { "model": model_name, "version": vr["version"], "src_run_id": vr["run_id"], "experiment": experiment_name, "RestException": str(e) }
                 _logger.error(f"Failed to import model version: {msg}")
+                import traceback
+                traceback.print_exc()
         if verbose:
             model_utils.dump_model_versions(self.mlflow_client, model_name)
 

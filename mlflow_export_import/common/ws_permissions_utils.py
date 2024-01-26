@@ -37,7 +37,7 @@ def update_permissions(dbx_client, perms_get_format, object_type, object_name, o
     :param object_name: name of object
     :param object_id: experiment or registered_model ID
     """
-    perms_get_format = perms_get_format.get("permissions", None)
+    perms_get_format = perms_get_format.get("permissions")
     if not perms_get_format:
         _logger.warning(f"No permissions for {object_type} '{object_name}'")
         return
