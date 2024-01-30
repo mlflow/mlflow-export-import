@@ -9,6 +9,7 @@ import click
 from mlflow_export_import.common.click_options import (
     opt_input_dir,
     opt_model,
+    opt_import_permissions,
     opt_import_source_tags
 )
 from . click_options import (
@@ -32,6 +33,7 @@ def import_model_version(
         experiment_name,
         input_dir,
         create_model = False,
+        import_permissions = False,
         import_source_tags = False,
         import_stages_and_aliases = True,
         import_metadata = False,
@@ -54,11 +56,11 @@ def import_model_version(
 
     mlflow_client = mlflow_client or create_mlflow_client()
 
-    path = os.path.join(input_dir, "model_version.json")
+    path = os.path.join(input_dir, "version.json")
     src_vr = io_utils.read_file_mlflow(path)["model_version"]
 
+    dbx_client = create_dbx_client(mlflow_client)
     if import_metadata:
-        dbx_client = create_dbx_client(mlflow_client)
         path = os.path.join(input_dir, "experiment.json")
         exp = io_utils.read_file_mlflow(path)["experiment"]
         tags = utils.mk_tags_dict(exp.get("tags"))
@@ -73,9 +75,12 @@ def import_model_version(
     )
 
     if create_model:
-        path = os.path.join(input_dir, "registered_model.json")
-        model_dct = io_utils.read_file_mlflow(path)["model"]
-        model_utils.create_model(mlflow_client, model_name, model_dct, import_metadata)
+        path = os.path.join(input_dir, "model.json")
+        model_dct = io_utils.read_file_mlflow(path)["registered_model"]
+        created_model = model_utils.create_model(mlflow_client, model_name, model_dct, import_metadata)
+        perms = model_dct.get("permissions")
+        if created_model and import_permissions and perms:
+            model_utils.update_model_permissions(mlflow_client, dbx_client, model_name, perms)
 
     model_path = _extract_model_path(src_vr["source"], src_vr["run_id"])
     dst_source = f"{dst_run.info.artifact_uri}/{model_path}"
@@ -165,11 +170,12 @@ def _set_source_tags_for_field(dct, tags):
 @opt_experiment_name
 @opt_input_dir
 @opt_create_model
+@opt_import_permissions
 @opt_import_source_tags
 @opt_import_stages_and_aliases
 @opt_import_metadata
 
-def main(input_dir, model, experiment_name, create_model, import_source_tags, import_stages_and_aliases, import_metadata):
+def main(input_dir, model, experiment_name, create_model, import_permissions, import_source_tags, import_stages_and_aliases, import_metadata):
     """
     Imports a registered model version and its run.
     """
@@ -181,6 +187,7 @@ def main(input_dir, model, experiment_name, create_model, import_source_tags, im
         experiment_name = experiment_name,
         input_dir = input_dir,
         create_model = create_model,
+        import_permissions = import_permissions,
         import_source_tags = import_source_tags,
         import_stages_and_aliases = import_stages_and_aliases,
         import_metadata = import_metadata

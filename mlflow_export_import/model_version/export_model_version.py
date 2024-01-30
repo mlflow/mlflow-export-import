@@ -70,7 +70,7 @@ def export_model_version(
     msg = utils.get_obj_key_values(vr, [ "name", "version", "current_stage", "status", "run_id" ])
     _logger.info(f"Exporting model verson: {msg}")
 
-    io_utils.write_export_file(output_dir, "model_version.json", __file__, mlflow_attr, info_attr)
+    io_utils.write_export_file(output_dir, "version.json", __file__, mlflow_attr, info_attr)
     return vr
 
 
@@ -87,15 +87,15 @@ def export_experiment(mlflow_client, experiment_id, output_dir):
 
 
 def _export_registered_model(mlflow_client, model_name, export_permissions, output_dir):
-    model = model_utils.get_registered_model(mlflow_client, model_name, get_permissions=export_permissions)
+    model = model_utils.get_registered_model(mlflow_client, model_name, export_permissions)
 
     msg = {"name": model["name"] }
     _logger.info(f"Exporting registered model: {msg}")
 
     adjust_timestamps(model, ["creation_timestamp", "last_updated_timestamp"])
 
-    mlflow_attr = { "model": model }
-    io_utils.write_export_file(output_dir, "registered_model.json", __file__, mlflow_attr, {})
+    mlflow_attr = { "registered_model": model }
+    io_utils.write_export_file(output_dir, "model.json", __file__, mlflow_attr, {})
 
 
 @click.command()

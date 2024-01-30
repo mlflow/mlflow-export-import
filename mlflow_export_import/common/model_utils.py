@@ -196,7 +196,7 @@ def get_registered_model(mlflow_client, model_name, get_permissions=False):
     return model
 
 
-def update_registered_model(mlflow_client, dbx_client, model_name, perms):
+def update_model_permissions(mlflow_client, dbx_client, model_name, perms):
     if perms:
         _logger.info(f"Updating permissions for registered model '{model_name}'")
         if is_unity_catalog_model(model_name):

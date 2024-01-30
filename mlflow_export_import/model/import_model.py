@@ -85,7 +85,6 @@ class BaseModelImporter():
         self.import_source_tags = import_source_tags
         self.await_creation_for = await_creation_for
 
-
     def _import_model(self,
             model_name,
             input_dir,
@@ -105,7 +104,7 @@ class BaseModelImporter():
         _logger.info(f"  Name: {model_dct['name']}")
         _logger.info(f"  Description: {model_dct.get('description','')}")
         _logger.info(f"  Tags: {model_dct.get('tags','')}")
-        _logger.info(f"  {len(model_dct['versions'])} versions")
+        _logger.info(f"  {len(model_dct.get('versions',[]))} versions")
         _logger.info(f"  path: {path}")
 
         if not model_name:
@@ -113,16 +112,16 @@ class BaseModelImporter():
         if delete_model:
             model_utils.delete_model(self.mlflow_client, model_name)
 
-        created_new_model = model_utils.create_model(self.mlflow_client, model_name, model_dct, True)
+        created_model = model_utils.create_model(self.mlflow_client, model_name, model_dct, True)
         perms = model_dct.get("permissions")
-        if created_new_model and self.import_permissions:
-            model_utils.update_registered_model(self.mlflow_client, self.dbx_client, model_name, perms)
+        if created_model and self.import_permissions and perms:
+            model_utils.update_model_permissions(self.mlflow_client, self.dbx_client, model_name, perms)
 
         return model_dct
 
 
 class ModelImporter(BaseModelImporter):
-    """ Low-level 'point' model importer.  """
+    """ Low-level 'single' model importer.  """
 
     def __init__(self,
             mlflow_client = None,
@@ -156,7 +155,7 @@ class ModelImporter(BaseModelImporter):
         """
         model_dct = self._import_model(model_name, input_dir, delete_model)
         _logger.info("Importing versions:")
-        for vr in model_dct["versions"]:
+        for vr in model_dct.get("versions",[]):
             try:
                 run_id = self._import_run(input_dir, experiment_name, vr)
                 if run_id:
@@ -269,7 +268,7 @@ class BulkModelImporter(BaseModelImporter):
                         mlflow.set_experiment(exp_name)
                     self.import_version(model_name, vr, dst_run_id)
                 except RestException as e:
-                    msg = { "model": model_name, "version": vr["version"], "experiment": exp_name, "run_id": dst_run_id, "exception": str(e) }
+                    msg = { "model": model_name, "version": vr.get("version",[]), "experiment": exp_name, "run_id": dst_run_id, "exception": str(e) }
                     _logger.error(f"Failed to import model version: {msg}")
         if verbose:
             model_utils.dump_model_versions(self.mlflow_client, model_name)
