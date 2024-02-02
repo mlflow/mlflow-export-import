@@ -32,6 +32,7 @@ class UcPermissionsClient:
         PATCH /api/2.1/unity-catalog/permissions/{securable_type}/{full_name}
         """
         resource = f"unity-catalog/permissions/function/{model_name}"
+        _logger.info(f"Updating {len(changes.get('changes',[]))} permissions for model '{model_name}'. Resource: {resource}")
         return self.client.patch(resource, changes)
 
 

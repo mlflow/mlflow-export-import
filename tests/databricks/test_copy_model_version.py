@@ -5,7 +5,7 @@ from . init_tests import workspace_src, workspace_dst
 from . import local_utils
 from . init_tests import test_context
 
-def _test_two_workspaces(test_context):
+def test_two_workspaces(test_context):
     src_model_name = local_utils.mk_test_object_name_default()
     src_vr, _ = local_utils.create_version(test_context.mlflow_client_src, src_model_name, "Production")
     dst_exp_name = local_utils.mk_experiment_name(workspace=workspace_dst)
@@ -24,7 +24,7 @@ def _test_two_workspaces(test_context):
     assert dst_vr == test_context.mlflow_client_dst.get_model_version(dst_vr.name, dst_vr.version)
 
 
-def _test_one_workspace_with_experiment(test_context):
+def test_one_workspace_with_experiment(test_context):
     src_model_name = local_utils.mk_test_object_name_default()
     dst_model_name = local_utils.mk_test_object_name_default()
     src_vr, _ = local_utils.create_version(test_context.mlflow_client_src, src_model_name, "Production")
@@ -46,7 +46,7 @@ def _test_one_workspace_with_experiment(test_context):
     assert dst_vr == test_context.mlflow_client_dst.get_model_version(dst_vr.name, dst_vr.version)
 
 
-def _test_one_workspace_without_experiment(test_context):
+def test_one_workspace_without_experiment(test_context):
     src_model_name = local_utils.mk_test_object_name_default()
     dst_model_name = local_utils.mk_test_object_name_default()
     src_vr, _ = local_utils.create_version(test_context.mlflow_client_src, src_model_name, "Production")

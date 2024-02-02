@@ -97,7 +97,7 @@ def _export_model(mlflow_client, model_name, output_dir, opts):
     msg = "latest" if opts.export_latest_versions else "all"
     _logger.info(f"Exporting model '{model_name}': found {len(ori_versions)} '{msg}' versions")
 
-    model = model_utils.get_registered_model(mlflow_client, model_name, get_permissions=opts.export_permissions)
+    model = model_utils.get_registered_model(mlflow_client, model_name, opts.export_permissions)
     versions, failed_versions = _export_versions(mlflow_client, model, ori_versions, output_dir, opts)
     _adjust_model(model, versions)
 

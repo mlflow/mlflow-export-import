@@ -64,6 +64,15 @@ def opt_dst_experiment_name(function):
     )(function)
     return function
 
+def opt_copy_permissions(function):
+    function = click.option("--copy-permissions",
+        help="Copy model permissions (only if target model does not exist).",
+        type=bool,
+        default=False,
+        show_default=True
+    )(function)
+    return function
+
 def opt_copy_stages_and_aliases(function):
     function = click.option("--copy-stages-and-aliases",
         help="Import stages and aliases.",
@@ -76,15 +85,6 @@ def opt_copy_stages_and_aliases(function):
 def opt_copy_lineage_tags(function):
     function = click.option("--copy-lineage-tags",
         help="Add source lineage info to destination version as tags starting with 'mlflow_exim'.",
-        type=bool,
-        default=False,
-        show_default=True
-    )(function)
-    return function
-
-def opt_copy_permissions(function):
-    function = click.option("--copy-permissions",
-        help="Update target model (only if it doesn't exist) with source model permissions.",
         type=bool,
         default=False,
         show_default=True

@@ -183,7 +183,7 @@ def get_registered_model(mlflow_client, model_name, get_permissions=False):
             dbx_client = create_dbx_client(mlflow_client)
             _model = http_client.get("databricks/registered-models/get", { "name": model_name })
             model = _model.pop("registered_model_databricks", None)
-            permissions = ws_permissions_utils.get_model_permissions(dbx_client, model["id"])
+            permissions = ws_permissions_utils.get_model_permissions_by_id(dbx_client, model["id"])
             _model["registered_model"] = model
     else:
         _model = http_client.get("registered-models/get", {"name": model_name})
@@ -205,6 +205,6 @@ def update_model_permissions(mlflow_client, dbx_client, model_name, perms):
             _model = dbx_client.get("mlflow/databricks/registered-models/get", { "name": model_name })
             _model = _model["registered_model_databricks"]
             model_id = _model["id"]
-            ws_permissions_utils.update_permissions(dbx_client, perms, "model", model_name, model_id)
+            ws_permissions_utils.update_permissions(dbx_client, perms, "registered-model", model_name, model_id)
     else:
         _logger.info(f"No permissions to update for registered model '{model_name}'")
