@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 CORE_REQUIREMENTS = [
-    "mlflow-skinny>=2.2.2",
+    "mlflow-skinny[databricks]==2.9.2",
     "pandas>=1.5.2",
     "wheel"
 ]
@@ -30,7 +30,7 @@ setup(
     packages=find_packages(exclude=["tests", "tests.*"]),
     zip_safe = False,
     install_requires = CORE_REQUIREMENTS,
-    extras_require= { "tests": [ "mlflow", "pytest","pytest-html>=3.2.0", "shortuuid>=1.0.11" ] },
+    extras_require= { "tests": [ "mlflow[databricks]==2.9.2", "pytest","pytest-html>=3.2.0", "shortuuid>=1.0.11" ] },
     license = "Apache License 2.0",
     keywords = "mlflow ml ai",
     classifiers = [
@@ -51,7 +51,6 @@ setup(
             "export-experiments = mlflow_export_import.bulk.export_experiments:main",
             "import-experiments = mlflow_export_import.bulk.import_experiments:main",
             "export-model = mlflow_export_import.model.export_model:main",
-            "import-model = mlflow_export_import.model.import_model_version:main",
             "export-model-version = mlflow_export_import.model_version.export_model_version:main",
             "import-model-version = mlflow_export_import.model_version.import_model_version:main",
             "download-notebook = mlflow_export_import.notebook.download_notebook:main",
