@@ -99,7 +99,7 @@ def import_run(
         traceback.print_exc()
         raise MlflowExportImportException(e, f"Importing run {run_id} of experiment '{exp.name}' failed")
 
-    if utils.importing_into_databricks() and dst_notebook_dir:
+    if utils.calling_databricks() and dst_notebook_dir:
         _upload_databricks_notebook(dbx_client, input_dir, src_run_dct, dst_notebook_dir)
 
     res = (run, src_run_dct["tags"].get(MLFLOW_PARENT_RUN_ID, None))

@@ -9,9 +9,9 @@ def getLogger(name):
 _logger = getLogger(__name__)
 
 
-is_importing_into_databricks = None
+_calling_databricks = None
 
-def importing_into_databricks(dbx_client=None):
+def calling_databricks(dbx_client=None):
     """
     Are we importing into Databricks?
     Check by making call to Databricks-specific API endpoint and check for 400 status code.
@@ -19,16 +19,16 @@ def importing_into_databricks(dbx_client=None):
     from mlflow_export_import.client.http_client import DatabricksHttpClient
     from mlflow_export_import.common import MlflowExportImportException
 
-    global is_importing_into_databricks
-    if is_importing_into_databricks is None:
+    global _calling_databricks
+    if _calling_databricks is None:
         dbx_client = dbx_client or DatabricksHttpClient()
         try:
             dbx_client.get("clusters/list-node-types")
-            is_importing_into_databricks =  True
+            _calling_databricks =  True
         except MlflowExportImportException:
-            is_importing_into_databricks =  False
-        _logger.info(f"Importing into Databricks: {is_importing_into_databricks}")
-    return is_importing_into_databricks
+            _calling_databricks =  False
+        _logger.info(f"Calling Databricks: {_calling_databricks}")
+    return _calling_databricks
 
 
 # Databricks tags that cannot or should not be set
@@ -42,13 +42,13 @@ _DATABRICKS_SKIP_TAGS = {
 
 
 def create_mlflow_tags_for_databricks_import(tags):
-    if importing_into_databricks():
+    if calling_databricks():
         tags = { k:v for k,v in tags.items() if not k in _DATABRICKS_SKIP_TAGS }
     return tags
 
 
 def set_dst_user_id(tags, user_id, use_src_user_id):
-    if importing_into_databricks():
+    if calling_databricks():
         return
     from mlflow.entities import RunTag
     from mlflow.utils.mlflow_tags import MLFLOW_USER

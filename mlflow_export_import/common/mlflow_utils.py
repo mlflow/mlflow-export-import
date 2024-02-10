@@ -27,7 +27,7 @@ def set_experiment(mlflow_client, dbx_client, exp_name, tags=None):
     For Databricks, create the workspace directory if it doesn't exist.
     :return: Experiment
     """
-    if utils.importing_into_databricks():
+    if utils.calling_databricks():
         create_workspace_dir(dbx_client, os.path.dirname(exp_name))
     try:
         if not tags: tags = {}

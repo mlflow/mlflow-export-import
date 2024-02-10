@@ -84,7 +84,7 @@ def copy(
 
 def _create_registered_model(src_client, src_model_name, dst_client, dst_model_name, copy_permissions):
     model_exists = copy_utils.create_registered_model(dst_client, dst_model_name)
-    if not utils.importing_into_databricks() or not copy_permissions:
+    if not utils.calling_databricks() or not copy_permissions:
         return
     if model_exists:
         _logger.warning(f"Not copying permissions for model '{dst_model_name}' because model already exists")

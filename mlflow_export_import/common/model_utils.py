@@ -174,7 +174,7 @@ def get_registered_model(mlflow_client, model_name, get_permissions=False):
     Get registered model and optionally its permissions.
     """
     http_client = create_http_client(mlflow_client, model_name)
-    if get_permissions and utils.importing_into_databricks():
+    if get_permissions and utils.calling_databricks():
         if is_unity_catalog_model(model_name):
             _model = http_client.get("registered-models/get", {"name": model_name})
             model = _model["registered_model"]
