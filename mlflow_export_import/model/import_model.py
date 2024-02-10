@@ -18,6 +18,7 @@ from mlflow_export_import.common.click_options import (
     opt_verbose
 )
 from mlflow_export_import.common import utils, io_utils, model_utils
+from mlflow_export_import.common import filesystem as _fs
 from mlflow_export_import.common.mlflow_utils import MlflowTrackingUriTweak
 from mlflow_export_import.common.source_tags import set_source_tags_for_field, fmt_timestamps
 from mlflow_export_import.common import MlflowExportImportException
@@ -174,10 +175,10 @@ class ModelImporter(BaseModelImporter):
         source = vr["source"]
         current_stage = vr["current_stage"]
         run_artifact_uri = vr.get("_run_artifact_uri",None)
-        run_dir = os.path.join(input_dir,run_id)
+        run_dir = _fs.mk_local_path(os.path.join(input_dir,run_id))
         if not os.path.exists(run_dir):
             msg = { "model": vr["name"], "version": vr["version"], "experiment": experiment_name, "run_id": run_id }
-            _logger.warning(f"Cannot import model version because its run does not exist: {msg}")
+            _logger.warning(f"Cannot import model version because its run folder '{run_dir}' does not exist: {msg}")
             return None
         _logger.info(f"  Version {vr['version']}:")
         _logger.info(f"    current_stage: {current_stage}:")

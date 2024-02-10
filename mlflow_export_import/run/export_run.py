@@ -14,7 +14,7 @@ from mlflow_export_import.common.click_options import (
     opt_notebook_formats
 )
 from mlflow.exceptions import RestException
-from mlflow_export_import.common import filesystem as _filesystem
+from mlflow_export_import.common import filesystem as _fs
 from mlflow_export_import.common import io_utils
 from mlflow_export_import.common.timestamp_utils import adjust_timestamps
 from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client
@@ -72,7 +72,7 @@ def export_run(
             "inputs": _inputs_to_dict(run.inputs)
         }
         io_utils.write_export_file(output_dir, "run.json", __file__, mlflow_attr)
-        fs = _filesystem.get_filesystem(".")
+        fs = _fs.get_filesystem(".")
 
         # copy artifacts
         dst_path = os.path.join(output_dir, "artifacts")
@@ -81,7 +81,7 @@ def export_run(
             fs.mkdirs(dst_path)
             mlflow.artifacts.download_artifacts(
                run_id = run.info.run_id,
-               dst_path = _filesystem.mk_local_path(dst_path),
+               dst_path = _fs.mk_local_path(dst_path),
                tracking_uri = mlflow_client._tracking_client.tracking_uri)
         notebook = tags.get(MLFLOW_DATABRICKS_NOTEBOOK_PATH)
 

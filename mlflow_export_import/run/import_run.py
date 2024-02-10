@@ -18,8 +18,7 @@ from mlflow_export_import.common.click_options import (
     opt_dst_notebook_dir
 )
 from mlflow_export_import.common import utils, mlflow_utils, io_utils
-from mlflow_export_import.common.filesystem import mk_local_path
-from mlflow_export_import.common import filesystem as _filesystem
+from mlflow_export_import.common import filesystem as _fs
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client, create_http_client
 from . import run_data_importer
@@ -84,9 +83,9 @@ def import_run(
         )
         _import_inputs(http_client, src_run_dct, run_id)
 
-        path = os.path.join(input_dir, "artifacts")
-        if os.path.exists(_filesystem.mk_local_path(path)):
-            mlflow_client.log_artifacts(run_id, mk_local_path(path))
+        path = _fs.mk_local_path(os.path.join(input_dir, "artifacts"))
+        if os.path.exists(path):
+            mlflow_client.log_artifacts(run_id, path)
         if mlmodel_fix:
             run_utils.update_mlmodel_run_id(mlflow_client, run_id)
         mlflow_client.set_terminated(run_id, RunStatus.to_string(RunStatus.FINISHED))
@@ -118,8 +117,8 @@ def _upload_databricks_notebook(dbx_client, input_dir, src_run_dct, dst_notebook
     notebook_name = os.path.basename(src_notebook_path)
 
     format = "source"
-    notebook_path = os.path.join(input_dir,"artifacts","notebooks",f"{notebook_name}.{format}")
-    if not os.path.exists(notebook_path):
+    notebook_path = _fs.make_local_path(os.path.join(input_dir,"artifacts","notebooks",f"{notebook_name}.{format}"))
+    if not _fs.exists(notebook_path):
         _logger.warning(f"Source '{notebook_path}' does not exist for run_id '{run_id}'")
         return
 
