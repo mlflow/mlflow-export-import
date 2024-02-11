@@ -1,8 +1,10 @@
 from setuptools import setup, find_packages
 
 CORE_REQUIREMENTS = [
-    "mlflow-skinny[databricks]==2.9.2",
+    "mlflow-skinny[databricks]>=2.9.2",
+    "databricks-cli==0.18.0",
     "pandas>=1.5.2",
+    "tabulate==0.9.0",
     "wheel"
 ]
 
@@ -30,7 +32,7 @@ setup(
     packages=find_packages(exclude=["tests", "tests.*"]),
     zip_safe = False,
     install_requires = CORE_REQUIREMENTS,
-    extras_require= { "tests": [ "mlflow[databricks]==2.9.2", "pytest","pytest-html>=3.2.0", "shortuuid>=1.0.11" ] },
+    extras_require= { "tests": [ "mlflow[databricks]>=2.9.2", "pytest","pytest-html>=3.2.0", "shortuuid>=1.0.11" ] },
     license = "Apache License 2.0",
     keywords = "mlflow ml ai",
     classifiers = [
