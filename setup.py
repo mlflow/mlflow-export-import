@@ -53,13 +53,13 @@ setup(
             "export-experiments = mlflow_export_import.bulk.export_experiments:main",
             "import-experiments = mlflow_export_import.bulk.import_experiments:main",
             "export-model = mlflow_export_import.model.export_model:main",
+            "import-model = mlflow_export_import.model.import_model:main",
             "export-model-version = mlflow_export_import.model_version.export_model_version:main",
             "import-model-version = mlflow_export_import.model_version.import_model_version:main",
             "download-notebook = mlflow_export_import.notebook.download_notebook:main",
-            "http-client = mlflow_export_import.client.http_client:main",
-            "list-models = mlflow_export_import.tools.list_registered_models:main",
             "copy-model-version = mlflow_export_import.copy.copy_model_version:main",
-            "copy-run = mlflow_export_import.copy.copy_run:main"
+            "copy-run = mlflow_export_import.copy.copy_run:main",
+            "http-client = mlflow_export_import.client.http_client:main"
          ]
       }
 )
