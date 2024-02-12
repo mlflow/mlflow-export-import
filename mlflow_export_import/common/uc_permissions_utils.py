@@ -60,10 +60,10 @@ def update_permissions(mlflow_client, model_name, perms):
         return {}
 
 def _mk_update_changes(perms):
-    effective_perms = perms.get("effective_permissions", {})
-    privilege_assignments = effective_perms.get("privilege_assignments", [])
     def _mk_change(assg):
         privileges = [ pr.get("privilege") for pr in assg.get("privileges") ]
         return { "principal" : assg.get("principal"), "add": privileges }
+    effective_perms = perms.get("effective_permissions", {})
+    privilege_assignments = effective_perms.get("privilege_assignments", [])
     changes = [ _mk_change(assg) for assg in privilege_assignments ]
     return { "changes": changes }

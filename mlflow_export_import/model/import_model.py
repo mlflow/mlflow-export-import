@@ -116,7 +116,10 @@ class BaseModelImporter():
         created_model = model_utils.create_model(self.mlflow_client, model_name, model_dct, True)
         perms = model_dct.get("permissions")
         if created_model and self.import_permissions and perms:
-            model_utils.update_model_permissions(self.mlflow_client, self.dbx_client, model_name, perms)
+            if model_utils.model_names_same_registry(model_dct["name"], model_name):
+                model_utils.update_model_permissions(self.mlflow_client, self.dbx_client, model_name, perms)
+            else:
+                _logger.warning(f'Cannot import permissions since models \'{model_dct["name"]}\' and \'{model_name}\' must be either both Unity Catalog model names or both Workspace model names.')
 
         return model_dct
 

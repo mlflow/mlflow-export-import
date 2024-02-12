@@ -20,6 +20,12 @@ def is_unity_catalog_model(name):
     return len(name.split(".")) == 3
 
 
+def model_names_same_registry(name1, name2):
+    return \
+        is_unity_catalog_model(name1) and is_unity_catalog_model(name2) or \
+        not is_unity_catalog_model(name1) and not is_unity_catalog_model(name2)
+
+
 def create_model(client, model_name, model_dct, import_metadata):
     """
     Creates a registered model if it does not exist, and returns the model in either case.
