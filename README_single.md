@@ -266,10 +266,7 @@ export-model --help
 Options:
   --model TEXT                    Registered model name.  [required]
   --output-dir TEXT               Output directory.  [required]
-  --notebook-formats TEXT         Databricks notebook formats. Values are
-                                  SOURCE, HTML, JUPYTER or DBC (comma
-                                  seperated).
-  --stages TEXT                   Stages to export (comma seperated). Default
+  --stages TEXT                   Stages to export (comma separated). Default
                                   is all stages and all versions. Stages are
                                   Production, Staging, Archived and None.
                                   Mututally exclusive with option --versions.
@@ -278,12 +275,14 @@ Options:
   --export-latest-versions BOOLEAN
                                   Export latest registered model versions
                                   instead of all versions.  [default: False]
+  --export-version-model BOOLEAN  Export registered model version's 'cached'
+                                  MLflow model.  [default: False]
+  --export-deleted-runs BOOLEAN   Export deleted runs.  [default: False]
   --export-permissions BOOLEAN    Export Databricks permissions.  [default:
                                   False]
-  --export-deleted-runs BOOLEAN   Export deleted runs.  [default: False]
-  --get-model-version-download-uri BOOLEAN
-                                  Call MLflowClient.get_model_version_download
-                                  _uri() for version export.  [default: False]
+  --notebook-formats TEXT         Databricks notebook formats. Values are
+                                  SOURCE, HTML, JUPYTER or DBC (comma
+                                  separated).
 ```
 
 #### Example
@@ -351,11 +350,12 @@ Options:
   --experiment-name TEXT        Destination experiment name  [required]
   --delete-model BOOLEAN        If the model exists, first delete the model
                                 and all its versions.  [default: False]
+  --import-permissions BOOLEAN  Import Databricks permissions using the HTTP
+                                PATCH method.  [default: False]
   --import-source-tags BOOLEAN  Import source information for registered model
                                 and its versions ad tags in destination
                                 object.  [default: False]
   --await-creation-for INTEGER  Await creation for specified seconds.
-  --verbose BOOLEAN             Verbose.  [default: False]
 ```
 
 #### Example
@@ -420,6 +420,8 @@ Options:
   --output-dir TEXT               Output directory.  [required]
   --export-version-model BOOLEAN  Export registered model version's 'cached'
                                   MLflow model.  [default: False]
+  --export-permissions BOOLEAN    Export Databricks permissions.  [default:
+                                  False]
   --notebook-formats TEXT         Databricks notebook formats. Values are
                                   SOURCE, HTML, JUPYTER or DBC (comma
                                   separated).
@@ -453,15 +455,20 @@ Usage: import-model-version
   Imports a registered model version and its run.
 
 Options:
-  --input-dir TEXT              Input directory.  [required]
-  --model TEXT                  Registered model name.  [required]
-  --create-model BOOLEAN        Create registered model before creating model
-                                version.  [default: False]
-  --experiment-name TEXT        Destination experiment name for the version's
-                                run.  [required]
-  --import-source-tags BOOLEAN  Import source information for registered model
-                                and its versions and tags in destination
-                                object.  [default: False]
-  --import-metadata BOOLEAN     Import registered model and experiment
-                                metadata (description and tags).```
+  --model TEXT                    Registered model name.  [required]
+  --experiment-name TEXT          Destination experiment name for the
+                                  version's run.  [required]
+  --input-dir TEXT                Input directory.  [required]
+  --create-model BOOLEAN          Create registered model before creating
+                                  model version.  [default: False]
+  --import-permissions BOOLEAN    Import Databricks permissions using the HTTP
+                                  PATCH method.  [default: False]
+  --import-source-tags BOOLEAN    Import source information for registered
+                                  model and its versions and tags in
+                                  destination object.  [default: False]
+  --import-stages-and-aliases BOOLEAN
+                                  Import stages and aliases.  [default: False]
+  --import-metadata BOOLEAN       Import registered model and experiment
+                                  metadata (description and tags).  [default:
+                                  False]
 ```
