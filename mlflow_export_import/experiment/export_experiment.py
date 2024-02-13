@@ -15,7 +15,7 @@ from mlflow_export_import.common.click_options import (
 )
 from mlflow_export_import.common.iterators import SearchRunsIterator
 from mlflow_export_import.common import utils, io_utils, mlflow_utils
-from mlflow_export_import.common import permissions_utils
+from mlflow_export_import.common import ws_permissions_utils
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis, utc_str_to_millis
 from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client
 from mlflow_export_import.run.export_run import export_run
@@ -91,7 +91,7 @@ def export_experiment(
 
     mlflow_attr = { "experiment": exp_dct , "runs": ok_run_ids }
     if export_permissions:
-        mlflow_attr["permissions"] = permissions_utils.get_experiment_permissions(dbx_client, exp.experiment_id)
+        mlflow_attr["permissions"] = ws_permissions_utils.get_experiment_permissions(dbx_client, exp.experiment_id)
     io_utils.write_export_file(output_dir, "experiment.json", __file__, mlflow_attr, info_attr)
 
     msg = f"for experiment '{exp.name}' (ID: {exp.experiment_id})"

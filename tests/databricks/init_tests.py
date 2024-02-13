@@ -50,7 +50,7 @@ class Workspace():
 workspace_src =  Workspace(cfg.workspace_src)
 workspace_dst =  Workspace(cfg.workspace_dst)
 
-utils.is_importing_into_databricks = True
+utils.calling_databricks(workspace_src.dbx_client)
 
 
 def init_tests():

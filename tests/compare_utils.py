@@ -112,7 +112,7 @@ def compare_versions(mlflow_context, vr_src, vr_dst, compare_names=True, run_ids
     assert vr_src.status_message == vr_dst.status_message
     if compare_names and mlflow_context.client_src != mlflow_context.client_dst:
         assert vr_src.name == vr_dst.name
-    if not utils.importing_into_databricks():
+    if not utils.calling_databricks():
         assert vr_src.user_id == vr_dst.user_id
 
     src_tags = _strip_mlflow_export_import_tags(vr_src.tags)

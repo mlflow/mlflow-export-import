@@ -18,10 +18,10 @@ from mlflow_export_import.common.click_options import (
     opt_verbose
 )
 from mlflow_export_import.common import utils, io_utils, model_utils
+from mlflow_export_import.common import filesystem as _fs
 from mlflow_export_import.common.mlflow_utils import MlflowTrackingUriTweak
 from mlflow_export_import.common.source_tags import set_source_tags_for_field, fmt_timestamps
 from mlflow_export_import.common import MlflowExportImportException
-from mlflow_export_import.common.permissions_utils import import_permissions
 from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client
 from mlflow_export_import.run.import_run import import_run
 from mlflow_export_import.bulk import rename_utils
@@ -86,7 +86,6 @@ class BaseModelImporter():
         self.import_source_tags = import_source_tags
         self.await_creation_for = await_creation_for
 
-
     def _import_model(self,
             model_name,
             input_dir,
@@ -106,7 +105,7 @@ class BaseModelImporter():
         _logger.info(f"  Name: {model_dct['name']}")
         _logger.info(f"  Description: {model_dct.get('description','')}")
         _logger.info(f"  Tags: {model_dct.get('tags','')}")
-        _logger.info(f"  {len(model_dct['versions'])} versions")
+        _logger.info(f"  {len(model_dct.get('versions',[]))} versions")
         _logger.info(f"  path: {path}")
 
         if not model_name:
@@ -114,30 +113,19 @@ class BaseModelImporter():
         if delete_model:
             model_utils.delete_model(self.mlflow_client, model_name)
 
-        try:
-            tags = { e["key"]:e["value"] for e in model_dct.get("tags", {}) }
-            if self.import_source_tags:
-                _set_source_tags_for_field(model_dct, tags)
-            self.mlflow_client.create_registered_model(model_name, tags, model_dct.get("description"))
-            _logger.info(f"Created new registered model '{model_name}'")
-        except RestException as e:
-            if e.error_code != "RESOURCE_ALREADY_EXISTS":
-                raise e
-            _logger.info(f"Registered model '{model_name}' already exists")
-
-        if self.import_permissions:
-            perms_dct = model_dct["permissions"]
-            if perms_dct:
-                _model = self.dbx_client.get("mlflow/databricks/registered-models/get", { "name": model_name })
-                _model = _model["registered_model_databricks"]
-                model_id = _model["id"]
-                import_permissions(self.dbx_client, perms_dct, "model", model_name, model_id)
+        created_model = model_utils.create_model(self.mlflow_client, model_name, model_dct, True)
+        perms = model_dct.get("permissions")
+        if created_model and self.import_permissions and perms:
+            if model_utils.model_names_same_registry(model_dct["name"], model_name):
+                model_utils.update_model_permissions(self.mlflow_client, self.dbx_client, model_name, perms)
+            else:
+                _logger.warning(f'Cannot import permissions since models \'{model_dct["name"]}\' and \'{model_name}\' must be either both Unity Catalog model names or both Workspace model names.')
 
         return model_dct
 
 
 class ModelImporter(BaseModelImporter):
-    """ Low-level 'point' model importer.  """
+    """ Low-level 'single' model importer.  """
 
     def __init__(self,
             mlflow_client = None,
@@ -171,7 +159,7 @@ class ModelImporter(BaseModelImporter):
         """
         model_dct = self._import_model(model_name, input_dir, delete_model)
         _logger.info("Importing versions:")
-        for vr in model_dct["versions"]:
+        for vr in model_dct.get("versions",[]):
             try:
                 run_id = self._import_run(input_dir, experiment_name, vr)
                 if run_id:
@@ -179,6 +167,8 @@ class ModelImporter(BaseModelImporter):
             except RestException as e:
                 msg = { "model": model_name, "version": vr["version"], "src_run_id": vr["run_id"], "experiment": experiment_name, "RestException": str(e) }
                 _logger.error(f"Failed to import model version: {msg}")
+                import traceback
+                traceback.print_exc()
         if verbose:
             model_utils.dump_model_versions(self.mlflow_client, model_name)
 
@@ -188,10 +178,10 @@ class ModelImporter(BaseModelImporter):
         source = vr["source"]
         current_stage = vr["current_stage"]
         run_artifact_uri = vr.get("_run_artifact_uri",None)
-        run_dir = os.path.join(input_dir,run_id)
+        run_dir = _fs.mk_local_path(os.path.join(input_dir,run_id))
         if not os.path.exists(run_dir):
             msg = { "model": vr["name"], "version": vr["version"], "experiment": experiment_name, "run_id": run_id }
-            _logger.warning(f"Cannot import model version because its run does not exist: {msg}")
+            _logger.warning(f"Cannot import model version because its run folder '{run_dir}' does not exist: {msg}")
             return None
         _logger.info(f"  Version {vr['version']}:")
         _logger.info(f"    current_stage: {current_stage}:")
@@ -223,10 +213,10 @@ class ModelImporter(BaseModelImporter):
         model_path = _extract_model_path(src_vr["source"], src_vr["run_id"])
         dst_source = f"{dst_run.info.artifact_uri}/{model_path}"
         return _import_model_version(
-            mlflow_client = self.mlflow_client, 
-            model_name = model_name, 
-            src_vr = src_vr, 
-            dst_run_id = dst_run_id, 
+            mlflow_client = self.mlflow_client,
+            model_name = model_name,
+            src_vr = src_vr,
+            dst_run_id = dst_run_id,
             dst_source = dst_source,
             import_source_tags = self.import_source_tags
         )
@@ -282,7 +272,7 @@ class BulkModelImporter(BaseModelImporter):
                         mlflow.set_experiment(exp_name)
                     self.import_version(model_name, vr, dst_run_id)
                 except RestException as e:
-                    msg = { "model": model_name, "version": vr["version"], "experiment": exp_name, "run_id": dst_run_id, "exception": str(e) }
+                    msg = { "model": model_name, "version": vr.get("version",[]), "experiment": exp_name, "run_id": dst_run_id, "exception": str(e) }
                     _logger.error(f"Failed to import model version: {msg}")
         if verbose:
             model_utils.dump_model_versions(self.mlflow_client, model_name)
@@ -294,10 +284,10 @@ class BulkModelImporter(BaseModelImporter):
         dst_artifact_uri = self.run_info_map[src_run_id].artifact_uri
         dst_source = f"{dst_artifact_uri}/{model_path}"
         return _import_model_version(
-            mlflow_client = self.mlflow_client, 
-            model_name = model_name, 
-            src_vr = src_vr, 
-            dst_run_id = dst_run_id, 
+            mlflow_client = self.mlflow_client,
+            model_name = model_name,
+            src_vr = src_vr,
+            dst_run_id = dst_run_id,
             dst_source = dst_source,
             import_source_tags = self.import_source_tags
         )

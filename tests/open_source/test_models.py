@@ -1,6 +1,7 @@
 import os
 from mlflow_export_import.common.source_tags import ExportTags
 from mlflow_export_import.common import MlflowExportImportException
+from mlflow_export_import.common.model_utils import model_names_same_registry
 from mlflow_export_import.model.export_model import export_model
 from mlflow_export_import.model.import_model import import_model
 from mlflow_export_import.model.import_model import _extract_model_path, _path_join
@@ -214,6 +215,21 @@ def test_extract_no_run_id():
         assert False
     except MlflowExportImportException:
         pass
+
+
+# == Test that both model names are either UC model names or WS model names
+
+def test_both_model_names_are_uc():
+    assert model_names_same_registry("model1", "model2")
+
+def test_both_model_names_are_ws():
+    assert model_names_same_registry("andre.models.model1", "andre.models.model2")
+
+def test_both_model_names_are_not_same_1():
+    assert not model_names_same_registry("model1", "andre.models.model2")
+
+def test_both_model_names_are_not_same_2():
+    assert not model_names_same_registry("andre.models.model2", "model1")
 
 
 # == Test for DOS path adjustment

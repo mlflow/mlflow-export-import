@@ -4,12 +4,12 @@ import json
 import yaml
 
 from mlflow_export_import.common.timestamp_utils import ts_now_seconds, ts_now_fmt_utc
-from mlflow_export_import.common import filesystem as _filesystem
+from mlflow_export_import.common import filesystem as _fs
 from mlflow_export_import.common.source_tags import ExportFields
 from mlflow_export_import.common.pkg_version import get_version
 
 
-export_file_version = "2"   
+export_file_version = "2"
 
 
 def _mk_system_attr(script):
@@ -48,7 +48,7 @@ def write_export_file(dir, file, script, mlflow_attr, info_attr=None):
     """
     Write standard formatted JSON file.
     """
-    dir = _filesystem.mk_local_path(dir)
+    dir = _fs.mk_local_path(dir)
     path = os.path.join(dir, file)
     info_attr = { ExportFields.INFO: info_attr} if info_attr else {}
     mlflow_attr = { ExportFields.MLFLOW: mlflow_attr}
@@ -65,7 +65,7 @@ def write_file(path, content, file_type=None):
     """
     Write to JSON, YAML or text file.
     """
-    path = _filesystem.mk_local_path(path)
+    path = _fs.mk_local_path(path)
     if path.endswith(".json"):
         with open(path, "w", encoding="utf-8") as f:
             f.write(json.dumps(content, indent=2)+"\n")
@@ -81,7 +81,7 @@ def read_file(path, file_type=None):
     """
     Read a JSON, YAML or text file.
     """
-    with open(_filesystem.mk_local_path(path), "r", encoding="utf-8") as f:
+    with open(_fs.mk_local_path(path), "r", encoding="utf-8") as f:
         if path.endswith(".json"):
             return json.loads(f.read())
         elif _is_yaml(path, file_type):
@@ -100,7 +100,7 @@ def get_mlflow(export_dct):
 
 def read_file_mlflow(path):
     dct = read_file(path)
-    return dct[ExportFields.MLFLOW] 
+    return dct[ExportFields.MLFLOW]
 
 
 def mk_manifest_json_path(input_dir, filename):

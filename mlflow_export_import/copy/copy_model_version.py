@@ -10,12 +10,14 @@ from . click_options import (
     opt_src_registry_uri,
     opt_dst_registry_uri,
     opt_dst_experiment_name,
+    opt_copy_permissions,
     opt_copy_stages_and_aliases,
     opt_copy_lineage_tags
 )
 from mlflow_export_import.common.source_tags import ExportTags
 from mlflow_export_import.common.click_options import opt_verbose
 from mlflow_export_import.common import utils, model_utils, dump_utils
+from mlflow_export_import.common import ws_permissions_utils, uc_permissions_utils
 from mlflow_export_import.common.mlflow_utils import MlflowTrackingUriTweak
 
 _logger = utils.getLogger(__name__)
@@ -30,6 +32,7 @@ def copy(
         dst_tracking_uri = None,
         src_registry_uri = None,
         dst_registry_uri = None,
+        copy_permissions = False,
         copy_stages_and_aliases = False,
         copy_lineage_tags = False,
         verbose = False
@@ -49,6 +52,7 @@ def copy(
     :param dst_tracking_uri: Destination tracking URI.
     :param src_registry_uri: Source registry URI.
     :param dst_registry_uri: Destination registry URI.
+    :param copy_permissions: Copy permission.
     :param copy_stages_and_aliases: Copy stages and aliases. If turned on may have side effects on another version's stage or aliases.
     :param copy_lineage_tags: Copy source version's metadata information as tags starting with 'mlflow_exim'. See README_copy.md.
     :param verbose: Verbose.
@@ -63,7 +67,8 @@ def copy(
     if verbose:
         dump_utils.dump_mlflow_client(src_client, "SRC")
         dump_utils.dump_mlflow_client(dst_client, "DST")
-    copy_utils.create_registered_model(dst_client,  dst_model_name)
+    _create_registered_model(src_client, src_model_name, dst_client, dst_model_name, copy_permissions)
+
     src_version = src_client.get_model_version(src_model_name, src_model_version)
     if verbose:
         model_utils.dump_model_version(src_version, "Source Model Version")
@@ -71,9 +76,34 @@ def copy(
         copy_stages_and_aliases, copy_lineage_tags)
     if verbose:
         model_utils.dump_model_version(dst_version, "Destination Model Version")
+
     dst_uri = f"{dst_version.name}/{dst_version.version}"
     _logger.info(f"Copied model version '{src_uri}' to '{dst_uri}'")
     return src_version, dst_version
+
+
+def _create_registered_model(src_client, src_model_name, dst_client, dst_model_name, copy_permissions):
+    model_exists = copy_utils.create_registered_model(dst_client, dst_model_name)
+    if not utils.calling_databricks() or not copy_permissions:
+        return
+    if model_exists:
+        _logger.warning(f"Not copying permissions for model '{dst_model_name}' because model already exists")
+        return
+
+    src_is_uc = model_utils.is_unity_catalog_model(src_model_name)
+    dst_is_uc = model_utils.is_unity_catalog_model(dst_model_name)
+    if not ((dst_is_uc and dst_is_uc) or (not src_is_uc and not dst_is_uc)):
+        _logger.warning(f"Cannot copy permissions since both models have to be UC or WS")
+        return
+    _logger.info(f"Copying permissions for model '{dst_model_name}'")
+    if src_is_uc:
+        permissions = uc_permissions_utils.get_permissions(src_client, src_model_name)
+        uc_permissions_utils.update_permissions(dst_client, src_model_name, permissions)
+    else:
+        from mlflow_export_import.client.client_utils import create_dbx_client
+        permissions = ws_permissions_utils.get_model_permissions_by_name(src_client, src_model_name)
+        dbx_client = create_dbx_client(dst_client) # can move down into ws_permissions_utils.update_model_permissions
+        model_utils.update_model_permissions(dst_client, dbx_client, dst_model_name, permissions)
 
 
 def _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_client, dst_client, \
@@ -99,10 +129,10 @@ def _copy_model_version(src_version, dst_model_name, dst_experiment_name, src_cl
             description = src_version.description
         )
     if copy_stages_and_aliases:
-        if not model_utils.is_unity_catalog_model(dst_version.name) and not model_utils.is_unity_catalog_model(src_version.name):
+        if not model_utils.is_unity_catalog_model(dst_version.name) and \
+           not model_utils.is_unity_catalog_model(src_version.name):
             if src_version.current_stage != "None":
                 dst_client.transition_model_version_stage(dst_version.name, dst_version.version, src_version.current_stage)
-
         try:
             for alias in src_version.aliases:
                 dst_client.set_registered_model_alias(dst_version.name, alias, dst_version.version)
@@ -144,12 +174,15 @@ def _add_lineage_tags(src_version, run, dst_model_name, src_client, dst_client):
 @opt_src_registry_uri
 @opt_dst_registry_uri
 @opt_dst_experiment_name
+@opt_copy_permissions
 @opt_copy_stages_and_aliases
 @opt_copy_lineage_tags
 @opt_verbose
 
 def main(src_model, src_version, dst_model, src_registry_uri, dst_registry_uri, \
-        dst_experiment_name, copy_stages_and_aliases, copy_lineage_tags, verbose):
+        dst_experiment_name, copy_permissions, copy_stages_and_aliases, \
+        copy_lineage_tags, verbose
+    ):
     print("Options:")
     for k,v in locals().items():
         print(f"  {k}: {v}")
@@ -178,6 +211,7 @@ def main(src_model, src_version, dst_model, src_registry_uri, dst_registry_uri, 
         dst_tracking_uri,
         src_registry_uri,
         dst_registry_uri,
+        copy_permissions,
         copy_stages_and_aliases = copy_stages_and_aliases,
         copy_lineage_tags = copy_lineage_tags,
         verbose = verbose

@@ -14,7 +14,7 @@ def test_no_model():
     create_experiment(client)
     with mlflow.start_run() as run:
         mlflow.set_tag("name","foo")
-    model_paths = find_run_model_names(run.info.run_id)
+    model_paths = find_run_model_names(client, run.info.run_id)
     assert len(model_paths) == 0
 
 
@@ -24,7 +24,7 @@ def test_one_model_at_artifact_root():
     model = create_sklearn_model()
     with mlflow.start_run() as run:
         mlflow.sklearn.log_model(model, "")
-    model_paths = find_run_model_names(run.info.run_id)
+    model_paths = find_run_model_names(client, run.info.run_id)
     assert len(model_paths) == 1
     assert model_paths[0] == ""
 
@@ -34,7 +34,7 @@ def test_one_model():
     model = create_sklearn_model()
     with mlflow.start_run() as run:
         mlflow.sklearn.log_model(model, "model")
-    model_paths = find_run_model_names(run.info.run_id)
+    model_paths = find_run_model_names(client, run.info.run_id)
     assert len(model_paths) == 1
     assert model_paths[0] == "model"
 
@@ -45,7 +45,7 @@ def test_two_models():
     with mlflow.start_run() as run:
         mlflow.sklearn.log_model(model, "model")
         mlflow.sklearn.log_model(model, "model-onnx")
-    model_paths = find_run_model_names(run.info.run_id)
+    model_paths = find_run_model_names(client, run.info.run_id)
     assert len(model_paths) == 2
     assert model_paths[0] == "model"
     assert model_paths[1] == "model-onnx"
@@ -57,7 +57,7 @@ def test_two_models_nested():
     with mlflow.start_run() as run:
         mlflow.sklearn.log_model(model, "model")
         mlflow.sklearn.log_model(model, "other_models/model-onnx")
-    model_paths = find_run_model_names(run.info.run_id)
+    model_paths = find_run_model_names(client, run.info.run_id)
     assert len(model_paths) == 2
     assert model_paths[0] == "model"
     assert model_paths[1] == "other_models/model-onnx"

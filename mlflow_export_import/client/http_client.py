@@ -8,7 +8,7 @@ from . import USER_AGENT
 from . import mlflow_auth_utils
 from . import databricks_cli_utils
 
-_TIMEOUT = 15
+_TIMEOUT = 120 # per mlflow.MlflowClient
 
 
 class BaseHttpClient(metaclass=ABCMeta):

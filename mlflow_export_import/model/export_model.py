@@ -5,10 +5,9 @@ Exports a registered model, its versions and the version's run.
 import os
 import click
 from dataclasses import dataclass
-
 from mlflow.exceptions import RestException
 
-from mlflow_export_import.client.client_utils import create_mlflow_client, create_http_client, create_dbx_client
+from mlflow_export_import.client.client_utils import create_mlflow_client
 from mlflow_export_import.common.click_options import (
     opt_model,
     opt_output_dir,
@@ -20,10 +19,8 @@ from mlflow_export_import.common.click_options import (
     opt_export_permissions,
     opt_export_version_model
 )
-
 from mlflow_export_import.common import utils, io_utils, model_utils
-from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
-from mlflow_export_import.common import permissions_utils
+from mlflow_export_import.common.timestamp_utils import adjust_timestamps
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.run.export_run import export_run
 
@@ -67,8 +64,6 @@ def export_model(
     """
 
     mlflow_client = mlflow_client or create_mlflow_client()
-    http_client = create_http_client(mlflow_client, model_name)
-    dbx_client = create_dbx_client(mlflow_client)
 
     stages = _normalize_stages(stages)
     versions = versions if versions else []
@@ -79,7 +74,7 @@ def export_model(
     opts = Options(stages, versions, export_latest_versions, export_deleted_runs, export_version_model, export_permissions, notebook_formats)
 
     try:
-        _export_model(mlflow_client, http_client, dbx_client, model_name, output_dir, opts)
+        _export_model(mlflow_client, model_name, output_dir, opts)
         return True, model_name
     except RestException as e:
         err_msg = { "model": model_name, "RestException": e.json  }
@@ -97,26 +92,14 @@ def export_model(
         return False, model_name
 
 
-def _export_model(mlflow_client, http_client, dbx_client, model_name, output_dir, opts):
+def _export_model(mlflow_client, model_name, output_dir, opts):
     ori_versions = model_utils.list_model_versions(mlflow_client, model_name, opts.export_latest_versions)
     msg = "latest" if opts.export_latest_versions else "all"
     _logger.info(f"Exporting model '{model_name}': found {len(ori_versions)} '{msg}' versions")
 
-    if utils.importing_into_databricks() and opts.export_permissions:
-        _model = http_client.get("databricks/registered-models/get", { "name": model_name })
-        model = _model.pop("registered_model_databricks", None)
-        permissions = permissions_utils.get_model_permissions(dbx_client, model["id"])
-        _model["registered_model"] = model
-    else:
-        _model = http_client.get("registered-models/get", {"name": model_name})
-        model = _model["registered_model"]
-        permissions = None
-
+    model = model_utils.get_registered_model(mlflow_client, model_name, opts.export_permissions)
     versions, failed_versions = _export_versions(mlflow_client, model, ori_versions, output_dir, opts)
-
     _adjust_model(model, versions)
-    if permissions:
-        model["permissions"] = permissions
 
     info_attr = {
         "num_target_stages": len(opts.stages),
@@ -139,7 +122,7 @@ def _export_versions(mlflow_client, model_dct, versions, output_dir, opts):
 
     output_versions, failed_versions = ([], [])
     for j,vr in enumerate(versions):
-        if len(opts.stages) > 0 and not vr.current_stage.lower() in opts.stages:
+        if not model_utils.is_unity_catalog_model(model_dct["name"]) and vr.current_stage and (len(opts.stages) > 0 and not vr.current_stage.lower() in opts.stages):
             continue
         if len(opts.versions) > 0 and not vr.version in opts.versions:
             continue
@@ -199,7 +182,7 @@ def _adjust_model(model, versions):
     """
     1. Add human friendly timestamps to model and versions
     2. For aesthetic reasons reorder dict keys
-    3. Rename ModelVersion 'latest_versions' (if it exists) to 'versions' key
+    3. Rename ModelVersion 'latest_versions' key (if it exists) to 'versions'
     """
 
     def _reorder(model, key):
@@ -207,16 +190,7 @@ def _adjust_model(model, versions):
         if val:
             model[key] = val
 
-    def _adjust_timestamp(dct, key):
-        dct[f"_{key}"] = fmt_ts_millis(dct.get(key))
-
-    # add human friendly timestamps
-    def _adjust_timestamps(dct):
-        _adjust_timestamp(dct, "creation_timestamp")
-        _adjust_timestamp(dct, "last_updated_timestamp")
-
-    # add human friendly timestamps for model
-    _adjust_timestamps(model)
+    adjust_timestamps(model, ["creation_timestamp", "last_updated_timestamp"])
 
     # reorder tags and aliases keys
     _reorder(model, "tags")
@@ -228,7 +202,12 @@ def _adjust_model(model, versions):
 
     # add human friendly timestamps for versions
     for vr in versions:
-        _adjust_timestamps(vr)
+        adjust_timestamps(vr, ["creation_timestamp", "last_updated_timestamp"])
+
+    # add permissions to the end
+    permissions = model.pop("permissions", None)
+    if permissions:
+        model["permissions"] = permissions
 
 
 def _normalize_stages(stages):

@@ -15,7 +15,7 @@ from mlflow_export_import.common.click_options import (
 )
 from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client
 from mlflow_export_import.common import utils, mlflow_utils, io_utils
-from mlflow_export_import.common import permissions_utils
+from mlflow_export_import.common import ws_permissions_utils
 from mlflow_export_import.common.source_tags import (
     set_source_tags_for_field,
     mk_source_tags_mlflow_tag,
@@ -70,7 +70,7 @@ def import_experiment(
     if import_permissions:
         perms_dct = mlflow_dct.get("permissions", None)
         if perms_dct:
-            permissions_utils.import_permissions(dbx_client, perms_dct, "experiment", exp.name, exp.experiment_id)
+            ws_permissions_utils.update_permissions(dbx_client, perms_dct, "experiment", exp.name, exp.experiment_id)
 
     run_ids = mlflow_dct["runs"]
     failed_run_ids = info["failed_runs"]

@@ -131,18 +131,21 @@ If the source version alread has lineage tags (from a previous copying) these ta
 copy-model-version --help
 
 Options:
-  --src-model TEXT             Source registered model.  [required]
-  --src-version TEXT           Source model version.  [required]
-  --dst-model TEXT             Destination registered model.  [required]
-  --src-registry-uri TEXT      Source MLflow registry URI.  [required]
-  --dst-registry-uri TEXT      Destination MLflow registry URI.  [required]
-  --dst-experiment-name TEXT   Destination experiment name. If specified, will
-                               copy old version's run to a new run. Else, use
-                               old version's run for new version.
-  --copy-lineage-tags BOOLEAN  Add source lineage info to destination version
-                               as tags starting with 'mlflow_exim'.  [default:
-                               False]
-  --verbose BOOLEAN            Verbose.  [default: False]
+  --src-model TEXT                Source registered model.  [required]
+  --src-version TEXT              Source model version.  [required]
+  --dst-model TEXT                Destination registered model.  [required]
+  --src-registry-uri TEXT         Source MLflow registry URI.  [required]
+  --dst-registry-uri TEXT         Destination MLflow registry URI.  [required]
+  --dst-experiment-name TEXT      Destination experiment name. If specified,
+                                  will copy old version's run to a new run.
+                                  Else, use old version's run for new version.
+  --copy-permissions BOOLEAN      Copy model permissions (only if target model
+                                  does not exist).  [default: False]
+  --copy-stages-and-aliases BOOLEAN
+                                  Import stages and aliases.  [default: False]
+  --copy-lineage-tags BOOLEAN     Add source lineage info to destination
+                                  version as tags starting with 'mlflow_exim'.
+                                  [default: False]
 ```
 
 ## Copy Run

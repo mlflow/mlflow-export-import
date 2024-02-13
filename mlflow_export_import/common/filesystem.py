@@ -14,6 +14,10 @@ def mk_local_path(path):
     return path.replace("dbfs:","/dbfs")
 
 
+def exists(path):
+    os.path.exists(mk_local_path(path))
+
+
 class DatabricksFileSystem():
     def __init__(self):
         import IPython
@@ -33,7 +37,7 @@ class DatabricksFileSystem():
 
     def write(self, path, content):
         self.dbutils.fs.put(mk_dbfs_path(path), content, True)
-            
+
 
 class LocalFileSystem():
     def __init__(self):

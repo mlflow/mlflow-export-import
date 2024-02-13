@@ -7,11 +7,12 @@ import click
 
 from mlflow_export_import.client.client_utils import create_mlflow_client, create_http_client
 from mlflow_export_import.common import utils, io_utils, model_utils
-from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
+from mlflow_export_import.common.timestamp_utils import adjust_timestamps
 from mlflow_export_import.run.export_run import export_run
 from mlflow_export_import.common.click_options import (
     opt_model,
     opt_output_dir,
+    opt_export_permissions,
     opt_notebook_formats,
     opt_export_version_model
 )
@@ -25,6 +26,7 @@ def export_model_version(
         version,
         output_dir,
         export_version_model = False,
+        export_permissions = False,
         notebook_formats = None,
         mlflow_client = None
     ):
@@ -34,13 +36,13 @@ def export_model_version(
     :param model_name: Registered model name.
     :param version: Registered model version.
     :param output_dir: Export directory.
-    :param export_version_model: Export model version's 'cached" MLflow model clone..
+    :param export_version_model: Export model version's 'cached" MLflow model clone.
+    :param export_permissions: Export Databricks permissions.
     :param notebook_formats: List of Databricks notebook formats. Values are SOURCE, HTML, JUPYTER or DBC (comma separated)
     :param mlflow_client: MlflowClient (optional).
 
     :return: Returns model version object.
     """
-
     mlflow_client = mlflow_client or create_mlflow_client()
 
     _model = mlflow_client.get_registered_model(model_name)
@@ -61,15 +63,14 @@ def export_model_version(
         info_attr["export_version_model"] = True
 
     export_experiment(mlflow_client, run.info.experiment_id, output_dir)
-    _export_model(mlflow_client, model_name, output_dir)
+    _export_registered_model(mlflow_client, model_name, export_permissions, output_dir)
 
-    _adjust_timestamp(vr_dct, "creation_timestamp")
-    _adjust_timestamp(vr_dct, "last_updated_timestamp")
+    adjust_timestamps(vr_dct, ["creation_timestamp", "last_updated_timestamp"])
     mlflow_attr = { "model_version": vr_dct}
     msg = utils.get_obj_key_values(vr, [ "name", "version", "current_stage", "status", "run_id" ])
     _logger.info(f"Exporting model verson: {msg}")
 
-    io_utils.write_export_file(output_dir, "model_version.json", __file__, mlflow_attr, info_attr)
+    io_utils.write_export_file(output_dir, "version.json", __file__, mlflow_attr, info_attr)
     return vr
 
 
@@ -80,39 +81,21 @@ def export_experiment(mlflow_client, experiment_id, output_dir):
     msg = { "name": exp["name"], "experiment_id": exp["experiment_id"] }
     _logger.info(f"Exporting experiment: {msg}")
 
-    _adjust_timestamp(exp, "creation_time")
-    _adjust_timestamp(exp, "last_update_time")
+    adjust_timestamps(exp, ["creation_time", "last_update_time"])
     mlflow_attr = { "experiment": exp }
     io_utils.write_export_file(output_dir, "experiment.json", __file__, mlflow_attr, {})
 
 
-def _export_model(mlflow_client, model_name, output_dir):
-    http_client = create_http_client(mlflow_client, model_name)
-    model = http_client.get("registered-models/get", {"name": model_name})
-    model = model.pop("registered_model")
-    model.pop("latest_versions", None)
+def _export_registered_model(mlflow_client, model_name, export_permissions, output_dir):
+    model = model_utils.get_registered_model(mlflow_client, model_name, export_permissions)
+
     msg = {"name": model["name"] }
     _logger.info(f"Exporting registered model: {msg}")
 
-    _adjust_timestamp(model, "creation_timestamp")
-    _adjust_timestamp(model, "last_updated_timestamp")
+    adjust_timestamps(model, ["creation_timestamp", "last_updated_timestamp"])
 
-    mlflow_attr = { "model": model }
-    io_utils.write_export_file(output_dir, "registered_model.json", __file__, mlflow_attr, {})
-
-
-def _adjust_version(vr):
-    """
-    Add nicely formatted timestamps and for aesthetic reasons order the dict attributes
-    """
-    _adjust_timestamp(vr, "creation_timestamp")
-    _adjust_timestamp(vr, "last_updated_timestamp")
-    return vr
-
-
-def _adjust_timestamp(dct, key):
-    if key in dct:
-        dct[f"_{key}"] = fmt_ts_millis(dct.get(key))
+    mlflow_attr = { "registered_model": model }
+    io_utils.write_export_file(output_dir, "model.json", __file__, mlflow_attr, {})
 
 
 @click.command()
@@ -120,11 +103,13 @@ def _adjust_timestamp(dct, key):
 @opt_version
 @opt_output_dir
 @opt_export_version_model
+@opt_export_permissions
 @opt_notebook_formats
 def main(model,
         version,
         output_dir,
         export_version_model,
+        export_permissions,
         notebook_formats,
     ):
     """
@@ -138,6 +123,7 @@ def main(model,
         version = version,
         output_dir = output_dir,
         export_version_model = export_version_model,
+        export_permissions = export_permissions,
         notebook_formats = notebook_formats
     )
 

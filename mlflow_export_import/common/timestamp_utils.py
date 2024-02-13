@@ -38,3 +38,13 @@ def utc_str_to_seconds(sdt):
     dt = datetime.fromisoformat(sdt)
     seconds = (dt - datetime(1970, 1, 1)).total_seconds()
     return seconds
+
+
+def adjust_timestamps(dct, keys):
+    """ 
+    Add human readable keys for millisecond timestamps.
+    """
+    keys = set(keys)
+    for key in keys:
+        if key in dct:
+            dct[f"_{key}"] = fmt_ts_millis(dct[key])
