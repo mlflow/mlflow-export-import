@@ -51,15 +51,27 @@ def get_permissions(mlflow_client, model_name):
         return {}
 
 
-def update_permissions(mlflow_client, model_name, perms):
+def update_permissions(mlflow_client, model_name, perms, unroll_changes=True):
     uc_client = UcPermissionsClient(mlflow_client)
+    changes = _mk_update_changes(perms)
+    if unroll_changes: # NOTE: in order to prevent batch update to fail because one individual update failed
+        unrolled_changes = _mk_unrolled_changes(changes)
+        for _changes in unrolled_changes:
+            _update_changes(uc_client, model_name, _changes)
+    else:
+        _update_changes(uc_client, model_name, changes)
+
+def _update_changes(uc_client, model_name, changes):
     try:
-        return uc_client.update_permissions(model_name, _mk_update_changes(perms))
+        return uc_client.update_permissions(model_name, changes)
     except MlflowExportImportException as e:
         _logger.error(f"Cannot update permissions for model '{model_name}'. {e.kwargs}")
         return {}
 
 def _mk_update_changes(perms):
+    """
+    Transform permissions GET response to PATCH request JSON format
+    """
     def _mk_change(assg):
         privileges = [ pr.get("privilege") for pr in assg.get("privileges") ]
         return { "principal" : assg.get("principal"), "add": privileges }
@@ -67,3 +79,6 @@ def _mk_update_changes(perms):
     privilege_assignments = effective_perms.get("privilege_assignments", [])
     changes = [ _mk_change(assg) for assg in privilege_assignments ]
     return { "changes": changes }
+
+def _mk_unrolled_changes(changes):
+    return [ { "changes":[ch] } for ch in changes["changes"] ]
