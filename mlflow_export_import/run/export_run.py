@@ -43,6 +43,7 @@ def export_run(
     :param mlflow_client: MLflow client.
     :return: Run or None if the run was not exported due to export_deleted_runs or errors.
     """
+    from Configs import Config
 
     mlflow_client = mlflow_client or create_mlflow_client()
     dbx_client = create_dbx_client(mlflow_client)
@@ -76,13 +77,16 @@ def export_run(
 
         # copy artifacts
         dst_path = os.path.join(output_dir, "artifacts")
-        artifacts = mlflow_client.list_artifacts(run.info.run_id)
-        if len(artifacts) > 0: # Because of https://github.com/mlflow/mlflow/issues/2839
-            fs.mkdirs(dst_path)
-            mlflow.artifacts.download_artifacts(
-               run_id = run.info.run_id,
-               dst_path = _fs.mk_local_path(dst_path),
-               tracking_uri = mlflow_client._tracking_client.tracking_uri)
+        if Config.SKIP_EXPORT_IF_EXISTS and os.path.exists(dst_path):
+            _logger.warning(f"Artifacts of {run.info.run_id} has been exported to {dst_path}.");
+        else:
+            artifacts = mlflow_client.list_artifacts(run.info.run_id)
+            if len(artifacts) > 0: # Because of https://github.com/mlflow/mlflow/issues/2839
+                fs.mkdirs(dst_path)
+                mlflow.artifacts.download_artifacts(
+                   run_id = run.info.run_id,
+                   dst_path = _fs.mk_local_path(dst_path),
+                   tracking_uri = mlflow_client._tracking_client.tracking_uri)
         notebook = tags.get(MLFLOW_DATABRICKS_NOTEBOOK_PATH)
 
         # export notebook as artifact

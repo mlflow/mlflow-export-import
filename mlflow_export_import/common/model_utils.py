@@ -63,20 +63,44 @@ def delete_model(client, model_name, sleep_time=5):
     except RestException:
         pass
 
+def filter_versions(versions):
+  from datetime import datetime
+  from Configs import Config
+
+  cut_off_start_time = datetime.strptime(Config.EXPORT_START_DATE, '%Y-%m-%d')
+  cut_off_end_time = datetime.strptime(Config.EXPORT_END_DATE, '%Y-%m-%d')
+  filtered_versions = [];
+  for vr in versions:
+    if vr.status !='READY':
+      continue;
+    
+    dt = datetime.fromtimestamp(vr.creation_timestamp / 1000);
+    if dt >= cut_off_start_time and dt < cut_off_end_time:
+      filtered_versions.append(vr);
+
+  return filtered_versions;
 
 def list_model_versions(client, model_name, get_latest_versions=False):
     """
     List 'all' or the 'latest' versions of registered model.
     """
+    from Configs import Config
+
+    versions = [];
     if is_unity_catalog_model(model_name):
         versions = SearchModelVersionsIterator(client, filter=f"name='{model_name}'")
         # JIRA: ES-834105 - UC-ML MLflow search_registered_models and search_model_versions do not return tags and aliases - 2023-08-21
-        return [ client.get_model_version(vr.name, vr.version) for vr in versions ]
+        versions = [ client.get_model_version(vr.name, vr.version) for vr in versions ]
     else:
         if get_latest_versions:
-            return client.get_latest_versions(model_name)
+            versions = client.get_latest_versions(model_name)
         else:
-            return list(SearchModelVersionsIterator(client, filter=f"name='{model_name}'"))
+            versions = list(SearchModelVersionsIterator(client, filter=f"name='{model_name}'"))
+    
+    if Config.APPLY_EXPORT_FILTER:
+        filtered_versions = filter_versions(versions)
+        return filtered_versions
+    else: return versions
 
 
 def search_model_versions(client, filter):
@@ -89,7 +113,6 @@ def search_model_versions(client, filter):
     versions = client.search_model_versions(filter)
     return [ client.get_model_version(vr.name, vr.version) for vr in versions ]
 
-
 def export_version_model(client, version, output_dir):
     """
     Exports the model version's "cached" MLflow model.
@@ -98,13 +121,20 @@ def export_version_model(client, version, output_dir):
     :param output_dir: Output directory.
     :return: Result of MlflowClient.get_model_version_download_uri().
     """
+    import os
+    from Configs import Config
+
     download_uri = client.get_model_version_download_uri(version.name, version.version)
-    _logger.info(f"Exporting model version 'cached model' to: '{output_dir}'")
-    mlflow.artifacts.download_artifacts(
-        artifact_uri = download_uri,
-        dst_path = _filesystem.mk_local_path(output_dir),
-        tracking_uri = client._tracking_client.tracking_uri
-    )
+    
+    if Config.SKIP_EXPORT_IF_EXISTS and os.path.exists(output_dir):
+        _logger.info(f"Exporting model version 'cached model' to: '{output_dir}'; Exists, SKIPPED.")
+    else:
+        _logger.info(f"Exporting model version 'cached model' to: '{output_dir}'")
+        mlflow.artifacts.download_artifacts(
+            artifact_uri = download_uri,
+            dst_path = _filesystem.mk_local_path(output_dir),
+            tracking_uri = client._tracking_client.tracking_uri
+        )
     return download_uri
 
 
