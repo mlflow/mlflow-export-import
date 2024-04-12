@@ -67,7 +67,3 @@ import_models(
     import_source_tags = import_source_tags,
     use_threads = use_threads
 )
-
-# COMMAND ----------
-
-

@@ -1,5 +1,7 @@
 # Databricks notebook source
-# MAGIC %pip install git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
+# MAGIC %pip install -U mlflow-skinny
+# MAGIC %pip install -U git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
+# MAGIC dbutils.library.restartPython()
 
 # COMMAND ----------
 
