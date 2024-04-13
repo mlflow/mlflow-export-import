@@ -57,8 +57,11 @@ def create_version(client, model_name, stage=None, archive_existing_versions=Fal
     tags = { "city": "copan" }
     model = _create_registered_model(client, model_name, tags, desc)
     tags = { "city": "yaxchilan", "uuid": utils_test.mk_uuid() }
-    vr = client.create_model_version(model_name, source, run.info.run_id, description="my version", tags=tags)
-    if is_unity_catalog_model(model_name): # Aliases are disabled for Non-UC Databricks MLflow :(
+
+    with MlflowTrackingUriTweak(client): # needed since client.registry_uri is ignored :(
+        vr = client.create_model_version(model_name, source, run.info.run_id, description="my version", tags=tags)
+
+    if is_unity_catalog_model(model_name): # Aliases are disabled for Non-UC Databricks MLflow
         alias = f"alias_{utils_test.mk_uuid()}"
         client.set_registered_model_alias(model_name, alias, vr.version)
     else:
