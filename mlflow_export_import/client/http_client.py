@@ -100,7 +100,7 @@ class HttpClient(BaseHttpClient):
 
     def _get(self, resource, params=None):
         uri = self._mk_uri(resource)
-        rsp = requests.get(uri, headers=self._mk_headers(), json=params, timeout=_TIMEOUT)
+        rsp = requests.get(uri, headers=self._mk_headers(), data=params, timeout=_TIMEOUT)
         return self._check_response(rsp, params)
 
     def get(self, resource, params=None):
@@ -108,7 +108,7 @@ class HttpClient(BaseHttpClient):
         :param resource: Relative path name of resource such as experiments/search
         :param params: Dict of query parameters
         """
-        return json.loads(self._get(resource, params).text)
+        return json.loads(self._get(resource, self._json_dumps(params)).text)
 
 
     def _post(self, resource, data=None):
@@ -156,17 +156,18 @@ class HttpClient(BaseHttpClient):
         return json.loads(self._delete(resource).text)
 
 
+    def _mutator(self, method, resource, data=None):
+        uri = self._mk_uri(resource)
+        rsp = method(uri, headers=self._mk_headers(), data=data, timeout=_TIMEOUT)
+        return self._check_response(rsp)
+
+
     def get_api_uri(self):
         return self.api_uri
 
     def get_token(self):
         return self.token
 
-
-    def _mutator(self, method, resource, data=None):
-        uri = self._mk_uri(resource)
-        rsp = method(uri, headers=self._mk_headers(), data=data, timeout=_TIMEOUT)
-        return self._check_response(rsp)
 
     def _json_dumps(self, data):
         return json.dumps(data) if data else None
@@ -191,6 +192,7 @@ class HttpClient(BaseHttpClient):
             msg = { "http_status_code": rsp.status_code, "uri": rsp.url, "params": params, "response": rsp.text }
             raise MlflowExportImportException(json.dumps(msg), http_status_code = rsp.status_code)
         return rsp
+
 
     def __repr__(self):
         return self.api_uri
