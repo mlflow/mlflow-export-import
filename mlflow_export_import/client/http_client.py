@@ -103,12 +103,14 @@ class HttpClient(BaseHttpClient):
         rsp = requests.get(uri, headers=self._mk_headers(), data=params, timeout=_TIMEOUT)
         return self._check_response(rsp, params)
 
+
     def get(self, resource, params=None):
         """ Executes an HTTP GET call
         :param resource: Relative path name of resource such as experiments/search
         :param params: Dict of query parameters
         """
-        return json.loads(self._get(resource, self._json_dumps(params)).text)
+        rsp = self._get(resource, self._json_dumps(params))
+        return self._json_loads(rsp, params)
 
 
     def _post(self, resource, data=None):
@@ -119,7 +121,8 @@ class HttpClient(BaseHttpClient):
         :param resource: Relative path name of resource such as runs/search
         :param data: Request payload as dict
         """
-        return json.loads(self._post(resource, self._json_dumps(data)).text)
+        rsp = self._post(resource, self._json_dumps(data))
+        return self._json_loads(rsp, data)
 
 
     def _put(self, resource, data=None):
@@ -130,7 +133,8 @@ class HttpClient(BaseHttpClient):
         :param resource: Relative path name of resource
         :param data: Request payload as dict
         """
-        return json.loads(self._put(resource, self._json_dumps(data)).text)
+        rsp = self._put(resource, self._json_dumps(data))
+        return self._json_loads(rsp, data)
 
 
     def _patch(self, resource, data=None):
@@ -141,7 +145,8 @@ class HttpClient(BaseHttpClient):
         :param resource: Relative path name of resource
         :param data: Request payload as dict
         """
-        return json.loads(self._patch(resource, self._json_dumps(data)).text)
+        rsp = self._patch(resource, self._json_dumps(data))
+        return self._json_loads(rsp, data)
 
 
     def _delete(self, resource):
@@ -193,6 +198,21 @@ class HttpClient(BaseHttpClient):
             raise MlflowExportImportException(json.dumps(msg), http_status_code = rsp.status_code)
         return rsp
 
+    def _json_loads(self, rsp, params):
+        json_str = rsp.text
+        try:
+            return json.loads(json_str)
+        except json.decoder.JSONDecodeError as e:
+            import traceback
+            traceback.print_exc()
+            msg = {
+                "uri": rsp.url,
+                "method": rsp.request.method,
+                "params": params,
+                "exception": str(e),
+                "response": json_str
+            }
+            raise MlflowExportImportException(msg, http_status_code=rsp.status_code)
 
     def __repr__(self):
         return self.api_uri
@@ -337,10 +357,9 @@ def main(api, resource, method, params, data, output_file):
 
     client = DatabricksHttpClient() if api == "databricks" else MlflowHttpClient()
     method = method.upper()
+
     if "GET" == method:
-        if params:
-            params = json.loads(params)
-        rsp = client._get(resource, params)
+        rsp = client._get(resource, _get_params(params))
         _write_output(rsp, output_file)
     elif "POST" == method:
         rsp = client._post(resource, _get_params(data))
