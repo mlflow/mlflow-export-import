@@ -29,7 +29,8 @@ def _find_artifacts(mlflow_client, run_id, path, target, max_level, level, match
         filename = os.path.basename(art.path)
         if filename == target:
             matches.append(art.path)
-        if art.is_dir:
+        # NOTE: as of mlflow 2.11.x a new directory 'metadata' is appeared with duplicate MLmodel and friend files in.
+        if art.is_dir and filename != "metadata":
             _find_artifacts(mlflow_client, run_id, art.path, target, max_level, level+1, matches)
     return matches
 
