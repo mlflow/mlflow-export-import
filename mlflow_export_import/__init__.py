@@ -8,11 +8,12 @@ __version__ = version.__version__
 # monkey patch mlflow.tracking.MlflowClient to return tracking URI in __repr__
 
 def add_repr_to_MlflowClient():
-    def custom_repr(self): 
+    def custom_repr(self):
         try:
-            return f'{{ "tracking_uri": "{self._tracking_client.tracking_uri}" }}'
-        except AttributeError:
-            return '{{ "tracking_uri": "?" }}'
+            msg = { "tracking_uri": self.tracking_uri, "registry_uri": self._registry_uri }
+        except AttributeError as e:
+            msg = { "error": str(e) }
+        return json.dumps(msg)
     mlflow.client.MlflowClient.__repr__ = custom_repr
 
 
