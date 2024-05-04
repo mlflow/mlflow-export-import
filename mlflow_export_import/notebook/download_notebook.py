@@ -1,8 +1,9 @@
-""" 
+"""
 Downloads a Databricks notebook with optional revision.
 """
 
 import os
+import json
 import click
 
 from mlflow_export_import.common.click_options import opt_output_dir
@@ -21,8 +22,8 @@ def download_notebook(output_dir, notebook_workspace_path, revision_id, notebook
 
 
 def _download_notebook(notebook_workspace_path, output_dir, format, extension, revision_id, dbx_client):
-    params = { 
-        "path": notebook_workspace_path, 
+    params = {
+        "path": notebook_workspace_path,
         "direct_download": True,
         "format": format
     }
@@ -30,7 +31,7 @@ def _download_notebook(notebook_workspace_path, output_dir, format, extension, r
         params ["revision"] = { "revision_timestamp": revision_id } # NOTE: not publicly documented
     notebook_name = os.path.basename(notebook_workspace_path)
     try:
-        rsp = dbx_client._get("workspace/export", params)
+        rsp = dbx_client._get("workspace/export", json.dumps(params))
         notebook_path = os.path.join(output_dir, f"{notebook_name}.{extension}")
         io_utils.write_file(notebook_path, rsp.content)
     except MlflowExportImportException as e:
