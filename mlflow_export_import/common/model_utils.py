@@ -98,12 +98,11 @@ def export_version_model(client, version, output_dir):
     :param output_dir: Output directory.
     :return: Result of MlflowClient.get_model_version_download_uri().
     """
-    download_uri = client.get_model_version_download_uri(version.name, version.version)
+    download_uri = f"models:/{version.name}/{version.version}"
     _logger.info(f"Exporting model version 'cached model' to: '{output_dir}'")
-    mlflow.artifacts.download_artifacts(
+    local_dir = mlflow.artifacts.download_artifacts(
         artifact_uri = download_uri,
-        dst_path = _filesystem.mk_local_path(output_dir),
-        tracking_uri = client._tracking_client.tracking_uri
+        dst_path = _filesystem.mk_local_path(output_dir)
     )
     return download_uri
 
