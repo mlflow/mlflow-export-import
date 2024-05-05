@@ -1,4 +1,3 @@
-import os
 import mlflow
 from . http_client import HttpClient, MlflowHttpClient, DatabricksHttpClient
 
@@ -28,16 +27,10 @@ def create_mlflow_client():
     """
     Create MLflowClient. If MLFLOW_TRACKING_URI is UC, then set MlflowClient.tracking_uri to the non-UC variant.
     """
-    tracking_uri = os.environ.get("MLFLOW_TRACKING_URI")
-    if tracking_uri:
-        nonuc_tracking_uri = tracking_uri.replace("databricks-uc","databricks")
-        return mlflow.MlflowClient(nonuc_tracking_uri, tracking_uri)
+    registry_uri = mlflow.get_registry_uri()
+    if registry_uri:
+        tracking_uri = mlflow.get_tracking_uri()
+        nonuc_tracking_uri = tracking_uri.replace("databricks-uc","databricks") # NOTE: legacy
+        return mlflow.MlflowClient(nonuc_tracking_uri, registry_uri)
     else:
         return mlflow.MlflowClient()
-
-
-def is_unity_catalog():
-    UC_VALUE = "databricks-uc"
-    env_var = os.environ.get("MLFLOW_REGISTRY_URI")
-    api_val = mlflow.get_registry_uri()
-    return (env_var and env_var.startswith(UC_VALUE)) or (api_val and api_val.startswith(UC_VALUE))
