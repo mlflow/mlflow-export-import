@@ -28,6 +28,8 @@ def set_experiment(mlflow_client, dbx_client, exp_name, tags=None):
     :return: Experiment
     """
     if utils.calling_databricks():
+        if not exp_name.startswith("/"):
+            raise MlflowExportImportException(f"Cannot create experiment '{exp_name}'. Databricks experiment must start with '/'.")
         create_workspace_dir(dbx_client, os.path.dirname(exp_name))
     try:
         if not tags: tags = {}
@@ -83,6 +85,8 @@ def create_workspace_dir(dbx_client, workspace_dir):
     Create Databricks workspace directory.
     """
     _logger.info(f"Creating Databricks workspace directory '{workspace_dir}'")
+    if not workspace_dir.startswith("/"):
+        raise MlflowExportImportException(f"Cannot create workspace directory '{workspace_dir}'. Databricks directory must start with '/'.")
     dbx_client.post("workspace/mkdirs", { "path": workspace_dir })
 
 
