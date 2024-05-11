@@ -11,7 +11,7 @@
 # MAGIC
 # MAGIC ##### Create Model Version Notebooks
 # MAGIC * [Create_Model_Version]($Create_Model_Version) - notebook
-# MAGIC   * Creates a model version from an MLflow model URI in the current or in another model registry.
+# MAGIC   * Creates a model version from an MLflow model "source" URI in the current or in another model registry.
 # MAGIC * Supported sources:
 # MAGIC   * MLflow Registry: `models:/my_catalog.my_schema.my_model/1` 
 # MAGIC   * MLflow Run: `runs:/319a3eec9fb444d4a70996091b31a940/model` 
@@ -20,5 +20,4 @@
 # MAGIC   * Local: `/root/sample_model`
 # MAGIC   * Cloud: `s3:/my-bucket/mlflow-models/sklearn-wine_best`
 # MAGIC
-# MAGIC
-# MAGIC ##### Last updated: _2024-05-09_
+# MAGIC ##### Last updated: _2024-05-11_

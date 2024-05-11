@@ -2,7 +2,7 @@
 # MAGIC %md ### Create a Model Version from different sources
 # MAGIC
 # MAGIC #### Overview
-# MAGIC * Creates a model version from an MLflow model URI in the current or in another model registry.
+# MAGIC * Creates a model version from an MLflow "source" model URI in the current or in another model registry.
 # MAGIC * Works either for a Unity Catalog model registry or Workspace model registry. 
 # MAGIC * Will create the target registered model if it doesn't exist.
 # MAGIC * If source URI is a 'models' URI, will not copy model version metadata - just copies the MLflow model from the model registry.
@@ -11,14 +11,16 @@
 # MAGIC
 # MAGIC ###### `1. Source Model URI`
 # MAGIC
-# MAGIC Source MLflow model URI. Required. Examples:
-# MAGIC   * Registry: `models:/my_catalog.my_schema.my_model/1` 
+# MAGIC Source URIs that point to an MLflow model. Required. 
+# MAGIC
+# MAGIC Examples:
+# MAGIC   * Registry: `models:/my_catalog.my_schema.my_model/13` 
 # MAGIC   * Run: `runs:/319a3eec9fb444d4a70996091b31a940/model` 
 # MAGIC   * Volume: `/Volumes/andre_catalog/volumes/mlflow_export_import/single/sklearn_wine_best/run/artifacts/model`
 # MAGIC   * DBFS: `/dbfs/home/andre@databricks.com/mlflow_export_import/single/sklearn_wine_best/model`
 # MAGIC   * Local (driver disk): `/root/sklearn_wine_best`
 # MAGIC   * Cloud s3: `s3:/my-bucket/mlflow-models/sklearn-wine_best`
-# MAGIC     * You will need to set up your cloud credentials, i.e.. IAM role or `AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY` environment variables.
+# MAGIC     * You will need to set up your cloud credentials, i.e. IAM role or `AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY` environment variables.
 # MAGIC
 # MAGIC ###### `2. Destination Model`
 # MAGIC
@@ -51,7 +53,8 @@
 # COMMAND ----------
 
 import mlflow
-mlflow.__version__, mlflow.get_registry_uri()
+print("mlflow.version:", mlflow.__version__)
+print("mlflow.get_registry_uri:", mlflow.get_registry_uri())
 
 # COMMAND ----------
 
@@ -64,9 +67,14 @@ dst_model_name = dbutils.widgets.get("2. Destination Model")
 dbutils.widgets.text("3. Destination Registry URI", "databricks-uc") 
 dst_registry_uri = dbutils.widgets.get("3. Destination Registry URI")
 
+dbutils.widgets.text("4. Description", "") 
+description = dbutils.widgets.get("4. Description")
+description = description or None
+
 print("src_model_uri:   ", src_model_uri)
 print("dst_model_name:  ", dst_model_name)
 print("dst_registry_uri:", dst_registry_uri)
+print("description:", description)
 
 # COMMAND ----------
 
@@ -101,7 +109,9 @@ except Exception as e:
 
 # COMMAND ----------
 
-vr = dst_client.create_model_version(dst_model_name, src_model_uri)
-
+vr = dst_client.create_model_version(dst_model_name, src_model_uri, description=description)
 print(vr)
+
+# COMMAND ----------
+
 print("Version:", vr.version)
