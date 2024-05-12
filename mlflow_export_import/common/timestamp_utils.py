@@ -41,10 +41,25 @@ def utc_str_to_seconds(sdt):
 
 
 def adjust_timestamps(dct, keys):
-    """ 
+    """
     Add human readable keys for millisecond timestamps.
     """
     keys = set(keys)
     for key in keys:
         if key in dct:
             dct[f"_{key}"] = fmt_ts_millis(dct[key])
+
+
+def format_seconds(seconds):
+    """
+    Format second duration h/m/s format, e.g. '6m 40s' or '40s'.
+    """
+    minutes, seconds = divmod(seconds, 60)
+    minutes = round(minutes)
+    if minutes:
+        seconds = round(seconds)
+        return f"{minutes}m {seconds}s"
+    else:
+        prec = 2 if seconds < .1 else 1
+        seconds = round(seconds,prec)
+        return f"{seconds}s"

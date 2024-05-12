@@ -7,7 +7,7 @@ For more details:
 * [JSON export file format](README_export_format.md).
 * [MLflow Object Relationships](https://github.com/amesar/mlflow-resources/blob/master/slides/Databricks_MLflow_Object_Relationships.pdf) slide deck.
 
-Last updated: _2023-12-10_.
+Last updated: _2024-05-10_
 
 ## High Level Architecture
 
@@ -23,7 +23,7 @@ Last updated: _2023-12-10_.
     * For example, copy an experiment from one user to another.
   * Backup your MLflow objects to external storage so they can be restored if needed.
   * Disaster recovery. Save your MLflow objects to external storage so they can be replicated to another tracking server.
-  * Supports new Databricks Unity Catalog models.
+  * Supports registered models in both the Databricks Workspace Model Registry and Unity Catalog Model Registry.
 
 ### MLflow Export Import scenarios
 
@@ -71,7 +71,7 @@ Full object referential integrity is maintained (e.g. an imported registered mod
 simply invoke the corresponding Python classes.
 
 Copy tools simply invoke the appropriate export and import on a temporary directory.
-## New Copy Tools
+## Copy Tools
 
 See [README_copy](README_copy.md) on how to copy model versions or runs.
 
@@ -83,10 +83,7 @@ See [README_limitations.md](README_limitations.md).
 ## Quick Start
 
 #### Setup
-```
-pip install mlflow-export-import
-```
-or the latest - _recommended_
+
 ```
 pip install git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
 ```
@@ -111,7 +108,7 @@ import-experiment \
 
 ## Setup
 
-Supports python 3.8.
+Supports python 3.8 and above.
 
 
 ### Local setup
@@ -124,21 +121,16 @@ source mlflow-export-import/bin/activate
 
 There are several different ways to install the package.
 
-#### 1. Install from PyPI 
+
+#### 1. Install from github
+
+Recommended.
 
 ```
 pip install git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
 ```
 
-#### 2. Install from github directly
-
-Due to the fast pace of Mlflow Export Important development, it is recommended that you install from github for the latest bug fixes.
-
-```
-pip install git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
-```
-
-#### 3. Install from specific commit
+#### 3. Install from a specific commit
 
 ```
 pip install git+https:///github.com/mlflow/mlflow-export-import@a334f8003a3c9c3b9cd0173827be692a39355fd8
@@ -151,9 +143,13 @@ cd mlflow-export-import
 pip install -e .
 ```
 
+#### 5. Install from PyPI 
+
+Legacy. Due to the quick turnaround time for bug ad feature fixes, this is deprecated.
+
 ### Databricks notebook setup
 
-Make sure your cluster has MLflow 2.2.1 (Databricks Runtime ML version 13.0) or later installed.
+Make sure your cluster has the latest MLflow and Databricks Runtime ML version installed.
 
 There are two different ways to install the mlflow-export-import package in a Databricks notebook.
 
@@ -202,17 +198,17 @@ export DATABRICKS_TOKEN=MY_TOKEN
 See the Databricks documentation page `Access the MLflow tracking server from outside Databricks` - [AWS](https://docs.databricks.com/applications/mlflow/access-hosted-tracking-server.html) or [Azure](https://docs.microsoft.com/en-us/azure/databricks/applications/mlflow/access-hosted-tracking-server).
 
 
-## Running tools
+## Running mlflow-export-import tools
 
 The main tool scripts can be executed either as a standard Python script or console script.
 
-Python [console scripts](https://python-packaging.readthedocs.io/en/latest/command-line-scripts.html#the-console-scripts-entry-point)  (such as export-run, import-run, etc.) are provided as a convenience. For a list of scripts see [setup.py](setup.py).
+Python [console scripts](https://python-packaging.readthedocs.io/en/latest/command-line-scripts.html#the-console-scripts-entry-point) are provided as a convenience. For a list of scripts see [setup.py](setup.py).
 
-This allows you to use:
+For example:
 ```
 export-experiment --help
 ```
-instead of:
+or:
 ```
 python -u -m mlflow_export_import.experiment.export_experiment --help
 ```
@@ -242,12 +238,15 @@ export MLFLOW_EXPORT_IMPORT_LOG_OUTPUT_FILE=/dbfs/mlflow_export_import/logs/expo
 export MLFLOW_EXPORT_IMPORT_LOG_FORMAT="%(asctime)s-%(levelname)s - %(message)s"
 ```
 
-Multithreading:
+## Multithreading:
 
 If you use the `use-threads` option on exports, you can use the `threadName` format option:
 ```
 export MLFLOW_EXPORT_IMPORT_LOG_FORMAT="%(threadName)s-%(levelname)s-%(message)s"
 ```
+
+Note that multithreading is experimental.
+Logging is currently not fully satisfactory as it is interspersed between threads.
 
 ## Other
 
