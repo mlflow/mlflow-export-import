@@ -59,6 +59,9 @@ setup(
             "download-notebook = mlflow_export_import.notebook.download_notebook:main",
             "copy-model-version = mlflow_export_import.copy.copy_model_version:main",
             "copy-run = mlflow_export_import.copy.copy_run:main",
+            "get-model-signature = mlflow_export_import.tools.get_model_signature:main",
+            "set-model-signature = mlflow_export_import.tools.set_model_signature:main",
+            "list-model-versions-without-signatures = mlflow_export_import.tools.list_model_versions_without_signatures:main",
             "http-client = mlflow_export_import.client.http_client:main"
          ]
       }
