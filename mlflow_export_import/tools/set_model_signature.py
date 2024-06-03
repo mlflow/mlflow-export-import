@@ -57,6 +57,8 @@ Per MLflow documentation 'models:/' scheme is not supported.
 def main(model_uri, input_file, output_file, overwrite_signature):
     """
     Set the signature of an MLflow model.
+    'models:/' scheme URIs are not accepted.
+    For OSS MLflow, if you add a model signature to a run, it will automatically update any model version that was created from the run.
     """
     print("Options:")
     for k,v in locals().items():

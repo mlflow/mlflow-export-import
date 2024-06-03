@@ -6,18 +6,19 @@ import click
 import pandas as pd
 from tabulate import tabulate
 import mlflow
+
 from . click_options import opt_filter, opt_output_file
 from . tools_utils import search_model_versions
 
-client = mlflow.MlflowClient()
 
 def as_pandas_df(filter):
+    client = mlflow.MlflowClient()
     versions = search_model_versions(client, filter)
 
     print(f"Found {len(versions)} model versions")
     versions_without_signatures = []
     for j, vr in enumerate(versions):
-        model_uri = f'models:/{vr.name}/{vr.version}'
+        model_uri = f"models:/{vr.name}/{vr.version}"
         if j%10 == 0:
             print(f"{j}/{len(versions)}: {model_uri}")
         try:
@@ -28,7 +29,7 @@ def as_pandas_df(filter):
             versions_without_signatures.append([vr.name, vr.version, vr.run_id, str(e)])
 
     df = pd.DataFrame(versions_without_signatures, columns = ["model","version", "run_id", "error"])
-    return df.sort_values(by=["model","version"], ascending = [True, False])
+    return df.sort_values(by=["model", "version"], ascending = [True, False])
 
 
 def show(filter, output_file):
