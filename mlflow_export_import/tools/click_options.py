@@ -26,7 +26,7 @@ def opt_model_uri(function):
 
 def opt_filter(function):
     function = click.option("--filter",
-        help="For OSS MLflow this is a filter for search_model_version(), for Databricks it is for search_registered_models() due to Databricks MLflow search limitations.",
+        help="For OSS MLflow this is a filter for search_model_versions(), for Databricks it is for search_registered_models() due to Databricks MLflow search limitations.",
         type=str,
         required=False
     )(function)
