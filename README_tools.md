@@ -15,6 +15,9 @@ Model signature scripts:
 * [set-model-signature](#set-model-signature)
 * [list-model-versions-without-signatures](#list-model-versions-without-a-model-signature)
 
+Test usage:
+* [test_model_signature.py](tests/open_source/test_model_signature.py)
+
 MLflow documentation: 
 * [mlflow.models.set_signature](https://mlflow.org/docs/latest/python_api/mlflow.models.html#mlflow.models.set_signature)
 * [Model Signatures And Input Examples](https://www.mlflow.org/docs/latest/models.html#model-signatures-and-input-examples)
