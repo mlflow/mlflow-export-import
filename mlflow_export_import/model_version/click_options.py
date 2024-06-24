@@ -11,6 +11,32 @@ def opt_version(function):
     )(function)
     return function
 
+
+def opt_vrm_export_version_model(function):
+    function = click.option("--vrm-export-version-model",
+        help="Export the MLflow model (from model registry) of a model version.",
+        type=bool,
+        default=False
+    )(function)
+    return function
+
+def opt_vrm_model_artifact_path(function):
+    function = click.option("--vrm-model-artifact-path",
+        help="Destination artifact path of the Mlflow model of a model version.",
+        type=str,
+        required=False
+    )(function)
+    return function
+
+def opt_skip_download_run_artifacts(function):
+    function = click.option("--skip-download-run-artifacts",
+        help="Skip downloading run artifacts (for fine-tuned LLM models)",
+        type=bool,
+        default=False
+    )(function)
+    return function
+
+
 # == Import model version
 
 def opt_create_model(function):
