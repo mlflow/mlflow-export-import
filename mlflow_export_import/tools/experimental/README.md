@@ -1,8 +1,8 @@
-# MLflow Export Import Tools - Experimental
+# MLflow Export Import - Experimental Tools
 
 ## Overview
 
-Experimental WIP.
+Some experimental tools.
 
 Tools:
 * [Rewrite models and experiments of JSON export directory](#Rewrite-models-and-experiments-of-JSON-export-directory)
@@ -26,32 +26,53 @@ In this example [custom_export_rewriters.py](samples/custom_export_rewriters.py)
 
 Rewrites [models.json](https://github.com/mlflow/mlflow-export-import/blob/master/samples/databricks/bulk/models/models/Sklearn_WineQuality/model.json#L22).
 ```
-def process_model(model_dct):
+def rewrite_model(model_dct, models_dir):
+    """ processes model.json """
     versions = model_dct["mlflow"]["registered_model"]["versions"]
-    versions = versions[:2]
+    print(f"  Original versions: {len(versions)}")
+    versions = versions[:1]
+    print(f"  New versions: {len(versions)}")
     model_dct["mlflow"]["registered_model"]["versions"] = versions
 ```
 
 Rewrites [experiment.json](https://github.com/mlflow/mlflow-export-import/blob/master/samples/databricks/bulk/experiments/76bcc705806b407fb971843bfb5e5cae/experiment.json#L22).
 
 ```
-def process_experiment(experiment_dct):
+def rewrite_experiment(experiment_dct, experiment_dir):
+    """ processes experiment.json """
+    def fmt_run(run_dct):
+        from mlflow_export_import.common.timestamp_utils import fmt_ts_millis
+        info = run_dct["info"]
+        return f'run_id: {info["run_id"]} start_time: {info["start_time"]} {fmt_ts_millis(info["start_time"])}'
     runs = experiment_dct["mlflow"]["runs"]
-    runs = runs[:2]
-    experiment_dct["mlflow"]["runs"] = runs
+    print(f"  Original runs: {len(runs)}")
+
+    # do some custom processing such as returning the latest run
+    latest_run_dct = None
+    for run_id in runs:
+        path = os.path.join(experiment_dir, run_id, "run.json")
+        run_dct = io_utils.read_file(path)["mlflow"]
+        if not latest_run_dct:
+            latest_run_dct = run_dct
+        else if latest_run_dct is not None and latest_run_dct["info"]["start_time"] > run_dct["info"]["start_time"]:
+            latest_run_dct = run_dct
+        print(f"    Run: {fmt_run(run_dct)}")
+    print(f"  Latest run: {fmt_run(latest_run_dct)}")
+    runs = [ latest_run_dct ]
+    print(f"  New runs: {len(runs)}")
 ```
 
 
 **Example**
 ```
-python -u -m mlflow_export_import.tools.process_export_models \
+python -u -m mlflow_export_import.tools.experimental.rewrite_export \
   --input-dir export_models \
-  --custom-rewriters-module mlflow_export_import/tools/samples/custom_export_rewriters.py
+  --custom-rewriters-module mlflow_export_import/tools/experimental/samples/custom_export_rewriters.py
 ```
 
 **Usage**
 ```
-python -u -m mlflow_export_import.tools.process_export_models --help
+python -u -m mlflow_export_import.tools.experimental.rewrite_export --help
 
 Options:
   --input-dir TEXT                Export directory of export-models or export-
@@ -74,7 +95,7 @@ with just that model and the experiment that its versions' runs belong to.
 **Example**
 
 ```
-python -u -m mlflow_export_import.tools.filter_one_model \
+python -u -m mlflow_export_import.tools.experimental.filter_one_model \
   --input-dir exported/export_models \
   --output-dir out \
   --src-model sklearn_iris_model \
@@ -84,7 +105,7 @@ python -u -m mlflow_export_import.tools.filter_one_model \
 
 **Usage**
 ```
-python -u -m mlflow_export_import.tools.filter_select_model --help
+python -u -m mlflow_export_import.tools.experimental.filter_select_model --help
 
 Options:
   --input-dir TEXT       Input directory  [required]

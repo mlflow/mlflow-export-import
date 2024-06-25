@@ -1,4 +1,4 @@
-""" 
+"""
 Selects specified model from `export-models` directory and creates a new export directory with just that model and the experiment that its versions's runs belong to.
 Assumes model version runs belong to one experiment and export just that experiment.
 WIP.
@@ -22,10 +22,10 @@ def do_main(input_dir, output_dir, src_model_name, dst_model_name, dst_experimen
 
 def do_manifest(input_dir, output_dir, src_model_name, dst_model_name, dst_experiment_name):
     root = io_utils.read_file(mk_path(input_dir, "manifest.json"))
-    info = root["info"] 
+    info = root["info"]
     info["model_names"] = [ dst_model_name ]
     info["models"]["model_names"] = [ dst_model_name ]
-    filter_dct = { 
+    filter_dct = {
         "description":  "Filtered select model from all_model export directory. WIP.",
         "timestamp":  ts_now_fmt_local,
         "src_model_name": src_model_name,
@@ -114,7 +114,7 @@ def do_experiments(src_experiment_name, dst_experiment_name, input_dir, output_d
     # Copy the one experiment dir
     src_exp_dir = mk_path(src_dir, exp["id"])
     dst_exp_dir = mk_path(dst_dir, exp["id"])
-    shutil.copytree(src_exp_dir, dst_exp_dir) 
+    shutil.copytree(src_exp_dir, dst_exp_dir)
 
     # Update experiment.json in dst experiment dir
     dst_exp_path = mk_path(dst_exp_dir, "experiment.json")
