@@ -5,6 +5,7 @@
 # MAGIC   * [Get_Model_Signature]($Get_Model_Signature) - Get the model signature for a model URI.
 # MAGIC   * [Set_Model_Signature]($Set_Model_Signature) - Set the model signature for a run's MLflow model.
 # MAGIC   * [List_Model_Versions_Without_Signature]($List_Model_Versions_Without_Signature)
+# MAGIC   * [Common]($Common)
 # MAGIC
 # MAGIC ##### Documentation:
 # MAGIC * [mlflow.models.ModelSignature](https://mlflow.org/docs/latest/python_api/mlflow.models.html#mlflow.models.ModelSignature)

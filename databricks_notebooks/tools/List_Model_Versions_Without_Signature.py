@@ -1,18 +1,16 @@
 # Databricks notebook source
 # MAGIC %md ### List Model Versions Without Signature
 # MAGIC
-# MAGIC #### Widgets
-# MAGIC * `1. Filter` - Filter is for  search_registered_models()
-# MAGIC * `2. Output file` - save output as CSV file
+# MAGIC List Workspace Model Registry model version that don't have a signature.
 # MAGIC
-# MAGIC List Workspace Model Registry model version that don't have a signature
+# MAGIC #### Widgets
+# MAGIC * `1. Filter` - Filter is for [search_registered_models()](https://mlflow.org/docs/latest/python_api/mlflow.client.html#mlflow.client.MlflowClient.search_registered_models) such as `name like 'Sklearn_Wine%'`
+# MAGIC * `2. Output file` - save output as CSV file
 
 # COMMAND ----------
 
 # MAGIC %pip install -U mlflow-skinny
-# MAGIC #%pip install -U git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
-# MAGIC %pip install -U /dbfs/home/andre.mesarovic@databricks.com/lib/wheels/mlflow_export_import-1.2.0-py3-none-any.whl
-# MAGIC
+# MAGIC %pip install -U git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
 # MAGIC dbutils.library.restartPython()
 
 # COMMAND ----------
@@ -21,10 +19,6 @@ import mlflow
 mlflow_client = mlflow.MlflowClient()
 mlflow.set_registry_uri("databricks")
 print("mlflow.version:", mlflow.__version__)
-
-# COMMAND ----------
-
-# name like 'Sklearn_Win%'
 
 # COMMAND ----------
 
