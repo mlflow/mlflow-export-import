@@ -22,7 +22,7 @@ def set_signature(model_uri, input_file, output_file, overwrite_signature):
             print(f"WARNING: Model '{model_uri}' already has a signature. Overwriting existing signature.")
     df_input = pd.read_csv(input_file)
     df_output = pd.read_csv(output_file)
-    signature = infer_signature(df_input, df_output) 
+    signature = infer_signature(df_input, df_output)
     print("New model signature:")
     dump_as_json(to_json_signature(signature.to_dict()))
 
@@ -32,7 +32,7 @@ def set_signature(model_uri, input_file, output_file, overwrite_signature):
 @click.command()
 @click.option("--model-uri",
   help="""
-Model URI such as 'runs:/73ab168e5775409fa3595157a415bb62/my_model' or 'file:/my_mlflow_model/. 
+Model URI such as 'runs:/73ab168e5775409fa3595157a415bb62/my_model' or 'file:/my_mlflow_model/.
 Per MLflow documentation 'models:/' scheme is not supported.
 """,
   type=str,
