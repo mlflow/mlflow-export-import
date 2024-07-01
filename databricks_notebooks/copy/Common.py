@@ -3,7 +3,9 @@
 
 # COMMAND ----------
 
-# MAGIC %pip install git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
+# MAGIC %pip install -Uq q git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
+# MAGIC %pip install -Uq mlflow_skinny
+# MAGIC dbutils.library.restartPython()
 
 # COMMAND ----------
 
@@ -50,19 +52,29 @@ def copy_model_version(
         src_model_version,
         dst_model_name,
         dst_experiment_name,
-        dst_run_workspace = "databricks",
+        dst_workspace = "databricks",
         copy_lineage_tags = False,
         verbose = False
     ):
     from mlflow_export_import.common.model_utils import is_unity_catalog_model
     from mlflow_export_import.copy.copy_model_version import copy
 
-    def mk_registry_uri(model_name):
+    def mk_src_registry_uri(model_name):
         return "databricks-uc" if is_unity_catalog_model(model_name) else "databricks"
-
-    src_registry_uri = mk_registry_uri(src_model_name)
-    dst_registry_uri = mk_registry_uri(dst_model_name)
     
+    def mk_dst_registry_uri(model_name, registry_uri):
+        if is_unity_catalog_model(model_name):
+            if "databricks-uc" in registry_uri:
+                return registry_uri
+            else:
+                return registry_uri.replace("databricks", "databricks-uc")                
+        else:
+            return registry_uri.replace("databricks-uc", "databricks")
+    
+    src_registry_uri = mk_src_registry_uri(src_model_name)
+    dst_registry_uri = mk_dst_registry_uri(dst_model_name, dst_workspace)
+
+    print("dst_workspace:   ", dst_workspace) # dst_tracking_URI
     print("src_registry_uri:", src_registry_uri)
     print("dst_registry_uri:", dst_registry_uri)
 
@@ -72,7 +84,7 @@ def copy_model_version(
         dst_model_name,
         dst_experiment_name,
         src_tracking_uri = "databricks",
-        dst_tracking_uri = dst_run_workspace,
+        dst_tracking_uri = dst_workspace,
         src_registry_uri = src_registry_uri,
         dst_registry_uri = dst_registry_uri,
         copy_lineage_tags = copy_lineage_tags,
