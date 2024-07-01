@@ -62,4 +62,5 @@ def mk_client(tracking_uri, registry_uri=None):
     if not tracking_uri and not registry_uri:
         return mlflow.MlflowClient()
     else:
+        tracking_uri = tracking_uri.replace("databricks-uc", "databricks")
         return mlflow.MlflowClient(tracking_uri, registry_uri)
