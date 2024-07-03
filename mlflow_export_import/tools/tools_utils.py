@@ -1,5 +1,4 @@
-import json
-from mlflow_export_import.common import  utils
+from mlflow_export_import.common import utils
 from mlflow_export_import.common.iterators import SearchRegisteredModelsIterator, SearchModelVersionsIterator
 
 def search_model_versions(client, filter):
@@ -15,9 +14,3 @@ def search_model_versions(client, filter):
         return versions
     else:
         return list(SearchModelVersionsIterator(client, filter=filter))
-
-
-def to_json_signature(signature):
-    def _to_json(lst):
-        return json.loads(lst) if lst else lst
-    return { k:_to_json(v) for k,v in signature.items()}

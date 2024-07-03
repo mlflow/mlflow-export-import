@@ -31,3 +31,12 @@ def opt_filter(function):
         required=False
     )(function)
     return function
+
+def opt_use_get_model_info(function):
+    function = click.option("--use-get-model-info",
+        help="Use mlflow.models.get_model_info() which apparently downloads *all* artifacts (quite slow for large models) instead of just downloading 'MLmodel' using mlflow.artifacts.download_artifacts().",
+        type=bool,
+        default=False,
+        show_default=True
+    )(function)
+    return function

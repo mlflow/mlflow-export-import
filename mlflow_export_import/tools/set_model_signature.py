@@ -9,12 +9,12 @@ import click
 import mlflow
 from mlflow.models.signature import infer_signature
 from mlflow_export_import.common.dump_utils import dump_as_json
-from . tools_utils import to_json_signature
+from . signature_utils import get_model_signature, to_json_signature
 
 
 def set_signature(model_uri, input_file, output_file, overwrite_signature):
-    model_info = mlflow.models.get_model_info(model_uri)
-    if model_info.signature:
+    signature = get_model_signature(model_uri)
+    if signature:
         if not overwrite_signature:
             print(f"WARNING: Model '{model_uri}' already has a signature. Not overwriting signature.")
             return
@@ -32,27 +32,27 @@ def set_signature(model_uri, input_file, output_file, overwrite_signature):
 @click.command()
 @click.option("--model-uri",
   help="""
-Model URI such as 'runs:/73ab168e5775409fa3595157a415bb62/my_model' or 'file:/my_mlflow_model/.
+Model URI such as 'runs:/73ab168e5775409fa3595157a415bb62/my_model' or 'file:/my_mlflow_model.
 Per MLflow documentation 'models:/' scheme is not supported.
 """,
   type=str,
   required=True
 )
 @click.option("--input-file",
-        help="Input CSV file with training data samples.",
-        type=str,
-        required=True
+    help="Input CSV file with training data samples for signature.",
+    type=str,
+    required=True
 )
 @click.option("--output-file",
-        help="Output CSV file with prediction data samples.",
-        type=str,
-        required=False
+    help="Output CSV file with prediction data samples for signature.",
+    type=str,
+    required=False
 )
 @click.option("--overwrite-signature",
-        help="Overwrite existing model signature.",
-        type=bool,
-        default=False,
-        show_default=True
+    help="Overwrite existing model signature.",
+    type=bool,
+    default=False,
+    show_default=True
 )
 def main(model_uri, input_file, output_file, overwrite_signature):
     """

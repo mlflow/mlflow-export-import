@@ -3,6 +3,7 @@ import pandas as pd
 import mlflow
 from mlflow.models.signature import infer_signature
 from mlflow_export_import.model_version.export_model_version import export_model_version
+from mlflow_export_import.tools.signature_utils import get_model_signature
 
 from . init_tests import mlflow_context
 from . oss_utils_test import mk_test_object_name_default
@@ -16,17 +17,13 @@ def test_set_run_signature(mlflow_context):
     """
     Tests set_signature with runs scheme: 'runs:/73ab168e5775409fa3595157a415bb62/model'
     """
-
     runs_uri, models_uri, signature, _ = _prep(mlflow_context)
-
     mlflow.models.set_signature(runs_uri, signature)
 
-    model_info = mlflow.models.get_model_info(runs_uri)
-    assert model_info.signature
+    assert get_model_signature(runs_uri)
 
     # NOTE: when you update a run's model signature, the model version it was created from also gets updated. AFAIK not documented.
-    model_info = mlflow.models.get_model_info(models_uri)
-    assert model_info.signature
+    assert get_model_signature(models_uri)
 
 
 def test_set_model_version_signature(mlflow_context):
@@ -58,6 +55,20 @@ def test_set_file_signature_with_file_scheme(mlflow_context):
     _run_set_file_signature(mlflow_context, use_file_scheme=True)
 
 
+def test_model_signature_get_methods(mlflow_context):
+    src_vr, src_run = _create_model_version(mlflow_context)
+
+    runs_uri = f"runs:/{src_run.info.run_id}/model"
+    sig1 = get_model_signature(runs_uri, False)
+    sig2 = get_model_signature(runs_uri, True)
+    assert sig1 == sig2
+
+    models_uri = f"models:/{src_vr.name}/{src_vr.version}"
+    sig1 = get_model_signature(models_uri, False)
+    sig2 = get_model_signature(models_uri, True)
+    assert sig1 == sig2
+
+
 def _run_set_file_signature(mlflow_context, use_file_scheme=False):
     """
     Tests set_signature with file scheme: 'file:/opts/mlflow_export_imports/tests/run/artifacts/model'
@@ -87,12 +98,10 @@ def _prep(mlflow_context):
     src_vr, src_run = _create_model_version(mlflow_context)
 
     runs_uri = f"runs:/{src_run.info.run_id}/model"
-    model_info = mlflow.models.get_model_info(runs_uri)
-    assert not model_info.signature
+    assert not get_model_signature(runs_uri)
 
     models_uri = f"models:/{src_vr.name}/{src_vr.version}"
-    model_info = mlflow.models.get_model_info(models_uri)
-    assert not model_info.signature
+    assert not get_model_signature(models_uri)
 
     signature = infer_signature(_input_df, _output_df)
     return runs_uri, models_uri, signature, src_vr
