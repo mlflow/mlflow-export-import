@@ -62,12 +62,13 @@ set_registry_uri(model_uri)
 
 # COMMAND ----------
 
-model_info = mlflow.models.get_model_info(model_uri)
-model_info.signature
+from mlflow_export_import.tools.signature_utils import get_model_signature
+signature = get_model_signature(model_uri)
+signature
 
 # COMMAND ----------
 
-if  model_info.signature:
+if signature:
     dbutils.notebook.exit(f"Model '{model_uri}' already has a signature")
 
 # COMMAND ----------
@@ -113,5 +114,4 @@ mlflow.models.set_signature(model_uri, signature)
 
 # COMMAND ----------
 
-model_info = mlflow.models.get_model_info(model_uri)
-model_info.signature
+get_model_signature(model_uri)

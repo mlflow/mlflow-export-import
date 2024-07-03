@@ -9,9 +9,7 @@
 
 # COMMAND ----------
 
-# MAGIC %pip install -U mlflow-skinny
-# MAGIC %pip install -U git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
-# MAGIC dbutils.library.restartPython()
+# MAGIC %run ./Common
 
 # COMMAND ----------
 
@@ -22,7 +20,7 @@ print("mlflow.version:", mlflow.__version__)
 
 # COMMAND ----------
 
-dbutils.widgets.text("1. Filter","")
+dbutils.widgets.text("1. Filter","name like 'Sklearn_Wine%'")
 filter = dbutils.widgets.get("1. Filter")
 filter = filter or None
 

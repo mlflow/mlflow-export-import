@@ -19,6 +19,9 @@
 # MAGIC ##### Documentation:
 # MAGIC * [mlflow.models.ModelSignature](https://mlflow.org/docs/latest/python_api/mlflow.models.html#mlflow.models.ModelSignature)
 # MAGIC * [mlflow.models.get_model_info](https://mlflow.org/docs/latest/python_api/mlflow.models.html#mlflow.models.get_model_info)
+# MAGIC
+# MAGIC ##### Github:
+# MAGIC
 
 # COMMAND ----------
 
@@ -45,24 +48,14 @@ set_registry_uri(model_uri)
 
 # COMMAND ----------
 
-model_info = mlflow.models.get_model_info(model_uri)
-model_info.signature
+from mlflow_export_import.tools.signature_utils import get_model_signature
+signature = get_model_signature(model_uri)
+signature
 
 # COMMAND ----------
 
-if not model_info.signature:
+if signature:
+    dump_json(signature)
+else:
     print(f"Model '{model_uri}' does not have a signature")
     dbutils.notebook.exit(None)
-
-# COMMAND ----------
-
-dump_json(model_info.signature.to_dict())
-
-# COMMAND ----------
-
-# MAGIC %md #### Display "stringified" signature as JSON
-
-# COMMAND ----------
-
-signature = to_json_signature(model_info.signature.to_dict())
-dump_json(signature)
