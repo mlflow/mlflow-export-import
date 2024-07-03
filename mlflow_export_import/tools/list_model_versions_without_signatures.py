@@ -12,7 +12,7 @@ from . tools_utils import search_model_versions
 from . signature_utils import get_model_signature
 
 
-def as_pandas_df(filter, use_get_model_info):
+def as_pandas_df(filter, use_get_model_info=False):
     client = mlflow.MlflowClient()
     versions = search_model_versions(client, filter)
 
