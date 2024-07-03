@@ -20,4 +20,4 @@
 # MAGIC   * Local: `/root/sample_model`
 # MAGIC   * Cloud: `s3:/my-bucket/mlflow-models/sklearn-wine_best`
 # MAGIC
-# MAGIC ##### Last updated: _2024-05-11_
+# MAGIC ##### Last updated: _2024-07-02_

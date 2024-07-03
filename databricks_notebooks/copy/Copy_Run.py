@@ -8,7 +8,7 @@
 # MAGIC ##### Widgets
 # MAGIC
 # MAGIC * `1. Source run ID` - Source run ID.
-# MAGIC * `2. Destination experiment name` - Destination experiment name where the run will live.
+# MAGIC * `2. Destination experiment name` - Destination experiment name of the run.
 # MAGIC * `3. Destination workspace` - Destination workspace - default is current workspace.
 
 # COMMAND ----------
@@ -24,8 +24,8 @@
 dbutils.widgets.text("1. Source run ID", "") 
 src_run_id = dbutils.widgets.get("1. Source run ID")
 
-dbutils.widgets.text("2. Destination experiment name", "") 
-dst_experiment_name = dbutils.widgets.get("2. Destination experiment name")
+dbutils.widgets.text("2. Destination experiment", "") 
+dst_experiment_name = dbutils.widgets.get("2. Destination experiment")
 
 dbutils.widgets.text("3. Destination workspace", "databricks") 
 dst_run_workspace = dbutils.widgets.get("3. Destination workspace")
@@ -52,8 +52,11 @@ dst_run = copy(src_run_id, dst_experiment_name, "databricks", dst_run_workspace)
 
 # COMMAND ----------
 
-display_run_uri(dst_run.info.run_id)
+dst_run
 
 # COMMAND ----------
 
-dst_run
+if dst_run_workspace == "databricks":
+    display_run_uri(dst_run.info.run_id)
+else:
+    print(f"Cannot display run '{dst_run.info.run_id}' since it is in a remove workspace.")
