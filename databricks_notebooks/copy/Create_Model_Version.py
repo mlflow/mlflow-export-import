@@ -2,10 +2,10 @@
 # MAGIC %md ### Create a Model Version from different sources
 # MAGIC
 # MAGIC #### Overview
-# MAGIC * Creates a model version from an MLflow "source" model URI in the current or in another model registry.
+# MAGIC * Creates a model version from an MLflow model URI in the current or in another model registry.
 # MAGIC * Works either for a Unity Catalog model registry or Workspace model registry. 
 # MAGIC * Will create the target registered model if it doesn't exist.
-# MAGIC * If source URI is a 'models' URI, will not copy model version metadata - just copies the MLflow model from the model registry.
+# MAGIC * If source URI is a 'models:' URI, will copy the source model version's description and tags.
 # MAGIC
 # MAGIC #### Widgets
 # MAGIC
@@ -41,6 +41,14 @@
 # MAGIC   * `my_prefix-token` - `MY_TOKEN`
 # MAGIC   * `my_prefix-workspace-id` - `18121492186110540`
 # MAGIC
+# MAGIC ###### `4. Description`
+# MAGIC
+# MAGIC Description for destination model version.
+# MAGIC
+# MAGIC ###### `5. Destination Alias`
+# MAGIC
+# MAGIC Alias for destination model version.
+# MAGIC
 # MAGIC #### Documentation
 # MAGIC
 # MAGIC * [MlflowClient.create_model_version()](https://mlflow.org/docs/latest/python_api/mlflow.client.html#mlflow.client.MlflowClient.create_model_version) - MLflow documentation
@@ -49,6 +57,11 @@
 # COMMAND ----------
 
 # MAGIC %md ##### Setup
+
+# COMMAND ----------
+
+# MAGIC %pip install -Uq mlflow-skinny
+# MAGIC dbutils.library.restartPython()
 
 # COMMAND ----------
 
@@ -71,10 +84,14 @@ dbutils.widgets.text("4. Description", "")
 description = dbutils.widgets.get("4. Description")
 description = description or None
 
+dbutils.widgets.text("5. Alias", "") 
+alias = dbutils.widgets.get("5. Alias")
+
 print("src_model_uri:   ", src_model_uri)
 print("dst_model_name:  ", dst_model_name)
 print("dst_registry_uri:", dst_registry_uri)
 print("description:", description)
+print("alias:", alias)
 
 # COMMAND ----------
 
@@ -87,8 +104,10 @@ if "." in src_model_uri:
 else:
     mlflow.set_registry_uri("databricks")
     
+src_client = mlflow.MlflowClient()
 dst_client = mlflow.MlflowClient(registry_uri=dst_registry_uri)
 
+print("src_client._registry_uri:", src_client._registry_uri)
 print("dst_client._registry_uri:", dst_client._registry_uri)
 print("mlflow.registry_uri:     ", mlflow.get_registry_uri())
 
@@ -105,13 +124,38 @@ except Exception as e:
 
 # COMMAND ----------
 
+# MAGIC %md ##### Get source model version
+
+# COMMAND ----------
+
+if src_model_uri.startswith("models:"):
+    toks = src_model_uri.split("/")
+    model_name, version = toks[1], toks[2]
+    src_vr = src_client.get_model_version(model_name, version)
+    tags = src_vr.tags
+    if not description:
+        description = src_vr.description
+else:
+    tags = None
+print("description: ", description)
+print("tags: ", tags)
+
+# COMMAND ----------
+
 # MAGIC %md ##### Create model version
 
 # COMMAND ----------
 
-vr = dst_client.create_model_version(dst_model_name, src_model_uri, description=description)
-print(vr)
+dst_vr = dst_client.create_model_version(dst_model_name, src_model_uri, description=description, tags=tags)
+print(dst_vr)
 
 # COMMAND ----------
 
-print("Version:", vr.version)
+if alias:
+    dst_client.set_registered_model_alias(dst_vr.name, alias, dst_vr.version)
+    dst_vr = dst_client.get_model_version(dst_vr.name, dst_vr.version)
+
+# COMMAND ----------
+
+print("Version:", dst_vr.version)
+print("Aliases:", dst_vr.aliases)
