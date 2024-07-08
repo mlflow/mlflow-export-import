@@ -47,7 +47,6 @@ def export_run(
     """
 
     mlflow_client = mlflow_client or create_mlflow_client()
-    dbx_client = create_dbx_client(mlflow_client)
 
     if notebook_formats is None:
         notebook_formats = []
@@ -96,6 +95,7 @@ def export_run(
         # export notebook as artifact
         if notebook is not None:
             if len(notebook_formats) > 0:
+                dbx_client = create_dbx_client(mlflow_client)
                 _export_notebook(dbx_client, output_dir, notebook, notebook_formats, run, fs)
         elif len(notebook_formats) > 0:
             _logger.warning(f"No notebooks to export for run '{run_id}' since tag '{MLFLOW_DATABRICKS_NOTEBOOK_PATH}' is not set.")

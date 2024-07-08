@@ -45,7 +45,6 @@ def export_experiment(
     """
 
     mlflow_client = mlflow_client or create_mlflow_client()
-    dbx_client = create_dbx_client(mlflow_client)
 
     run_start_time_str = run_start_time
     if run_start_time:
@@ -91,6 +90,7 @@ def export_experiment(
 
     mlflow_attr = { "experiment": exp_dct , "runs": ok_run_ids }
     if export_permissions:
+        dbx_client = create_dbx_client(mlflow_client)
         mlflow_attr["permissions"] = ws_permissions_utils.get_experiment_permissions(dbx_client, exp.experiment_id)
     io_utils.write_export_file(output_dir, "experiment.json", __file__, mlflow_attr, info_attr)
 
