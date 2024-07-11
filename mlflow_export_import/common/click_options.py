@@ -88,6 +88,14 @@ def opt_export_version_model(function):
     )(function)
     return function
 
+def opt_run_ids_file(function):
+    function = click.option("--run-ids-file",
+        help="File with run IDs to export.",
+        type=str,
+        required=False
+    )(function)
+    return function
+
 
 # == import
 

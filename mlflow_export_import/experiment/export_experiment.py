@@ -8,6 +8,7 @@ import click
 from mlflow_export_import.common.click_options import (
     opt_experiment,
     opt_output_dir,
+    opt_run_ids_file,
     opt_notebook_formats,
     opt_export_permissions,
     opt_run_start_time,
@@ -36,7 +37,7 @@ def export_experiment(
     """
     :param: experiment_id_or_name: Experiment ID or name.
     :param: output_dir: Output directory.
-    :param: run_ids: List of run IDs to export. If None export then all run IDs.
+    :param: run_ids: List of run IDs to export. If None then export all run IDs.
     :param: export_permissions - Export Databricks permissions.
     :param: run_start_time - Only export runs started after this UTC time (inclusive). Format: YYYY-MM-DD.
     :param: notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
@@ -62,8 +63,7 @@ def export_experiment(
     num_runs_exported = 0
     if run_ids:
         for j,run_id in enumerate(run_ids):
-            run = mlflow_client.get_run(run_id)
-            _export_run(mlflow_client, run, output_dir, ok_run_ids, failed_run_ids,
+            _export_run(mlflow_client, run_id, exp.experiment_id, output_dir, ok_run_ids, failed_run_ids,
                 run_start_time, run_start_time_str, export_deleted_runs, notebook_formats)
             num_runs_exported += 1
     else:
@@ -74,7 +74,7 @@ def export_experiment(
             from mlflow.entities import ViewType
             kwargs["view_type"] = ViewType.ALL
         for j,run in enumerate(SearchRunsIterator(mlflow_client, exp.experiment_id, **kwargs)):
-            _export_run(mlflow_client, run, output_dir, ok_run_ids, failed_run_ids,
+            _export_run(mlflow_client, run, exp.experiment_id, output_dir, ok_run_ids, failed_run_ids,
                 run_start_time, run_start_time_str, export_deleted_runs, notebook_formats)
             num_runs_exported += 1
 
@@ -100,24 +100,36 @@ def export_experiment(
     elif len(failed_run_ids) == 0:
         _logger.info(f"{len(ok_run_ids)} runs succesfully exported {msg}")
     else:
-        _logger.info(f"{len(ok_run_ids)}/{j} runs succesfully exported {msg}")
-        _logger.info(f"{len(failed_run_ids)}/{j} runs failed {msg}")
+        _logger.info(f"{len(ok_run_ids)}/{num_runs_exported} runs succesfully exported {msg}")
+        _logger.info(f"{len(failed_run_ids)}/{num_runs_exported} runs failed {msg}")
     return len(ok_run_ids), len(failed_run_ids)
 
 
-def _export_run(mlflow_client, run, output_dir, ok_run_ids, failed_run_ids,
+def _export_run(mlflow_client, run_or_run_id, experiment_id, output_dir,
+        ok_run_ids, failed_run_ids,
         run_start_time, run_start_time_str,
         export_deleted_runs, notebook_formats
     ):
-    if run_start_time and run.info.start_time < run_start_time:
-        msg = {
-            "run_id": {run.info.run_id},
-            "experiment_id": {run.info.experiment_id},
-            "start_time": fmt_ts_millis(run.info.start_time),
-            "run_start_time": run_start_time_str
-        }
-        _logger.info(f"Not exporting run: {msg}")
-        return
+
+    if isinstance(run_or_run_id, str):
+        try:
+            run = mlflow_client.get_run(run_or_run_id)
+        except Exception as e:
+            err_msg = { "run_id": run_or_run_id, "experiment_id": experiment_id, "Exception": e }
+            _logger.warning(f"Run export failed: {err_msg}")
+            failed_run_ids.append(run_or_run_id)
+            return
+    else:
+        run = run_or_run_id
+        if run_start_time and run.info.start_time < run_start_time:
+            msg = {
+                "run_id": {run.info.run_id},
+                "experiment_id": {run.info.experiment_id},
+                "start_time": fmt_ts_millis(run.info.start_time),
+                "run_start_time": run_start_time_str
+            }
+            _logger.info(f"Not exporting run: {msg}")
+            return
 
     is_success = export_run(
         run_id = run.info.run_id,
@@ -135,18 +147,27 @@ def _export_run(mlflow_client, run, output_dir, ok_run_ids, failed_run_ids,
 @click.command()
 @opt_experiment
 @opt_output_dir
+@opt_run_ids_file
 @opt_export_permissions
 @opt_run_start_time
 @opt_export_deleted_runs
 @opt_notebook_formats
 
-def main(experiment, output_dir, export_permissions, run_start_time, export_deleted_runs, notebook_formats):
+def main(experiment, output_dir, run_ids_file, export_permissions, run_start_time, export_deleted_runs, notebook_formats):
     _logger.info("Options:")
     for k,v in locals().items():
         _logger.info(f"  {k}: {v}")
+
+    if run_ids_file:
+        with open(run_ids_file, "r", encoding="utf-8") as f:
+            run_ids = [ line.rstrip() for line in f ]
+    else:
+        run_ids = None
+
     export_experiment(
         experiment_id_or_name = experiment,
         output_dir = output_dir,
+        run_ids = run_ids,
         export_permissions = export_permissions,
         run_start_time = run_start_time,
         export_deleted_runs = export_deleted_runs,
