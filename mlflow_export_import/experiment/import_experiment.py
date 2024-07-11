@@ -4,6 +4,7 @@ Exports an experiment to a directory.
 
 import os
 import click
+from dotenv import load_dotenv
 
 from mlflow_export_import.common.click_options import (
     opt_experiment_name,
@@ -13,7 +14,7 @@ from mlflow_export_import.common.click_options import (
     opt_use_src_user_id,
     opt_dst_notebook_dir
 )
-from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client
+from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client, create_mlflow_client_from_tracking_uri
 from mlflow_export_import.common import utils, mlflow_utils, io_utils
 from mlflow_export_import.common import ws_permissions_utils
 from mlflow_export_import.common.source_tags import (
@@ -33,7 +34,8 @@ def import_experiment(
         import_permissions = False,
         use_src_user_id = False,
         dst_notebook_dir = None,
-        mlflow_client = None
+        mlflow_client = None,
+        mlflow_tracking_uri = None
     ):
     """
     :param experiment_name: Destination experiment name.
@@ -47,8 +49,12 @@ def import_experiment(
     :return: Dictionary of source run_id (key) to destination run.info object (value).
     """
 
-    mlflow_client = mlflow_client or create_mlflow_client()
-    dbx_client = create_dbx_client(mlflow_client)
+    if mlflow_tracking_uri:
+        mlflow_client = mlflow_client or create_mlflow_client_from_tracking_uri(mlflow_tracking_uri)
+    else:
+        mlflow_client = mlflow_client or create_mlflow_client()
+    
+    #dbx_client = create_dbx_client(mlflow_client)
 
     path = io_utils.mk_manifest_json_path(input_dir, "experiment.json")
     root_dct = io_utils.read_file(path)
@@ -65,12 +71,12 @@ def import_experiment(
         fmt_timestamps("creation_time", exp, tags)
         fmt_timestamps("last_update_time", exp, tags)
 
-    exp = mlflow_utils.set_experiment(mlflow_client, dbx_client, experiment_name, tags)
+    exp = mlflow_utils.set_experiment_azureml(mlflow_client, experiment_name, tags)
 
-    if import_permissions:
-        perms_dct = mlflow_dct.get("permissions", None)
-        if perms_dct:
-            ws_permissions_utils.update_permissions(dbx_client, perms_dct, "experiment", exp.name, exp.experiment_id)
+    # if import_permissions:
+    #     perms_dct = mlflow_dct.get("permissions", None)
+    #     if perms_dct:
+    #         ws_permissions_utils.update_permissions(dbx_client, perms_dct, "experiment", exp.name, exp.experiment_id)
 
     run_ids = mlflow_dct["runs"]
     failed_run_ids = info["failed_runs"]
@@ -85,7 +91,9 @@ def import_experiment(
             input_dir = os.path.join(input_dir, src_run_id),
             dst_notebook_dir = dst_notebook_dir,
             import_source_tags = import_source_tags,
-            use_src_user_id = use_src_user_id
+            use_src_user_id = use_src_user_id,
+            target_client = "azureml",
+            mlflow_tracking_uri = mlflow_tracking_uri
         )
         dst_run_id = dst_run.info.run_id
         run_ids_map[src_run_id] = { "dst_run_id": dst_run_id, "src_parent_run_id": src_parent_run_id }
@@ -110,15 +118,20 @@ def main(input_dir, experiment_name, import_source_tags, use_src_user_id, dst_no
     _logger.info("Options:")
     for k,v in locals().items():
         _logger.info(f"  {k}: {v}")
+        
+    mlflow_tracking_uri = os.getenv("MLFLOW_TRACKING_URI_IMPORT")
+    print(mlflow_tracking_uri)    
     import_experiment(
         experiment_name = experiment_name,
         input_dir = input_dir,
         import_source_tags = import_source_tags,
         import_permissions = import_permissions,
         use_src_user_id = use_src_user_id,
-        dst_notebook_dir = dst_notebook_dir
+        dst_notebook_dir = dst_notebook_dir,
+        mlflow_tracking_uri=mlflow_tracking_uri
     )
 
 
 if __name__ == "__main__":
+    load_dotenv()
     main()

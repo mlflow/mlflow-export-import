@@ -6,6 +6,8 @@ import os
 import click
 import base64
 
+import mlflow
+
 from mlflow.entities.lifecycle_stage import LifecycleStage
 from mlflow.entities import RunStatus
 from mlflow.utils.mlflow_tags import MLFLOW_PARENT_RUN_ID
@@ -20,7 +22,7 @@ from mlflow_export_import.common.click_options import (
 from mlflow_export_import.common import utils, mlflow_utils, io_utils
 from mlflow_export_import.common import filesystem as _fs
 from mlflow_export_import.common import MlflowExportImportException
-from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client, create_http_client
+from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client, create_http_client, create_mlflow_client_from_tracking_uri
 from . import run_data_importer
 from . import run_utils
 
@@ -33,7 +35,9 @@ def import_run(
         dst_notebook_dir = None,
         use_src_user_id = False,
         mlmodel_fix = True,
-        mlflow_client = None
+        target_client = None,
+        mlflow_client = None,
+        mlflow_tracking_uri = None
     ):
     """
     Imports a run into the specified experiment.
@@ -58,49 +62,78 @@ def import_run(
             "experiment": exp_name
     }
 
-    mlflow_client = mlflow_client or create_mlflow_client()
+    if target_client not in ["azureml", "databricks"]:
+        raise MlflowExportImportException(f"Invalid target client '{target_client}'. Must be 'azureml' or 'databricks'.")
+
+    print(mlflow_tracking_uri)
+
+    if mlflow_tracking_uri:
+        mlflow_client = create_mlflow_client_from_tracking_uri(mlflow_tracking_uri)
+    else:
+        mlflow_client = mlflow_client or create_mlflow_client()
+        
     http_client = create_http_client(mlflow_client)
-    dbx_client = create_dbx_client(mlflow_client)
+        
+    if target_client == "databricks":
+        dbx_client = create_dbx_client(mlflow_client)
+    else:
+        dbx_client = None
 
     _logger.info(f"Importing run from '{input_dir}'")
 
-    exp = mlflow_utils.set_experiment(mlflow_client, dbx_client, experiment_name)
+    exp = mlflow_utils.set_experiment_azureml(mlflow_client, experiment_name)
     src_run_path = os.path.join(input_dir, "run.json")
     src_run_dct = io_utils.read_file_mlflow(src_run_path)
-    in_databricks = "DATABRICKS_RUNTIME_VERSION" in os.environ
+    in_databricks = None #"DATABRICKS_RUNTIME_VERSION" in os.environ
 
-    run = mlflow_client.create_run(exp.experiment_id)
+    #run = mlflow_client.create_run(exp.experiment_id)
+    # If a run is running, terminate it
+    mlflow.end_run()
+    run = mlflow.start_run(experiment_id=exp.experiment_id)
     run_id = run.info.run_id
     try:
-        run_data_importer.import_run_data(
-            mlflow_client,
-            src_run_dct,
-            run_id,
-            import_source_tags,
-            src_run_dct["info"]["user_id"],
-            use_src_user_id,
-            in_databricks
-        )
-        _import_inputs(http_client, src_run_dct, run_id)
+            run_data_importer.import_run_data(
+                mlflow_client,
+                src_run_dct,
+                run_id,
+                import_source_tags,
+                src_run_dct["info"]["user_id"],
+                use_src_user_id,
+                in_databricks
+            )
+            
+            inputs = src_run_dct.get("inputs")
+            if inputs:
+                for input in inputs:
+                    mlflow.log_input(datasets=input)
+            
+            #_import_inputs(http_client, src_run_dct, run_id)
 
-        path = _fs.mk_local_path(os.path.join(input_dir, "artifacts"))
-        if os.path.exists(path):
-            mlflow_client.log_artifacts(run_id, path)
-        if mlmodel_fix:
-            run_utils.update_mlmodel_run_id(mlflow_client, run_id)
-        mlflow_client.set_terminated(run_id, RunStatus.to_string(RunStatus.FINISHED))
-        run = mlflow_client.get_run(run_id)
-        if src_run_dct["info"]["lifecycle_stage"] == LifecycleStage.DELETED:
-            mlflow_client.delete_run(run.info.run_id)
-            run = mlflow_client.get_run(run.info.run_id)
+            path = _fs.mk_local_path(os.path.join(input_dir, "artifacts"))
+            if os.path.exists(path):
+                mlflow_client.log_artifacts(run_id, path)
+            if mlmodel_fix:
+                run_utils.update_mlmodel_run_id(mlflow_client, run_id)
+            mlflow_client.set_terminated(run_id, RunStatus.to_string(RunStatus.FINISHED))
+            mlflow.end_run()
+            run = mlflow_client.get_run(run_id)
+            if src_run_dct["info"]["lifecycle_stage"] == LifecycleStage.DELETED:
+                mlflow_client.delete_run(run.info.run_id)
+                run = mlflow_client.get_run(run.info.run_id)
     except Exception as e:
         mlflow_client.set_terminated(run_id, RunStatus.to_string(RunStatus.FAILED))
+        mlflow.end_run()
+        import traceback
         import traceback
         traceback.print_exc()
         raise MlflowExportImportException(e, f"Importing run {run_id} of experiment '{exp.name}' failed")
+# utils.calling_databricks()
+    #     # if utils.calling_databricks() and dst_notebook_dir:
+    #     _upload_databricks_notebook(dbx_client, input_dir, src_run_dct, dst_notebook_dir)
 
-    if utils.calling_databricks() and dst_notebook_dir:
-        _upload_databricks_notebook(dbx_client, input_dir, src_run_dct, dst_notebook_dir)
+
+    print("TAGS:")
+    print(src_run_dct["tags"])
 
     res = (run, src_run_dct["tags"].get(MLFLOW_PARENT_RUN_ID, None))
     _logger.info(f"Imported run '{run.info.run_id}' into experiment '{experiment_name}'")

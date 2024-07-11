@@ -8,13 +8,16 @@ def create_http_client(mlflow_client, model_name=None):
     If model_name is a Unity Catalog (UC) model, the returned client is UC-enabled.
     """
     from mlflow_export_import.common import model_utils
+    
+    print(mlflow_client._tracking_client.store)
+    
     creds = mlflow_client._tracking_client.store.get_host_creds()
     if model_name and model_utils.is_unity_catalog_model(model_name):
         return HttpClient("api/2.0/mlflow/unity-catalog", creds.host, creds.token)
     else:
         return MlflowHttpClient(creds.host, creds.token)
 
-
+    
 def create_dbx_client(mlflow_client):
     """
     Create Databricks HTTP client from MlflowClient.
@@ -34,3 +37,9 @@ def create_mlflow_client():
         return mlflow.MlflowClient(nonuc_tracking_uri, registry_uri)
     else:
         return mlflow.MlflowClient()
+
+def create_mlflow_client_from_tracking_uri(tracking_uri):
+    """
+    Create MLflowClient from tracking URI.
+    """
+    return mlflow.MlflowClient(tracking_uri)

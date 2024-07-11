@@ -52,18 +52,23 @@ def _log_tags(client, run_dct, run_id, batch_size, import_source_tags, in_databr
 
     def get_data(run_dct, args):
         tags = run_dct["tags"]
+        
         if import_source_tags:
             source_mlflow_tags = mk_source_tags_mlflow_tag(tags)
             info =  run_dct["info"]
             source_info_tags = mk_source_tags(info, f"{ExportTags.PREFIX_RUN_INFO}")
             tags = { **tags, **source_mlflow_tags, **source_info_tags }
-        tags = utils.create_mlflow_tags_for_databricks_import(tags) # remove "mlflow" tags that cannot be imported into Databricks
+        #tags = utils.create_mlflow_tags_for_databricks_import(tags) # remove "mlflow" tags that cannot be imported into Databricks
         tags = [ RunTag(k,v) for k,v in tags.items() ]
-        if not in_databricks:
-            utils.set_dst_user_id(tags, args["src_user_id"], args["use_src_user_id"])
+        
+        # if not in_databricks:
+        #     utils.set_dst_user_id(tags, args["src_user_id"], args["use_src_user_id"])
         return tags
 
     def log_data(run_id, tags):
+        # remove tags with duplicate keys
+        tag_keys = set()
+        tags = [ t for t in tags if t.key not in tag_keys and not tag_keys.add(t.key) ]
         client.log_batch(run_id, tags=tags)
 
     args_get = {
@@ -71,7 +76,10 @@ def _log_tags(client, run_dct, run_id, batch_size, import_source_tags, in_databr
         "src_user_id": src_user_id,
         "use_src_user_id": use_src_user_id
     }
-
+    
+    print("TAGS:")
+    print(run_dct["tags"])
+    
     _log_data(run_dct, run_id, batch_size, get_data, log_data, args_get)
 
 

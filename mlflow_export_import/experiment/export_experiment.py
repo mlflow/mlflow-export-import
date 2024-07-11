@@ -4,6 +4,7 @@ Exports an experiment to a directory.
 
 import os
 import click
+from dotenv import load_dotenv
 
 from mlflow_export_import.common.click_options import (
     opt_experiment,
@@ -17,7 +18,7 @@ from mlflow_export_import.common.iterators import SearchRunsIterator
 from mlflow_export_import.common import utils, io_utils, mlflow_utils
 from mlflow_export_import.common import ws_permissions_utils
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis, utc_str_to_millis
-from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client
+from mlflow_export_import.client.client_utils import create_mlflow_client, create_mlflow_client_from_tracking_uri, create_dbx_client
 from mlflow_export_import.run.export_run import export_run
 
 _logger = utils.getLogger(__name__)
@@ -31,7 +32,8 @@ def export_experiment(
         run_start_time = None,
         export_deleted_runs = False,
         notebook_formats = None,
-        mlflow_client = None
+        mlflow_client = None,
+        mlflow_tracking_uri = None
     ):
     """
     :param: experiment_id_or_name: Experiment ID or name.
@@ -43,9 +45,11 @@ def export_experiment(
     :param: mlflow_client: MLflow client.
     :return: Number of successful and number of failed runs.
     """
-
-    mlflow_client = mlflow_client or create_mlflow_client()
-    dbx_client = create_dbx_client(mlflow_client)
+    if mlflow_tracking_uri:
+        mlflow_client = mlflow_client or create_mlflow_client_from_tracking_uri()
+    else:
+        mlflow_client = mlflow_client or create_mlflow_client()
+    #dbx_client = create_dbx_client(mlflow_client)
 
     run_start_time_str = run_start_time
     if run_start_time:
@@ -90,8 +94,8 @@ def export_experiment(
     exp_dct["tags"] = dict(sorted(exp_dct["tags"].items()))
 
     mlflow_attr = { "experiment": exp_dct , "runs": ok_run_ids }
-    if export_permissions:
-        mlflow_attr["permissions"] = ws_permissions_utils.get_experiment_permissions(dbx_client, exp.experiment_id)
+    #if export_permissions:
+    #    mlflow_attr["permissions"] = ws_permissions_utils.get_experiment_permissions(dbx_client, exp.experiment_id)
     io_utils.write_export_file(output_dir, "experiment.json", __file__, mlflow_attr, info_attr)
 
     msg = f"for experiment '{exp.name}' (ID: {exp.experiment_id})"
@@ -150,9 +154,15 @@ def main(experiment, output_dir, export_permissions, run_start_time, export_dele
         export_permissions = export_permissions,
         run_start_time = run_start_time,
         export_deleted_runs = export_deleted_runs,
-        notebook_formats = utils.string_to_list(notebook_formats)
+        notebook_formats = utils.string_to_list(notebook_formats),
+        mlflow_tracking_uri=os.getenv("MLFLOW_TRACKING_URI")
     )
 
 
 if __name__ == "__main__":
+    load_dotenv()
+    
+    opt_experiment="dev_taxi_fare_train_dev"
+    opt_output_dir = "output"
+    
     main()

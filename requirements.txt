@@ -1,0 +1,5 @@
+mlflow==2.14.2
+azureml-mlflow
+python-dotenv==1.0.1
+ipykernel==6.29.5
+azure-ai-ml

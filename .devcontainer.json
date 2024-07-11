@@ -1,0 +1,22 @@
+{
+    "name": "PreProDeployment DevContainer",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": "."
+    },
+    
+    "features": {
+        "ghcr.io/devcontainers/features/azure-cli:1.2.5": {}
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-azuretools.azure-dev",
+                "ms-python.python",
+                "ms-toolsai.jupyter",
+                "ms-vscode.powershell",
+                "ms-azuretools.azure-dev"
+            ]
+        }
+    }
+}
