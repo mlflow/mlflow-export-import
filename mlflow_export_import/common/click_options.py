@@ -96,6 +96,14 @@ def opt_run_ids_file(function):
     )(function)
     return function
 
+def opt_check_nested_runs(function):
+    function = click.option("--check-nested-runs",
+        help="Check if run is parent of nested run",
+        type=bool,
+        default=False,
+        show_default=True
+    )(function)
+    return function
 
 # == import
 

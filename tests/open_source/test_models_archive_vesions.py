@@ -82,7 +82,7 @@ def _test_2_none_archive_yes(mlflow_context):
 
 def _run_test(mlflow_context, stage, num_stages, archive_existing_versions=False):
     """ Run with one or mode same stages, i.e. ['Production', 'Production'] """
-    stages = [ stage for _ in range(0,num_stages) ]
+    stages = [ stage for _ in range(num_stages) ]
     model_src, model_dst = _run_export_import(mlflow_context, stages, archive_existing_versions)
 
     src_all_versions = list_model_versions(mlflow_context.client_src, model_src.name)

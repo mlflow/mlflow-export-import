@@ -26,7 +26,7 @@ client = mlflow.MlflowClient()
 
 def _create_experiment(num_runs=5):
     experiment = create_experiment(client)
-    for _ in range(0, num_runs):
+    for _ in range( num_runs):
         with mlflow.start_run():
             mlflow.log_metric("m1", 0.1)
     return experiment
@@ -35,7 +35,7 @@ def _create_experiments(num_experiments):
     delete_experiments(client)
     experiments = list_experiments(client)
     assert len(experiments) == 0
-    return [ _create_experiment().experiment_id for _ in range(0,num_experiments) ]
+    return [ _create_experiment().experiment_id for _ in range(num_experiments) ]
 
 def _run_test_search_experiments(num_experiments, max_results):
     _create_experiments(num_experiments)
@@ -75,7 +75,7 @@ _num_exps_deleted = 2
 def _run_test_deleted_experiments():
     exp_ids = _create_experiments(_num_exps)
     exps_del_01 = list(SearchExperimentsIterator(client, view_type=ViewType.DELETED_ONLY))
-    for j in range(0,_num_exps_deleted):
+    for j in range(_num_exps_deleted):
         client.delete_experiment(exp_ids[j])
     exps_del_02 = list(SearchExperimentsIterator(client, view_type=ViewType.DELETED_ONLY))
     return len(exps_del_02) - len(exps_del_01)
@@ -114,7 +114,7 @@ def _create_models(num_models):
     delete_models(client)
     models = client.search_registered_models()
     assert len(models) == 0
-    for _ in range(0, num_models):
+    for _ in range( num_models):
         model_name = mk_test_object_name_default()
         client.create_registered_model(model_name)
 
@@ -126,7 +126,7 @@ def test_search_models_like():
     _create_models(num_models)
     models = list(SearchRegisteredModelsIterator(client, max_results))
     new_prefix = f"{TEST_OBJECT_PREFIX}_new"
-    for j in range(0,4):
+    for j in range(4):
         new_name = models[j].name.replace(TEST_OBJECT_PREFIX, new_prefix)
         client.rename_registered_model(models[j].name, new_name)
     filter = f"name like '{new_prefix}%'"
@@ -207,7 +207,7 @@ def _run_test_deleted_runs():
     exp = _create_experiment(_num_runs)
     runs = list(SearchRunsIterator(client, exp.experiment_id))
     assert _num_runs == len(runs)
-    for j in range(0,_num_runs_deleted):
+    for j in range(_num_runs_deleted):
         client.delete_run(runs[j].info.run_id)
     return exp, runs
 

@@ -61,7 +61,7 @@ def _create_simple_run(client, run_name=None, model_artifact="model", use_metric
         with mlflow.start_run(run_name=run_name) as run:
             mlflow.log_param("max_depth",max_depth)
             if use_metric_steps:
-                for j in range(0,5):
+                for j in range(5):
                     mlflow.log_metric("rmse",.789+j,j)
             else:
                 mlflow.log_metric("rmse", 0.789)

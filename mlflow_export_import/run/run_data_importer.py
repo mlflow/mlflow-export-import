@@ -17,7 +17,7 @@ def _log_data(run_dct, run_id, batch_size, get_data, log_data, args_get_data=Non
     metadata = get_data(run_dct, args_get_data)
     num_batches = int(math.ceil(len(metadata) / batch_size))
     res = []
-    for j in range(0,num_batches):
+    for j in range(num_batches):
         start = j * batch_size
         end = start + batch_size
         batch = metadata[start:end]

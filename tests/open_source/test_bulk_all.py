@@ -16,7 +16,7 @@ _num_runs = 2
 
 def _run_test(mlflow_context, compare_func=compare_runs, use_threads=False):
     delete_experiments_and_models(mlflow_context)
-    for _ in range(0, _num_models):
+    for _ in range( _num_models):
         create_model(mlflow_context.client_src)
     export_all(
         mlflow_client = mlflow_context.client_src,

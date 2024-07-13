@@ -58,7 +58,7 @@ def _create_model(client):
 
 def _run_test(mlflow_context, use_threads=False):
     delete_experiments_and_models(mlflow_context)
-    model_names = [ create_model(mlflow_context.client_src) for j in range(0, _num_models) ]
+    model_names = [ create_model(mlflow_context.client_src) for j in range( _num_models) ]
     _run_test_with_models_names(mlflow_context, model_names, use_threads)
     models = mlflow_context.client_dst.search_registered_models()
     assert len(models) == len(model_names)
@@ -177,7 +177,7 @@ def test_get_model_names_from_comma_delimited_string(mlflow_context):
 
 def test_get_model_names_from_all_string(mlflow_context):
     delete_experiments_and_models(mlflow_context)
-    model_names1 = [ create_model(mlflow_context.client_src) for j in range(0,3) ]
+    model_names1 = [ create_model(mlflow_context.client_src) for j in range(3) ]
     model_names2 = bulk_utils.get_model_names(mlflow_context.client_src, "*")
     assert set(model_names1) == set(model_names2)
 

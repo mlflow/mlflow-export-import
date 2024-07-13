@@ -66,18 +66,18 @@ def _create_run(client, num_params=None, num_metrics=None, num_tags=None):
         with open("info.txt", "w", encoding="utf-8") as f: f.write("Hi artifact")
         mlflow.log_artifact("info.txt","dir")
     if num_params:
-        params0 = [Param(f"p0_{j:>04d}", "pval") for j in range(0,MAX_PARAMS_TAGS_PER_BATCH) ]
-        params1 = [Param(f"p1_{j:>04d}", "pval") for j in range(0,num_params) ]
+        params0 = [Param(f"p0_{j:>04d}", "pval") for j in range(MAX_PARAMS_TAGS_PER_BATCH) ]
+        params1 = [Param(f"p1_{j:>04d}", "pval") for j in range(num_params) ]
         client.log_batch(run.info.run_id, params=params0)
         client.log_batch(run.info.run_id, params=params1)
     if num_metrics:
-        metrics0 = [ Metric(f"m0_{j:>04d}", 0.87, now(), 0) for j in range(0,MAX_METRICS_PER_BATCH) ]
-        metrics1 = [ Metric(f"m1_{j:>04d}", 0.87, now(), 0) for j in range(0,num_metrics) ]
+        metrics0 = [ Metric(f"m0_{j:>04d}", 0.87, now(), 0) for j in range(MAX_METRICS_PER_BATCH) ]
+        metrics1 = [ Metric(f"m1_{j:>04d}", 0.87, now(), 0) for j in range(num_metrics) ]
         client.log_batch(run.info.run_id, metrics=metrics0)
         client.log_batch(run.info.run_id, metrics=metrics1)
     if num_tags:
-        tags0 = [RunTag(f"t0_{j:>04d}", "tval") for j in range(0,MAX_PARAMS_TAGS_PER_BATCH) ]
-        tags1 = [RunTag(f"t1_{j:>04d}", "tval") for j in range(0,num_tags) ]
+        tags0 = [RunTag(f"t0_{j:>04d}", "tval") for j in range(MAX_PARAMS_TAGS_PER_BATCH) ]
+        tags1 = [RunTag(f"t1_{j:>04d}", "tval") for j in range(num_tags) ]
         client.log_batch(run.info.run_id, tags=tags0)
         client.log_batch(run.info.run_id, tags=tags1)
     return exp, run
