@@ -8,7 +8,7 @@ import click
 from mlflow_export_import.common.click_options import (
     opt_experiment,
     opt_output_dir,
-    opt_run_ids_file,
+    opt_run_ids,
     opt_notebook_formats,
     opt_export_permissions,
     opt_run_start_time,
@@ -62,7 +62,7 @@ def export_experiment(
     failed_run_ids = []
     num_runs_exported = 0
     if run_ids:
-        for j,run_id in enumerate(run_ids):
+        for _,run_id in enumerate(run_ids):
             _export_run(mlflow_client, run_id, exp.experiment_id, output_dir, ok_run_ids, failed_run_ids,
                 run_start_time, run_start_time_str, export_deleted_runs, notebook_formats)
             num_runs_exported += 1
@@ -73,7 +73,7 @@ def export_experiment(
         if export_deleted_runs:
             from mlflow.entities import ViewType
             kwargs["view_type"] = ViewType.ALL
-        for j,run in enumerate(SearchRunsIterator(mlflow_client, exp.experiment_id, **kwargs)):
+        for _,run in enumerate(SearchRunsIterator(mlflow_client, exp.experiment_id, **kwargs)):
             _export_run(mlflow_client, run, exp.experiment_id, output_dir, ok_run_ids, failed_run_ids,
                 run_start_time, run_start_time_str, export_deleted_runs, notebook_formats)
             num_runs_exported += 1
@@ -147,22 +147,19 @@ def _export_run(mlflow_client, run_or_run_id, experiment_id, output_dir,
 @click.command()
 @opt_experiment
 @opt_output_dir
-@opt_run_ids_file
+@opt_run_ids
 @opt_export_permissions
 @opt_run_start_time
 @opt_export_deleted_runs
 @opt_notebook_formats
 
-def main(experiment, output_dir, run_ids_file, export_permissions, run_start_time, export_deleted_runs, notebook_formats):
+def main(experiment, output_dir, run_ids, export_permissions, run_start_time, export_deleted_runs, notebook_formats):
     _logger.info("Options:")
     for k,v in locals().items():
         _logger.info(f"  {k}: {v}")
 
-    if run_ids_file:
-        with open(run_ids_file, "r", encoding="utf-8") as f:
-            run_ids = [ line.rstrip() for line in f ]
-    else:
-        run_ids = None
+    if run_ids:
+        run_ids = run_ids.split(",")
 
     export_experiment(
         experiment_id_or_name = experiment,

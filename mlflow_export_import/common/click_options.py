@@ -88,9 +88,9 @@ def opt_export_version_model(function):
     )(function)
     return function
 
-def opt_run_ids_file(function):
-    function = click.option("--run-ids-file",
-        help="File with run IDs to export.",
+def opt_run_ids(function):
+    function = click.option("--run-ids",
+        help="List of run IDs to export (comma seperated).",
         type=str,
         required=False
     )(function)
