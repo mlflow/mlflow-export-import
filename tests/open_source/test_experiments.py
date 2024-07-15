@@ -240,3 +240,38 @@ def test_exp_with_multiple_runs_nonexistent_run(mlflow_context):
     runs2 = client2.search_runs(exp2.experiment_id)
     assert len(runs2) == 1
     compare_runs(mlflow_context, run1_ok, runs2[0])
+
+def test_exp_with_run_from_other_experiment(mlflow_context):
+    client1, client2 = mlflow_context.client_src, mlflow_context.client_dst
+    init_output_dirs(mlflow_context.output_dir)
+    exp1a = create_experiment(client1)
+    exp1b = create_experiment(client1)
+
+    mlflow.set_experiment(exp1a.name)
+    run1a = _create_simple_run(client1)
+
+    mlflow.set_experiment(exp1b.name)
+    run1b = _create_simple_run(client1)
+
+    runs1 = client1.search_runs(exp1a.experiment_id)
+    assert len(runs1) == 1
+
+    run_ids = [ run1b.info.run_id, run1a.info.run_id ]
+
+    export_experiment(
+        mlflow_client = client1,
+        experiment_id_or_name = exp1a.name,
+        run_ids = run_ids,
+        output_dir = mlflow_context.output_dir
+    )
+
+    exp_name2 = mk_dst_experiment_name(exp1a.name)
+    exp2 = import_experiment(
+        mlflow_client = client2,
+        experiment_name = exp_name2,
+        input_dir = mlflow_context.output_dir
+    )
+    exp2 = client2.get_experiment_by_name(exp_name2)
+    runs2 = client2.search_runs(exp2.experiment_id)
+    assert len(runs2) == 1
+    compare_runs(mlflow_context, run1a, runs2[0])

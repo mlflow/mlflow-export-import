@@ -131,6 +131,16 @@ def _export_run(mlflow_client, run_or_run_id, experiment_id, output_dir,
             _logger.info(f"Not exporting run: {msg}")
             return
 
+    if run.info.experiment_id != experiment_id:
+        msg = {
+           "run_id": {run.info.run_id},
+            "run.experiment_id": {run.info.experiment_id},
+            "experiment_id": {experiment_id}
+        }
+        _logger.warning(f"Not exporting run since it doesn't belong to experiment: {msg}")
+        failed_run_ids.append(run.info.run_id)
+        return
+
     is_success = export_run(
         run_id = run.info.run_id,
         output_dir = os.path.join(output_dir, run.info.run_id),
