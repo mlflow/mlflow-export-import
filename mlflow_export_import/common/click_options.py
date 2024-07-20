@@ -98,7 +98,7 @@ def opt_run_ids(function):
 
 def opt_check_nested_runs(function):
     function = click.option("--check-nested-runs",
-        help="Check if run is parent of nested run",
+        help="Check if run in the 'run-ids' option is a parent of nested runs and export all the nested runs.",
         type=bool,
         default=False,
         show_default=True
