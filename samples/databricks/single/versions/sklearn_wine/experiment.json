@@ -1,0 +1,59 @@
+{
+  "system": {
+    "package_version": "1.2.0",
+    "script": "export_model_version.py",
+    "export_file_version": "2",
+    "export_time": 1721364374,
+    "_export_time": "2024-07-19 04:46:14",
+    "mlflow_version": "2.14.3",
+    "mlflow_tracking_uri": "databricks://e2_demo_fieldeng",
+    "platform": {
+      "python_version": "3.8.16",
+      "system": "Darwin",
+      "processor": "i386"
+    },
+    "user": "andre.mesarovic"
+  },
+  "mlflow": {
+    "experiment": {
+      "experiment_id": "0828080c9c7b43a7b7624307809cfcda",
+      "name": "/Repos/andre.mesarovic@databricks.com/mlflow-examples/databricks/notebooks/basic/Sklearn_Wine_UC",
+      "artifact_location": "dbfs:/databricks/mlflow-tracking/0828080c9c7b43a7b7624307809cfcda",
+      "lifecycle_stage": "active",
+      "last_update_time": 1717552430207,
+      "creation_time": 1716309738995,
+      "tags": [
+        {
+          "key": "mlflow.experiment.sourceType",
+          "value": "REPO_NOTEBOOK"
+        },
+        {
+          "key": "mlflow.ownerId",
+          "value": "4566812440727830"
+        },
+        {
+          "key": "mlflow.sharedViewState.d6a47c70ec552dd064068bd2040c8c53e68e466c44a75fa3353a7747a8c6489c",
+          "value": "{\"searchFilter\":\"\",\"orderByKey\":\"attributes.start_time\",\"orderByAsc\":false,\"startTime\":\"ALL\",\"lifecycleFilter\":\"Active\",\"datasetsFilter\":[],\"modelVersionFilter\":\"All Runs\",\"selectedColumns\":[\"attributes.`Source`\",\"attributes.`Models`\",\"attributes.`Dataset`\"],\"runsExpanded\":{},\"runsPinned\":[],\"runsHidden\":[],\"runsHiddenMode\":\"FIRST_10_RUNS\",\"viewMaximized\":false,\"runListHidden\":false,\"isAccordionReordered\":false,\"useGroupedValuesInCharts\":true,\"groupBy\":null,\"groupsExpanded\":{},\"autoRefreshEnabled\":true}"
+        },
+        {
+          "key": "mlflow.experiment.sourceName",
+          "value": "/Repos/andre.mesarovic@databricks.com/mlflow-examples/databricks/notebooks/basic/Sklearn_Wine_UC"
+        },
+        {
+          "key": "mlflow.ownerId",
+          "value": "4566812440727830"
+        },
+        {
+          "key": "mlflow.ownerEmail",
+          "value": "andre.mesarovic@databricks.com"
+        },
+        {
+          "key": "mlflow.experiment.sourceId",
+          "value": "2824690123548175"
+        }
+      ],
+      "_last_update_time": "2024-06-05 01:53:50",
+      "_creation_time": "2024-05-21 16:42:19"
+    }
+  }
+}

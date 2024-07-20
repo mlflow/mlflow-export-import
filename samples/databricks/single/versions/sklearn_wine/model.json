@@ -1,0 +1,119 @@
+{
+  "system": {
+    "package_version": "1.2.0",
+    "script": "export_model_version.py",
+    "export_file_version": "2",
+    "export_time": 1721364374,
+    "_export_time": "2024-07-19 04:46:14",
+    "mlflow_version": "2.14.3",
+    "mlflow_tracking_uri": "databricks://e2_demo_fieldeng",
+    "platform": {
+      "python_version": "3.8.16",
+      "system": "Darwin",
+      "processor": "i386"
+    },
+    "user": "andre.mesarovic"
+  },
+  "mlflow": {
+    "registered_model": {
+      "name": "andre_catalog.ml_models2.sklearn_wine_best",
+      "creation_timestamp": 1691761329476,
+      "last_updated_timestamp": 1717552439520,
+      "user_id": "andre.mesarovic@databricks.com",
+      "description": "Best UC sklearn_wine registered model",
+      "aliases": [
+        {
+          "alias": "champ",
+          "version": "14"
+        },
+        {
+          "alias": "champ2",
+          "version": "3"
+        },
+        {
+          "alias": "prod",
+          "version": "1"
+        },
+        {
+          "alias": "white_2",
+          "version": "15"
+        }
+      ],
+      "tags": [
+        {
+          "key": "info",
+          "value": "My best model"
+        }
+      ],
+      "_creation_timestamp": "2023-08-11 13:42:09",
+      "_last_updated_timestamp": "2024-06-05 01:54:00",
+      "permissions": {
+        "permissions": {
+          "privilege_assignments": [
+            {
+              "principal": "account users",
+              "privileges": [
+                "ALL_PRIVILEGES"
+              ]
+            },
+            {
+              "principal": "andre.mesarovic@databricks.com",
+              "privileges": [
+                "EXECUTE"
+              ]
+            },
+            {
+              "principal": "global_read_test",
+              "privileges": [
+                "EXECUTE"
+              ]
+            }
+          ]
+        },
+        "effective_permissions": {
+          "privilege_assignments": [
+            {
+              "principal": "global_read_test",
+              "privileges": [
+                {
+                  "privilege": "EXECUTE"
+                },
+                {
+                  "privilege": "EXECUTE",
+                  "inherited_from_type": "CATALOG",
+                  "inherited_from_name": "andre_catalog"
+                }
+              ]
+            },
+            {
+              "principal": "account users",
+              "privileges": [
+                {
+                  "privilege": "ALL_PRIVILEGES"
+                },
+                {
+                  "privilege": "ALL_PRIVILEGES",
+                  "inherited_from_type": "CATALOG",
+                  "inherited_from_name": "andre_catalog"
+                }
+              ]
+            },
+            {
+              "principal": "andre.mesarovic@databricks.com",
+              "privileges": [
+                {
+                  "privilege": "EXECUTE"
+                },
+                {
+                  "privilege": "EXECUTE",
+                  "inherited_from_type": "SCHEMA",
+                  "inherited_from_name": "andre_catalog.ml_models2"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}

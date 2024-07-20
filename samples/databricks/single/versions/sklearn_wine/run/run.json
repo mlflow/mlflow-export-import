@@ -1,0 +1,104 @@
+{
+  "system": {
+    "package_version": "1.2.0",
+    "script": "export_run.py",
+    "export_file_version": "2",
+    "export_time": 1721364374,
+    "_export_time": "2024-07-19 04:46:14",
+    "mlflow_version": "2.14.3",
+    "mlflow_tracking_uri": "databricks://e2_demo_fieldeng",
+    "platform": {
+      "python_version": "3.8.16",
+      "system": "Darwin",
+      "processor": "i386"
+    },
+    "user": "andre.mesarovic"
+  },
+  "mlflow": {
+    "info": {
+      "run_uuid": "6222162b4c7f47c2820a7e5b520f65a9",
+      "run_id": "6222162b4c7f47c2820a7e5b520f65a9",
+      "experiment_id": "0828080c9c7b43a7b7624307809cfcda",
+      "user_id": "",
+      "status": "FINISHED",
+      "start_time": 1717552430207,
+      "end_time": 1717552437312,
+      "lifecycle_stage": "active",
+      "artifact_uri": "dbfs:/databricks/mlflow-tracking/0828080c9c7b43a7b7624307809cfcda/6222162b4c7f47c2820a7e5b520f65a9/artifacts",
+      "run_name": "white_2",
+      "_end_time": "2024-06-05 01:53:57",
+      "_start_time": "2024-06-05 01:53:50"
+    },
+    "params": {
+      "max_depth": "1"
+    },
+    "metrics": {
+      "r2": [
+        {
+          "value": 0.16952774536420723,
+          "timestamp": 1717552437157,
+          "step": 0
+        }
+      ],
+      "rmse": [
+        {
+          "value": 0.8248773953029855,
+          "timestamp": 1717552437018,
+          "step": 0
+        }
+      ]
+    },
+    "tags": {
+      "algorithm": "<class 'sklearn.tree._classes.DecisionTreeRegressor'>",
+      "data_source": "andre_catalog.ml_data.winequality_white_2",
+      "input_example": "True",
+      "log_input": "True",
+      "mlflow.databricks.cluster.id": "0519-020413-t1asguzo",
+      "mlflow.databricks.cluster.info": "{\"cluster_name\":\"andre_ML_15.1\",\"spark_version\":\"15.1.x-cpu-ml-scala2.12\",\"node_type_id\":\"r6id.xlarge\",\"driver_node_type_id\":\"r6id.xlarge\",\"autotermination_minutes\":120,\"disk_spec\":{\"disk_count\":0},\"num_workers\":1}",
+      "mlflow.databricks.cluster.libraries": "{\"installable\":[],\"redacted\":[]}",
+      "mlflow.databricks.gitRepoCommit": "4afec69ef703ad51d52c41b52696910017475764",
+      "mlflow.databricks.gitRepoProvider": "gitHub",
+      "mlflow.databricks.gitRepoReference": "master",
+      "mlflow.databricks.gitRepoReferenceType": "branch",
+      "mlflow.databricks.gitRepoRelativePath": "databricks/notebooks/basic/Sklearn_Wine_UC",
+      "mlflow.databricks.gitRepoStatus": "unknown",
+      "mlflow.databricks.gitRepoUrl": "https://github.com/amesar/mlflow-examples",
+      "mlflow.databricks.notebook.commandID": "1832365270251579733_8050031820591080118_fc7ed50c41ff4a8b928c2f6d45a7505b",
+      "mlflow.databricks.notebookID": "2824690123548175",
+      "mlflow.databricks.notebookPath": "/Repos/andre.mesarovic@databricks.com/mlflow-examples/databricks/notebooks/basic/Sklearn_Wine_UC",
+      "mlflow.databricks.webappURL": "https://oregon.cloud.databricks.com",
+      "mlflow.databricks.workspaceID": "1444828305810485",
+      "mlflow.databricks.workspaceURL": "e2-demo-field-eng.cloud.databricks.com",
+      "mlflow.log-model.history": "[{\"artifact_path\":\"model\",\"saved_input_example_info\":{\"artifact_path\":\"input_example.json\",\"type\":\"dataframe\",\"pandas_orient\":\"split\"},\"signature\":{\"inputs\":\"[{\\\"type\\\": \\\"double\\\", \\\"name\\\": \\\"fixed_acidity\\\", \\\"required\\\": true}, {\\\"type\\\": \\\"double\\\", \\\"name\\\": \\\"volatile_acidity\\\", \\\"required\\\": true}, {\\\"type\\\": \\\"double\\\", \\\"name\\\": \\\"citric_acid\\\", \\\"required\\\": true}, {\\\"type\\\": \\\"double\\\", \\\"name\\\": \\\"residual_sugar\\\", \\\"required\\\": true}, {\\\"type\\\": \\\"double\\\", \\\"name\\\": \\\"chlorides\\\", \\\"required\\\": true}, {\\\"type\\\": \\\"double\\\", \\\"name\\\": \\\"free_sulfur_dioxide\\\", \\\"required\\\": true}, {\\\"type\\\": \\\"double\\\", \\\"name\\\": \\\"total_sulfur_dioxide\\\", \\\"required\\\": true}, {\\\"type\\\": \\\"double\\\", \\\"name\\\": \\\"density\\\", \\\"required\\\": true}, {\\\"type\\\": \\\"double\\\", \\\"name\\\": \\\"pH\\\", \\\"required\\\": true}, {\\\"type\\\": \\\"double\\\", \\\"name\\\": \\\"sulphates\\\", \\\"required\\\": true}, {\\\"type\\\": \\\"double\\\", \\\"name\\\": \\\"alcohol\\\", \\\"required\\\": true}]\",\"outputs\":\"[{\\\"type\\\": \\\"tensor\\\", \\\"tensor-spec\\\": {\\\"dtype\\\": \\\"float64\\\", \\\"shape\\\": [-1]}}]\",\"params\":null},\"flavors\":{\"python_function\":{\"predict_fn\":\"predict\",\"model_path\":\"model.pkl\",\"loader_module\":\"mlflow.sklearn\",\"env\":{\"conda\":\"conda.yaml\",\"virtualenv\":\"python_env.yaml\"},\"python_version\":\"3.11.0\"},\"sklearn\":{\"pickled_model\":\"model.pkl\",\"sklearn_version\":\"1.3.0\",\"serialization_format\":\"cloudpickle\",\"code\":null}},\"run_id\":\"6222162b4c7f47c2820a7e5b520f65a9\",\"model_uuid\":\"7c56d8b80973448b8c4e7b5a3b9fc7b6\",\"model_size_bytes\":102527,\"utc_time_created\":\"2024-06-05 01:53:53.910623\",\"mlflow_version\":\"2.13.1\",\"databricks_runtime\":\"15.1\"}]",
+      "mlflow.runName": "white_2",
+      "mlflow.source.name": "/Repos/andre.mesarovic@databricks.com/mlflow-examples/databricks/notebooks/basic/Sklearn_Wine_UC",
+      "mlflow.source.type": "NOTEBOOK",
+      "mlflow.user": "andre.mesarovic@databricks.com",
+      "run_name": "white_2",
+      "sparkDatasourceInfo": "path=s3://databricks-e2demofieldengwest/b169b504-4c54-49f2-bc3a-adf4b128f36d/tables/968250e8-0300-4ce2-8e00-89ae933d9e5b,version=1,format=delta",
+      "timestamp": "2024-06-05 01:50:43",
+      "version.DATABRICKS_RUNTIME_VERSION": "15.1",
+      "version.mlflow": "2.13.1",
+      "version.python": "3.11.0rc1",
+      "version.sklearn": "1.3.0"
+    },
+    "inputs": [
+      {
+        "dataset": {
+          "name": "winequality_white_2",
+          "digest": "062ac4fa",
+          "source_type": "delta_table",
+          "source": "{\"delta_table_name\": \"andre_catalog.ml_data.winequality_white_2\", \"delta_table_version\": 1, \"is_databricks_uc_table\": true, \"delta_table_id\": \"968250e8-0300-4ce2-8e00-89ae933d9e5b\"}",
+          "schema": "{\"mlflow_colspec\": [{\"type\": \"double\", \"name\": \"fixed_acidity\", \"required\": true}, {\"type\": \"double\", \"name\": \"volatile_acidity\", \"required\": true}, {\"type\": \"double\", \"name\": \"citric_acid\", \"required\": true}, {\"type\": \"double\", \"name\": \"residual_sugar\", \"required\": true}, {\"type\": \"double\", \"name\": \"chlorides\", \"required\": true}, {\"type\": \"double\", \"name\": \"free_sulfur_dioxide\", \"required\": true}, {\"type\": \"double\", \"name\": \"total_sulfur_dioxide\", \"required\": true}, {\"type\": \"double\", \"name\": \"density\", \"required\": true}, {\"type\": \"double\", \"name\": \"pH\", \"required\": true}, {\"type\": \"double\", \"name\": \"sulphates\", \"required\": true}, {\"type\": \"double\", \"name\": \"alcohol\", \"required\": true}, {\"type\": \"integer\", \"name\": \"quality\", \"required\": true}]}",
+          "profile": "{\"approx_count\": 4824}"
+        },
+        "tags": [
+          {
+            "key": "mlflow.data.context",
+            "value": "training"
+          }
+        ]
+      }
+    ]
+  }
+}

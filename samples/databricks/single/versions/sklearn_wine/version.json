@@ -1,0 +1,41 @@
+{
+  "system": {
+    "package_version": "1.2.0",
+    "script": "export_model_version.py",
+    "export_file_version": "2",
+    "export_time": 1721364374,
+    "_export_time": "2024-07-19 04:46:14",
+    "mlflow_version": "2.14.3",
+    "mlflow_tracking_uri": "databricks://e2_demo_fieldeng",
+    "platform": {
+      "python_version": "3.8.16",
+      "system": "Darwin",
+      "processor": "i386"
+    },
+    "user": "andre.mesarovic"
+  },
+  "mlflow": {
+    "model_version": {
+      "name": "andre_catalog.ml_models2.sklearn_wine_best",
+      "version": "15",
+      "creation_timestamp": 1717552439516,
+      "last_updated_timestamp": 1717552440318,
+      "description": "white_2",
+      "user_id": "andre.mesarovic@databricks.com",
+      "current_stage": null,
+      "source": "dbfs:/databricks/mlflow-tracking/0828080c9c7b43a7b7624307809cfcda/6222162b4c7f47c2820a7e5b520f65a9/artifacts/model",
+      "run_id": "6222162b4c7f47c2820a7e5b520f65a9",
+      "run_link": null,
+      "status": "READY",
+      "status_message": "",
+      "tags": {
+        "alias": "white_2"
+      },
+      "aliases": [
+        "white_2"
+      ],
+      "_creation_timestamp": "2024-06-05 01:54:00",
+      "_last_updated_timestamp": "2024-06-05 01:54:00"
+    }
+  }
+}
