@@ -11,8 +11,11 @@ def get_nested_runs(client, runs):
     if utils.calling_databricks():
         return get_by_rootRunId(client, runs)
     else:
-        _logger.warning(f"OSS MLflow nested run export not yet supported")
-        return runs
+        #_logger.warning(f"OSS MLflow nested run export not yet supported")
+        #return runs
+        from . import oss_nested_runs_utils
+        descendant_runs = oss_nested_runs_utils.get_descendant_runs(client, runs)
+        return runs + descendant_runs
 
 
 def get_by_rootRunId(client, runs):
@@ -23,5 +26,9 @@ def get_by_rootRunId(client, runs):
     descendant_runs= []
     for run in runs:
         filter = f"tags.mlflow.rootRunId = '{run.info.run_id}'"
-        descendant_runs += list(SearchRunsIterator(client, run.info.experiment_id, filter=filter))
+        _descendant_runs = list(SearchRunsIterator(client, run.info.experiment_id, filter=filter))
+        if _descendant_runs:
+            descendant_runs += _descendant_runs
+        else:
+            descendant_runs.append(run)
     return descendant_runs
