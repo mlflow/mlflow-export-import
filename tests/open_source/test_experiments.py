@@ -221,7 +221,7 @@ def test_exp_with_multiple_runs_nonexistent_run(mlflow_context):
     assert len(runs1) == num_runs
 
     run1_ok =  runs1[1]
-    run_ids = [ "foo", run1_ok ]
+    run_ids = [ "foo", run1_ok.info.run_id ]
 
     export_experiment(
         mlflow_client = client1,
