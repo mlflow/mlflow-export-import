@@ -53,15 +53,12 @@ run_start_date = dbutils.widgets.get("3. Run start date")
 dbutils.widgets.dropdown("4. Export permissions","no",["yes","no"])
 export_permissions = dbutils.widgets.get("4. Export permissions") == "yes"
 
-notebook_formats = get_notebook_formats(5)
-
 if run_start_date=="": run_start_date = None
 
 print("experiment_id_or_name:", experiment_id_or_name)
 print("output_dir:", output_dir)
 print("run_start_date:", run_start_date)
 print("export_permissions:", export_permissions)
-print("notebook_formats:", notebook_formats)
 
 # COMMAND ----------
 
@@ -99,8 +96,7 @@ export_experiment(
     experiment_id_or_name = experiment.experiment_id,
     output_dir = output_dir,
     run_start_time = run_start_date,
-    export_permissions = export_permissions,
-    notebook_formats = notebook_formats
+    export_permissions = export_permissions
 )
 
 # COMMAND ----------
