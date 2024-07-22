@@ -13,15 +13,15 @@ See sample JSON export files [here](README_export_format.md#sample-export-json-f
 
 | MLflow Object | Documentation | Code |
 |-------|-------|---|
-| Registered Model | [export-model](#Export-Registered-model) | [code](mlflow_export_import/model/export_model.py) |
-|    | [import-model](#Import-registered-model) | [code](mlflow_export_import/model/import_model.py) |
-| Model Version | [export-model-version](#Export-Model-Version) | [code](mlflow_export_import/model_version/export_model_version.py) |
-|    | [import-model-version](#Import-model-version) | [code](mlflow_export_import/model_version/import_model_version.py) |
+| Registered Model | [export-model](#export-registered-model) | [code](mlflow_export_import/model/export_model.py) |
+|    | [import-model](#import-registered-model) | [code](mlflow_export_import/model/import_model.py) |
+| Model Version | [export-model-version](#export-model-version) | [code](mlflow_export_import/model_version/export_model_version.py) |
+|    | [import-model-version](#import-model-version) | [code](mlflow_export_import/model_version/import_model_version.py) |
 |    | [copy-model-version](README_copy.md#copy-model-version) | [code](mlflow_export_import/copy/copy_model_version.py) |
-| Experiment | [export-experiment](#Export-Experiment) | [code](mlflow_export_import/experiment/export_experiment.py) |
-|    | [import-experiment](#Import-Experiment) | [code](mlflow_export_import/experiment/import_experiment.py) |
-| Run | [export-run](#Export-run) | [code](mlflow_export_import/run/export_run.py) |
-|  | [import-run](#Import-run) | [code](mlflow_export_import/run/import_run.py) |
+| Experiment | [export-experiment](#export-experiment) | [code](mlflow_export_import/experiment/export_experiment.py) |
+|    | [import-experiment](#import-experiment) | [code](mlflow_export_import/experiment/import_experiment.py) |
+| Run | [export-run](#export-run) | [code](mlflow_export_import/run/export_run.py) |
+|  | [import-run](#import-run) | [code](mlflow_export_import/run/import_run.py) |
 |  | [copy-run](README_copy.md#copy-run) | [code](mlflow_export_import/copy/copy_run.py) |
 
 ## Experiment Tools
@@ -39,30 +39,51 @@ export-experiment --help
 Options:
   --experiment TEXT              Experiment name or ID.  [required]
   --output-dir TEXT              Output directory.  [required]
+  --run-ids TEXT                 List of run IDs to export (comma seperated).
   --export-permissions BOOLEAN   Export Databricks permissions.  [default:
                                  False]
   --run-start-time TEXT          Only export runs started after this UTC time
                                  (inclusive). Format: YYYY-MM-DD.
   --export-deleted-runs BOOLEAN  Export deleted runs.  [default: False]
+  --check-nested-runs BOOLEAN    Check if run in the 'run-ids' option is a
+                                 parent of nested runs and export all the
+                                 nested runs.  [default: False]
   --notebook-formats TEXT        Databricks notebook formats. Values are
                                  SOURCE, HTML, JUPYTER or DBC (comma
-                                 seperated).
+                                 separated).
 ```
 
 #### Examples
 
-Export experiment by experiment ID.
+##### Export experiment by experiment ID:
 ```
 export-experiment \
   --experiment 2 \
   --output-dir out
 ```
 
-Export experiment by experiment name.
+##### Export experiment by experiment name:
 ```
 export-experiment \
   --experiment sklearn-wine \
   --output-dir out
+```
+
+##### Export selected runs:
+```
+export-experiment \
+  --experiment sklearn-wine \
+  --output-dir out \
+  --run-ids 1eea5a4f49184781947d6761b7207b25,1320b260e894469a9b60b415a25e4062
+```
+
+##### Export selected nested runs:
+```
+export-experiment \
+  --experiment sklearn-wine \
+  --output-dir out \
+  --run-ids 1eea5a4f49184781947d6761b7207b25 \
+  --check-nested-runs True 
 ```
 
 #### Databricks export examples
