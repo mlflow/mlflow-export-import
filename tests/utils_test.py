@@ -4,6 +4,7 @@ import yaml
 import shortuuid
 import pandas as pd 
 import mlflow
+from mlflow_export_import.common.mlflow_utils import MlflowTrackingUriTweak
 from . import sklearn_utils
 
 TEST_OBJECT_PREFIX = "test_exim"
@@ -61,3 +62,22 @@ def read_config_file(path="config.yaml"):
         for k,v in dct.items():
             print(f"  {k}: {v}")
     return dct
+
+
+def create_nested_runs(client, experiment_id, max_depth=1, max_width=1, level=0, indent=""):
+    run_name = "run"
+    if level >= max_depth:
+        return
+    run_name = f"{run_name}_{level}"
+    nested = level > 0
+    with MlflowTrackingUriTweak(client) as run:
+        with mlflow.start_run(experiment_id=experiment_id, run_name=run_name, nested=nested) as run:
+            mlflow.log_param("alpha", "0.123")
+            mlflow.log_metric("m",0.123)
+            mlflow.set_tag("run_name", run_name)
+            mlflow.set_tag("ori_run_id", run.info.run_id)
+            model = sklearn_utils.create_sklearn_model()
+            mlflow.sklearn.log_model(model, "model")
+            for _ in range(max_width):
+                create_nested_runs(client, experiment_id, max_depth, max_width, level+1, indent+"  ")
+    return client.get_run(run.info.run_id)
