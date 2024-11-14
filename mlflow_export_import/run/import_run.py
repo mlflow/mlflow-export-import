@@ -7,7 +7,7 @@ import click
 import base64
 
 from mlflow.entities.lifecycle_stage import LifecycleStage
-from mlflow.entities import RunStatus
+from mlflow.entities import Dataset, DatasetInput, InputTag, RunStatus
 from mlflow.utils.mlflow_tags import MLFLOW_PARENT_RUN_ID
 
 from mlflow_export_import.common.click_options import (
@@ -81,7 +81,7 @@ def import_run(
             use_src_user_id,
             in_databricks
         )
-        _import_inputs(http_client, src_run_dct, run_id)
+        _import_inputs(mlflow_client, src_run_dct, run_id)
 
         path = _fs.mk_local_path(os.path.join(input_dir, "artifacts"))
         if os.path.exists(path):
@@ -141,10 +141,12 @@ def _upload_databricks_notebook(dbx_client, input_dir, src_run_dct, dst_notebook
         _logger.warning(f"Cannot save notebook '{dst_notebook_path}'. {e}")
 
 
-def _import_inputs(http_client, src_run_dct, run_id):
-    inputs = src_run_dct.get("inputs")
-    dct = { "run_id": run_id, "datasets": inputs }
-    http_client.post("runs/log-inputs", dct)
+def _import_inputs(mlflow_client, src_run_dct, run_id):
+    inputs = src_run_dct.get("inputs", [])
+    if not inputs:
+        return
+    dataset_inputs = [DatasetInput(Dataset.from_dictionary(input['dataset']), [InputTag.from_dictionary(tag) for tag in input['tags']]) for input in inputs]
+    mlflow_client.log_inputs(run_id=run_id, datasets=dataset_inputs)
 
 
 @click.command()
