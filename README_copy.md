@@ -152,7 +152,7 @@ Options:
 
 Overview:
 * Copies a run to either the same or another tracking server (workspace).
-* Source code: [Copy_Run.py](mlflow_export_import/copy/Copy_Run.py).
+* Source code: [copy_run.py](mlflow_export_import/copy/copy_run.py).
 
 ### Examples
 
