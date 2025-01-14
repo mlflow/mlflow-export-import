@@ -112,8 +112,8 @@ def import_run(
             path = _fs.mk_local_path(os.path.join(input_dir, "artifacts"))
             if os.path.exists(path):
                 mlflow_client.log_artifacts(run_id, path)
-            if mlmodel_fix:
-                run_utils.update_mlmodel_run_id(mlflow_client, run_id)
+            #if mlmodel_fix:
+            #    run_utils.update_mlmodel_run_id(mlflow_client, run_id)
             mlflow_client.set_terminated(run_id, RunStatus.to_string(RunStatus.FINISHED))
             mlflow.end_run()
             run = mlflow_client.get_run(run_id)

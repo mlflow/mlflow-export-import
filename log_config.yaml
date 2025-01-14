@@ -23,7 +23,7 @@ handlers:
 
 loggers:
   mlflow_export_import:
-    level: DEBUG
+    level: INFO
     handlers: [console, file_handler]
     propagate: no
 
