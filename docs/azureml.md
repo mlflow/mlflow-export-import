@@ -14,10 +14,15 @@
 3. Create a `.env` file and configure the following variables:
 
     ```text
-    MLFLOW_TRACKING_URI=<aml_mlflow_tracking_uri>
+    MLFLOW_TRACKING_URI_EXPORT=<aml_mlflow_tracking_uri>
+    MLFLOW_TRACKING_URI_IMPORT=<aml_mlflow_tracking_uri>
     ```
 
     Note: You can retrieve the MLFLOW_TRACKING_URI value from the Azure Portal, in the homepage of the AML Workspace resource.
+
+4. Create in the root of the project the two AML config file, named them as following:
+    - `config.export.json`: config file of the source AML Workspace
+    - `config.target.json`: config file of the target AML WOrkspace
 
 ### Run the script
 

@@ -49,6 +49,8 @@ def import_experiment(
     :return: Dictionary of source run_id (key) to destination run.info object (value).
     """
 
+    _logger.debug(f"Starting import_experiment: {experiment_name}, {input_dir}, {import_source_tags}, {import_permissions}, {use_src_user_id}, {dst_notebook_dir}")
+
     if mlflow_tracking_uri:
         mlflow_client = mlflow_client or create_mlflow_client_from_tracking_uri(mlflow_tracking_uri)
     else:
@@ -59,6 +61,9 @@ def import_experiment(
     path = io_utils.mk_manifest_json_path(input_dir, "experiment.json")
     root_dct = io_utils.read_file(path)
     info = io_utils.get_info(root_dct)
+    
+    _logger.debug(f"Retrieved experiment info from '{path}'")
+    
     mlflow_dct = io_utils.get_mlflow(root_dct)
     exp_dct = mlflow_dct["experiment"]
 
@@ -70,13 +75,21 @@ def import_experiment(
         set_source_tags_for_field(exp, tags)
         fmt_timestamps("creation_time", exp, tags)
         fmt_timestamps("last_update_time", exp, tags)
+        
+    _logger.info(f"Importing experiment '{experiment_name}' from '{input_dir}'....")
+    
+    _logger.info(f"Tags: {tags}")
 
     exp = mlflow_utils.set_experiment_azureml(mlflow_client, experiment_name, tags)
+    
+    _logger.info(f"Created experiment '{exp.name}' with ID '{exp.experiment_id}'")
 
     # if import_permissions:
     #     perms_dct = mlflow_dct.get("permissions", None)
     #     if perms_dct:
     #         ws_permissions_utils.update_permissions(dbx_client, perms_dct, "experiment", exp.name, exp.experiment_id)
+
+    _logger.info("Start importing runs....")
 
     run_ids = mlflow_dct["runs"]
     failed_run_ids = info["failed_runs"]

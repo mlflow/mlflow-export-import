@@ -3,6 +3,8 @@ import mlflow
 from mlflow.utils.mlflow_tags import MLFLOW_RUN_NOTE
 from mlflow.exceptions import RestException, MlflowException
 
+import traceback
+
 from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common.iterators import SearchModelVersionsIterator
 from mlflow_export_import.common import utils
@@ -44,27 +46,38 @@ def set_experiment(mlflow_client, dbx_client, exp_name, tags=None):
         _logger.info(f"Using existing experiment '{exp.name}' with location '{exp.artifact_location}'")
     return exp
 
-def set_experiment_azureml(mlflow_client, exp_name, tags=None):
+def set_experiment_azureml(mlflow_client: mlflow.MlflowClient, exp_name, tags=None):
     """
     Set experiment name.
     :return: Experiment
     """
+    _logger.info(f"Creating experiment '{exp_name}'")
     try:
-        if not tags: tags = {}
         #tags = utils.create_mlflow_tags_for_databricks_import(tags)
+        tags = {"mlflow.source.name": "mlflow-import-export"}
         exp_id = mlflow_client.create_experiment(exp_name, tags=tags)
         exp = mlflow_client.get_experiment(exp_id)
-        _logger.info(f"Created experiment '{exp.name}' with location '{exp.artifact_location}'")
+        _logger.info(f"Created experiment '{exp.name}' with ID {exp.experiment_id} and with location '{exp.artifact_location}'")
     except RestException as ex:
         if ex.error_code != "RESOURCE_ALREADY_EXISTS":
+            _logger.error(f"Cannot create experiment '{exp_name}'. Error: {ex}")
             raise MlflowExportImportException(ex, f"Cannot create experiment '{exp_name}'")
+        _logger.warning(f"Experiment '{exp_name}' already exists")
         exp = mlflow_client.get_experiment_by_name(exp_name)
         _logger.info(f"Using existing experiment '{exp.name}' with location '{exp.artifact_location}'")
     except MlflowException as ex:
         if ex.error_code != "RESOURCE_ALREADY_EXISTS":
+            _logger.error(f"Cannot create experiment '{exp_name}'. Error: {ex}")
             raise MlflowExportImportException(ex, f"Cannot create experiment '{exp_name}'")
+        _logger.warning(f"Experiment '{exp_name}' already exists")
         exp = mlflow_client.get_experiment_by_name(exp_name)
         _logger.info(f"Using existing experiment '{exp.name}' with location '{exp.artifact_location}'")
+    except Exception as ex:
+        _logger.error(f"Error creating experiment '{exp_name}'")
+        _logger.error(f"Exception: {ex}")
+        _logger.error(f"Traceback: {traceback.format_exc()}")
+        raise MlflowExportImportException(ex, f"Cannot create experiment '{exp_name}'")
+    
     return exp
 
 def get_first_run(mlflow_client, exp_id_or_name):

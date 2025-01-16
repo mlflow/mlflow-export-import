@@ -86,40 +86,42 @@ def import_run(
     src_run_dct = io_utils.read_file_mlflow(src_run_path)
     in_databricks = None #"DATABRICKS_RUNTIME_VERSION" in os.environ
 
-    #run = mlflow_client.create_run(exp.experiment_id)
-    # If a run is running, terminate it
-    mlflow.end_run()
-    run = mlflow.start_run(experiment_id=exp.experiment_id)
+    _logger.info(f"Creating run for experiment '{exp.name}'")
+    run = mlflow_client.create_run(exp.experiment_id)
     run_id = run.info.run_id
+    _logger.info(f"Created run '{run_id}' for experiment '{exp.name}'")
     try:
-            run_data_importer.import_run_data(
-                mlflow_client,
-                src_run_dct,
-                run_id,
-                import_source_tags,
-                src_run_dct["info"]["user_id"],
-                use_src_user_id,
-                in_databricks
-            )
-            
-            inputs = src_run_dct.get("inputs")
-            if inputs:
-                for input in inputs:
-                    mlflow.log_input(datasets=input)
-            
-            #_import_inputs(http_client, src_run_dct, run_id)
+        run_data_importer.import_run_data(
+            mlflow_client,
+            src_run_dct,
+            run_id,
+            import_source_tags,
+            src_run_dct["info"]["user_id"],
+            use_src_user_id,
+            in_databricks
+        )
+        
+        inputs = src_run_dct.get("inputs")
+        if inputs:
+            for input in inputs:
+                mlflow.log_input(datasets=input)
+        
+        #_import_inputs(http_client, src_run_dct, run_id)
 
-            path = _fs.mk_local_path(os.path.join(input_dir, "artifacts"))
-            if os.path.exists(path):
-                mlflow_client.log_artifacts(run_id, path)
-            #if mlmodel_fix:
-            #    run_utils.update_mlmodel_run_id(mlflow_client, run_id)
-            mlflow_client.set_terminated(run_id, RunStatus.to_string(RunStatus.FINISHED))
-            mlflow.end_run()
-            run = mlflow_client.get_run(run_id)
-            if src_run_dct["info"]["lifecycle_stage"] == LifecycleStage.DELETED:
-                mlflow_client.delete_run(run.info.run_id)
-                run = mlflow_client.get_run(run.info.run_id)
+        path = _fs.mk_local_path(os.path.join(input_dir, "artifacts"))
+        
+        _logger.info(f"Logging artifacts for run '{run_id}' from '{path}'")
+        
+        if os.path.exists(path):
+            mlflow_client.log_artifacts(run_id, path)
+        #if mlmodel_fix:
+        #    run_utils.update_mlmodel_run_id(mlflow_client, run_id)
+        mlflow_client.set_terminated(run_id, RunStatus.to_string(RunStatus.FINISHED))
+        mlflow.end_run()
+        run = mlflow_client.get_run(run_id)
+        if src_run_dct["info"]["lifecycle_stage"] == LifecycleStage.DELETED:
+            mlflow_client.delete_run(run.info.run_id)
+            run = mlflow_client.get_run(run.info.run_id)
     except Exception as e:
         mlflow_client.set_terminated(run_id, RunStatus.to_string(RunStatus.FAILED))
         mlflow.end_run()

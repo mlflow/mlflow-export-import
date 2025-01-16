@@ -10,4 +10,5 @@ meta.yaml
 
 build/
 
-config.json
+config.source.json
+config.target.json

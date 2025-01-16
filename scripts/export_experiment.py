@@ -6,11 +6,11 @@ from mlflow_export_import.experiment.export_experiment import export_experiment
 
 load_dotenv()
 
-mlflow_tracking_uri = os.getenv("MLFLOW_TRACKING_URI")
+mlflow_tracking_uri = os.getenv("MLFLOW_TRACKING_URI_EXPORT")
 
 print(mlflow_tracking_uri)
 
-experiment_id_or_name="inference-feature-selection"
+experiment_id_or_name="register_model_with_component"
 output_dir="output"
 
 mlflow_client = client_utils.create_mlflow_client_from_tracking_uri(mlflow_tracking_uri)

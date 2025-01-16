@@ -1,6 +1,13 @@
 import os
 import pandas as pd
+import mlflow
 from tabulate import tabulate
+from enum import Enum, auto
+
+class MLFlowImplementation(Enum):
+    DATABRICKS = auto()
+    AZURE_ML = auto()
+    OSS = auto()
 
 def getLogger(name):
     from mlflow_export_import.common import logging_utils
@@ -40,21 +47,37 @@ _DATABRICKS_SKIP_TAGS = {
     "mlflow.experiment.sourceId"
 }
 
+_AZURE_ML_SKIP_TAGS = set([
+  "mlflow.user",
+  "mlflow.source.git.commit"
+  ])
 
 def create_mlflow_tags_for_databricks_import(tags):
-    if calling_databricks():
-        tags = { k:v for k,v in tags.items() if not k in _DATABRICKS_SKIP_TAGS }
-    return tags
+    environment = get_import_target_implementation()
+    if environment == MLFlowImplementation.DATABRICKS:
+        return { k:v for k,v in tags.items() if not k in _DATABRICKS_SKIP_TAGS }
+    if environment == MLFlowImplementation.AZURE_ML:
+        return { k:v for k,v in tags.items() if not k in _AZURE_ML_SKIP_TAGS }
+    if environment == MLFlowImplementation.OSS:
+        return tags
+    raise Exception("Unsupported environment")
 
 
 def set_dst_user_id(tags, user_id, use_src_user_id):
-    if calling_databricks():
+    if get_import_target_implementation() in (MLFlowImplementation.DATABRICKS, 
+                                              MLFlowImplementation.AZURE_ML):
         return
     from mlflow.entities import RunTag
     from mlflow.utils.mlflow_tags import MLFLOW_USER
     user_id = user_id if use_src_user_id else get_user_id()
     tags.append(RunTag(MLFLOW_USER,user_id ))
 
+def get_import_target_implementation() -> MLFlowImplementation:
+    if mlflow.tracking.get_tracking_uri().startswith("databricks"):
+        return MLFlowImplementation.DATABRICKS
+    if mlflow.tracking.get_tracking_uri().startswith("azureml"):
+        return MLFlowImplementation.AZURE_ML
+    return MLFlowImplementation.OSS
 
 # Tags
 
