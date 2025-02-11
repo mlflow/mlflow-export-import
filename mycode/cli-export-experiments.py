@@ -43,22 +43,12 @@ with open("/dbfs/FileStore/shared_uploads/darrell.coles@crowncastle.com/azure_da
 
 # COMMAND ----------
 
-# DBTITLE 0,`export-models` options
-# MAGIC %sh 
-# MAGIC export-experiments --help
-
-# COMMAND ----------
-
 # DBTITLE 1,cli execution
 # MAGIC %sh 
 # MAGIC export-experiments \
-# MAGIC   --output-dir /dbfs/mnt/ccidsdatascidatalake/mlflow-migration-01/experiments \
+# MAGIC   --output-dir /dbfs/mnt/ccidsdatascidatalake/mlflow-migration-02/experiments \
 # MAGIC   --experiments all \
-# MAGIC   --run-start-time 2022-11-01 \
+# MAGIC   --run-start-time 2024-08-01 \
 # MAGIC   --export-permissions True \
 # MAGIC   --notebook-formats SOURCE \
 # MAGIC   --use-threads True
-
-# COMMAND ----------
-
-
