@@ -7,7 +7,7 @@
 # COMMAND ----------
 
 # DBTITLE 1,we can see the s3 mount from %sh :)
-# MAGIC %sh ls /dbfs/mnt/ccidsdatascidatalake/
+# MAGIC %sh ls /dbfs/mnt/datalake/
 
 # COMMAND ----------
 
@@ -27,7 +27,7 @@ os.environ["MLFLOW_EXPORT_IMPORT_LOG_FORMAT"]="%(threadName)s-%(levelname)s-%(me
 
 os.environ["MLFLOW_TRACKING_URI"]="databricks"
 
-with open("/dbfs/FileStore/shared_uploads/darrell.coles@crowncastle.com/aws_databricks_credentials") as f:
+with open("/dbfs/FileStore/tables/aws_databricks_credentials") as f:
   os.environ["DATABRICKS_HOST"]  = f.readline().strip("\n")
   os.environ["DATABRICKS_TOKEN"] = f.readline().strip("\n")
 
@@ -52,11 +52,12 @@ with open("/dbfs/FileStore/shared_uploads/darrell.coles@crowncastle.com/aws_data
 # DBTITLE 1,cli execution
 # MAGIC %sh 
 # MAGIC import-models \
-# MAGIC   --input-dir /dbfs/mnt/ccidsdatascidatalake/mlflow-migration-models \
+# MAGIC   --input-dir /dbfs/mnt/datalake/mlflow-migration-models \
 # MAGIC   --delete-model True \
 # MAGIC   --import-permissions True \
 # MAGIC   --import-source-tags True \
 # MAGIC   --verbose True
+# MAGIC   # --use-threads True
 
 # COMMAND ----------
 
