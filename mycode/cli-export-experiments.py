@@ -43,10 +43,10 @@ with open("/dbfs/FileStore/shared_uploads/darrell.coles@crowncastle.com/azure_da
 
 # COMMAND ----------
 
-# DBTITLE 1,cli execution
+# DBTITLE 1,cli execution | all
 # MAGIC %sh 
 # MAGIC export-experiments \
-# MAGIC   --output-dir /dbfs/mnt/ccidsdatascidatalake/mlflow-migration-02/experiments \
+# MAGIC   --output-dir /dbfs/mnt/ccidsdatascidatalake/mlflow-migration/experiments \
 # MAGIC   --experiments all \
 # MAGIC   --run-start-time 2024-08-01 \
 # MAGIC   --export-permissions True \
