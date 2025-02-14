@@ -19,7 +19,7 @@ import os
 # DBTITLE 1,set model env vars
 wij = dbutils.widgets
 
-wij.text("input_dir","/dbfs/mnt/ccidsdatascidatalake/mlflow-migration-models/models")
+wij.text("input_dir","/dbfs/mnt/datalake/mlflow-migration-models/models")
 input_dir = wij.get("input_dir")
 
 wij.text("model_name", "churn-model")
