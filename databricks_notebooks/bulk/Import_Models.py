@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md ## Import Models
-# MAGIC 
+# MAGIC
 # MAGIC Widgets 
 # MAGIC * `1. Input directory` - directory of exported models. 
 # MAGIC * `2. Delete model` - delete the current contents of model
@@ -8,7 +8,7 @@
 # MAGIC * `4. Experiment rename file` - Experiment rename file.
 # MAGIC * `5. Import source tags`
 # MAGIC * `6. Use threads` - use multi-threaded import
-# MAGIC 
+# MAGIC
 # MAGIC See https://github.com/mlflow/mlflow-export-import/blob/master/README_bulk.md#Import-registered-models
 
 # COMMAND ----------
@@ -47,17 +47,35 @@ print("use_threads:", use_threads)
 
 # COMMAND ----------
 
+# DBTITLE 1,set up log file
+import os 
+from datetime import datetime
+import pytz
+
+cst = pytz.timezone('US/Central')
+now = datetime.now(tz=cst)
+date = now.strftime("%Y-%m-%d-%H:%M:%S")
+
+logfile = f"import_models.{date}.log"
+os.environ["MLFLOW_EXPORT_IMPORT_LOG_OUTPUT_FILE"] = logfile 
+
+print("Logging to", logfile)
+
+# COMMAND ----------
+
 assert_widget(input_dir, "1. Input directory")
 
 # COMMAND ----------
 
-from mlflow_export_import.bulk.import_models import import_all
+from mlflow_export_import.bulk.import_models import import_models
 
-import_all(
-    input_dir = input_dir,
-    delete_model = delete_model,
-    import_source_tags = import_source_tags,
-    experiment_renames = experiment_rename_file,
-    model_renames = model_rename_file,
-    use_threads = use_threads
+import_models(
+  input_dir = input_dir,
+  delete_model = delete_model,
+  use_src_user_id = True,
+  verbose=True,
+  import_source_tags = import_source_tags,
+  experiment_renames = experiment_rename_file,
+  model_renames = model_rename_file,
+  use_threads = use_threads
 )

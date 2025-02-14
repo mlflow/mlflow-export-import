@@ -1,8 +1,8 @@
 # Databricks notebook source
 # MAGIC %md ## Export Experiments
-# MAGIC 
+# MAGIC
 # MAGIC Export multiple experiments and all their runs.
-# MAGIC 
+# MAGIC
 # MAGIC Widgets
 # MAGIC * `1. Experiments` - comma delimited list of either experiment IDs or experiment names. `all` will export all experiments.
 # MAGIC * `2. Output directory` - shared directory between source and destination workspaces.
@@ -50,6 +50,22 @@ print("export_permissions:", export_permissions)
 print("export_deleted_runs:", export_deleted_runs)
 print("notebook_formats:", notebook_formats)
 print("use_threads:", use_threads)
+
+# COMMAND ----------
+
+# DBTITLE 1,set up log file
+import os 
+from datetime import datetime
+import pytz
+
+cst = pytz.timezone('US/Central')
+now = datetime.now(tz=cst)
+date = now.strftime("%Y-%m-%d-%H:%M:%S")
+ 
+logfile = f"export_experiments.{date}.log"
+os.environ["MLFLOW_EXPORT_IMPORT_LOG_OUTPUT_FILE"] = logfile 
+
+print("Logging to", logfile)
 
 # COMMAND ----------
 

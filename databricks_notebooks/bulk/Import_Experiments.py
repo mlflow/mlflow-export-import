@@ -1,17 +1,33 @@
 # Databricks notebook source
 # MAGIC %md ## Import Experiments
-# MAGIC 
+# MAGIC
 # MAGIC Widgets
 # MAGIC * `1. Input directory` - directory of exported experiments.
 # MAGIC * `2. Import source tags`
 # MAGIC * `3. Experiment rename file` - Experiment rename file.
 # MAGIC * `4. Use threads` - use multi-threaded import.
-# MAGIC 
+# MAGIC
 # MAGIC See https://github.com/mlflow/mlflow-export-import/blob/master/README_bulk.md#Import-experiments.
 
 # COMMAND ----------
 
 # MAGIC %run ./Common
+
+# COMMAND ----------
+
+# DBTITLE 1,set up log file
+import os 
+from datetime import datetime
+import pytz
+
+cst = pytz.timezone('US/Central')
+now = datetime.now(tz=cst)
+date = now.strftime("%Y-%m-%d-%H:%M:%S")
+ 
+logfile = f"import_experiments.{date}.log"
+os.environ["MLFLOW_EXPORT_IMPORT_LOG_OUTPUT_FILE"] = logfile 
+
+print("Logging to", logfile)
 
 # COMMAND ----------
 
@@ -40,6 +56,8 @@ assert_widget(input_dir, "1. Input directory")
 
 # COMMAND ----------
 
+#%%capture captured
+
 from mlflow_export_import.bulk.import_experiments import import_experiments
 
 import_experiments(
@@ -48,3 +66,7 @@ import_experiments(
     experiment_renames = experiment_rename_file,
     use_threads = use_threads
 )
+
+# COMMAND ----------
+
+

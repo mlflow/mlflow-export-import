@@ -62,15 +62,29 @@ assert_widget(output_dir, "1. Output directory")
 
 # COMMAND ----------
 
-from mlflow_export_import.bulk.export_all import export_all
+# MAGIC %%capture captured
+# MAGIC 
+# MAGIC from mlflow_export_import.bulk.export_all import export_all
+# MAGIC 
+# MAGIC export_all(
+# MAGIC     output_dir = output_dir, 
+# MAGIC     stages = stages,
+# MAGIC     export_latest_versions = export_latest_versions,
+# MAGIC     run_start_time = run_start_date,
+# MAGIC     export_permissions = export_permissions,
+# MAGIC     export_deleted_runs = export_deleted_runs,
+# MAGIC     notebook_formats = notebook_formats, 
+# MAGIC     use_threads = use_threads
+# MAGIC )
 
-export_all(
-    output_dir = output_dir, 
-    stages = stages,
-    export_latest_versions = export_latest_versions,
-    run_start_time = run_start_date,
-    export_permissions = export_permissions,
-    export_deleted_runs = export_deleted_runs,
-    notebook_formats = notebook_formats, 
-    use_threads = use_threads
-)
+# COMMAND ----------
+
+# DBTITLE 1,write log file
+filepath = "/mnt/public-blobs/dcoles/mlflow_export_log.txt"
+
+dbutils.fs.rm(filepath)
+dbutils.fs.put(filepath, captured.stdout)
+
+# COMMAND ----------
+
+
