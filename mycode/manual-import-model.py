@@ -46,7 +46,7 @@ os.environ["MLFLOW_EXPORT_IMPORT_LOG_FORMAT"]="%(threadName)s-%(levelname)s-%(me
 
 os.environ["MLFLOW_TRACKING_URI"]="databricks"
 
-with open("/dbfs/FileStore/shared_uploads/darrell.coles@crowncastle.com/aws_databricks_credentials") as f:
+with open("/dbfs/FileStore/tables/aws_databricks_credentials") as f:
   os.environ["DATABRICKS_HOST"]  = f.readline().strip("\n")
   os.environ["DATABRICKS_TOKEN"] = f.readline().strip("\n")
 
@@ -65,6 +65,30 @@ def get_most_recent_experiment_name(model: dict):
 with open(f"{input_dir}/{model_name}/model.json") as f:
   model = json.load(f)
   os.environ["EXPERIMENT_NAME"] = get_most_recent_experiment_name(model)
+
+# COMMAND ----------
+
+# DBTITLE 1,remove failed model registrations before import
+import json
+import os
+
+fname = f"{input_dir}/{model_name}/model.json"
+
+# read model.json
+with open(fname, "r") as f:
+  d = json.load(f)
+
+# remove failed versions
+for version in d["mlflow"]["registered_model"]["versions"]:
+  if version["status"] == 'FAILED_REGISTRATION':
+    d["mlflow"]["registered_model"]["versions"].remove(version)
+
+# rename old json
+os.rename(fname, f"{fname}_old")
+
+# write clean json
+with open(fname, "w") as f:
+  d = json.dump(d, f)
 
 # COMMAND ----------
 
@@ -96,6 +120,18 @@ with open(f"{input_dir}/{model_name}/model.json") as f:
 # MAGIC   --delete-model True \
 # MAGIC   --import-source-tags True \
 # MAGIC   --verbose True
+
+# COMMAND ----------
+
+#%sh ls /dbfs/databricks/mlflow-tracking
+
+# COMMAND ----------
+
+
+
+# COMMAND ----------
+
+# MAGIC %sh cat /dbfs/mnt/datalake/mlflow-migration-models/models/churn-arima/model.json
 
 # COMMAND ----------
 
