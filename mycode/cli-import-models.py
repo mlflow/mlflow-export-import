@@ -57,7 +57,7 @@ with open("/dbfs/FileStore/tables/aws_databricks_credentials") as f:
 # MAGIC   --import-permissions True \
 # MAGIC   --import-source-tags True \
 # MAGIC   --verbose True
-# MAGIC   # --use-threads True
+# MAGIC   --use-threads True
 
 # COMMAND ----------
 
