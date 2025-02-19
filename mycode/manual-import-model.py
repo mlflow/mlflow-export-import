@@ -64,7 +64,7 @@ def get_most_recent_experiment_name(model: dict):
 
 with open(f"{input_dir}/{model_name}/model.json") as f:
   model = json.load(f)
-  os.environ["EXPERIMENT_NAME"] = get_most_recent_experiment_name(model)
+  os.environ["EXPERIMENT_NAME"] = get_most_recent_experiment_name(model).replace(" ","_")
 
 # COMMAND ----------
 
@@ -123,15 +123,7 @@ with open(fname, "w") as f:
 
 # COMMAND ----------
 
-#%sh ls /dbfs/databricks/mlflow-tracking
-
-# COMMAND ----------
-
-
-
-# COMMAND ----------
-
-# MAGIC %sh cat /dbfs/mnt/datalake/mlflow-migration-models/models/churn-arima/model.json
+# MAGIC %sh ls /dbfs/databricks/mlflow-tracking
 
 # COMMAND ----------
 
