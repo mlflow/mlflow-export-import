@@ -80,13 +80,13 @@ with open(credentials_path) as f:
 
 # COMMAND ----------
 
-# DBTITLE 0,`export-models` options
-# MAGIC %sh  
-# MAGIC export-model --help
+# MAGIC %md ## Execute
 
 # COMMAND ----------
 
-# MAGIC %md ## Execute
+# DBTITLE 0,`export-models` options
+# MAGIC %sh  
+# MAGIC export-model --help
 
 # COMMAND ----------
 
@@ -133,7 +133,7 @@ if filepaths:
   exec(f"bhashes = b'{''.join(hashes)}'")
 
   # hash the concatenated hashes
-  result = f"{model_name}: {md5(bhashes).hexdigest()}"
+  result = f"{model_name}: {md5(hashes).hexdigest()}"
 else:
   result = f"{model_name}: No Production model files found"
 

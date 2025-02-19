@@ -1,4 +1,8 @@
 # Databricks notebook source
+# MAGIC %md ## Libs
+
+# COMMAND ----------
+
 # DBTITLE 1,install latest pkg from github
 # MAGIC %sh 
 # MAGIC #pip install mlflow-export-import
@@ -6,12 +10,25 @@
 
 # COMMAND ----------
 
-# MAGIC %fs mounts
+# MAGIC %run ./credentials
+
+# COMMAND ----------
+
+# MAGIC %md ## Setup
 
 # COMMAND ----------
 
 # DBTITLE 1,we can see the s3 mount from %sh :)
 # MAGIC %fs ls /mnt/datalake
+
+# COMMAND ----------
+
+# DBTITLE 1,variables
+dbutils.widgets.dropdown("platform","",["", "azure", "aws"])
+platform = dbutils.widgets.get("platform")
+
+credentials_path = get_credentials_path(platform)
+credentials_path
 
 # COMMAND ----------
 
@@ -31,7 +48,7 @@ os.environ["MLFLOW_EXPORT_IMPORT_LOG_FORMAT"]="%(threadName)s-%(levelname)s-%(me
 
 os.environ["MLFLOW_TRACKING_URI"]="databricks"
 
-with open("/dbfs/FileStore/tables/aws_databricks_credentials") as f:
+with open(credentials_path) as f:
   os.environ["DATABRICKS_HOST"]  = f.readline().strip("\n")
   os.environ["DATABRICKS_TOKEN"] = f.readline().strip("\n")
 
@@ -42,8 +59,12 @@ with open("/dbfs/FileStore/tables/aws_databricks_credentials") as f:
 # MAGIC echo $MLFLOW_EXPORT_IMPORT_LOG_OUTPUT_FILE
 # MAGIC echo $MLFLOW_EXPORT_IMPORT_LOG_FORMAT
 # MAGIC echo $MLFLOW_TRACKING_URI
-# MAGIC echo $DATABRICKS_HOST
-# MAGIC echo $DATABRICKS_TOKEN
+# MAGIC # echo $DATABRICKS_HOST
+# MAGIC # echo $DATABRICKS_TOKEN
+
+# COMMAND ----------
+
+# MAGIC %md ## Execution
 
 # COMMAND ----------
 
