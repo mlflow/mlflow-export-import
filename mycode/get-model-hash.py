@@ -9,7 +9,7 @@
 
 # COMMAND ----------
 
-# MAGIC %config Completer.use_jedi=False
+# MAGIC %md ## Libs
 
 # COMMAND ----------
 
@@ -32,15 +32,22 @@
 
 # COMMAND ----------
 
-# DBTITLE 1,we can see the s3 mount from %sh :)
-# MAGIC %sh ls /dbfs/mnt/datalake/
+# MAGIC %run ./credentials
 
 # COMMAND ----------
 
+# MAGIC %md ## Setup
+
+# COMMAND ----------
+
+# DBTITLE 1,variables
 dbutils.widgets.text("registered-model-name","")
 model_name = dbutils.widgets.get("registered-model-name")
-
 model_dir = f"/mnt/public-blobs/dcoles/mlflow-migration-validation/{model_name}"
+
+dbutils.widgets.dropdown("platform","",["", "azure", "aws"])
+platform = dbutils.widgets.get("platform")
+credentials_path = get_credentials_path(platform)
 
 # COMMAND ----------
 
@@ -56,7 +63,7 @@ os.environ["MLFLOW_TRACKING_URI"]="databricks"
 os.environ["MLFLOW_MODEL_NAME"]=model_name
 
 # NEED FOR THE CLI CALL
-with open("/dbfs/FileStore/tables/aws_databricks_credentials") as f:
+with open(credentials_path) as f:
   os.environ["DATABRICKS_HOST"]  = f.readline().strip("\n")
   os.environ["DATABRICKS_TOKEN"] = f.readline().strip("\n")
 
@@ -76,6 +83,10 @@ with open("/dbfs/FileStore/tables/aws_databricks_credentials") as f:
 # DBTITLE 0,`export-models` options
 # MAGIC %sh  
 # MAGIC export-model --help
+
+# COMMAND ----------
+
+# MAGIC %md ## Execute
 
 # COMMAND ----------
 
