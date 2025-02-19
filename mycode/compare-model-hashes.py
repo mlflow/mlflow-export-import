@@ -31,12 +31,21 @@ set(az_model_hashes.keys()) - set(aws_model_hashes.keys()), set(aws_model_hashes
 
 # COMMAND ----------
 
-for k, v in az_model_hashes.items():
-  try:
-    if v != aws_model_hashes[k]:
-      print(k, v, aws_model_hashes[k],"\n")
-  except:
-    print(k, "is not in the AWS model set\n")
+import pandas as pd
+
+azure_df = pd.DataFrame(az_model_hashes, index=["azure"])
+aws_df = pd.DataFrame(aws_model_hashes, index=["aws"])
+model_hashes_pdf = pd.concat((azure_df, aws_df)).T
+
+model_hashes_pdf["match"] = model_hashes_pdf.azure == model_hashes_pdf.aws
+
+model_hashes = spark.createDataFrame(model_hashes_pdf.reset_index(names=["model"]))
+
+display(model_hashes)
+
+# COMMAND ----------
+
+display(model_hashes.where("not match"))
 
 # COMMAND ----------
 
