@@ -33,7 +33,7 @@
 # COMMAND ----------
 
 # DBTITLE 1,we can see the s3 mount from %sh :)
-# MAGIC %sh ls /dbfs/mnt/ccidsdatascidatalake/
+# MAGIC %sh ls /dbfs/mnt/datalake/
 
 # COMMAND ----------
 
@@ -56,7 +56,7 @@ os.environ["MLFLOW_TRACKING_URI"]="databricks"
 os.environ["MLFLOW_MODEL_NAME"]=model_name
 
 # NEED FOR THE CLI CALL
-with open("/dbfs/FileStore/shared_uploads/darrell.coles@crowncastle.com/aws_databricks_credentials") as f:
+with open("/dbfs/FileStore/tables/aws_databricks_credentials") as f:
   os.environ["DATABRICKS_HOST"]  = f.readline().strip("\n")
   os.environ["DATABRICKS_TOKEN"] = f.readline().strip("\n")
 
