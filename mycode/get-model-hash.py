@@ -64,9 +64,12 @@ model_uri = f"models:/{model_name}/Production" if platform == "azure" else f"run
 
 # COMMAND ----------
 
-model_dir = mlflow.artifacts.download_artifacts(model_uri)
+try:
+  model_dir = mlflow.artifacts.download_artifacts(model_uri)
 
-result = hash_model_directory(model_dir)
+  result = hash_model_directory(model_dir)
+except:
+  result = f"{model_name}: Model not found"
 
 # COMMAND ----------
 
