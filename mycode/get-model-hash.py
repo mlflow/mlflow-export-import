@@ -3,8 +3,7 @@
 # MAGIC This notebook takes the name of a registered mlflow model and hashes its `champion` or `Production` version, depending on whether it's in Azure (Databricks Workspace) or AWS (Unity Catalog).
 # MAGIC
 # MAGIC 1. The directory of the `champion`/`Production` model is exported to the local machine with MLflow artifact utilities 
-# MAGIC 1. Several files reside in this directory. Of these, the files `conda.yaml`, `model.pkl`, and `requirements.txt` are hashed
-# MAGIC 1. The 3 hashes are sorted, concatenated, and hashed again to create the final, model hash.
+# MAGIC 1. From this directory, hash `model.pkl`
 
 # COMMAND ----------
 
@@ -28,15 +27,9 @@ def hash(path: str):
     return md5(f.read()).hexdigest()
   
 def hash_model_directory(model_dir):
-  files = ["conda.yaml", "model.pkl", "requirements.txt"]
   try:
-    hashes = []
-    for file in files:
-      hashes.append(hash(model_dir+file))
-    hashes = sorted(hashes)
-    bhashes = ''.join(hashes).encode('utf-8')
-    final_hash = md5(bhashes).hexdigest()
-    result = f"{model_name}: {final_hash}"
+    model_hash = hash(model_dir+"model.pkl")
+    result = f"{model_name}: {model_hash}"
   except:
     result = f"{model_name}: Model files not found"
   return result
