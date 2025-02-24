@@ -14,6 +14,7 @@
 import mlflow
 from mlflow import MlflowClient
 from hashlib import md5 
+import os
 
 # COMMAND ----------
 
@@ -28,10 +29,11 @@ def hash(path: str):
   
 def hash_model_directory(model_dir):
   try:
-    model_hash = hash(model_dir+"model.pkl")
+    fname = [file for file in os.listdir(model_dir) if file.endswith("pkl")][0]
+    model_hash = hash(model_dir+fname)
     result = f"{model_name}: {model_hash}"
   except:
-    result = f"{model_name}: Model files not found"
+    result = f"{model_name}: Model file not found"
   return result
 
 # COMMAND ----------
