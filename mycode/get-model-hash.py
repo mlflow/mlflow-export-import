@@ -3,7 +3,7 @@
 # MAGIC This notebook takes the name of a registered mlflow model and hashes its `champion` or `Production` version, depending on whether it's in Azure (Databricks Workspace) or AWS (Unity Catalog).
 # MAGIC
 # MAGIC 1. The directory of the `champion`/`Production` model is exported to the local machine with MLflow artifact utilities 
-# MAGIC 1. From this directory, hash `model.pkl`
+# MAGIC 1. From this directory, hash the first file that ends with `pkl`
 
 # COMMAND ----------
 
@@ -51,7 +51,7 @@ platform = dbutils.widgets.get("platform")
 if platform == "aws":
   mlflow.set_registry_uri("databricks-uc")
 
-model_uri = f"models:/{model_name}/Production" if platform == "azure" else f"runs:/ds_nonprod.migrated_models.{model_name}@champion"
+model_uri = f"models:/{model_name}/Production" if platform == "azure" else f"models:/ds_nonprod.migrated_models.{model_name}@champion"
 
 # COMMAND ----------
 
