@@ -55,7 +55,12 @@ elif model_registry == "unity_catalog":
 else:
   raise Exception("Invalid model registry")
 
-model_uri = f"models:/{model_name}/Production" if model_registry == "workspace" else f"models:/{model_name}@champion"
+if model_registry == "workspace":
+  client=mlflow.tracking.MlflowClient()
+  version = client.get_latest_versions(model_name, stages=["Production"])[0].version
+  model_uri = f"models:/{model_name}/{version}"  
+else:
+  model_uri = f"models:/{model_name}@champion"
 
 # COMMAND ----------
 
