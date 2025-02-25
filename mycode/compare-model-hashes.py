@@ -39,9 +39,13 @@ model_hashes_pdf = pd.concat((azure_df, aws_df)).T
 
 model_hashes_pdf["match"] = model_hashes_pdf.azure == model_hashes_pdf.aws
 
-model_hashes = spark.createDataFrame(model_hashes_pdf.reset_index(names=["model"]))
+model_hashes = spark.createDataFrame(model_hashes_pdf.reset_index())
 
 display(model_hashes)
+
+# COMMAND ----------
+
+display(model_hashes.where("not match"))
 
 # COMMAND ----------
 
