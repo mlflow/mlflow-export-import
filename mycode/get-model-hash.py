@@ -42,16 +42,20 @@ def hash_model_directory(model_dir):
 dbutils.widgets.text("registered-model-name","")
 model_name = dbutils.widgets.get("registered-model-name")
 
-dbutils.widgets.dropdown("platform","",["","azure","aws"])
-platform = dbutils.widgets.get("platform")
+dbutils.widgets.dropdown("mlflow_model_registry", "workspace",["workspace", "unity_catalog"])
+model_registry = dbutils.widgets.get("mlflow_model_registry")
 
 # COMMAND ----------
 
 # DBTITLE 1,dependent variables
-if platform == "aws":
+if model_registry == "workspace":
+  mlflow.set_registry_uri("databricks")
+elif model_registry == "unity_catalog":
   mlflow.set_registry_uri("databricks-uc")
+else:
+  raise Exception("Invalid model registry")
 
-model_uri = f"models:/{model_name}/Production" if platform == "azure" else f"models:/ds_nonprod.migrated_models.{model_name}@champion"
+model_uri = f"models:/{model_name}/Production" if model_registry == "workspace" else f"models:/{model_name}@champion"
 
 # COMMAND ----------
 
