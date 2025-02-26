@@ -49,8 +49,4 @@ display(model_hashes.where("not match"))
 
 # COMMAND ----------
 
-display(model_hashes.where("not match"))
-
-# COMMAND ----------
-
 
