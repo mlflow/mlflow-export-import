@@ -10,16 +10,12 @@
 
 # COMMAND ----------
 
-# DBTITLE 1,we can see the s3 mount from %sh :)
-# MAGIC %sh ls /dbfs/mnt/ccidsdatascidatalake/
-
-# COMMAND ----------
-
 # MAGIC %run ./credentials
 
 # COMMAND ----------
 
 # MAGIC %md ## Setup
+# MAGIC Make sure the mount to the target s3 bucket is set up. See the **mount** notebook in this directory
 
 # COMMAND ----------
 
@@ -76,7 +72,7 @@ with open(credentials_path) as f:
 # DBTITLE 1,cli execution
 # MAGIC %sh 
 # MAGIC export-models \
-# MAGIC   --output-dir /dbfs/mnt/ccidsdatascidatalake/mlflow-migration-models \
+# MAGIC   --output-dir /dbfs/mnt/aws-ds-non-prod/mlflow-migration-models \
 # MAGIC   --models all \
 # MAGIC   # --stages 'Production,Staging,Archived,None' \
 # MAGIC   --export-permissions True \
