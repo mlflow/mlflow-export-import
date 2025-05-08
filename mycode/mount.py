@@ -1,6 +1,13 @@
 # Databricks notebook source
 # MAGIC %md 
-# MAGIC I added the AWS keys to Databricks secrets using the databricks cli. For Azure DEV, the profile name is **azure-dev** 
+# MAGIC I added the AWS keys to Databricks secrets using the databricks cli. For Azure DEV, the profile name is **azure-dev**. 
+# MAGIC
+# MAGIC Raj had to give me the AWS keys because I don't have permission to create  AWS IAM users with S3 access. 
+# MAGIC
+# MAGIC ### Reference
+# MAGIC - https://docs.databricks.com/aws/en/dbfs/mounts#mount-a-bucket-using-aws-keys
+# MAGIC - https://docs.databricks.com/aws/en/security/secrets#create-a-secret-scope
+# MAGIC - https://docs.databricks.com/aws/en/security/secrets#create-a-secret
 
 # COMMAND ----------
 
