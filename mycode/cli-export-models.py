@@ -14,6 +14,11 @@
 
 # COMMAND ----------
 
+# DBTITLE 1,we can see the s3 mount from %sh :)
+# MAGIC %sh ls /dbfs/mnt/aws-ds-non-prod
+
+# COMMAND ----------
+
 # MAGIC %md ## Setup
 # MAGIC Make sure the mount to the target s3 bucket is set up. See the **mount** notebook in this directory
 
