@@ -11,7 +11,7 @@
 # COMMAND ----------
 
 # DBTITLE 1,we can see the s3 mount from %sh :)
-# MAGIC %sh ls /dbfs/mnt/ccidsdatascidatalake/
+# MAGIC %sh ls /dbfs/mnt/aws-ds-non-prod
 
 # COMMAND ----------
 
@@ -70,9 +70,9 @@ with open(credentials_path) as f:
 # DBTITLE 1,cli execution | all
 # MAGIC %sh 
 # MAGIC export-experiments \
-# MAGIC   --output-dir /dbfs/mnt/ccidsdatascidatalake/mlflow-migration-experiments/experiments \
+# MAGIC   --output-dir /dbfs/mnt/aws-ds-non-prod/mlflow-migration-experiments/experiments \
 # MAGIC   --experiments all \
-# MAGIC   --run-start-time 2024-08-01 \
+# MAGIC   --run-start-time 2024-11-09 \
 # MAGIC   --export-permissions True \
 # MAGIC   --notebook-formats SOURCE \
 # MAGIC   --use-threads True
