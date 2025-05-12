@@ -21,6 +21,5 @@ mount_name = "aws-ds-non-prod"
 dbutils.fs.mount(f"s3a://{access_key}:{encoded_secret_key}@{aws_bucket_name}", f"/mnt/{mount_name}")
 display(dbutils.fs.ls(f"/mnt/{mount_name}"))
 
-# COMMAND ----------
 
 

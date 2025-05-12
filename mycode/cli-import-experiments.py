@@ -28,7 +28,6 @@ dbutils.widgets.dropdown("platform","",["", "azure", "aws"])
 platform = dbutils.widgets.get("platform")
 
 credentials_path = get_credentials_path(platform)
-credentials_path
 
 # COMMAND ----------
 

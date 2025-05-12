@@ -5,19 +5,27 @@ with open("azure-model-hashes", "r") as f:
 
 az_model_hashes = dict()
 for line in lines:
-  k, v = line.strip("\n").split(": ")
+  k, v = line.lower().strip("\n").split(": ")
+  if v=="model file not found":
+    v=None
   az_model_hashes[k] = v
 
 # COMMAND ----------
 
 # DBTITLE 1,aws model hashes
-with open("aws-model-hashes", "r") as f:
+with open("aws-model-hashes-uc", "r") as f:
   lines = f.readlines()
 
 aws_model_hashes = dict()
 for line in lines:
-  k, v = line.strip("\n").split(": ")
+  k, v = line.lower().replace("ds_nonprod.migrated_models.","").strip("\n").split(": ")
+  if v=='model not found': 
+    v=None
   aws_model_hashes[k] = v
+
+# COMMAND ----------
+
+aws_model_hashes
 
 # COMMAND ----------
 
@@ -45,7 +53,7 @@ display(model_hashes)
 
 # COMMAND ----------
 
-display(model_hashes.where("not match"))
+display(model_hashes.where("not match and azure is not null and aws is not null"))
 
 # COMMAND ----------
 

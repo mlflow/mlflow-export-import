@@ -14,7 +14,7 @@ import numpy as np
 
 # COMMAND ----------
 
-exp_pat = "^.*\/dbfs\/mnt\/ccidsdatascidatalake\/mlflow-migration-models\/experiments\/(.*)$"
+exp_pat = "^.*\/dbfs\/mnt\/datalake\/mlflow-migration-models\/experiments\/(.*)$"
 
 filepath = "exported_experiments"
 capture = [re.findall(exp_pat, line) for line in open(filepath)]
@@ -39,7 +39,7 @@ exp_df.columns = ["n_runs"]
 # COMMAND ----------
 
 # MAGIC %sh 
-# MAGIC ls /dbfs/mnt/ccidsdatascidatalake/mlflow-migration-models/models/ > exported_models
+# MAGIC ls /dbfs/mnt/datalake/mlflow-migration-models/models/ > exported_models
 
 # COMMAND ----------
 

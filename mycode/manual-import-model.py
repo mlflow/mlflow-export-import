@@ -142,7 +142,7 @@ with open(fname, "w") as f:
 # MAGIC   --model $MODEL_NAME \
 # MAGIC   --experiment-name $EXPERIMENT_NAME \
 # MAGIC   --delete-model True \
-# MAGIC   --import-source-tags True \
+# MAGIC   # --import-source-tags True \
 # MAGIC   --verbose True
 
 # COMMAND ----------

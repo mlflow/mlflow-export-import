@@ -3,13 +3,13 @@ churn-arima: Model file not found
 churn-model: cfae6c5c021a01238fab224158046823
 FDM: cba24da13caf82c694dcc443d2abb6dc
 five-year-alv: 3d1e4337f348a53d54701fff0e1f8b9f
-nearby_location_classifier: Model not found
+nearby_location_classifier: Model file not found
 nearby_transmitter_classificiation_1km: 4f7014a660f5dd7b0bdf519a1cc8733e
 pycaret_small_cell_clf: ce16bf9bbcfe0226860c1d77c03bf737
 random-forest-small-cell-classifier: 02c70a5af3406809b34f93a72b2c14f2
-rfds_vgg: Model not found
+rfds_vgg: Model file not found
 rm_sos_model: b79915de67585a407af1bc188cf59350
-SC_TAM_xgb_ATT_14: Model not found
+SC_TAM_xgb_ATT_14: Model file not found
 SC_TAM_xgb_CC_ATT_13: c9b1bff151699b358199e8c3f29dd0fd
 SC_TAM_xgb_CC_ATT_14: e780e65b67f3d5f8ee10d33c26bca286
 SC_TAM_xgb_CC_ATT_15: 9fb0a58f88c76f442a2ae95d1c5f5572
@@ -26,13 +26,13 @@ SC_TAM_xgb_CC_VZW_13: 5bcd17f601967212a59132710d116b72
 SC_TAM_xgb_CC_VZW_14: 3bc0d66861a84ab7a66b20588cacfcf4
 SC_TAM_xgb_CC_VZW_15: e38cfe16baeef765596bb0130d3d6061
 SC_TAM_xgb_CC_VZW_16: a4bdc13587d437ed12dd3021e506ad16
-SC_TAM_xgb_TMO_14: Model not found
-SC_TAM_xgb_total_14: Model not found
-SC_TAM_xgb_VZW_14: Model not found
+SC_TAM_xgb_TMO_14: Model file not found
+SC_TAM_xgb_total_14: Model file not found
+SC_TAM_xgb_VZW_14: Model file not found
 small_cell_classifier: e88cbd08d01e0bbe8e5ff6608541455a
-small_cell_classifier_fs: Model not found
+small_cell_classifier_fs: Model file not found
 ta_step_size_classifier: afaf962b88719e786d59597e0553921c
-TAM v1 MVP: Model not found
+TAM v1 MVP: Model file not found
 tam_RF_CC_12: 4eaa75365903f7a30946194a9b3cb94c
 tam_RF_CC_13: c8d6a83d36cb4d28eb9f83dd829c99b3
 tam_RF_CC_14: 67508cac03d341de200abaa958b77a31
@@ -65,6 +65,6 @@ wireless_throughput_model_T-Mobile: e6e83b20667bd5726ba39c183ece3527
 wireless_throughput_model_T-Mobile_log: 09f16d64726d3d721240eda91271ef07
 wireless_throughput_model_Verizon: e6311060a594a4250e9bfaba97688695
 wireless_throughput_model_Verizon_log: 3023cc6114e2f16cdf89a2c1b22d99d1
-wireless_throughput_Verizon: Model not found
+wireless_throughput_Verizon: Model file not found
 ws_activity_classifier: c159a33ed4788b4e5925befe8da66efe
-xgboost_dev: Model not found
+xgboost_dev: Model file not found
