@@ -5,12 +5,21 @@ client = MlflowClient()
 
 # COMMAND ----------
 
-for mod in client.search_registered_models():
-  model_name = mod.name
+len(client.search_registered_models())
 
-  model_uri = f"models:/{model_name}/Production"
+# COMMAND ----------
 
-  model = mlflow.pyfunc.load_model(model_uri=model_uri)
+count = 0
+
+for registered_model in mlflow.search_registered_models():
+  has_prod_stg = False
+  if "Production" in [version.current_stage for version in registered_model.latest_versions]:
+    has_prod_stg = True
+    count +=1
+  if not has_prod_stg:
+    print(registered_model.name, "DOES NOT HAVE a Production stage")
+
+print(count, "models have Production stage all together")
 
 # COMMAND ----------
 
