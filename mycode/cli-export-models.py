@@ -77,9 +77,9 @@ with open(credentials_path) as f:
 # DBTITLE 1,cli execution
 # MAGIC %sh 
 # MAGIC export-models \
-# MAGIC   --output-dir /dbfs/mnt/aws-ds-non-prod/mlflow-migration-models \
+# MAGIC   --output-dir /dbfs/mnt/aws-ds-non-prod/mlflow-migration-models-01 \
 # MAGIC   --models all \
-# MAGIC   # --stages 'Production,Staging,Archived,None' \
+# MAGIC   --stages 'Production' \
 # MAGIC   --export-permissions True \
 # MAGIC   --notebook-formats SOURCE \
 # MAGIC   --export-version-model True \
