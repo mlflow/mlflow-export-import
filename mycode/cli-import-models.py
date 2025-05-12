@@ -1,5 +1,5 @@
 # Databricks notebook source
-#md ## Libs
+# MAGIC %md ## Libs
 
 # COMMAND ----------
 
@@ -11,7 +11,7 @@
 # COMMAND ----------
 
 # DBTITLE 1,we can see the s3 mount from %sh :)
-# MAGIC %sh ls /dbfs/mnt/datalake/
+# MAGIC %sh ls /dbfs/mnt/aws-ds-non-prod
 
 # COMMAND ----------
 
@@ -57,8 +57,8 @@ with open(credentials_path) as f:
 # MAGIC echo $MLFLOW_EXPORT_IMPORT_LOG_OUTPUT_FILE
 # MAGIC echo $MLFLOW_EXPORT_IMPORT_LOG_FORMAT
 # MAGIC echo $MLFLOW_TRACKING_URI
-# MAGIC #echo $DATABRICKS_HOST
-# MAGIC #echo $DATABRICKS_TOKEN
+# MAGIC echo $DATABRICKS_HOST
+# MAGIC echo $DATABRICKS_TOKEN
 
 # COMMAND ----------
 
@@ -75,7 +75,7 @@ with open(credentials_path) as f:
 # DBTITLE 1,cli execution
 # MAGIC %sh 
 # MAGIC import-models \
-# MAGIC   --input-dir /dbfs/mnt/datalake/mlflow-migration-models \
+# MAGIC   --input-dir /dbfs/mnt/aws-ds-non-prod/mlflow-migration-models-01 \
 # MAGIC   --delete-model True \
 # MAGIC   --import-permissions True \
 # MAGIC   --import-source-tags True \
