@@ -69,6 +69,7 @@ def n_runs(exp, start_time=None):
 
 # COMMAND ----------
 
+# DBTITLE 1,experiment stats
 data = np.array([(exp_id(exp), n_runs(exp, start_time), email(exp)) for exp in mlflow.search_experiments()])
 
 df = pd.DataFrame(dict(experiment_id=data[:,0], n_runs=data[:,1], owner_email=data[:,2]))
@@ -78,6 +79,10 @@ print("There are", df.shape[0], "total experiments")
 print("There are", df.query("n_runs > 0").shape[0], "experiments with at least one run")
 print("There are", df.query("n_runs == 0").shape[0], "experiments with no runs")
 print("There are", df.n_runs.sum(), "runs")
+
+# COMMAND ----------
+
+# DBTITLE 1,model stats
 print("There are", len(mlflow.search_registered_models()), "registered models")
 
 # COMMAND ----------
