@@ -80,11 +80,17 @@ with open(credentials_path) as f:
 # MAGIC   --import-permissions True \
 # MAGIC   --import-source-tags True \
 # MAGIC   --verbose True
-# MAGIC   --use-threads True
+# MAGIC   --use-threads False
 
 # COMMAND ----------
 
 # MAGIC %md ## Appendices
+
+# COMMAND ----------
+
+# DBTITLE 1,count models in workspace model registry
+import mlflow
+len(mlflow.search_registered_models())
 
 # COMMAND ----------
 
