@@ -1,5 +1,6 @@
 import mlflow
 from . http_client import HttpClient, MlflowHttpClient, DatabricksHttpClient
+from mlflow_export_import.bulk import config
 
 
 def create_http_client(mlflow_client, model_name=None):
@@ -23,14 +24,27 @@ def create_dbx_client(mlflow_client):
     return DatabricksHttpClient(creds.host, creds.token)
 
 
-def create_mlflow_client():
+# def create_mlflow_client():  ##birbal . This is original block. commented out
+#     """
+#     Create MLflowClient. If MLFLOW_TRACKING_URI is UC, then set MlflowClient.tracking_uri to the non-UC variant.
+#     """
+#     registry_uri = mlflow.get_registry_uri()
+#     if registry_uri:
+#         tracking_uri = mlflow.get_tracking_uri()
+#         nonuc_tracking_uri = tracking_uri.replace("databricks-uc","databricks") # NOTE: legacy
+#         return mlflow.MlflowClient(nonuc_tracking_uri, registry_uri)
+#     else:
+#         return mlflow.MlflowClient()
+
+
+def create_mlflow_client():  ##birbal added. Modified version of above. 
     """
     Create MLflowClient. If MLFLOW_TRACKING_URI is UC, then set MlflowClient.tracking_uri to the non-UC variant.
     """
-    registry_uri = mlflow.get_registry_uri()
-    if registry_uri:
-        tracking_uri = mlflow.get_tracking_uri()
-        nonuc_tracking_uri = tracking_uri.replace("databricks-uc","databricks") # NOTE: legacy
-        return mlflow.MlflowClient(nonuc_tracking_uri, registry_uri)
-    else:
-        return mlflow.MlflowClient()
+    target_model_registry=config.target_model_registry  # Birbal- this is set at Import_Registered_Models.py
+
+    if not target_model_registry or target_model_registry.lower() == "workspace_registry":
+        mlflow.set_registry_uri('databricks')
+    elif target_model_registry.lower() == "unity_catalog":
+        mlflow.set_registry_uri('databricks-uc')
+    return mlflow.MlflowClient()

@@ -31,6 +31,9 @@ def set_experiment(mlflow_client, dbx_client, exp_name, tags=None):
         if not exp_name.startswith("/"):
             raise MlflowExportImportException(f"Cannot create experiment '{exp_name}'. Databricks experiment must start with '/'.")
         create_workspace_dir(dbx_client, os.path.dirname(exp_name))
+
+    else: ##birbal
+        _logger.error("utils.calling_databricks is false")
     try:
         if not tags: tags = {}
         tags = utils.create_mlflow_tags_for_databricks_import(tags)

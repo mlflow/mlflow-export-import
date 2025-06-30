@@ -85,7 +85,8 @@ def import_experiment(
             input_dir = os.path.join(input_dir, src_run_id),
             dst_notebook_dir = dst_notebook_dir,
             import_source_tags = import_source_tags,
-            use_src_user_id = use_src_user_id
+            use_src_user_id = use_src_user_id,
+            exp = exp #birbal added
         )
         dst_run_id = dst_run.info.run_id
         run_ids_map[src_run_id] = { "dst_run_id": dst_run_id, "src_parent_run_id": src_parent_run_id }

@@ -39,7 +39,9 @@ def import_models(
         model_renames = None,
         verbose = False,
         use_threads = False,
-        mlflow_client = None
+        mlflow_client = None,
+        target_model_catalog = None,    #birbal added
+        target_model_schema = None      #birbal added
     ):
     mlflow_client = mlflow_client or create_mlflow_client()
     experiment_renames = rename_utils.get_renames(experiment_renames)
@@ -65,7 +67,9 @@ def import_models(
         model_renames,
         experiment_renames,
         verbose,
-        use_threads
+        use_threads,
+        target_model_catalog, #birbal added
+        target_model_schema     #birbal added
     )
     duration = round(time.time()-start_time, 1)
     dct = { "duration": duration, "experiments_import": exp_info, "models_import": model_res }
@@ -132,7 +136,9 @@ def _import_models(mlflow_client,
         model_renames,
         experiment_renames,
         verbose,
-        use_threads
+        use_threads,
+        target_model_catalog = None,    #birbal added
+        target_model_schema = None      #birbal added
     ):
     max_workers = utils.get_threads(use_threads)
     start_time = time.time()
@@ -150,8 +156,14 @@ def _import_models(mlflow_client,
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for model_name in model_names:
+            _logger.info(f"model name BEFORE rename : '{model_name}'")  #birbal added
             dir = os.path.join(models_dir, model_name)
             model_name = rename_utils.rename(model_name, model_renames, "model")
+
+            if target_model_catalog is not None and target_model_schema is not None: #birbal added
+                model_name=rename_utils.build_full_model_name(target_model_catalog, target_model_schema, model_name)
+            _logger.info(f"model name AFTER rename : '{model_name}'")   #birbal added
+            
             executor.submit(all_importer.import_model,
                model_name = model_name,
                input_dir = dir,

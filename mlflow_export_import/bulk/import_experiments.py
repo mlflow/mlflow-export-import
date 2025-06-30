@@ -47,12 +47,13 @@ def import_experiments(
     """
 
     experiment_renames = rename_utils.get_renames(experiment_renames)
+
     mlflow_client = mlflow_client or mlflow.MlflowClient()
     dct = io_utils.read_file_mlflow(os.path.join(input_dir, "experiments.json"))
     exps = dct["experiments"]
     _logger.info("Importing experiments:")
     for exp in exps:
-        _logger.info(f"  Importing experiment: {exp}")
+        _logger.info(f"Importing experiment: {exp}")
 
     max_workers = utils.get_threads(use_threads)
     futures = []

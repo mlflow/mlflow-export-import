@@ -103,7 +103,7 @@ def _import_model_version(
         src_vr,
         dst_run_id,
         dst_source,
-        import_stages_and_aliases = True,
+        import_stages_and_aliases = True, 
         import_source_tags = False
     ):
     start_time = time.time()
@@ -128,7 +128,7 @@ def _import_model_version(
             tags = tags
         )
 
-    if import_stages_and_aliases:
+    if import_stages_and_aliases:  
         for alias in src_vr.get("aliases",[]):
             mlflow_client.set_registered_model_alias(dst_vr.name, alias, dst_vr.version)
 

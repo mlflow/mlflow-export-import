@@ -26,13 +26,23 @@ class UcPermissionsClient:
         resource = f"unity-catalog/effective-permissions/function/{model_name}"
         return self.client.get(resource)
 
-    def update_permissions(self, model_name, changes):
+    # def update_permissions(self, model_name, changes): #birbal commented out entire func def
+    #     """
+    #     https://docs.databricks.com/api/workspace/grants/update
+    #     PATCH /api/2.1/unity-catalog/permissions/{securable_type}/{full_name}
+    #     """
+    #     resource = f"unity-catalog/permissions/function/{model_name}"
+    #     _logger.info(f"Updating {len(changes.get('changes',[]))} permissions for model '{model_name}'. Resource: {resource}")
+    #     return self.client.patch(resource, changes)
+
+    
+    def update_permissions(self, object_type, object_name , changes): #birbal modified the above block
         """
         https://docs.databricks.com/api/workspace/grants/update
         PATCH /api/2.1/unity-catalog/permissions/{securable_type}/{full_name}
         """
-        resource = f"unity-catalog/permissions/function/{model_name}"
-        _logger.info(f"Updating {len(changes.get('changes',[]))} permissions for model '{model_name}'. Resource: {resource}")
+        resource = f"unity-catalog/permissions/{object_type}/{object_name}"
+        _logger.info(f"Updating {len(changes.get('changes',[]))} permissions for {object_type} '{object_name}'. Resource: {resource}")
         return self.client.patch(resource, changes)
 
 
@@ -51,7 +61,77 @@ def get_permissions(mlflow_client, model_name):
         return {}
 
 
-def update_permissions(mlflow_client, model_name, perms, unroll_changes=True):
+
+def update_permissions_nonucsrc_uctgt(mlflow_client, model_name, perms): ##birbal added this entire func.
+
+    try:
+        _logger.info(f"BEFORE perms is {perms}")
+        uc_client = UcPermissionsClient(mlflow_client)
+        model_perm_dict, catalog_perm_dict, schema_perm_dict = format_perms(perms)
+        _logger.info(f"AFTER model_perm_dict is {model_perm_dict}")
+        _logger.info(f"AFTER catalog_perm_dict is {catalog_perm_dict}")
+        _logger.info(f"AFTER schema_perm_dict is {schema_perm_dict}")
+
+        catalog, schema, model = model_name.split(".")
+
+        uc_client.update_permissions("catalog", catalog, catalog_perm_dict)
+        uc_client.update_permissions("schema", catalog+"."+schema, schema_perm_dict)
+        uc_client.update_permissions("function", model_name, model_perm_dict)
+    except Exception as e:
+        _logger.error(f"error with update_permissions for model '{model_name}'. Error: {e}")
+
+
+def format_perms(perms):    ##birbal added this entire func.
+    model_perm = []
+    catalog_perm=[]
+    schema_perm=[]
+
+    for acl in perms['permissions']['access_control_list']:
+            permission_type = "EXECUTE"
+            for perm in acl['all_permissions']:
+                if perm.get('permission_level') == 'CAN_MANAGE':
+                    permission_type = "MANAGE"
+                    break
+            if 'user_name' in acl:
+              model_perm.append({
+                  "add": [permission_type],
+                  "principal": acl['user_name']
+              })
+              catalog_perm.append({
+                  "add": ["USE_CATALOG"],
+                  "principal": acl['user_name']
+              })
+              schema_perm.append({
+                  "add": ["USE_SCHEMA"],
+                  "principal": acl['user_name']
+              })              
+
+            if 'group_name' in acl:
+              group_name = acl['group_name']
+              if group_name == "admins":
+                  continue
+              model_perm.append({
+                  "add": [permission_type],
+                  "principal": group_name
+              })
+              catalog_perm.append({
+                  "add": ["USE_CATALOG"],
+                  "principal": group_name
+              })
+              schema_perm.append({
+                  "add": ["USE_SCHEMA"],
+                  "principal": group_name
+              })  
+
+    model_perm_dict = {"changes": model_perm}
+    catalog_perm_dict = {"changes": catalog_perm}
+    schema_perm_dict = {"changes": schema_perm}
+    return model_perm_dict,catalog_perm_dict,schema_perm_dict
+
+
+
+
+def update_permissions(mlflow_client, model_name, perms, unroll_changes=True): 
     uc_client = UcPermissionsClient(mlflow_client)
     changes = _mk_update_changes(perms)
     if unroll_changes: # NOTE: in order to prevent batch update to fail because one individual update failed

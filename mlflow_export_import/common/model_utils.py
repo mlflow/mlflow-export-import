@@ -26,6 +26,11 @@ def model_names_same_registry(name1, name2):
         not is_unity_catalog_model(name1) and not is_unity_catalog_model(name2)
 
 
+def model_names_same_registry_nonucsrc_uctgt(name1, name2):
+    return \
+        not is_unity_catalog_model(name1) and is_unity_catalog_model(name2)
+
+
 def create_model(client, model_name, model_dct, import_metadata):
     """
     Creates a registered model if it does not exist, and returns the model in either case.
@@ -38,6 +43,8 @@ def create_model(client, model_name, model_dct, import_metadata):
             client.create_registered_model(model_name)
         _logger.info(f"Created new registered model '{model_name}'")
         return True
+    except Exception as e:
+        _logger.info(f"except Exception trigger, error for '{model_name}': {e}")
     except RestException as e:
         if e.error_code != "RESOURCE_ALREADY_EXISTS":
             raise e
@@ -50,7 +57,8 @@ def delete_model(client, model_name, sleep_time=5):
     Delete a registered model and all its versions.
     """
     try:
-        versions = SearchModelVersionsIterator(client, filter=f"name='{model_name}'")
+        # versions = SearchModelVersionsIterator(client, filter=f"name='{model_name}'")
+        versions = SearchModelVersionsIterator(client, filter=f""" name="{model_name}" """)  #birbal added
         _logger.info(f"Deleting model '{model_name}' and its versions")
         for vr in versions:
             msg = utils.get_obj_key_values(vr, [ "name", "version", "current_stage", "status", "run_id"  ])
@@ -60,8 +68,10 @@ def delete_model(client, model_name, sleep_time=5):
                 time.sleep(sleep_time) # Wait until stage transition takes hold
             client.delete_model_version(model_name, vr.version)
         client.delete_registered_model(model_name)
-    except RestException:
-        pass
+    # except RestException: #birbal commented out
+    except Exception as e:
+        _logger.error(f"Error deleting modfel {model_name}. Error: {e}")
+        
 
 
 def list_model_versions(client, model_name, get_latest_versions=False):
@@ -69,14 +79,16 @@ def list_model_versions(client, model_name, get_latest_versions=False):
     List 'all' or the 'latest' versions of registered model.
     """
     if is_unity_catalog_model(model_name):
-        versions = SearchModelVersionsIterator(client, filter=f"name='{model_name}'")
+        # versions = SearchModelVersionsIterator(client, filter=f"name='{model_name}'")
+        versions = SearchModelVersionsIterator(client, filter=f""" name="{model_name}" """) #birbal added
         # JIRA: ES-834105 - UC-ML MLflow search_registered_models and search_model_versions do not return tags and aliases - 2023-08-21
         return [ client.get_model_version(vr.name, vr.version) for vr in versions ]
     else:
         if get_latest_versions:
             return client.get_latest_versions(model_name)
         else:
-            return list(SearchModelVersionsIterator(client, filter=f"name='{model_name}'"))
+            # return list(SearchModelVersionsIterator(client, filter=f"name='{model_name}'"))
+            return list(SearchModelVersionsIterator(client, filter=f""" name="{model_name}" """)) #birbal added
 
 
 def search_model_versions(client, filter):
@@ -201,11 +213,13 @@ def get_registered_model(mlflow_client, model_name, get_permissions=False):
     return model
 
 
-def update_model_permissions(mlflow_client, dbx_client, model_name, perms):
+def update_model_permissions(mlflow_client, dbx_client, model_name, perms, nonucsrc_uctgt = False): #birbal added nonucsrc_uctgt parameter
     if perms:
         _logger.info(f"Updating permissions for registered model '{model_name}'")
-        if is_unity_catalog_model(model_name):
+        if is_unity_catalog_model(model_name) and not nonucsrc_uctgt: #birbal added
             uc_permissions_utils.update_permissions(mlflow_client, model_name, perms)
+        elif is_unity_catalog_model(model_name) and nonucsrc_uctgt: #birbal added
+            uc_permissions_utils.update_permissions_nonucsrc_uctgt(mlflow_client, model_name, perms)
         else:
             _model = dbx_client.get("mlflow/databricks/registered-models/get", { "name": model_name })
             _model = _model["registered_model_databricks"]
