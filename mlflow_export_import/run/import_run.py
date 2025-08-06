@@ -133,7 +133,8 @@ def _upload_databricks_notebook(mlflow_client, dbx_client, input_dir, src_run_dc
 
     content = base64.b64encode(content.encode()).decode("utf-8")
     payload = {
-        "path": dst_notebook_path,
+        # "path": dst_notebook_path,
+        "path": dst_notebook_path + "_notebook", ##birbal added _notebook to fix issue with Notebook scoped experiment
         "language": "PYTHON",
         "format": format,
         "overwrite": True,

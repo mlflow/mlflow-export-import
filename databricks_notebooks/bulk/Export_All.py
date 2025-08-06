@@ -54,6 +54,9 @@ run_timestamp = dbutils.widgets.get("run_timestamp")
 
 dbutils.widgets.text("jobrunid", "")
 jobrunid = dbutils.widgets.get("jobrunid")
+
+dbutils.widgets.text("model_file_name", "")
+model_file_name = dbutils.widgets.get("model_file_name")
  
 if run_start_date=="": run_start_date = None
 
@@ -66,6 +69,7 @@ print("task_index:", task_index)
 print("num_tasks:", num_tasks)
 print("run_timestamp:", run_timestamp)
 print("jobrunid:", jobrunid)
+print("model_file_name:", model_file_name)
 
 # COMMAND ----------
 
@@ -119,7 +123,8 @@ export_all(
     task_index = task_index,
     num_tasks = num_tasks,
     checkpoint_dir_experiment = checkpoint_dir_experiment,
-    checkpoint_dir_model = checkpoint_dir_model
+    checkpoint_dir_model = checkpoint_dir_model,
+    model_names = model_file_name
 )
 
 # COMMAND ----------

@@ -90,23 +90,25 @@ def export_model(
         result_queue.put(err_msg)  #birbal added
         return False, model_name
     except Exception as e:
-        _logger.error({ "model": model_name, "Exception": e })   
+        _logger.error({ "model": model_name, "Exception": str(e) })   
         err_msg = { "model": model_name, "status": "failed","Exception": str(e)  }   #birbal string casted        
         result_queue.put(err_msg)  #birbal added
-        import traceback
-        traceback.print_exc()
+        # import traceback
+        # traceback.print_exc()
         return False, model_name
 
 
 def _export_model(mlflow_client, model_name, output_dir, opts, result_queue = None):    #birbal added result_queue
     ori_versions = model_utils.list_model_versions(mlflow_client, model_name, opts.export_latest_versions)
-    _logger.info(f"TOTAL MODELS VERSIONS TO EXPORT: {len(ori_versions)}") #birbal added
+    _logger.info(f"TOTAL MODELS VERSIONS TO EXPORT FOR MODEL {model_name}: {len(ori_versions)}") #birbal added
 
     msg = "latest" if opts.export_latest_versions else "all"
     _logger.info(f"Exporting model '{model_name}': found {len(ori_versions)} '{msg}' versions")
 
     model = model_utils.get_registered_model(mlflow_client, model_name, opts.export_permissions)
+
     versions, failed_versions = _export_versions(mlflow_client, model, ori_versions, output_dir, opts, result_queue) #birbal added result_queue
+
     _adjust_model(model, versions)
 
     info_attr = {
@@ -118,6 +120,8 @@ def _export_model(mlflow_client, model_name, output_dir, opts, result_queue = No
         "export_latest_versions": opts.export_latest_versions,
         "export_permissions": opts.export_permissions
     }
+
+
     try:    #birbal added
         _model = { "registered_model": model }
         io_utils.write_export_file(output_dir, "model.json", __file__, _model, info_attr)
@@ -140,6 +144,7 @@ def _export_versions(mlflow_client, model_dct, versions, output_dir, opts, resul
     output_versions, failed_versions = ([], [])
     for j,vr in enumerate(versions):
         if not model_utils.is_unity_catalog_model(model_dct["name"]) and vr.current_stage and (len(opts.stages) > 0 and not vr.current_stage.lower() in opts.stages):
+            _logger.info(f"_export_version skipped") #birbal
             continue
         if len(opts.versions) > 0 and not vr.version in opts.versions:
             continue

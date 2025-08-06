@@ -5,6 +5,10 @@ from datetime import datetime
 
 # COMMAND ----------
 
+dbutils.widgets.removeAll()
+
+# COMMAND ----------
+
 dbutils.widgets.text("1. Output directory", "") 
 output_dir = dbutils.widgets.get("1. Output directory")
 output_dir = output_dir.replace("dbfs:","/dbfs")
@@ -21,8 +25,11 @@ run_start_date = dbutils.widgets.get("4. Run start date")
 dbutils.widgets.dropdown("5. Export permissions","no",["yes","no"])
 export_permissions = dbutils.widgets.get("5. Export permissions") == "yes"
 
-dbutils.widgets.text("11. num_tasks", "") 
-num_tasks = dbutils.widgets.get("11. num_tasks")
+dbutils.widgets.text("6. num_tasks", "") 
+num_tasks = dbutils.widgets.get("6. num_tasks")
+
+dbutils.widgets.text("7. model_file_name", "")
+model_file_name = dbutils.widgets.get("7. model_file_name")
  
 print("output_dir:", output_dir)
 print("stages:", stages)
@@ -30,6 +37,30 @@ print("export_latest_versions:", export_latest_versions)
 print("run_start_date:", run_start_date)
 print("export_permissions:", export_permissions)
 print("num_tasks:", num_tasks)
+print("model_file_name:", model_file_name)
+
+# COMMAND ----------
+
+if not output_dir:
+    raise ValueError("output_dir cannot be empty")
+if not output_dir.startswith("/dbfs/mnt"):
+    raise ValueError("output_dir must start with /dbfs/mnt")
+if not num_tasks:
+    raise ValueError("num_tasks cannot be empty")
+if not num_tasks.isdigit():
+    raise ValueError("num_tasks must be a number")
+
+# COMMAND ----------
+
+if model_file_name:
+    if not model_file_name.endswith(".txt"):
+        raise ValueError("model_file_name must end with .txt if not empty")
+    if not model_file_name.startswith("/dbfs"):
+        raise ValueError("model_file_name must start with /dbfs if not empty")
+else:
+    model_file_name = "all"
+
+model_file_name
 
 # COMMAND ----------
 
@@ -55,7 +86,7 @@ def create_multi_task_job_json():
                 "runtime_engine": "STANDARD"
             },
             "notebook_task": {
-                "notebook_path": "/Workspace/Users/birbal.das@databricks.com/mlflowimport/bir-mlflow-export-import/databricks_notebooks/bulk/Export_All",
+                "notebook_path": "/Workspace/Users/birbal.das@databricks.com/AA_sephora/birnew-mlflow-export-import/databricks_notebooks/bulk/Export_All",
                 "base_parameters": {
                     "output_dir": output_dir,
                     "stages": stages,
@@ -64,8 +95,9 @@ def create_multi_task_job_json():
                     "export_permissions": export_permissions,
                     "task_index": i,
                     "num_tasks": num_tasks,
-                    "run_timestamp": "{{job.start_time.iso_date}}-Export-jobid-{{job.id}}",
-                    "jobrunid": "jobrunid-{{job.run_id}}"
+                    "run_timestamp": "{{job.start_time.iso_date}}-ExportAll-jobid-{{job.id}}",
+                    "jobrunid": "jobrunid-{{job.run_id}}",
+                    "model_file_name": model_file_name
                 }
             }
         }
@@ -104,3 +136,7 @@ def submit_databricks_job():
 # COMMAND ----------
 
 submit_databricks_job()
+
+# COMMAND ----------
+
+

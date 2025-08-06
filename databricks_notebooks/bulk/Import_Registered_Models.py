@@ -155,7 +155,7 @@ time.sleep(10)
 
 # COMMAND ----------
 
-curr_timestamp = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+curr_timestamp = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
 
 dbfs_log_path = f"{input_dir}/Import_Registered_Models_{task_index}_{curr_timestamp}.log"
 if dbfs_log_path.startswith("/Workspace"):

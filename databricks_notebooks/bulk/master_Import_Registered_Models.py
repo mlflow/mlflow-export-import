@@ -81,13 +81,6 @@ except Exception as e:
 
 # COMMAND ----------
 
-if input_dir.startswith("/Workspace"):
-    input_dir=input_dir.replace("/Workspace","file:/Workspace") 
-
-input_dir
-
-# COMMAND ----------
-
 DATABRICKS_INSTANCE=dbutils.notebook.entry_point.getDbutils().notebook().getContext().tags().get('browserHostName').getOrElse(None)
 DATABRICKS_INSTANCE = f"https://{DATABRICKS_INSTANCE}"
 DATABRICKS_TOKEN = dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().getOrElse(None)
@@ -110,7 +103,7 @@ def create_multi_task_job_json():
                 "runtime_engine": "STANDARD"
             },
             "notebook_task": {
-                "notebook_path": "/Workspace/Users/birbal.das@databricks.com/test_final/bir-mlflow-export-import/databricks_notebooks/bulk/Import_Registered_Models",
+                "notebook_path": "/Workspace/Users/birbal.das@databricks.com/AA_sephora/birnew-mlflow-export-import/databricks_notebooks/bulk/Import_Registered_Models",
                 "base_parameters": {
                     "input_dir": os.path.join(input_dir,str(i)),
                     "target_model_registry": target_model_registry,
@@ -159,3 +152,7 @@ def submit_databricks_job():
 # COMMAND ----------
 
 submit_databricks_job()
+
+# COMMAND ----------
+
+

@@ -26,8 +26,12 @@ def _get_list(names, func_list, task_index=None, num_tasks=None): #birbal update
             return [ x for x in func_list() if x.startswith(prefix) ] 
         else:
             return names.split(",")
-    else:
+        
+    elif isinstance(names, dict):   #birbal added
         return names
+    
+    else:
+        return get_subset_list(names, task_index, num_tasks) #birbal updated
 
 
 
@@ -38,7 +42,6 @@ def get_experiment_ids(mlflow_client, experiment_ids):
     return _get_list(experiment_ids, list_entities)
 
 
-# def get_model_names(mlflow_client, model_names):
 def get_model_names(mlflow_client, model_names,task_index=None,num_tasks=None): #birbal updated
     def list_entities():
         return [ model.name for model in SearchRegisteredModelsIterator(mlflow_client) ]
