@@ -5,10 +5,6 @@ from datetime import datetime
 
 # COMMAND ----------
 
-dbutils.widgets.removeAll()
-
-# COMMAND ----------
-
 dbutils.widgets.text("1. Output directory", "") 
 output_dir = dbutils.widgets.get("1. Output directory")
 output_dir = output_dir.replace("dbfs:","/dbfs")
@@ -43,8 +39,8 @@ print("model_file_name:", model_file_name)
 
 if not output_dir:
     raise ValueError("output_dir cannot be empty")
-if not output_dir.startswith("/dbfs/mnt"):
-    raise ValueError("output_dir must start with /dbfs/mnt")
+# if not output_dir.startswith("/dbfs/mnt"):
+#     raise ValueError("output_dir must start with /dbfs/mnt")
 if not num_tasks:
     raise ValueError("num_tasks cannot be empty")
 if not num_tasks.isdigit():
@@ -55,8 +51,8 @@ if not num_tasks.isdigit():
 if model_file_name:
     if not model_file_name.endswith(".txt"):
         raise ValueError("model_file_name must end with .txt if not empty")
-    if not model_file_name.startswith("/dbfs"):
-        raise ValueError("model_file_name must start with /dbfs if not empty")
+    # if not model_file_name.startswith("/dbfs"):
+    #     raise ValueError("model_file_name must start with /dbfs if not empty")
 else:
     model_file_name = "all"
 

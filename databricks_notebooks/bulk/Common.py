@@ -25,3 +25,23 @@ def get_notebook_formats(num):
     notebook_formats = notebook_formats.split(",")
     if "" in notebook_formats: notebook_formats.remove("")
     return notebook_formats
+
+# COMMAND ----------
+
+import mlflow
+display([{"mlflow_version": mlflow.__version__}])
+
+# COMMAND ----------
+
+# MAGIC %pip install -U mlflow-skinny
+# MAGIC %pip install -U git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
+# MAGIC dbutils.library.restartPython()
+
+# COMMAND ----------
+
+import mlflow
+display([{"mlflow_version": mlflow.__version__}])
+
+# COMMAND ----------
+
+

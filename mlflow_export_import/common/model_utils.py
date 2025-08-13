@@ -57,8 +57,8 @@ def delete_model(client, model_name, sleep_time=5):
     Delete a registered model and all its versions.
     """
     try:
-        # versions = SearchModelVersionsIterator(client, filter=f"name='{model_name}'")
-        versions = SearchModelVersionsIterator(client, filter=f""" name="{model_name}" """)  #birbal added
+        versions = SearchModelVersionsIterator(client, filter=f"name='{model_name}'")
+        # versions = SearchModelVersionsIterator(client, filter=f""" name="{model_name}" """)  #birbal added
         _logger.info(f"Deleting model '{model_name}' and its versions")
         for vr in versions:
             msg = utils.get_obj_key_values(vr, [ "name", "version", "current_stage", "status", "run_id"  ])
@@ -79,16 +79,16 @@ def list_model_versions(client, model_name, get_latest_versions=False):
     List 'all' or the 'latest' versions of registered model.
     """
     if is_unity_catalog_model(model_name):
-        # versions = SearchModelVersionsIterator(client, filter=f"name='{model_name}'")
-        versions = SearchModelVersionsIterator(client, filter=f""" name="{model_name}" """) #birbal added
+        versions = SearchModelVersionsIterator(client, filter=f"name='{model_name}'")
+        # versions = SearchModelVersionsIterator(client, filter=f""" name="{model_name}" """) #birbal added
         # JIRA: ES-834105 - UC-ML MLflow search_registered_models and search_model_versions do not return tags and aliases - 2023-08-21
         return [ client.get_model_version(vr.name, vr.version) for vr in versions ]
     else:
         if get_latest_versions:
             return client.get_latest_versions(model_name)
         else:
-            # return list(SearchModelVersionsIterator(client, filter=f"name='{model_name}'"))
-            return list(SearchModelVersionsIterator(client, filter=f""" name="{model_name}" """)) #birbal added
+            return list(SearchModelVersionsIterator(client, filter=f"name='{model_name}'"))
+            # return list(SearchModelVersionsIterator(client, filter=f""" name="{model_name}" """)) #birbal added
 
 
 def search_model_versions(client, filter):

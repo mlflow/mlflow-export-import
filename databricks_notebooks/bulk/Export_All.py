@@ -99,12 +99,14 @@ output_dir
 # COMMAND ----------
 
 log_path=f"/tmp/my.log"
+dbfs_log_path = f"{output_dir}/export_all_{task_index}.log"
 log_path
 
 # COMMAND ----------
 
 config.log_path=log_path
 config.export_or_import="export"
+config.target_model_registry="unity_catalog" ## birbal...remove
 
 # COMMAND ----------
 

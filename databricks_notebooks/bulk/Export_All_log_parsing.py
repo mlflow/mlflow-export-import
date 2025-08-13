@@ -1,5 +1,5 @@
 # Databricks notebook source
-spark.read.parquet("dbfs:/mnt/modelnonuc/2025-06-17-Export-jobid-34179827290231/checkpoint/models/*.parquet").createOrReplaceTempView("models")
+spark.read.parquet("<volume path till jobid>/checkpoint/models/*.parquet").createOrReplaceTempView("models")
 
 
 # COMMAND ----------
@@ -11,7 +11,7 @@ spark.read.parquet("dbfs:/mnt/modelnonuc/2025-06-17-Export-jobid-34179827290231/
 
 # COMMAND ----------
 
-spark.read.parquet("dbfs:/mnt/modelnonuc/2025-06-17-Export-jobid-34179827290231/checkpoint/experiments").createOrReplaceTempView("experiments")
+spark.read.parquet("<volume path till jobid>/checkpoint/experiments").createOrReplaceTempView("experiments")
 
 # COMMAND ----------
 

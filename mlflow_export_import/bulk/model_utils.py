@@ -15,7 +15,8 @@ def get_experiments_runs_of_models(client, model_names, task_index=None, num_tas
         _logger.info(f"  {model_name}")
     exps_and_runs = {}
     for model_name in model_names:
-        versions = SearchModelVersionsIterator(client, filter=f""" name="{model_name}" """)      #birbal.Changed from "name='{model_name}'" to handle models name with single quote
+        versions = SearchModelVersionsIterator(client, filter=f"name='{model_name}'" )  
+        # versions = SearchModelVersionsIterator(client, filter=f""" name="{model_name}" """)      #birbal.Changed from "name='{model_name}'" to handle models name with single quote
         for vr in versions:
             try:
                 run = client.get_run(vr.run_id)
@@ -48,7 +49,8 @@ def get_experiments_name_of_models(client, model_names):
     model_names = bulk_utils.get_model_names(client, model_names)
     experiment_name_list = []
     for model_name in model_names:
-        versions = SearchModelVersionsIterator(client, filter=f""" name="{model_name}" """)     #birbal. Fix for models name with single quote
+        versions = SearchModelVersionsIterator(client, filter=f"name='{model_name}'") 
+        # versions = SearchModelVersionsIterator(client, filter=f""" name="{model_name}" """)     #birbal. Fix for models name with single quote
         for vr in versions:
             try:
                 run = client.get_run(vr.run_id)

@@ -50,8 +50,8 @@ print("num_tasks:", num_tasks)
 
 if not input_dir:
     raise ValueError("input_dir cannot be empty")
-if not input_dir.startswith("/dbfs/mnt"):
-    raise ValueError("input_dir must start with /dbfs/mnt")
+# if not input_dir.startswith("/dbfs/mnt"):
+#     raise ValueError("input_dir must start with /dbfs/mnt")
 if not num_tasks:
     raise ValueError("num_tasks cannot be empty")
 if not num_tasks.isdigit():
