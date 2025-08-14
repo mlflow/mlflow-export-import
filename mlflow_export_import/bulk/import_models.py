@@ -153,7 +153,7 @@ def _import_models(mlflow_client,
         for model_name in model_names:
             dir = os.path.join(models_dir, model_name)
             model_name = rename_utils.rename(model_name, model_renames, "model")
-            model_name = validate_model_name(model_name)
+            validate_model_name(model_name)
             executor.submit(all_importer.import_model,
                model_name = model_name,
                input_dir = dir,
