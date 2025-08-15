@@ -28,14 +28,15 @@ def _download_notebook(notebook_workspace_path, output_dir, format, extension, r
         "format": format
     }
     if revision_id:
-        params ["revision"] = { "revision_timestamp": revision_id } # NOTE: not publicly documented
+        # params ["revision"] = { "revision_timestamp": revision_id } # NOTE: not publicly documented
+        params ["revision.revision_timestamp"] = revision_id # Birbal. Above longer supports due to change in format. Format change was done sometime in August 2025.
     notebook_name = os.path.basename(notebook_workspace_path)
     try:
         rsp = dbx_client._get("workspace/export", json.dumps(params))
         notebook_path = os.path.join(output_dir, f"{notebook_name}.{extension}")
         io_utils.write_file(notebook_path, rsp.content)
     except MlflowExportImportException as e:
-        _logger.warning(f"Cannot download notebook '{notebook_workspace_path}'. {e}")
+        _logger.error(f"Cannot download notebook '{notebook_workspace_path}'. {e}")
 
 
 @click.command()
