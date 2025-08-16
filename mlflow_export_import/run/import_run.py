@@ -107,8 +107,14 @@ def import_run(
         raise MlflowExportImportException(e, f"Importing run {run_id} of experiment '{exp.name}' failed")
 
     if utils.calling_databricks(): #birbal added
-        _upload_databricks_notebook(mlflow_client, dbx_client, input_dir, src_run_dct, dst_notebook_dir,run_id) #birbal added.. passed mlflow_client 
-
+        creds = mlflow_client._tracking_client.store.get_host_creds()        
+        src_webappURL = src_run_dct["tags"]["mlflow.databricks.webappURL"]
+        _logger.info(f"src_webappURL izzzz {src_webappURL} and target webappURL is {creds.host}")
+        if creds.host != src_webappURL:
+            _logger.info(f"NOTEBOOK IMPORT STARTED")
+            _upload_databricks_notebook(mlflow_client, dbx_client, input_dir, src_run_dct, dst_notebook_dir,run_id) #birbal added.. passed mlflow_client 
+        else:
+            _logger.info(f"NOTEBOOK IMPORT SKIPPED DUE TO SAME WORKSPACE")
     res = (run, src_run_dct["tags"].get(MLFLOW_PARENT_RUN_ID, None))
     _logger.info(f"Imported run '{run.info.run_id}' into experiment '{experiment_name}'")
     return res
