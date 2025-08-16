@@ -81,8 +81,6 @@ print(f"import_permissions is {import_permissions}")
 
 if not input_dir:
     raise ValueError("input_dir cannot be empty")
-# if not input_dir.startswith("/dbfs/mnt"):
-#     raise ValueError("input_dir must start with /dbfs/mnt")
 if not task_index:
     raise ValueError("task_index cannot be empty")
 if not task_index.isdigit():
@@ -129,7 +127,6 @@ log_path
 # COMMAND ----------
 
 # curr_timestamp = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
-
 # log_path = f"{input_dir}/Import_Registered_Models_{task_index}_{curr_timestamp}.log"
 
 # COMMAND ----------
