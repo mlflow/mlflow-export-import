@@ -128,13 +128,12 @@ def _upload_databricks_notebook(mlflow_client, dbx_client, input_dir, src_run_dc
 
     with open(notebook_path, "r", encoding="utf-8") as f:
         content = f.read()
-    dst_notebook_path = src_notebook_path #birbal added
+    dst_notebook_path = src_notebook_path + "_notebook" ##birbal added _notebook to fix issue with Notebook scoped experiment
     
 
     content = base64.b64encode(content.encode()).decode("utf-8")
     payload = {
-        # "path": dst_notebook_path,
-        "path": dst_notebook_path + "_notebook", ##birbal added _notebook to fix issue with Notebook scoped experiment
+        "path": dst_notebook_path,
         "language": "PYTHON",
         "format": format,
         "overwrite": True,
@@ -190,6 +189,7 @@ def update_notebook_lineage(mlflow_client,run_id,dst_notebook_path):    #birbal 
         mlflow_client.set_tag(run_id, "mlflow.source.type", "NOTEBOOK")
         mlflow_client.set_tag(run_id, "mlflow.databricks.notebookID", notebook_id)
         mlflow_client.set_tag(run_id, "mlflow.databricks.workspaceURL", host)
+        mlflow_client.set_tag(run_id, "mlflow.databricks.notebookPath", dst_notebook_path)
 
 def _import_inputs(http_client, src_run_dct, run_id):
     inputs = src_run_dct.get("inputs")
