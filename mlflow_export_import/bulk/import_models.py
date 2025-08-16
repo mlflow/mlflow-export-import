@@ -44,13 +44,15 @@ def import_models(
         target_model_schema = None      #birbal added
     ):
     mlflow_client = mlflow_client or create_mlflow_client()
+    experiment_renames_original = experiment_renames #birbal
     experiment_renames = rename_utils.get_renames(experiment_renames)
     model_renames = rename_utils.get_renames(model_renames)
     start_time = time.time()
     exp_run_info_map, exp_info = _import_experiments(
         mlflow_client,
         input_dir,
-        experiment_renames,
+        # experiment_renames,
+        experiment_renames_original, #birbal
         import_permissions,
         import_source_tags,
         use_src_user_id,

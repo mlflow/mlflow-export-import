@@ -144,7 +144,7 @@ def _export_versions(mlflow_client, model_dct, versions, output_dir, opts, resul
     output_versions, failed_versions = ([], [])
     for j,vr in enumerate(versions):
         if not model_utils.is_unity_catalog_model(model_dct["name"]) and vr.current_stage and (len(opts.stages) > 0 and not vr.current_stage.lower() in opts.stages):
-            _logger.warning(f"_export_version skipped") #birbal
+            _logger.warning(f"MODEL VERSION EXPORT SKIPPED. Current model stage:{vr.current_stage} does not match with Input stages passed:{opts.stages}  ") #birbal
             continue
         if len(opts.versions) > 0 and not vr.version in opts.versions:
             continue

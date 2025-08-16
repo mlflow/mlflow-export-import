@@ -190,12 +190,15 @@ def update_notebook_lineage(mlflow_client,run_id,dst_notebook_path):    #birbal 
         response.raise_for_status()
         notebook_object = response.json()
         notebook_id = notebook_object.get("object_id")
+        
+        creds = mlflow_client._tracking_client.store.get_host_creds()
 
         mlflow_client.set_tag(run_id, "mlflow.source.name", dst_notebook_path)
         mlflow_client.set_tag(run_id, "mlflow.source.type", "NOTEBOOK")
         mlflow_client.set_tag(run_id, "mlflow.databricks.notebookID", notebook_id)
         mlflow_client.set_tag(run_id, "mlflow.databricks.workspaceURL", host)
         mlflow_client.set_tag(run_id, "mlflow.databricks.notebookPath", dst_notebook_path)
+        mlflow_client.set_tag(run_id, "mlflow.databricks.webappURL", creds.host)
 
 def _import_inputs(http_client, src_run_dct, run_id):
     inputs = src_run_dct.get("inputs")
