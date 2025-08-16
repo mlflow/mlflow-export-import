@@ -101,20 +101,18 @@ if target_model_registry == "unity_catalog" and (not target_model_catalog or not
 
 # COMMAND ----------
 
-w = WorkspaceClient()
-try:
-    catalog = w.catalogs.get(name=target_model_catalog)
-    print(f"Catalog '{target_model_catalog}' exists.")
-except Exception as e:
-    raise ValueError(f"Error - {e}")
-
-# COMMAND ----------
-
-try:
-    schema = w.schemas.get(full_name=f"{target_model_catalog}.{target_model_schema}")
-    print(f"Schema '{target_model_catalog}.{target_model_schema}' exists.")    
-except Exception as e:
-    raise ValueError(f"Error - {e}")    
+if target_model_registry == "unity_catalog":
+    w = WorkspaceClient()
+    try:
+        catalog = w.catalogs.get(name=target_model_catalog)
+        print(f"Catalog '{target_model_catalog}' exists.")
+    except Exception as e:
+        raise ValueError(f"Error - {e}")
+    try:
+        schema = w.schemas.get(full_name=f"{target_model_catalog}.{target_model_schema}")
+        print(f"Schema '{target_model_catalog}.{target_model_schema}' exists.")    
+    except Exception as e:
+        raise ValueError(f"Error - {e}")    
 
 # COMMAND ----------
 
@@ -127,6 +125,12 @@ input_dir
 
 log_path=f"/tmp/Import_Registered_Models_{task_index}.log"
 log_path
+
+# COMMAND ----------
+
+# curr_timestamp = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+
+# log_path = f"{input_dir}/Import_Registered_Models_{task_index}_{curr_timestamp}.log"
 
 # COMMAND ----------
 

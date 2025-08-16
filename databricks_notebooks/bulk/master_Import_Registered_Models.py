@@ -36,6 +36,9 @@ import_permissions = dbutils.widgets.get("8. Import permissions") == "yes"
 dbutils.widgets.text("9. num_tasks", "") 
 num_tasks = dbutils.widgets.get("9. num_tasks")
 
+dbutils.widgets.dropdown("10. Cloud","azure",["azure","aws","gcp"])
+cloud = dbutils.widgets.get("10. Cloud")
+
 print("input_dir:", input_dir)
 print("target_model_registry:", target_model_registry)
 print("target_model_catalog:", target_model_catalog)
@@ -45,6 +48,7 @@ print("model_rename_file:", model_rename_file)
 print("experiment_rename_file:", experiment_rename_file)
 print("import_permissions:", import_permissions)
 print("num_tasks:", num_tasks)
+print("cloud:", cloud)
 
 # COMMAND ----------
 
@@ -64,20 +68,19 @@ if target_model_registry == "unity_catalog" and (not target_model_catalog or not
 
 # COMMAND ----------
 
-w = WorkspaceClient()
-try:
-    catalog = w.catalogs.get(name=target_model_catalog)
-    print(f"Catalog '{target_model_catalog}' exists.")
-except Exception as e:
-    raise ValueError(f"Error - {e}")
+if target_model_registry == "unity_catalog":
+    w = WorkspaceClient()
+    try:
+        catalog = w.catalogs.get(name=target_model_catalog)
+        print(f"Catalog '{target_model_catalog}' exists.")
+    except Exception as e:
+        raise ValueError(f"Error - {e}")
 
-# COMMAND ----------
-
-try:
-    schema = w.schemas.get(full_name=f"{target_model_catalog}.{target_model_schema}")
-    print(f"Schema '{target_model_catalog}.{target_model_schema}' exists.")    
-except Exception as e:
-    raise ValueError(f"Error - {e}")    
+    try:
+        schema = w.schemas.get(full_name=f"{target_model_catalog}.{target_model_schema}")
+        print(f"Schema '{target_model_catalog}.{target_model_schema}' exists.")    
+    except Exception as e:
+        raise ValueError(f"Error - {e}")    
 
 # COMMAND ----------
 
@@ -85,8 +88,18 @@ DATABRICKS_INSTANCE=dbutils.notebook.entry_point.getDbutils().notebook().getCont
 DATABRICKS_INSTANCE = f"https://{DATABRICKS_INSTANCE}"
 DATABRICKS_TOKEN = dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().getOrElse(None)
 
-driver_node_type = "Standard_D4ds_v5"
-worker_node_type = "Standard_D4ds_v5"
+
+if cloud == "azure":
+    driver_node_type = "Standard_D4ds_v5"
+    worker_node_type = "Standard_D4ds_v5"
+
+if cloud == "aws":
+    driver_node_type = "m4.xlarge"
+    worker_node_type = "m4.xlarge"
+
+if cloud == "gcp":
+    driver_node_type = "n1-standard-4"
+    worker_node_type = "n1-standard-4"
 
 def create_multi_task_job_json():
     tasks = []
@@ -152,7 +165,3 @@ def submit_databricks_job():
 # COMMAND ----------
 
 submit_databricks_job()
-
-# COMMAND ----------
-
-

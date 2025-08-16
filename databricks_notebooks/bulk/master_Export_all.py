@@ -26,6 +26,12 @@ num_tasks = dbutils.widgets.get("6. num_tasks")
 
 dbutils.widgets.text("7. model_file_name", "")
 model_file_name = dbutils.widgets.get("7. model_file_name")
+
+dbutils.widgets.dropdown("8. Source model registry","unity_catalog",["unity_catalog","workspace_registry"])
+source_model_registry = dbutils.widgets.get("8. Source model registry")
+
+dbutils.widgets.dropdown("9. Cloud","azure",["azure","aws","gcp"])
+cloud = dbutils.widgets.get("9. Cloud")
  
 print("output_dir:", output_dir)
 print("stages:", stages)
@@ -34,6 +40,8 @@ print("run_start_date:", run_start_date)
 print("export_permissions:", export_permissions)
 print("num_tasks:", num_tasks)
 print("model_file_name:", model_file_name)
+print("source_model_registry:", source_model_registry)
+print("cloud:", cloud)
 
 # COMMAND ----------
 
@@ -64,8 +72,17 @@ DATABRICKS_INSTANCE=dbutils.notebook.entry_point.getDbutils().notebook().getCont
 DATABRICKS_INSTANCE = f"https://{DATABRICKS_INSTANCE}"
 DATABRICKS_TOKEN = dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().getOrElse(None)
 
-driver_node_type = "Standard_D4ds_v5"
-worker_node_type = "Standard_D4ds_v5"
+if cloud == "azure":
+    driver_node_type = "Standard_D4ds_v5"
+    worker_node_type = "Standard_D4ds_v5"
+
+if cloud == "aws":
+    driver_node_type = "m4.xlarge"
+    worker_node_type = "m4.xlarge"
+
+if cloud == "gcp":
+    driver_node_type = "n1-standard-4"
+    worker_node_type = "n1-standard-4"
 
 def create_multi_task_job_json():
     tasks = []
@@ -82,7 +99,7 @@ def create_multi_task_job_json():
                 "runtime_engine": "STANDARD"
             },
             "notebook_task": {
-                "notebook_path": "/Workspace/Users/birbal.das@databricks.com/AA_sephora/birnew-mlflow-export-import/databricks_notebooks/bulk/Export_All",
+                "notebook_path": "/Workspace/Users/birbal.das@databricks.com/AA_sephora_notebook_export_fix/birnew-mlflow-export-import/databricks_notebooks/bulk/Export_All",
                 "base_parameters": {
                     "output_dir": output_dir,
                     "stages": stages,
@@ -93,7 +110,8 @@ def create_multi_task_job_json():
                     "num_tasks": num_tasks,
                     "run_timestamp": "{{job.start_time.iso_date}}-ExportAll-jobid-{{job.id}}",
                     "jobrunid": "jobrunid-{{job.run_id}}",
-                    "model_file_name": model_file_name
+                    "model_file_name": model_file_name,
+                    "source_model_registry": source_model_registry
                 }
             }
         }

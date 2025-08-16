@@ -1,7 +1,8 @@
 # Databricks notebook source
-# MAGIC %md ## Export All
+# MAGIC %md
+# MAGIC ##Export All
 # MAGIC
-# MAGIC Export all the MLflow registered models and all experiments of a tracking server.
+# MAGIC ##Export all the MLflow registered models and all experiments of a tracking server.
 # MAGIC
 # MAGIC **Widgets**
 # MAGIC * `1. Output directory` - shared directory between source and destination workspaces.
@@ -23,6 +24,7 @@
 from mlflow_export_import.bulk import config
 import time
 import os
+from datetime import datetime
 
 # COMMAND ----------
 
@@ -57,6 +59,12 @@ jobrunid = dbutils.widgets.get("jobrunid")
 
 dbutils.widgets.text("model_file_name", "")
 model_file_name = dbutils.widgets.get("model_file_name")
+
+dbutils.widgets.text("source_model_registry", "")
+source_model_registry = dbutils.widgets.get("source_model_registry")
+
+dbutils.widgets.dropdown("Cloud","azure",["azure","aws","gcp"])
+cloud = dbutils.widgets.get("Cloud")
  
 if run_start_date=="": run_start_date = None
 
@@ -70,6 +78,7 @@ print("num_tasks:", num_tasks)
 print("run_timestamp:", run_timestamp)
 print("jobrunid:", jobrunid)
 print("model_file_name:", model_file_name)
+print("source_model_registry:", source_model_registry)
 
 # COMMAND ----------
 
@@ -98,15 +107,18 @@ output_dir
 
 # COMMAND ----------
 
-log_path=f"/tmp/my.log"
-dbfs_log_path = f"{output_dir}/export_all_{task_index}.log"
+log_path=f"/tmp/exportall_{task_index}.log"
 log_path
 
 # COMMAND ----------
 
+# curr_timestamp = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+# log_path = f"{output_dir}/export_all_{task_index}_{curr_timestamp}.log"
+
+# COMMAND ----------
+
 config.log_path=log_path
-config.export_or_import="export"
-config.target_model_registry="unity_catalog" ## birbal...remove
+config.target_model_registry=source_model_registry
 
 # COMMAND ----------
 
