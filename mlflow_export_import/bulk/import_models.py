@@ -148,6 +148,11 @@ def _import_models(mlflow_client,
     models_dir = os.path.join(input_dir, "models")
     models = io_utils.read_file_mlflow(os.path.join(models_dir,"models.json"))
     model_names = models["models"]
+
+    if len(model_names) == 0:
+        _logger.warning(f"No models found in {os.path.join(models_dir,"models.json")}. NO MODELS TO IMPORT")
+        return {}
+
     all_importer = BulkModelImporter(
         mlflow_client = mlflow_client,
         run_info_map = run_info_map,

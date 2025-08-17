@@ -49,7 +49,13 @@ def import_experiments(
     experiment_renames = rename_utils.get_renames(experiment_renames)
 
     mlflow_client = mlflow_client or mlflow.MlflowClient()
-    dct = io_utils.read_file_mlflow(os.path.join(input_dir, "experiments.json"))
+
+    try: #birbal
+        dct = io_utils.read_file_mlflow(os.path.join(input_dir, "experiments.json"))
+    except Exception as e:
+        _logger.info(f"'experiments.json' does not exist in {input_dir}. NO EXPERIMENTS TO IMPORT") 
+        return []
+
     exps = dct["experiments"]
     _logger.info("Importing experiments:")
     for exp in exps:
