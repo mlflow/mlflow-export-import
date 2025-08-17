@@ -106,10 +106,10 @@ def import_run(
         traceback.print_exc()
         raise MlflowExportImportException(e, f"Importing run {run_id} of experiment '{exp.name}' failed")
 
-    if utils.calling_databricks(): #birbal added
-        creds = mlflow_client._tracking_client.store.get_host_creds()        
-        src_webappURL = src_run_dct["tags"]["mlflow.databricks.webappURL"]
-        _logger.info(f"src_webappURL izzzz {src_webappURL} and target webappURL is {creds.host}")
+    if utils.calling_databricks(): #birbal added entire block
+        creds = mlflow_client._tracking_client.store.get_host_creds()  
+        src_webappURL = src_run_dct.get("tags", {}).get("mlflow.databricks.webappURL", None)
+        _logger.info(f"src_webappURL is {src_webappURL} and target webappURL is {creds.host}")
         if creds.host != src_webappURL:
             _logger.info(f"NOTEBOOK IMPORT STARTED")
             _upload_databricks_notebook(mlflow_client, dbx_client, input_dir, src_run_dct, dst_notebook_dir,run_id) #birbal added.. passed mlflow_client 
@@ -124,7 +124,7 @@ def _upload_databricks_notebook(mlflow_client, dbx_client, input_dir, src_run_dc
     tag_key = "mlflow.databricks.notebookPath"
     src_notebook_path = src_run_dct["tags"].get(tag_key,None)
     if not src_notebook_path:
-        _logger.warning(f"No tag '{tag_key}' for run_id '{run_id}'")
+        _logger.warning(f"No tag '{tag_key}' for run_id '{run_id}'. NOTEBOOK IMPORT SKIPPED")
         return
     notebook_name = os.path.basename(src_notebook_path)
     dst_notebook_dir = os.path.dirname(src_notebook_path)
