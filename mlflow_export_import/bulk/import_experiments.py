@@ -94,9 +94,9 @@ def _import_experiment(mlflow_client,
        - None if error happened
     """
     try:
-        _logger.error(f"EXPERIMENT BEFORE RENAME  {exp_name} ") # birbal
+        _logger.info(f"EXPERIMENT BEFORE RENAME  {exp_name} ") # birbal
         exp_name =  rename_utils.rename(exp_name, experiment_renames, "experiment")
-        _logger.error(f"EXPERIMENT AFTER RENAME  {exp_name} ") # birbal
+        _logger.info(f"EXPERIMENT AFTER RENAME  {exp_name} ") # birbal
         run_info_map = import_experiment(
             mlflow_client = mlflow_client,
             experiment_name = exp_name,
