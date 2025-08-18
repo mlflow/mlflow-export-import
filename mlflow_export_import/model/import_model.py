@@ -276,7 +276,7 @@ class BulkModelImporter(BaseModelImporter):
             else:
                 dst_run_id = dst_run_info.run_id
                 exp_name = rename_utils.rename(vr["_experiment_name"], self.experiment_renames, "experiment")
-                _logger.error(f"RENAMED EXPERIMENT FROM  {vr["_experiment_name"]} TO {exp_name}") # birbal
+                _logger.info(f"RENAMED EXPERIMENT FROM  {vr["_experiment_name"]} TO {exp_name}") # birbal
                 try:
                     with MlflowTrackingUriTweak(self.mlflow_client):
                         mlflow.set_experiment(exp_name)

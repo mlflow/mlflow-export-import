@@ -55,6 +55,10 @@ import_permissions = dbutils.widgets.get("import_permissions") == "true"
 dbutils.widgets.text("task_index", "") 
 task_index = dbutils.widgets.get("task_index")
 
+dbutils.widgets.text("notebook_user_mapping_file","")
+val = dbutils.widgets.get("notebook_user_mapping_file") 
+notebook_user_mapping_file = {} if val in ("null", None, "") else val
+
 
 print("input_dir:", input_dir)
 print("target_model_registry:", target_model_registry)
@@ -65,6 +69,7 @@ print("model_rename_file:     ", model_rename_file)
 print("experiment_rename_file:", experiment_rename_file)
 print("import_permissions:", import_permissions)
 print("task_index:", task_index)
+print("notebook_user_mapping_file:", notebook_user_mapping_file)
 
 # COMMAND ----------
 
@@ -133,7 +138,7 @@ log_path
 
 config.log_path=log_path
 config.target_model_registry=target_model_registry
-config.notebook_user_mapping_file="/dbfs/mnt/con1/dinner2/vol1/exportall_uc/notebookuserm.txt"
+config.notebook_user_mapping_file=notebook_user_mapping_file
 
 # COMMAND ----------
 

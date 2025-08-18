@@ -39,6 +39,10 @@ num_tasks = dbutils.widgets.get("9. num_tasks")
 dbutils.widgets.dropdown("10. Cloud","azure",["azure","aws","gcp"])
 cloud = dbutils.widgets.get("10. Cloud")
 
+dbutils.widgets.text("11. Notebook user mapping file","")
+val = dbutils.widgets.get("11. Notebook user mapping file") 
+notebook_user_mapping_file = val or None 
+
 print("input_dir:", input_dir)
 print("target_model_registry:", target_model_registry)
 print("target_model_catalog:", target_model_catalog)
@@ -49,6 +53,7 @@ print("experiment_rename_file:", experiment_rename_file)
 print("import_permissions:", import_permissions)
 print("num_tasks:", num_tasks)
 print("cloud:", cloud)
+print("notebook_user_mapping_file:", notebook_user_mapping_file)
 
 # COMMAND ----------
 
@@ -114,7 +119,7 @@ def create_multi_task_job_json():
                 "runtime_engine": "STANDARD"
             },
             "notebook_task": {
-                "notebook_path": "/Workspace/Users/birbal.das@databricks.com/AA_sephora/birnew-mlflow-export-import/databricks_notebooks/bulk/Import_Registered_Models",
+                "notebook_path": "/Workspace/Users/birbal.das@databricks.com/birnew-mlflow-export-import/databricks_notebooks/bulk/Import_Registered_Models",
                 "base_parameters": {
                     "input_dir": os.path.join(input_dir,str(i)),
                     "target_model_registry": target_model_registry,
@@ -124,7 +129,8 @@ def create_multi_task_job_json():
                     "model_rename_file": model_rename_file,
                     "experiment_rename_file": experiment_rename_file,
                     "import_permissions": import_permissions,
-                    "task_index": str(i)
+                    "task_index": str(i),
+                    "notebook_user_mapping_file":notebook_user_mapping_file
                 }
             }
         }
