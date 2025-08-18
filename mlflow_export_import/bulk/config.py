@@ -1,2 +1,3 @@
 log_path=None
 target_model_registry=None
+notebook_user_mapping_file=None

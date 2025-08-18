@@ -133,6 +133,7 @@ log_path
 
 config.log_path=log_path
 config.target_model_registry=target_model_registry
+config.notebook_user_mapping_file="/dbfs/mnt/con1/dinner2/vol1/exportall_uc/notebookuserm.txt"
 
 # COMMAND ----------
 

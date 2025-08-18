@@ -26,6 +26,8 @@ from . import run_utils
 import mlflow.utils.databricks_utils as db_utils    #birbal added
 import requests #birbal added
 import json
+from mlflow_export_import.bulk import config #birbal added
+from mlflow_export_import.bulk import rename_utils  #birbal added
 
 _logger = utils.getLogger(__name__)
 
@@ -126,8 +128,28 @@ def _upload_databricks_notebook(mlflow_client, dbx_client, input_dir, src_run_dc
     if not src_notebook_path:
         _logger.warning(f"No tag '{tag_key}' for run_id '{run_id}'. NOTEBOOK IMPORT SKIPPED")
         return
+    
     notebook_name = os.path.basename(src_notebook_path)
-    dst_notebook_dir = os.path.dirname(src_notebook_path)
+
+    try:    #birbal added entire block to solve the issue where the source user doesn't exists in target workspace
+        dst_notebook_dir = os.path.dirname(src_notebook_path)
+        mlflow_utils.create_workspace_dir(dbx_client, dst_notebook_dir)
+        
+    except Exception as e:  #birbal added
+        _logger.warning(f"Failed to create directory '{dst_notebook_dir}'. This is most probably because the user doesn't exist in target workspace. Checking notebook user mapping file...")
+        notebook_user_mapping_file=config.notebook_user_mapping_file
+        if notebook_user_mapping_file:
+            notebook_user_mapping_file = rename_utils.get_renames(notebook_user_mapping_file)
+            _logger.info(f"notebook_user_mapping_file is {notebook_user_mapping_file}")
+            _logger.info(f"src_notebook_path BEFORE RENAME {src_notebook_path}")
+            src_notebook_path =  rename_utils.rename(src_notebook_path, notebook_user_mapping_file, "notebook")
+            _logger.info(f"src_notebook_path AFTER RENAME {src_notebook_path}")
+            dst_notebook_dir = os.path.dirname(src_notebook_path)
+            mlflow_utils.create_workspace_dir(dbx_client, dst_notebook_dir)
+        else:
+            _logger.error(f"Notebook couldn't be imported because the target directory '{dst_notebook_dir}' could not be created, and no notebook user mapping file was provided as input")
+            raise e        
+
     format = "source"
 
     notebook_path = os.path.join(input_dir,"artifacts","notebooks",f"{notebook_name}.{format}") #birbal added
@@ -145,7 +167,6 @@ def _upload_databricks_notebook(mlflow_client, dbx_client, input_dir, src_run_dc
         "overwrite": True,
         "content": content
         }
-    mlflow_utils.create_workspace_dir(dbx_client, dst_notebook_dir)
     try:
         _logger.info(f"Importing notebook '{dst_notebook_path}' for run {run_id}")
         create_notebook(mlflow_client,payload,run_id) #birbal added

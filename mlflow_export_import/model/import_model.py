@@ -269,7 +269,6 @@ class BulkModelImporter(BaseModelImporter):
         _logger.info(f"Importing {len(model_dct['versions'])} versions:")
         for vr in model_dct["versions"]:
             src_run_id = vr["run_id"]
-            _logger.info(f"self.run_info_map is {self.run_info_map}")  ##birbal...need to remove
             dst_run_info = self.run_info_map.get(src_run_id, None)
             if not dst_run_info:
                 msg = { "model": model_name, "version": vr["version"], "stage": vr["current_stage"], "run_id": src_run_id }

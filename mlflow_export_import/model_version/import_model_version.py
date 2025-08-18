@@ -86,6 +86,7 @@ def import_model_version(
 
     model_path = _get_model_path(src_vr)
     dst_source = f"{dst_run.info.artifact_uri}/{model_path}"
+
     dst_vr = _import_model_version(
         mlflow_client,
         model_name = model_name,
