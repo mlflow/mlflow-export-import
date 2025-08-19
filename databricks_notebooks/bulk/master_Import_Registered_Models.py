@@ -119,7 +119,7 @@ def create_multi_task_job_json():
                 "runtime_engine": "STANDARD"
             },
             "notebook_task": {
-                "notebook_path": "/Workspace/Users/birbal.das@databricks.com/birnew-mlflow-export-import/databricks_notebooks/bulk/Import_Registered_Models",
+                "notebook_path": "/Workspace/Users/birbal.das@databricks.com/AA_final/birnew-mlflow-export-import/databricks_notebooks/bulk/Import_Registered_Models",
                 "base_parameters": {
                     "input_dir": os.path.join(input_dir,str(i)),
                     "target_model_registry": target_model_registry,
