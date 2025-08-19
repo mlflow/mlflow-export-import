@@ -33,7 +33,8 @@ def import_experiment(
         import_permissions = False,
         use_src_user_id = False,
         dst_notebook_dir = None,
-        mlflow_client = None
+        mlflow_client = None,
+        notebook_user_mapping = None    #birbal
     ):
     """
     :param experiment_name: Destination experiment name.
@@ -86,7 +87,8 @@ def import_experiment(
             dst_notebook_dir = dst_notebook_dir,
             import_source_tags = import_source_tags,
             use_src_user_id = use_src_user_id,
-            exp = exp #birbal added
+            exp = exp, #birbal added
+            notebook_user_mapping = notebook_user_mapping   #birbal
         )
         dst_run_id = dst_run.info.run_id
         run_ids_map[src_run_id] = { "dst_run_id": dst_run_id, "src_parent_run_id": src_parent_run_id }

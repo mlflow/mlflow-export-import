@@ -41,12 +41,14 @@ def import_models(
         use_threads = False,
         mlflow_client = None,
         target_model_catalog = None,    #birbal added
-        target_model_schema = None      #birbal added
+        target_model_schema = None,      #birbal added
+        notebook_user_mapping_file = None  #birbal added
     ):
     mlflow_client = mlflow_client or create_mlflow_client()
     experiment_renames_original = experiment_renames #birbal
     experiment_renames = rename_utils.get_renames(experiment_renames)
     model_renames = rename_utils.get_renames(model_renames)
+    notebook_user_mapping = rename_utils.get_renames(notebook_user_mapping_file)    #birbal
     start_time = time.time()
     exp_run_info_map, exp_info = _import_experiments(
         mlflow_client,
@@ -56,7 +58,8 @@ def import_models(
         import_permissions,
         import_source_tags,
         use_src_user_id,
-        use_threads
+        use_threads,
+        notebook_user_mapping  #birbal
     )
     run_info_map = _flatten_run_info_map(exp_run_info_map)
     model_res = _import_models(
@@ -94,7 +97,8 @@ def _import_experiments(mlflow_client,
         import_permissions,
         import_source_tags,
         use_src_user_id,
-        use_threads
+        use_threads,
+        notebook_user_mapping
     ):
     start_time = time.time()
 
@@ -105,7 +109,8 @@ def _import_experiments(mlflow_client,
         use_src_user_id = use_src_user_id,
         experiment_renames = experiment_renames,
         use_threads = use_threads,
-        mlflow_client = mlflow_client
+        mlflow_client = mlflow_client,
+        notebook_user_mapping = notebook_user_mapping   #birbal
     )
     duration = round(time.time()-start_time, 1)
 

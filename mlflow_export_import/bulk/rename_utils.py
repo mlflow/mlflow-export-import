@@ -18,11 +18,14 @@ def rename(name, replacements, object_name="object"):
     if not replacements:
         return name  ## birbal :: corrected to return name instead of None. returning None will cause failure
     for k,v in replacements.items():
+        if object_name == "notebook": #birbal added
+            k = k.removeprefix("/Workspace")
         if k != "" and name.startswith(k):
             new_name = name.replace(k,v)
             _logger.info(f"Renaming {object_name} '{name}' to '{new_name}'")
             return new_name
     return name
+
 
 
 def get_renames(filename_or_dict):

@@ -138,7 +138,6 @@ log_path
 
 config.log_path=log_path
 config.target_model_registry=target_model_registry
-config.notebook_user_mapping_file=notebook_user_mapping_file
 
 # COMMAND ----------
 
@@ -153,7 +152,8 @@ import_models(
     import_source_tags = False, ## Birbal:: Do not set to True. else it will import junk mlflow tags. Setting to False WILL import all source tags by default.
     use_threads = True,
     target_model_catalog = target_model_catalog, #birbal added
-    target_model_schema = target_model_schema   #birbal added
+    target_model_schema = target_model_schema,   #birbal added,
+    notebook_user_mapping_file = notebook_user_mapping_file #birbal added
 )
 
 # COMMAND ----------

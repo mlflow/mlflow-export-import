@@ -26,7 +26,6 @@ from . import run_utils
 import mlflow.utils.databricks_utils as db_utils    #birbal added
 import requests #birbal added
 import json
-from mlflow_export_import.bulk import config #birbal added
 from mlflow_export_import.bulk import rename_utils  #birbal added
 
 _logger = utils.getLogger(__name__)
@@ -39,7 +38,8 @@ def import_run(
         use_src_user_id = False,
         mlmodel_fix = True,
         mlflow_client = None,
-        exp = None
+        exp = None,
+        notebook_user_mapping = None    #birbal
     ):
     """
     Imports a run into the specified experiment.
@@ -114,7 +114,7 @@ def import_run(
         _logger.info(f"src_webappURL is {src_webappURL} and target webappURL is {creds.host}")
         if creds.host != src_webappURL:
             _logger.info(f"NOTEBOOK IMPORT STARTED")
-            _upload_databricks_notebook(mlflow_client, dbx_client, input_dir, src_run_dct, dst_notebook_dir,run_id) #birbal added.. passed mlflow_client 
+            _upload_databricks_notebook(mlflow_client, dbx_client, input_dir, src_run_dct, dst_notebook_dir,run_id,notebook_user_mapping) #birbal added.. passed mlflow_client 
         else:
             _logger.info(f"NOTEBOOK IMPORT SKIPPED DUE TO SAME WORKSPACE")
     res = (run, src_run_dct["tags"].get(MLFLOW_PARENT_RUN_ID, None))
@@ -122,7 +122,7 @@ def import_run(
     return res
 
 
-def _upload_databricks_notebook(mlflow_client, dbx_client, input_dir, src_run_dct, dst_notebook_dir,run_id): #birbal added    
+def _upload_databricks_notebook(mlflow_client, dbx_client, input_dir, src_run_dct, dst_notebook_dir,run_id,notebook_user_mapping): #birbal added    
     tag_key = "mlflow.databricks.notebookPath"
     src_notebook_path = src_run_dct["tags"].get(tag_key,None)
     if not src_notebook_path:
@@ -131,18 +131,16 @@ def _upload_databricks_notebook(mlflow_client, dbx_client, input_dir, src_run_dc
     
     notebook_name = os.path.basename(src_notebook_path)
 
-    try:    #birbal added entire block to solve the issue where the source user doesn't exists in target workspace
+    try:    #birbal added entire try/except block to solve the issue where the source user doesn't exists in target workspace
         dst_notebook_dir = os.path.dirname(src_notebook_path)
         mlflow_utils.create_workspace_dir(dbx_client, dst_notebook_dir)
         
-    except Exception as e:  #birbal added
+    except Exception as e:  
         _logger.warning(f"Failed to create directory '{dst_notebook_dir}'. This is most probably because the user doesn't exist in target workspace. Checking notebook user mapping file...")
-        notebook_user_mapping_file=config.notebook_user_mapping_file
-        if notebook_user_mapping_file:
-            notebook_user_mapping_file = rename_utils.get_renames(notebook_user_mapping_file)
-            _logger.info(f"notebook_user_mapping_file is {notebook_user_mapping_file}")
+        if notebook_user_mapping:
+            _logger.info(f"notebook_user_mapping is {notebook_user_mapping}")
             _logger.info(f"src_notebook_path BEFORE RENAME {src_notebook_path}")
-            src_notebook_path =  rename_utils.rename(src_notebook_path, notebook_user_mapping_file, "notebook")
+            src_notebook_path =  rename_utils.rename(src_notebook_path, notebook_user_mapping, "notebook")
             _logger.info(f"src_notebook_path AFTER RENAME {src_notebook_path}")
             dst_notebook_dir = os.path.dirname(src_notebook_path)
             mlflow_utils.create_workspace_dir(dbx_client, dst_notebook_dir)

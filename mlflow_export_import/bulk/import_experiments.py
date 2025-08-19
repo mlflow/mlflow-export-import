@@ -30,7 +30,8 @@ def import_experiments(
         use_src_user_id = False, 
         experiment_renames = None,
         use_threads = False,
-        mlflow_client = None
+        mlflow_client = None,
+        notebook_user_mapping = None    #birbal
     ): 
     """
     :param input_dir: Source experiment directory.
@@ -74,7 +75,8 @@ def import_experiments(
                 import_permissions, 
                 import_source_tags, 
                 use_src_user_id, 
-                experiment_renames
+                experiment_renames,
+                notebook_user_mapping   #birbal
             )
             futures.append([exp["id"], run_info_map])
     return [ (f[0], f[1].result()) for f in futures ] # materialize the future
@@ -86,7 +88,8 @@ def _import_experiment(mlflow_client,
         import_permissions, 
         import_source_tags, 
         use_src_user_id, 
-        experiment_renames
+        experiment_renames,
+        notebook_user_mapping
     ):
     """
     :return: 
@@ -103,7 +106,8 @@ def _import_experiment(mlflow_client,
             input_dir = input_dir,
             import_permissions = import_permissions,
             import_source_tags = import_source_tags,
-            use_src_user_id = use_src_user_id
+            use_src_user_id = use_src_user_id,
+            notebook_user_mapping = notebook_user_mapping   #birbal
         )
         return run_info_map
     except Exception as e:
