@@ -28,8 +28,7 @@ from datetime import datetime
 
 # COMMAND ----------
 
-
-output_dir = dbutils.widgets.get("output_dir")
+dbutils.widgets.text("output_dir","")
 output_dir = dbutils.widgets.get("output_dir")
 output_dir = output_dir.replace("dbfs:","/dbfs")
 
@@ -45,10 +44,10 @@ run_start_date = dbutils.widgets.get("run_start_date")
 dbutils.widgets.dropdown("export_permissions","false",["true","false"])
 export_permissions = dbutils.widgets.get("export_permissions") == "true"
 
-dbutils.widgets.text("task_index", "")
+dbutils.widgets.text("task_index", "1")
 task_index = int(dbutils.widgets.get("task_index"))
 
-dbutils.widgets.text("num_tasks", "")
+dbutils.widgets.text("num_tasks", "1")
 num_tasks = int(dbutils.widgets.get("num_tasks"))
 
 dbutils.widgets.text("run_timestamp", "")
@@ -60,7 +59,7 @@ jobrunid = dbutils.widgets.get("jobrunid")
 dbutils.widgets.text("model_file_name", "")
 model_file_name = dbutils.widgets.get("model_file_name")
 
-dbutils.widgets.text("source_model_registry", "")
+dbutils.widgets.dropdown("source_model_registry","unity_catalog",["unity_catalog","workspace_registry"])
 source_model_registry = dbutils.widgets.get("source_model_registry")
 
 dbutils.widgets.dropdown("Cloud","azure",["azure","aws","gcp"])

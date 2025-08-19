@@ -73,8 +73,8 @@ if cloud == "azure":
     worker_node_type = "Standard_D4ds_v5"
 
 if cloud == "aws":
-    driver_node_type = "m4.xlarge"
-    worker_node_type = "m4.xlarge"
+    driver_node_type = "rd-fleet.xlarge"
+    worker_node_type = "rd-fleet.xlarge"
 
 if cloud == "gcp":
     driver_node_type = "n1-standard-4"
