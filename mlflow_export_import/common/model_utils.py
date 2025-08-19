@@ -44,7 +44,8 @@ def create_model(client, model_name, model_dct, import_metadata):
         _logger.info(f"Created new registered model '{model_name}'")
         return True
     except Exception as e:
-        _logger.info(f"except Exception trigger, error for '{model_name}': {e}")
+        # _logger.info(f"except Exception trigger, error for '{model_name}': {e}")
+        _logger.error(f"FAILED TO CREATE MODEL: '{model_name}': ERROR- {e}")    #birbal
     except RestException as e:
         if e.error_code != "RESOURCE_ALREADY_EXISTS":
             raise e
