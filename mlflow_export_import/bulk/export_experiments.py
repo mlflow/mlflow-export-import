@@ -24,6 +24,8 @@ from mlflow_export_import.common import utils, io_utils, mlflow_utils
 from mlflow_export_import.common import filesystem as _fs
 from mlflow_export_import.bulk import bulk_utils
 from mlflow_export_import.experiment.export_experiment import export_experiment
+from mlflow_export_import.common.checkpoint_thread import CheckpointThread #birbal added
+from queue import Queue     #birbal added
 
 _logger = utils.getLogger(__name__)
 
@@ -35,7 +37,9 @@ def export_experiments(
         export_deleted_runs = False,
         notebook_formats = None,
         use_threads = False,
-        mlflow_client = None
+        mlflow_client = None,
+        task_index = None,   #birbal added
+        checkpoint_dir_experiment = None   #birbal added
     ):
     """
     :param experiments: Can be either:
@@ -50,7 +54,7 @@ def export_experiments(
     mlflow_client = mlflow_client or mlflow.MlflowClient()
     start_time = time.time()
     max_workers = utils.get_threads(use_threads)
-    experiments_arg = _convert_dict_keys_to_list(experiments)
+    experiments_arg = _convert_dict_keys_to_list(experiments.keys())     #birbal added
 
     if isinstance(experiments,str) and experiments.endswith(".txt"):
         with open(experiments, "r", encoding="utf-8") as f:
@@ -61,6 +65,7 @@ def export_experiments(
     else:
         export_all_runs = not isinstance(experiments, dict)
         experiments = bulk_utils.get_experiment_ids(mlflow_client, experiments)
+
         if export_all_runs:
             table_data = experiments
             columns = ["Experiment Name or ID"]
@@ -73,87 +78,112 @@ def export_experiments(
             table_data.append(["Total",num_runs])
             columns = ["Experiment ID", "# Runs"]
     utils.show_table("Experiments",table_data,columns)
-    _logger.info("")
+
+    if len(experiments) == 0:
+        _logger.info(f"NO EXPERIMENTS TO PROCESS")
+        return
+
+    ######## birbal new block
+    result_queue = Queue()
+    checkpoint_thread = CheckpointThread(result_queue, checkpoint_dir_experiment, interval=300, batch_size=100)
+    _logger.info(f"checkpoint_thread started for experiments")
+    checkpoint_thread.start()
+    ########
 
     ok_runs = 0
     failed_runs = 0
     export_results = []
     futures = []
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        for exp_id_or_name in experiments:
-            run_ids = experiments_dct.get(exp_id_or_name, None)
-            future = executor.submit(_export_experiment,
-                mlflow_client,
-                exp_id_or_name,
-                output_dir,
-                export_permissions,
-                notebook_formats,
-                export_results,
-                run_start_time,
-                export_deleted_runs,
-                run_ids
-            )
-            futures.append(future)
-    duration = round(time.time() - start_time, 1)
-    ok_runs = 0
-    failed_runs = 0
-    experiment_names = []
-    for future in futures:
-        result = future.result()
-        ok_runs += result.ok_runs
-        failed_runs += result.failed_runs
-        experiment_names.append(result.name)
 
-    total_runs = ok_runs + failed_runs
-    duration = round(time.time() - start_time, 1)
+    try:
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            for exp_id_or_name in experiments:
+                run_ids = experiments_dct.get(exp_id_or_name, [])
+                future = executor.submit(_export_experiment,
+                    mlflow_client,
+                    exp_id_or_name,
+                    output_dir,
+                    export_permissions,
+                    notebook_formats,
+                    export_results,
+                    run_start_time,
+                    export_deleted_runs,
+                    run_ids,
+                    result_queue #birbal added
+                )
+                futures.append(future)
+        duration = round(time.time() - start_time, 1)
+        ok_runs = 0
+        failed_runs = 0
+        experiment_names = []
+        for future in futures:
+            result = future.result()
+            ok_runs += result.ok_runs
+            failed_runs += result.failed_runs
+            experiment_names.append(result.name)
 
-    info_attr = {
-        "experiment_names": experiment_names,
-        "options": {
-            "experiments": experiments_arg,
-            "output_dir": output_dir,
-            "export_permissions": export_permissions,
-            "run_start_time": run_start_time,
-            "export_deleted_runs": export_deleted_runs,
-            "notebook_formats": notebook_formats,
-            "use_threads": use_threads
-        },
-        "status": {
-            "duration": duration,
-            "experiments": len(experiments),
-            "total_runs": total_runs,
-            "ok_runs": ok_runs,
-            "failed_runs": failed_runs
+        total_runs = ok_runs + failed_runs
+        duration = round(time.time() - start_time, 1)
+
+        info_attr = {
+            "experiment_names": experiment_names,
+            "options": {
+                "experiments": experiments_arg,
+                "output_dir": output_dir,
+                "export_permissions": export_permissions,
+                "run_start_time": run_start_time,
+                "export_deleted_runs": export_deleted_runs,
+                "notebook_formats": notebook_formats,
+                "use_threads": use_threads
+            },
+            "status": {
+                "duration": duration,
+                "experiments": len(experiments),
+                "total_runs": total_runs,
+                "ok_runs": ok_runs,
+                "failed_runs": failed_runs
+            }
         }
-    }
-    mlflow_attr = { "experiments": export_results }
+        mlflow_attr = { "experiments": export_results }
 
-    # NOTE: Make sure we don't overwrite existing experiments.json generated by export_models when being called by export_all.
-    # Merge this existing experiments.json with the new built by export_experiments.
-    path = _fs.mk_local_path(os.path.join(output_dir, "experiments.json"))
-    if os.path.exists(path):
-        from mlflow_export_import.bulk.experiments_merge_utils import merge_mlflow, merge_info
-        root = io_utils.read_file(path)
-        mlflow_attr = merge_mlflow(io_utils.get_mlflow(root), mlflow_attr)
-        info_attr = merge_info(io_utils.get_info(root), info_attr)
-        info_attr["note"] = "Merged by export_all from export_models and export_experiments"
+        # NOTE: Make sure we don't overwrite existing experiments.json generated by export_models when being called by export_all.
+        # Merge this existing experiments.json with the new built by export_experiments.
+        path = _fs.mk_local_path(os.path.join(output_dir, "experiments.json"))
+        if os.path.exists(path):
+            from mlflow_export_import.bulk.experiments_merge_utils import merge_mlflow, merge_info
+            root = io_utils.read_file(path)
+            mlflow_attr = merge_mlflow(io_utils.get_mlflow(root), mlflow_attr)
+            info_attr = merge_info(io_utils.get_info(root), info_attr)
+            info_attr["note"] = "Merged by export_all from export_models and export_experiments"
 
-    io_utils.write_export_file(output_dir, "experiments.json", __file__, mlflow_attr, info_attr)
+        io_utils.write_export_file(output_dir, "experiments.json", __file__, mlflow_attr, info_attr)
 
-    _logger.info(f"{len(experiments)} experiments exported")
-    _logger.info(f"{ok_runs}/{total_runs} runs succesfully exported")
-    if failed_runs > 0:
-        _logger.info(f"{failed_runs}/{total_runs} runs failed")
-    _logger.info(f"Duration for {len(experiments)} experiments export: {duration} seconds")
+        _logger.info(f"{len(experiments)} experiments exported")
+        _logger.info(f"{ok_runs}/{total_runs} runs succesfully exported")
+        if failed_runs > 0:
+            _logger.info(f"{failed_runs}/{total_runs} runs failed")
+        _logger.info(f"Duration for {len(experiments)} experiments export: {duration} seconds")
 
-    return info_attr
+        return info_attr
+    
+    except Exception as e:  #birbal added
+        _logger.error(f"_export_experiment failed: {e}", exc_info=True)
+    
+    finally: #birbal added
+        checkpoint_thread.stop()
+        checkpoint_thread.join()
+        _logger.info("Checkpoint thread flushed and terminated for experiments") 
 
 
 def _export_experiment(mlflow_client, exp_id_or_name, output_dir, export_permissions, notebook_formats, export_results,
-        run_start_time, export_deleted_runs, run_ids):
+        run_start_time, export_deleted_runs, run_ids, result_queue = None): #birbal added result_queue = None
     ok_runs = -1; failed_runs = -1
     exp_name = exp_id_or_name
     try:
+        if not run_ids:
+            _logger.error(f"no runs to export for experiment {exp_id_or_name}. Throwing exception to capture in checkpoint file")
+            raise Exception(f"no runs to export for experiment {exp_id_or_name}")
+
         exp = mlflow_utils.get_experiment(mlflow_client, exp_id_or_name)
         exp_name = exp.name
         exp_output_dir = os.path.join(output_dir, exp.experiment_id)
@@ -166,7 +196,8 @@ def _export_experiment(mlflow_client, exp_id_or_name, output_dir, export_permiss
             run_start_time = run_start_time,
             export_deleted_runs = export_deleted_runs,
             notebook_formats = notebook_formats,
-            mlflow_client = mlflow_client
+            mlflow_client = mlflow_client,
+            result_queue = result_queue #birbal added
         )
         duration = round(time.time() - start_time, 1)
         result = {
@@ -181,14 +212,23 @@ def _export_experiment(mlflow_client, exp_id_or_name, output_dir, export_permiss
 
     except RestException as e:
         mlflow_utils.dump_exception(e)
-        err_msg = { **{ "message": "Cannot export experiment", "experiment": exp_name }, ** mlflow_utils.mk_msg_RestException(e) }
+        err_msg = { **{ "message": "Cannot export experiment", "experiment_id": exp_id_or_name }, ** mlflow_utils.mk_msg_RestException(str(e)) } #birbal type casted
         _logger.error(err_msg)
+        err_msg["status"] = "failed"    #birbal added
+        result_queue.put(err_msg)   #birbal added
     except MlflowExportImportException as e:
-        err_msg = { "message": "Cannot export experiment", "experiment": exp_name, "MlflowExportImportException": e.kwargs }
+        err_msg = { "message": "Cannot export experiment", "experiment_id": exp_id_or_name, "MlflowExportImportException": str(e.kwargs) }    #birbal string casted
         _logger.error(err_msg)
+
+        err_msg["status"] = "failed"    #birbal added
+        result_queue.put(err_msg)   #birbal added
     except Exception as e:
-        err_msg = { "message": "Cannot export experiment", "experiment": exp_name, "Exception": e }
+        err_msg = { "message": "Cannot export experiment", "experiment_id": exp_id_or_name, "Exception": str(e) }    #birbal string casted
         _logger.error(err_msg)
+        
+        err_msg["status"] = "failed"    #birbal added
+        result_queue.put(err_msg)   #birbal added
+
     return Result(exp_name, ok_runs, failed_runs)
 
 

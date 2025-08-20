@@ -23,57 +23,78 @@
 
 # COMMAND ----------
 
-dbutils.widgets.text("01. Models", "") 
-models = dbutils.widgets.get("01. Models")
-
-dbutils.widgets.text("02. Output directory", "dbfs:/mnt/andre-work/exim/experiments") 
-output_dir = dbutils.widgets.get("02. Output directory")
-output_dir = output_dir.replace("dbfs:","/dbfs")
-
-dbutils.widgets.multiselect("03. Stages", "Production", ["Production","Staging","Archived","None"])
-stages = dbutils.widgets.get("03. Stages")
-
-dbutils.widgets.dropdown("04. Export latest versions","no",["yes","no"])
-export_latest_versions = dbutils.widgets.get("04. Export latest versions") == "yes"
-
-dbutils.widgets.dropdown("05. Export all runs","no",["yes","no"])
-export_all_runs = dbutils.widgets.get("05. Export all runs") == "yes"
-
-dbutils.widgets.dropdown("06. Export permissions","no",["yes","no"])
-export_permissions = dbutils.widgets.get("06. Export permissions") == "yes"
-
-dbutils.widgets.dropdown("07. Export deleted runs","no",["yes","no"])
-export_deleted_runs = dbutils.widgets.get("07. Export deleted runs") == "yes"
-
-dbutils.widgets.dropdown("08. Export version MLflow model","no",["yes","no"]) # TODO
-export_version_model = dbutils.widgets.get("08. Export version MLflow model") == "yes"
-
-notebook_formats = get_notebook_formats("09")
-
-dbutils.widgets.dropdown("10. Use threads","no",["yes","no"])
-use_threads = dbutils.widgets.get("10. Use threads") == "yes"
-
-export_notebook_revision = False
-export_all_runs = False
-
+from mlflow_export_import.bulk import config
+import time
 import os
-os.environ["OUTPUT_DIR"] = output_dir
-
-print("models:", models)
-print("output_dir:", output_dir)
-print("stages:", stages)
-print("export_latest_versions:", export_latest_versions)
-print("export_all_runs:", export_all_runs)
-print("export_permissions:", export_permissions)
-print("export_deleted_runs:", export_deleted_runs)
-print("export_version_model:", export_version_model)
-print("notebook_formats:", notebook_formats)
-print("use_threads:", use_threads)
 
 # COMMAND ----------
 
-assert_widget(models, "1. Models")
-assert_widget(output_dir, "2. Output directory")
+model_file_name = dbutils.widgets.get("model_file_name")
+
+output_dir = dbutils.widgets.get("output_dir")
+output_dir = output_dir.replace("dbfs:","/dbfs")
+
+stages = dbutils.widgets.get("stages")
+
+export_latest_versions = dbutils.widgets.get("export_latest_versions") == "true"
+
+export_permissions = dbutils.widgets.get("export_permissions") == "true"
+
+export_deleted_runs = dbutils.widgets.get("export_deleted_runs") == "true"
+
+task_index = int(dbutils.widgets.get("task_index"))
+
+num_tasks = int(dbutils.widgets.get("num_tasks"))
+
+run_timestamp = dbutils.widgets.get("run_timestamp")
+
+dbutils.widgets.text("jobrunid", "")
+jobrunid = dbutils.widgets.get("jobrunid")
+
+print("model_file_name:", model_file_name)
+print("output_dir:", output_dir)
+print("stages:", stages)
+print("export_latest_versions:", export_latest_versions)
+print("export_permissions:", export_permissions)
+print("export_deleted_runs:", export_deleted_runs)
+print("task_index:", task_index)
+print("num_tasks:", num_tasks)
+print("run_timestamp:", run_timestamp)
+print("jobrunid:", jobrunid)
+
+# COMMAND ----------
+
+log_path=f"/tmp/my.log"
+log_path
+
+# COMMAND ----------
+
+config.log_path=log_path
+
+# COMMAND ----------
+
+checkpoint_dir_experiment = os.path.join(output_dir, run_timestamp,"checkpoint", "experiments")
+try:
+    if not os.path.exists(checkpoint_dir_experiment):
+        os.makedirs(checkpoint_dir_experiment, exist_ok=True)
+        print(f"checkpoint_dir_experiment: created {checkpoint_dir_experiment}")
+except Exception as e:
+    raise Exception(f"Failed to create directory {checkpoint_dir_experiment}: {e}")
+
+# COMMAND ----------
+
+checkpoint_dir_model = os.path.join(output_dir, run_timestamp,"checkpoint", "models")
+try:
+    if not os.path.exists(checkpoint_dir_model):
+        os.makedirs(checkpoint_dir_model, exist_ok=True)
+        print(f"checkpoint_dir_model: created {checkpoint_dir_model}")
+except Exception as e:
+    raise Exception(f"Failed to create directory {checkpoint_dir_model}: {e}")
+
+# COMMAND ----------
+
+output_dir = os.path.join(output_dir, run_timestamp, jobrunid, str(task_index))
+output_dir
 
 # COMMAND ----------
 
@@ -84,17 +105,46 @@ assert_widget(output_dir, "2. Output directory")
 from mlflow_export_import.bulk.export_models import export_models
 
 export_models(
-    model_names = models, 
+    model_names = model_file_name, 
     output_dir = output_dir,
     stages = stages, 
     export_latest_versions = export_latest_versions,
-    export_all_runs = export_all_runs,
-    export_version_model = export_version_model,
+    export_all_runs = True,
+    export_version_model = False,
     export_permissions = export_permissions,
     export_deleted_runs = export_deleted_runs, 
-    notebook_formats = notebook_formats,
-    use_threads = use_threads
+    notebook_formats = ['SOURCE'],
+    use_threads = True,
+    task_index = task_index,
+    num_tasks = num_tasks,
+    checkpoint_dir_experiment = checkpoint_dir_experiment,
+    checkpoint_dir_model = checkpoint_dir_model
+
 )
+
+# COMMAND ----------
+
+time.sleep(10)
+
+# COMMAND ----------
+
+# MAGIC %sh cat /tmp/my.log
+
+# COMMAND ----------
+
+dbfs_log_path = f"{output_dir}/export_all_{task_index}.log"
+if dbfs_log_path.startswith("/Workspace"):
+    dbfs_log_path=dbfs_log_path.replace("/Workspace","file:/Workspace") 
+dbfs_log_path = dbfs_log_path.replace("/dbfs","dbfs:")
+dbfs_log_path
+
+# COMMAND ----------
+
+dbutils.fs.cp(f"file:{log_path}", dbfs_log_path)
+
+# COMMAND ----------
+
+print(dbutils.fs.head(dbfs_log_path))
 
 # COMMAND ----------
 
@@ -125,3 +175,7 @@ export_models(
 # COMMAND ----------
 
 # MAGIC %sh cat $OUTPUT_DIR/experiments/experiments.json
+
+# COMMAND ----------
+
+

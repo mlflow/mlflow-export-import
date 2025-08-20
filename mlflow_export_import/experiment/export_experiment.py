@@ -35,7 +35,8 @@ def export_experiment(
         export_deleted_runs = False,
         check_nested_runs = False,
         notebook_formats = None,
-        mlflow_client = None
+        mlflow_client = None,
+        result_queue = None #birbal added
     ):
     """
     :param: experiment_id_or_name: Experiment ID or name.
@@ -81,7 +82,7 @@ def export_experiment(
 
     for run in runs:
         _export_run(mlflow_client, run, output_dir, ok_run_ids, failed_run_ids,
-            run_start_time, run_start_time_str, export_deleted_runs, notebook_formats)
+            run_start_time, run_start_time_str, export_deleted_runs, notebook_formats, result_queue)  #birbal added result_queue
         num_runs_exported += 1
 
     info_attr = {
@@ -114,7 +115,7 @@ def export_experiment(
 def _export_run(mlflow_client, run, output_dir,
         ok_run_ids, failed_run_ids,
         run_start_time, run_start_time_str,
-        export_deleted_runs, notebook_formats
+        export_deleted_runs, notebook_formats, result_queue = None #birbal added result_queue
     ):
     if run_start_time and run.info.start_time < run_start_time:
         msg = {
@@ -123,14 +124,15 @@ def _export_run(mlflow_client, run, output_dir,
             "start_time": fmt_ts_millis(run.info.start_time),
             "run_start_time": run_start_time_str
         }
-        _logger.info(f"Not exporting run: {msg}")
+        _logger.info(f"Not exporting run: {msg} as run.info.start_time < run_start_time ") #birbal updated
         return
     is_success = export_run(
         run_id = run.info.run_id,
         output_dir = os.path.join(output_dir, run.info.run_id),
         export_deleted_runs = export_deleted_runs,
         notebook_formats = notebook_formats,
-        mlflow_client = mlflow_client
+        mlflow_client = mlflow_client,
+        result_queue = result_queue #birbal added
     )
     if is_success:
         ok_run_ids.append(run.info.run_id)

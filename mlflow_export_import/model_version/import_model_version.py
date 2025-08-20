@@ -86,6 +86,7 @@ def import_model_version(
 
     model_path = _get_model_path(src_vr)
     dst_source = f"{dst_run.info.artifact_uri}/{model_path}"
+
     dst_vr = _import_model_version(
         mlflow_client,
         model_name = model_name,
@@ -103,7 +104,7 @@ def _import_model_version(
         src_vr,
         dst_run_id,
         dst_source,
-        import_stages_and_aliases = True,
+        import_stages_and_aliases = True, 
         import_source_tags = False
     ):
     start_time = time.time()
@@ -119,27 +120,32 @@ def _import_model_version(
     # The client's tracking_uri is not honored. Instead MlflowClient.create_model_version()
     # seems to use mlflow.tracking_uri internally to download run artifacts for UC models.
     _logger.info(f"Importing model version '{model_name}'")
-    with MlflowTrackingUriTweak(mlflow_client):
-        dst_vr = mlflow_client.create_model_version(
-            name = model_name,
-            source = dst_source,
-            run_id = dst_run_id,
-            description = src_vr.get("description"),
-            tags = tags
-        )
 
-    if import_stages_and_aliases:
-        for alias in src_vr.get("aliases",[]):
-            mlflow_client.set_registered_model_alias(dst_vr.name, alias, dst_vr.version)
+    try:    #birbal added
+        with MlflowTrackingUriTweak(mlflow_client):
+            dst_vr = mlflow_client.create_model_version(
+                name = model_name,
+                source = dst_source,
+                run_id = dst_run_id,
+                description = src_vr.get("description"),
+                tags = tags
+            )
 
-        if not model_utils.is_unity_catalog_model(model_name):
-            src_current_stage = src_vr["current_stage"]
-            if src_current_stage and src_current_stage != "None": # fails for Databricks  but not OSS
-                mlflow_client.transition_model_version_stage(model_name, dst_vr.version, src_current_stage)
+        if import_stages_and_aliases:  
+            for alias in src_vr.get("aliases",[]):
+                mlflow_client.set_registered_model_alias(dst_vr.name, alias, dst_vr.version)
 
-    dur = format_seconds(time.time()-start_time)
-    _logger.info(f"Imported model version '{model_name}/{dst_vr.version}' in {dur}")
-    return mlflow_client.get_model_version(dst_vr.name, dst_vr.version)
+            if not model_utils.is_unity_catalog_model(model_name):
+                src_current_stage = src_vr["current_stage"]
+                if src_current_stage and src_current_stage != "None": # fails for Databricks  but not OSS
+                    mlflow_client.transition_model_version_stage(model_name, dst_vr.version, src_current_stage)
+
+        dur = format_seconds(time.time()-start_time)
+        _logger.info(f"Imported model version '{model_name}/{dst_vr.version}' in {dur}")
+        return mlflow_client.get_model_version(dst_vr.name, dst_vr.version)    
+
+    except Exception as e:
+        _logger.error(f"Error creating model version of {model_name}. Error:  {str(e)}")
 
 
 def _get_model_path(src_vr):

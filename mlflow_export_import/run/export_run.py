@@ -21,7 +21,7 @@ from mlflow_export_import.common.timestamp_utils import adjust_timestamps, forma
 from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client
 from mlflow_export_import.notebook.download_notebook import download_notebook
 
-from mlflow.utils.mlflow_tags import MLFLOW_DATABRICKS_NOTEBOOK_PATH
+from mlflow.utils.mlflow_tags import MLFLOW_DATABRICKS_NOTEBOOK_PATH, MLFLOW_DATABRICKS_NOTEBOOK_ID #birbal added MLFLOW_DATABRICKS_NOTEBOOK_ID
 MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID = "mlflow.databricks.notebookRevisionID" # NOTE: not in mlflow/utils/mlflow_tags.py
 
 _logger = utils.getLogger(__name__)
@@ -34,7 +34,9 @@ def export_run(
         skip_download_run_artifacts = False,
         notebook_formats = None,
         raise_exception = False,
-        mlflow_client = None
+        mlflow_client = None,
+        result_queue = None, #birbal addedbirbal added
+        vr = None   #
     ):
     """
     :param run_id: Run ID.
@@ -56,13 +58,15 @@ def export_run(
     experiment_id = None
     try:
         run = mlflow_client.get_run(run_id)
+
         dst_path = os.path.join(output_dir, "artifacts")
         msg = { "run_id": run.info.run_id, "dst_path": dst_path }
         if run.info.lifecycle_stage == "deleted" and not export_deleted_runs:
             _logger.warning(f"Not exporting run '{run.info.run_id} because its lifecycle_stage is '{run.info.lifecycle_stage}'")
             return None
         experiment_id = run.info.experiment_id
-        msg = { "run_id": run.info.run_id, "lifecycle_stage": run.info.lifecycle_stage, "experiment_id": run.info.experiment_id }
+        experiment = mlflow_client.get_experiment(experiment_id)
+        msg = { "run_id": run.info.run_id, "experiment_id": run.info.experiment_id, "experiment_name": experiment.name} #birbal removed lifecycle_stage
         tags = run.data.tags
         tags = dict(sorted(tags.items()))
 
@@ -91,6 +95,7 @@ def export_run(
                     run_id = run.info.run_id,
                     dst_path = _fs.mk_local_path(dst_path),
                     tracking_uri = mlflow_client._tracking_client.tracking_uri)
+        
         notebook = tags.get(MLFLOW_DATABRICKS_NOTEBOOK_PATH)
 
         # export notebook as artifact
@@ -98,22 +103,48 @@ def export_run(
             if len(notebook_formats) > 0:
                 _export_notebook(dbx_client, output_dir, notebook, notebook_formats, run, fs)
         elif len(notebook_formats) > 0:
-            _logger.warning(f"No notebooks to export for run '{run_id}' since tag '{MLFLOW_DATABRICKS_NOTEBOOK_PATH}' is not set.")
+            _logger.error(f"No notebooks to export for run '{run_id}' since run tag '{MLFLOW_DATABRICKS_NOTEBOOK_PATH}' is not set.")
         dur = format_seconds(time.time()-start_time)
         _logger.info(f"Exported run in {dur}: {msg}")
+
+        msg["status"] = "success" #birbal added
+        if vr:            
+            msg["model"] = vr.name  #birbal added
+            msg["version"] = vr.version #birbal added
+            msg["stage"] = vr.current_stage #birbal added
+        if result_queue:
+            result_queue.put(msg) #birbal added
         return run
 
     except RestException as e:
         if raise_exception:
             raise e
-        err_msg = { "run_id": run_id, "experiment_id": experiment_id, "RestException": e.json }
+        err_msg = { "run_id": run_id, "experiment_id": experiment_id, "RestException": str(e.json) }        #birbal string casted  
+
+        err_msg["status"] = "failed" #birbal added
+        if vr:
+            err_msg["model"] = vr.name  #birbal added
+            err_msg["version"] = vr.version #birbal added
+            err_msg["stage"] = vr.current_stage #birbal added
         _logger.error(f"Run export failed (1): {err_msg}")
+        if result_queue:
+            result_queue.put(err_msg) #birbal added
+
         return None
     except Exception as e:
         if raise_exception:
             raise e
-        err_msg = { "run_id": run_id, "experiment_id": experiment_id, "Exception": e }
-        _logger.error(f"Run export failed (2): {err_msg}")
+        err_msg = { "run_id": run_id, "experiment_id": experiment_id, "Exception": str(e) }     #birbal string casted
+
+        err_msg["status"] = "failed" #birbal added
+        if vr:
+            err_msg["model"] = vr.name  #birbal added
+            err_msg["version"] = vr.version #birbal added
+            err_msg["stage"] = vr.current_stage #birbal added
+        _logger.error(f"Run export failed (2): {err_msg}")        
+        if result_queue:
+            result_queue.put(err_msg) #birbal added
+
         traceback.print_exc()
         return None
 
@@ -133,9 +164,9 @@ def _export_notebook(dbx_client, output_dir, notebook, notebook_formats, run, fs
     notebook_dir = os.path.join(output_dir, "artifacts", "notebooks")
     fs.mkdirs(notebook_dir)
     revision_id = run.data.tags.get(MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID)
-    if not revision_id:
-        _logger.warning(f"Cannot download notebook '{notebook}' for run '{run.info.run_id}' since tag '{MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID}' does not exist. Notebook is probably a Git Repo notebook.")
-        return
+    # if not revision_id:   #birbal commented out. If not, it simply skips the notebook download due to missing notebook versionID which shouldn't be the case.
+    #     _logger.warning(f"Cannot download notebook '{notebook}' for run '{run.info.run_id}' since tag '{MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID}' does not exist. Notebook is probably a Git Repo notebook.")
+    #     return
     manifest = {
        MLFLOW_DATABRICKS_NOTEBOOK_PATH: run.data.tags[MLFLOW_DATABRICKS_NOTEBOOK_PATH],
        MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID: revision_id,

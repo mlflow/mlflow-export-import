@@ -32,7 +32,7 @@ def _call_get(dbx_client, resource):
     try:
         return dbx_client.get(resource)
     except MlflowExportImportException as e:
-        _logger.error(e.kwargs)
+        _logger.error(f"Error while retrieving permissions with endpoint {resource}. Most probably due to notebook scoped experiment. Valid experiment type (mlflow.experimentType) should be MLFLOW_EXPERIMENT, not NOTEBOOK. Verify experimentType using  SDK. Error: {e.kwargs}")    #birbal added
         return {}
 
 

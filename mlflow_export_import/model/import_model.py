@@ -116,11 +116,17 @@ class BaseModelImporter():
         created_model = model_utils.create_model(self.mlflow_client, model_name, model_dct, True)
         perms = model_dct.get("permissions")
         if created_model and self.import_permissions and perms:
-            if model_utils.model_names_same_registry(model_dct["name"], model_name):
-                model_utils.update_model_permissions(self.mlflow_client, self.dbx_client, model_name, perms)
-            else:
-                _logger.warning(f'Cannot import permissions since models \'{model_dct["name"]}\' and \'{model_name}\' must be either both Unity Catalog model names or both Workspace model names.')
-
+            try: #birbal added
+                if model_utils.model_names_same_registry(model_dct["name"], model_name):                     
+                    model_utils.update_model_permissions(self.mlflow_client, self.dbx_client, model_name, perms)
+                elif model_utils.model_names_same_registry_nonucsrc_uctgt(model_dct["name"], model_name):     #birbal added                
+                    model_utils.update_model_permissions(self.mlflow_client, self.dbx_client, model_name, perms, True) 
+                else:
+                    _logger.warning(f'Cannot import permissions since models \'{model_dct["name"]}\' and \'{model_name}\' must be either both Unity Catalog model names or both Workspace model names.')
+            except Exception as e: #birbal added
+                _logger.error(f"Error updating model permission for model {model_name} . Error: {e}")
+        else: ##birbal added
+            _logger.info(f"Model permission update skipped for model {model_name}")
         return model_dct
 
 
@@ -157,14 +163,17 @@ class ModelImporter(BaseModelImporter):
         :param verbose: Verbose.
         :return: Model import manifest.
         """
+
         model_dct = self._import_model(model_name, input_dir, delete_model)
+
         _logger.info("Importing versions:")
         for vr in model_dct.get("versions",[]):
             try:
                 run_id = self._import_run(input_dir, experiment_name, vr)
                 if run_id:
                     self.import_version(model_name, vr, run_id)
-            except RestException as e:
+            # except RestException as e: #birbal commented out
+            except Exception as e: #birbal added
                 msg = { "model": model_name, "version": vr["version"], "src_run_id": vr["run_id"], "experiment": experiment_name, "RestException": str(e) }
                 _logger.error(f"Failed to import model version: {msg}")
                 import traceback
@@ -267,6 +276,7 @@ class BulkModelImporter(BaseModelImporter):
             else:
                 dst_run_id = dst_run_info.run_id
                 exp_name = rename_utils.rename(vr["_experiment_name"], self.experiment_renames, "experiment")
+                _logger.info(f"RENAMED EXPERIMENT FROM  {vr["_experiment_name"]} TO {exp_name}") # birbal
                 try:
                     with MlflowTrackingUriTweak(self.mlflow_client):
                         mlflow.set_experiment(exp_name)

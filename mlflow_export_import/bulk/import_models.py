@@ -39,20 +39,27 @@ def import_models(
         model_renames = None,
         verbose = False,
         use_threads = False,
-        mlflow_client = None
+        mlflow_client = None,
+        target_model_catalog = None,    #birbal added
+        target_model_schema = None,      #birbal added
+        notebook_user_mapping_file = None  #birbal added
     ):
     mlflow_client = mlflow_client or create_mlflow_client()
+    experiment_renames_original = experiment_renames #birbal
     experiment_renames = rename_utils.get_renames(experiment_renames)
     model_renames = rename_utils.get_renames(model_renames)
+    notebook_user_mapping = rename_utils.get_renames(notebook_user_mapping_file)    #birbal
     start_time = time.time()
     exp_run_info_map, exp_info = _import_experiments(
         mlflow_client,
         input_dir,
-        experiment_renames,
+        # experiment_renames,
+        experiment_renames_original, #birbal
         import_permissions,
         import_source_tags,
         use_src_user_id,
-        use_threads
+        use_threads,
+        notebook_user_mapping  #birbal
     )
     run_info_map = _flatten_run_info_map(exp_run_info_map)
     model_res = _import_models(
@@ -65,7 +72,9 @@ def import_models(
         model_renames,
         experiment_renames,
         verbose,
-        use_threads
+        use_threads,
+        target_model_catalog, #birbal added
+        target_model_schema     #birbal added
     )
     duration = round(time.time()-start_time, 1)
     dct = { "duration": duration, "experiments_import": exp_info, "models_import": model_res }
@@ -88,7 +97,8 @@ def _import_experiments(mlflow_client,
         import_permissions,
         import_source_tags,
         use_src_user_id,
-        use_threads
+        use_threads,
+        notebook_user_mapping
     ):
     start_time = time.time()
 
@@ -99,7 +109,8 @@ def _import_experiments(mlflow_client,
         use_src_user_id = use_src_user_id,
         experiment_renames = experiment_renames,
         use_threads = use_threads,
-        mlflow_client = mlflow_client
+        mlflow_client = mlflow_client,
+        notebook_user_mapping = notebook_user_mapping   #birbal
     )
     duration = round(time.time()-start_time, 1)
 
@@ -132,7 +143,9 @@ def _import_models(mlflow_client,
         model_renames,
         experiment_renames,
         verbose,
-        use_threads
+        use_threads,
+        target_model_catalog = None,    #birbal added
+        target_model_schema = None      #birbal added
     ):
     max_workers = utils.get_threads(use_threads)
     start_time = time.time()
@@ -140,6 +153,11 @@ def _import_models(mlflow_client,
     models_dir = os.path.join(input_dir, "models")
     models = io_utils.read_file_mlflow(os.path.join(models_dir,"models.json"))
     model_names = models["models"]
+
+    if len(model_names) == 0:
+        _logger.warning(f"No models found in {os.path.join(models_dir,"models.json")}. NO MODELS TO IMPORT")
+        return {}
+
     all_importer = BulkModelImporter(
         mlflow_client = mlflow_client,
         run_info_map = run_info_map,
@@ -150,8 +168,14 @@ def _import_models(mlflow_client,
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for model_name in model_names:
+            _logger.info(f"model name BEFORE rename : '{model_name}'")  #birbal added
             dir = os.path.join(models_dir, model_name)
             model_name = rename_utils.rename(model_name, model_renames, "model")
+
+            if target_model_catalog is not None and target_model_schema is not None: #birbal added
+                model_name=rename_utils.build_full_model_name(target_model_catalog, target_model_schema, model_name)
+            _logger.info(f"model name AFTER rename : '{model_name}'")   #birbal added
+            
             executor.submit(all_importer.import_model,
                model_name = model_name,
                input_dir = dir,

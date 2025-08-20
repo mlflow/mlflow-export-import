@@ -30,7 +30,8 @@ def import_experiments(
         use_src_user_id = False, 
         experiment_renames = None,
         use_threads = False,
-        mlflow_client = None
+        mlflow_client = None,
+        notebook_user_mapping = None    #birbal
     ): 
     """
     :param input_dir: Source experiment directory.
@@ -47,12 +48,19 @@ def import_experiments(
     """
 
     experiment_renames = rename_utils.get_renames(experiment_renames)
+
     mlflow_client = mlflow_client or mlflow.MlflowClient()
-    dct = io_utils.read_file_mlflow(os.path.join(input_dir, "experiments.json"))
+
+    try: #birbal
+        dct = io_utils.read_file_mlflow(os.path.join(input_dir, "experiments.json"))
+    except Exception as e:
+        _logger.info(f"'experiments.json' does not exist in {input_dir}. NO EXPERIMENTS TO IMPORT") 
+        return []
+
     exps = dct["experiments"]
     _logger.info("Importing experiments:")
     for exp in exps:
-        _logger.info(f"  Importing experiment: {exp}")
+        _logger.info(f"Importing experiment: {exp}")
 
     max_workers = utils.get_threads(use_threads)
     futures = []
@@ -67,7 +75,8 @@ def import_experiments(
                 import_permissions, 
                 import_source_tags, 
                 use_src_user_id, 
-                experiment_renames
+                experiment_renames,
+                notebook_user_mapping   #birbal
             )
             futures.append([exp["id"], run_info_map])
     return [ (f[0], f[1].result()) for f in futures ] # materialize the future
@@ -79,7 +88,8 @@ def _import_experiment(mlflow_client,
         import_permissions, 
         import_source_tags, 
         use_src_user_id, 
-        experiment_renames
+        experiment_renames,
+        notebook_user_mapping
     ):
     """
     :return: 
@@ -87,14 +97,17 @@ def _import_experiment(mlflow_client,
        - None if error happened
     """
     try:
+        _logger.info(f"EXPERIMENT BEFORE RENAME  {exp_name} ") # birbal
         exp_name =  rename_utils.rename(exp_name, experiment_renames, "experiment")
+        _logger.info(f"EXPERIMENT AFTER RENAME  {exp_name} ") # birbal
         run_info_map = import_experiment(
             mlflow_client = mlflow_client,
             experiment_name = exp_name,
             input_dir = input_dir,
             import_permissions = import_permissions,
             import_source_tags = import_source_tags,
-            use_src_user_id = use_src_user_id
+            use_src_user_id = use_src_user_id,
+            notebook_user_mapping = notebook_user_mapping   #birbal
         )
         return run_info_map
     except Exception as e:

@@ -9,7 +9,7 @@ config = {
     "handlers": {
       "console": {
         "class": "logging.StreamHandler",
-        "level": "DEBUG",
+        "level": "INFO",
         "formatter": "simple",
         "stream": "ext://sys.stdout"
       },
@@ -22,7 +22,7 @@ config = {
     },
     "loggers": {
       "sampleLogger": {
-        "level": "DEBUG",
+        "level": "INFO",
         "handlers": [
           "console"
         ],
@@ -30,7 +30,7 @@ config = {
       }
     },
     "root": {
-      "level": "DEBUG",
+      "level": "INFO",
       "handlers": [
         "console",
         "file"

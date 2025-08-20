@@ -16,13 +16,16 @@ def read_rename_file(path):
 
 def rename(name, replacements, object_name="object"):
     if not replacements:
-        return name
+        return name  ## birbal :: corrected to return name instead of None. returning None will cause failure
     for k,v in replacements.items():
+        if object_name == "notebook": #birbal added
+            k = k.removeprefix("/Workspace")
         if k != "" and name.startswith(k):
             new_name = name.replace(k,v)
             _logger.info(f"Renaming {object_name} '{name}' to '{new_name}'")
             return new_name
     return name
+
 
 
 def get_renames(filename_or_dict):
@@ -34,3 +37,9 @@ def get_renames(filename_or_dict):
         return filename_or_dict
     else:
         raise MlflowExportImportException(f"Unknown name replacement type '{type(filename_or_dict)}'", http_status_code=400)
+
+def build_full_model_name(catalog, schema, model_name): #birbal added
+    if model_name.count('.') == 2:
+        return model_name    
+    else:
+        return f"{catalog}.{schema}.{model_name}"        
