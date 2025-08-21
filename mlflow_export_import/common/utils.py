@@ -18,6 +18,7 @@ def calling_databricks(dbx_client=None):
     """
     from mlflow_export_import.client.http_client import DatabricksHttpClient
     from mlflow_export_import.common import MlflowExportImportException
+    from requests.exceptions import RequestException
 
     global _calling_databricks
     if _calling_databricks is None:
@@ -26,6 +27,8 @@ def calling_databricks(dbx_client=None):
             dbx_client.get("clusters/list-node-types")
             _calling_databricks =  True
         except MlflowExportImportException:
+            _calling_databricks =  False
+        except RequestException:
             _calling_databricks =  False
         _logger.info(f"Calling Databricks: {_calling_databricks}")
     return _calling_databricks

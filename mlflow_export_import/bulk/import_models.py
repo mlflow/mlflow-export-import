@@ -2,6 +2,7 @@
 Imports models and their experiments and runs.
 """
 
+import re
 import os
 import time
 import json
@@ -152,6 +153,7 @@ def _import_models(mlflow_client,
         for model_name in model_names:
             dir = os.path.join(models_dir, model_name)
             model_name = rename_utils.rename(model_name, model_renames, "model")
+            validate_model_name(model_name)
             executor.submit(all_importer.import_model,
                model_name = model_name,
                input_dir = dir,
@@ -161,6 +163,15 @@ def _import_models(mlflow_client,
 
     duration = round(time.time()-start_time, 1)
     return { "models": len(model_names), "duration": duration }
+
+
+def validate_model_name(model_name):
+    pattern = r"^[a-zA-Z0-9](-*[a-zA-Z0-9]){0,56}$"
+    if not re.match(pattern, model_name):
+        _logger.warning(
+            f"The model name does match the pattern {pattern} and may not import "
+            "correctly for some environments."
+        )
 
 
 @click.command()
