@@ -16,15 +16,16 @@ Notes:
 
 ### Tools
 
-| MLflow Object | Documentation | Code | Description |
-|-------|-------|----|---|
-| All  | [export-all](#Export-all-MLflow-objects) | [code](mlflow_export_import/bulk/export_all.py) | Exports all MLflow objects (registered models, experiments and runs) to a directory. |
-| | [import-all](#Import-all-MLflow-objects) | Uses [import-models](mlflow_export_import/bulk/import_models.py) | Imports MLflow objects from a directory. |
-| Model | [export-models](#Export-registered-models) | [code](mlflow_export_import/bulk/export_models.py) | Exports several (or all) registered models and their versions' backing run along with the run's experiment to a directory. |
-| | [import-models](#Import-registered-models) | [code](mlflow_export_import/bulk/import_models.py) | Imports registered models from a directory. |
-| Experiment | [export-experiments](#Export-experiments) | [code](mlflow_export_import/bulk/export_experiments.py) | Export several (or all) experiments to a directory. |
-| | [import-experiments](#Import-experiments) | [code](mlflow_export_import/bulk/import_experiments.py) | Imports experiments from a directory. |
-
+| MLflow Object | Documentation                                 | Code                                                             | Description |
+|---------------|-----------------------------------------------|------------------------------------------------------------------|---|
+| All           | [export-all](#Export-all-MLflow-objects)      | [code](mlflow_export_import/bulk/export_all.py)                  | Exports all MLflow objects (registered models, experiments and runs) to a directory. |
+|               | [import-all](#Import-all-MLflow-objects)      | Uses [import-models](mlflow_export_import/bulk/import_models.py) | Imports MLflow objects from a directory. |
+| Model         | [export-models](#Export-registered-models)    | [code](mlflow_export_import/bulk/export_models.py)               | Exports several (or all) registered models and their versions' backing run along with the run's experiment to a directory. |
+|               | [import-models](#Import-registered-models)    | [code](mlflow_export_import/bulk/import_models.py)               | Imports registered models from a directory. |
+| Experiment    | [export-experiments](#Export-experiments)     | [code](mlflow_export_import/bulk/export_experiments.py)          | Export several (or all) experiments to a directory. |
+|               | [import-experiments](#Import-experiments)     | [code](mlflow_export_import/bulk/import_experiments.py)          | Imports experiments from a directory. |
+| Logged model  | [export-logged-models](#Export-logged-models) | [code](mlflow_export_import/bulk/export_logged_models.py)        | Exports several (or all) logged models to a directory |
+| Logged model  | [import-logged-models](#Import-logged-models) | [code](mlflow_export_import/bulk/import_logged_models.py) | Imports several (or all) logged models to a directory |
 
 ## All MLflow Objects Tools
 
@@ -386,4 +387,54 @@ cat experiment-names.csv
 
 /Users/me@mycompany.com,/Users/you@mycompany.com
 /Users/foo@mycompany.com,/Users/bar@mycompany.com
+```
+
+### Export Logged Models
+
+Export several (or all) logged models to a directory.
+
+#### Usage
+```
+export-logged-models --help
+
+Options:
+  --experiment-ids TEXT  List of experiment IDs (comma delimited).  [required]
+  --output-dir TEXT      Output directory.  [required]
+```
+
+#### Examples 
+
+##### Export logged models for specific experiment ids
+```
+ export-logged-models \
+    --experiment-ids '0,1' --output-dir out
+```
+
+##### Export all logged models
+```
+ export-logged-models \
+    --experiment-ids all --output-dir out
+```
+
+### Import Logged Models
+Import logged models from a directory. Reads the manifest file to import logged models under the experiment.
+
+#### Usage
+
+```
+export-logged-models --help
+
+Options:
+  --experiment-ids TEXT  List of experiment IDs (comma delimited).
+                         For example, '1,2'. 'all' will export all logged
+                         model from all experiments.  [required]
+  --output-dir TEXT      Output directory.  [required]
+  --help                 Show this message and exit.
+```
+
+#### Example
+
+```
+import-logged-models \ 
+    --input-dir exported_logged-models
 ```

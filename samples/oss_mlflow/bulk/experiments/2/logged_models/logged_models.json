@@ -1,0 +1,31 @@
+{
+  "system": {
+    "package_version": "1.2.0",
+    "script": "export_logged_models.py",
+    "export_file_version": "2",
+    "export_time": 1761770287,
+    "_export_time": "2025-10-29 20:38:07",
+    "mlflow_version": "3.0.0",
+    "mlflow_tracking_uri": "http://127.0.0.1:5020",
+    "platform": {
+      "python_version": "3.11.13",
+      "system": "Darwin",
+      "processor": "arm"
+    }
+  },
+  "info": {
+    "num_total_logged_models": 0,
+    "num_ok_logged_models": 0,
+    "num_failed_logged_models": 0,
+    "failed_logged_models": []
+  },
+  "mlflow": {
+    "experiments": [
+      {
+        "id": "1",
+        "name": "sklearn_wine",
+        "logged_models": []
+      }
+    ]
+  }
+}

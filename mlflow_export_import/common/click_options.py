@@ -249,3 +249,29 @@ def opt_verbose(function):
         show_default=True
     )(function)
     return function
+
+def opt_experiment_ids(function):
+    function = click.option("--experiment-ids",
+        help="List of experiment IDs (comma delimited). \
+                For example, '1,2'. 'all' will export all logged model from all experiments.",
+        type=str,
+        required=True
+        )(function)
+    return function
+
+def opt_model_id(function):
+    function = click.option("--model-id",
+        help="Logged Model ID. ",
+        type=str,
+        required=True
+    )(function)
+    return function
+
+def opt_import_model_version(function):
+    function = click.option("--import-model-version",
+        help="Import Registered model version.",
+        type=bool,
+        default=False,
+        show_default=True
+    )(function)
+    return function

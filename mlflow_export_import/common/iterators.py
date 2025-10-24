@@ -83,3 +83,8 @@ class SearchRunsIterator(BaseIterator):
         self.kwargs["experiment_ids"] = experiment_ids
         if view_type:
             self.kwargs["run_view_type"] = view_type
+
+class SearchLoggedModelsIterator(BaseIterator):
+    def __init__(self, client, experiment_ids, max_results=None, filter=None):
+        super().__init__(client.search_logged_models, max_results=max_results, filter=filter)
+        self.kwargs["experiment_ids"] = experiment_ids

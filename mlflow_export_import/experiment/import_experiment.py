@@ -22,6 +22,7 @@ from mlflow_export_import.common.source_tags import (
     fmt_timestamps
 )
 from mlflow_export_import.run.import_run import import_run
+from mlflow_export_import.logged_model.import_logged_model import import_logged_model
 
 _logger = utils.getLogger(__name__)
 
@@ -78,11 +79,12 @@ def import_experiment(
     _logger.info(f"Importing {len(run_ids)} runs into experiment '{experiment_name}' from '{input_dir}'")
     run_ids_map = {}
     run_info_map = {}
+    imported_logged_models = []
     for src_run_id in run_ids:
         dst_run, src_parent_run_id = import_run(
             mlflow_client = mlflow_client,
             experiment_name = experiment_name,
-            input_dir = os.path.join(input_dir, src_run_id),
+            input_dir = os.path.join(input_dir, f'runs/{src_run_id}'),
             dst_notebook_dir = dst_notebook_dir,
             import_source_tags = import_source_tags,
             use_src_user_id = use_src_user_id
@@ -90,6 +92,43 @@ def import_experiment(
         dst_run_id = dst_run.info.run_id
         run_ids_map[src_run_id] = { "dst_run_id": dst_run_id, "src_parent_run_id": src_parent_run_id }
         run_info_map[src_run_id] = dst_run.info
+
+        src_run_dct = io_utils.read_file_mlflow(os.path.join(input_dir, f'runs/{src_run_id}/run.json'))
+
+        if "model_inputs" in src_run_dct["inputs"]:
+            for model in src_run_dct["inputs"]["model_inputs"]:
+                import_logged_model(
+                    input_dir = os.path.join(f"{input_dir}/logged_models", model['model_id']),
+                    experiment_name = experiment_name,
+                    run_id = dst_run_id,
+                    mlflow_client = mlflow_client,
+                    model_type = "input",
+                    step = model['step'],
+                )
+                imported_logged_models.append(model['model_id'])
+
+        if "outputs" in src_run_dct:
+            for model in src_run_dct["outputs"]["model_outputs"]:
+                import_logged_model(
+                    input_dir = os.path.join(f"{input_dir}/logged_models", model['model_id']),
+                    experiment_name = experiment_name,
+                    run_id = dst_run_id,
+                    mlflow_client = mlflow_client,
+                    model_type = "output",
+                    step = model['step'],
+                )
+                imported_logged_models.append(model['model_id'])
+
+    ## Importing the logged models that are not part of run
+    if "logged_models" in mlflow_dct:
+        remaining_logged_models = set(mlflow_dct["logged_models"]) - set(imported_logged_models)
+        for model_id in remaining_logged_models:
+            import_logged_model(
+                input_dir=os.path.join(f"{input_dir}/logged_models", model_id),
+                experiment_name=experiment_name,
+                mlflow_client=mlflow_client,
+            )
+
     _logger.info(f"Imported {len(run_ids)} runs into experiment '{experiment_name}' from '{input_dir}'")
     if len(failed_run_ids) > 0:
         _logger.warning(f"{len(failed_run_ids)} failed runs were not imported - see '{path}'")

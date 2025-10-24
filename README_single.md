@@ -11,18 +11,20 @@ See sample JSON export files [here](README_export_format.md#sample-export-json-f
 
 ### Tools
 
-| MLflow Object | Documentation | Code |
-|-------|-------|---|
-| Registered Model | [export-model](#export-registered-model) | [code](mlflow_export_import/model/export_model.py) |
-|    | [import-model](#import-registered-model) | [code](mlflow_export_import/model/import_model.py) |
-| Model Version | [export-model-version](#export-model-version) | [code](mlflow_export_import/model_version/export_model_version.py) |
-|    | [import-model-version](#import-model-version) | [code](mlflow_export_import/model_version/import_model_version.py) |
-|    | [copy-model-version](README_copy.md#copy-model-version) | [code](mlflow_export_import/copy/copy_model_version.py) |
-| Experiment | [export-experiment](#export-experiment) | [code](mlflow_export_import/experiment/export_experiment.py) |
-|    | [import-experiment](#import-experiment) | [code](mlflow_export_import/experiment/import_experiment.py) |
-| Run | [export-run](#export-run) | [code](mlflow_export_import/run/export_run.py) |
-|  | [import-run](#import-run) | [code](mlflow_export_import/run/import_run.py) |
-|  | [copy-run](README_copy.md#copy-run) | [code](mlflow_export_import/copy/copy_run.py) |
+| MLflow Object | Documentation                                           | Code                                                               |
+|-----|---------------------------------------------------------|--------------------------------------------------------------------|
+| Registered Model | [export-model](#export-registered-model)                | [code](mlflow_export_import/model/export_model.py)                 |
+|     | [import-model](#import-registered-model)                | [code](mlflow_export_import/model/import_model.py)                 |
+| Model Version | [export-model-version](#export-model-version)           | [code](mlflow_export_import/model_version/export_model_version.py) |
+|     | [import-model-version](#import-model-version)           | [code](mlflow_export_import/model_version/import_model_version.py) |
+|     | [copy-model-version](README_copy.md#copy-model-version) | [code](mlflow_export_import/copy/copy_model_version.py)            |
+| Experiment | [export-experiment](#export-experiment)                 | [code](mlflow_export_import/experiment/export_experiment.py)       |
+|     | [import-experiment](#import-experiment)                 | [code](mlflow_export_import/experiment/import_experiment.py)       |
+| Run | [export-run](#export-run)                               | [code](mlflow_export_import/run/export_run.py)                     |
+|     | [import-run](#import-run)                               | [code](mlflow_export_import/run/import_run.py)                     |
+|     | [copy-run](README_copy.md#copy-run)                     | [code](mlflow_export_import/copy/copy_run.py)                      |
+| Logged Model | [export-logged-model](#export-logged-model)             | [code](mlflow_export_import/logged_model/export_logged_model.py)   |
+| | [import-logged-model](#import-logged-model) | [code](mlflow_export_import/logged_model/import_logged_model.py)   |
 
 ## Experiment Tools
 
@@ -104,7 +106,7 @@ export-experiment \
 
 The [export directory](samples/oss_mlflow/single/experiments/basic) contains a [JSON export file](samples/oss_mlflow/single/experiments/basic/experiment.json)
 for the experiment and a subdirectory for each run.
-The [run directory](samples/oss_mlflow/single/experiments/basic/eb66c160957d4a28b11d3f1b968df9cd) contains a [JSON export file](samples/oss_mlflow/single/experiments/basic/eb66c160957d4a28b11d3f1b968df9cd/run.json) containing run metadata and an artifact folder directory.
+The [run directory](samples/oss_mlflow/single/experiments/basic/runs/eb66c160957d4a28b11d3f1b968df9cd) contains a [JSON export file](samples/oss_mlflow/single/experiments/basic/runs/eb66c160957d4a28b11d3f1b968df9cd/run.json) containing run metadata and an artifact folder directory.
 
 Sample export directory
 ```
@@ -212,7 +214,7 @@ Produces a directory with the following structure:
 ```
 
 Sample run.json files:
-[OSS](samples/oss_mlflow/single/experiments/basic/eb66c160957d4a28b11d3f1b968df9cd/run.json)
+[OSS](samples/oss_mlflow/single/experiments/basic/runs/eb66c160957d4a28b11d3f1b968df9cd/run.json)
 \- [Databricks](samples/databricks/single/experiments/notebook_experiments/workspace_notebook/f7816bc76f254f22ab25549a7c2c9b06/run.json).
 
 
@@ -492,4 +494,49 @@ Options:
   --import-metadata BOOLEAN       Import registered model and experiment
                                   metadata (description and tags).  [default:
                                   False]
+```
+
+## Logged Models Tools
+
+### Export Logged Model
+Export a Logged Model to a directory. Accepts Logged model id
+
+#### Usage
+```
+ export-logged-model --help
+ 
+ Options:
+  --model-id TEXT    Logged Model ID.   [required]
+  --output-dir TEXT  Output directory.  [required] 
+```
+#### Example
+
+```
+export-logged-model \ 
+    --model-id m-c4302dcdcded475fa84a20988964a2aa \
+    --output-dir out
+```
+
+### Import Logged Model
+Imports a Logged Model from a directory. Reads the manifest file to import the logged model and its run if associated.
+
+The run will be created for the logged models if associated to import metrics, datasets, inputs.
+
+#### Usage
+```
+ import-logged-model --help
+ 
+ Options:
+  --input-dir TEXT        Input directory.  [required]
+  --experiment-name TEXT  Destination experiment name.  [required]
+  --mlmodel-fix BOOLEAN   Add correct run ID in destination MLmodel artifact.
+                          Can be expensive for deeply nested artifacts.
+                          [default: True]
+```
+#### Example
+
+```
+import-logged-model \ 
+    --input-dir exported-logged-model \
+    --experiment-name logged-model
 ```

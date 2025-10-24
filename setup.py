@@ -62,7 +62,11 @@ setup(
             "get-model-signature = mlflow_export_import.tools.get_model_signature:main",
             "set-model-signature = mlflow_export_import.tools.set_model_signature:main",
             "list-model-versions-without-signatures = mlflow_export_import.tools.list_model_versions_without_signatures:main",
-            "http-client = mlflow_export_import.client.http_client:main"
+            "http-client = mlflow_export_import.client.http_client:main",
+            "export-logged-models = mlflow_export_import.bulk.export_logged_models:main",
+            "export-logged-model = mlflow_export_import.logged_model.export_logged_model:main",
+            "import-logged-models = mlflow_export_import.bulk.import_logged_models:main",
+            "import-logged-model = mlflow_export_import.logged_model.import_logged_model:main",
          ]
       }
 )
