@@ -4,6 +4,7 @@ class ExportFields:
     SYSTEM = "system"
     INFO = "info"
     MLFLOW = "mlflow"
+    SPANS = "spans"
 
 
 class ExportTags:

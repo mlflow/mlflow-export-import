@@ -105,3 +105,7 @@ def read_file_mlflow(path):
 
 def mk_manifest_json_path(input_dir, filename):
     return os.path.join(input_dir, filename)
+
+def read_spans_data_file(path):
+    dct = read_file(path)
+    return dct[ExportFields.SPANS]

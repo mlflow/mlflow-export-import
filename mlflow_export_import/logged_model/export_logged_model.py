@@ -60,7 +60,6 @@ def export_logged_model(
         dur = format_seconds(time.time() - start_time)
         _logger.info(f"Exported logged model in {dur}: {msg}")
         return logged_model
-
     except RestException as e:
         err_msg = {"model_id": model_id, "experiment_id": logged_model.experiment_id, "RestException": e.json}
         _logger.error(f"Logged model export failed (1): {err_msg}")

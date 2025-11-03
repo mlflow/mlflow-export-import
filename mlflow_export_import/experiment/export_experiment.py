@@ -23,7 +23,10 @@ from mlflow_export_import.common import ws_permissions_utils
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis, utc_str_to_millis
 from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client
 from mlflow_export_import.run.export_run import export_run
-from mlflow_export_import.bulk import export_logged_models
+from mlflow_export_import.bulk import (
+    export_logged_models,
+    export_traces
+)
 from . import nested_runs_utils
 
 _logger = utils.getLogger(__name__)
@@ -102,6 +105,7 @@ def export_experiment(
 
     mlflow_attr = { "experiment": exp_dct , "runs": ok_run_ids }
 
+    # Export Logged Models
     if version.parse(mlflow.__version__) >= version.parse("3.0.0"):
         ok_logged_models, failed_logged_models = export_logged_models.export_logged_models(
             experiment_ids = [exp.experiment_id],
@@ -112,6 +116,17 @@ def export_experiment(
         info_attr["ok_logged_models"] = len(ok_logged_models)
         info_attr["failed_logged_models"] = len(failed_logged_models)
         mlflow_attr["logged_models"] = ok_logged_models
+
+    # Export traces
+    if version.parse(mlflow.__version__) >= version.parse("2.14.0"):
+        ok_traces, failed_traces = export_traces.export_traces(
+            experiment_ids=[exp.experiment_id],
+            output_dir=os.path.join(output_dir, "traces"),
+            mlflow_client=mlflow_client,
+        )
+        info_attr["ok_traces"] = len(ok_traces)
+        info_attr["failed_traces"] = len(failed_traces)
+        mlflow_attr["traces"] = ok_traces
 
     if export_permissions:
         mlflow_attr["permissions"] = ws_permissions_utils.get_experiment_permissions(dbx_client, exp.experiment_id)

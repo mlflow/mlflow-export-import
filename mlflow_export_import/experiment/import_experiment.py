@@ -23,6 +23,7 @@ from mlflow_export_import.common.source_tags import (
 )
 from mlflow_export_import.run.import_run import import_run
 from mlflow_export_import.logged_model.import_logged_model import import_logged_model
+from mlflow_export_import.trace.import_trace import import_trace
 
 _logger = utils.getLogger(__name__)
 
@@ -80,6 +81,7 @@ def import_experiment(
     run_ids_map = {}
     run_info_map = {}
     imported_logged_models = []
+    imported_traces = []
     for src_run_id in run_ids:
         dst_run, src_parent_run_id = import_run(
             mlflow_client = mlflow_client,
@@ -95,6 +97,7 @@ def import_experiment(
 
         src_run_dct = io_utils.read_file_mlflow(os.path.join(input_dir, f'runs/{src_run_id}/run.json'))
 
+        # Logged Models
         if "model_inputs" in src_run_dct["inputs"]:
             for model in src_run_dct["inputs"]["model_inputs"]:
                 import_logged_model(
@@ -119,12 +122,33 @@ def import_experiment(
                 )
                 imported_logged_models.append(model['model_id'])
 
+        # Import traces associated to the run
+        if src_run_dct.get("traces"):
+            for trace_id in src_run_dct["traces"]:
+                import_trace(
+                    input_dir=os.path.join(f"{input_dir}/traces", trace_id),
+                    experiment_name=experiment_name,
+                    run_id=dst_run_id,
+                    mlflow_client=mlflow_client,
+                )
+                imported_traces.append(trace_id)
+
     ## Importing the logged models that are not part of run
     if "logged_models" in mlflow_dct:
         remaining_logged_models = set(mlflow_dct["logged_models"]) - set(imported_logged_models)
         for model_id in remaining_logged_models:
             import_logged_model(
                 input_dir=os.path.join(f"{input_dir}/logged_models", model_id),
+                experiment_name=experiment_name,
+                mlflow_client=mlflow_client,
+            )
+
+    ## Importing the traces that are not part of run
+    if mlflow_dct.get("traces"):
+        remaining_traces = set(mlflow_dct["traces"]) - set(imported_traces)
+        for trace_id in remaining_traces:
+            import_trace(
+                input_dir=os.path.join(f"{input_dir}/traces", trace_id),
                 experiment_name=experiment_name,
                 mlflow_client=mlflow_client,
             )

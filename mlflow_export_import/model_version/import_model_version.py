@@ -39,6 +39,7 @@ def import_model_version(
         import_source_tags = False,
         import_stages_and_aliases = True,
         import_metadata = False,
+        model_id = None,
         mlflow_client = None
     ):
     """
@@ -51,6 +52,7 @@ def import_model_version(
     :param import_source_tags: Import source information for registered model and its versions and tags in destination object.
     :param import_stages_and_aliases: Import stages and aliases.
     :param import_metadata: Import registered model and experiment metadata.
+    :param model_id: logged Model id if applicable. Supported from >=3.0 version
     :param mlflow_client: MlflowClient (optional).
 
     :return: Returns model version object.
@@ -104,7 +106,8 @@ def _import_model_version(
         dst_run_id,
         dst_source,
         import_stages_and_aliases = True,
-        import_source_tags = False
+        import_source_tags = False,
+        model_id = None
     ):
     start_time = time.time()
     dst_source = dst_source.replace("file://","") # OSS MLflow
@@ -118,15 +121,20 @@ def _import_model_version(
     # NOTE: MLflow UC bug:
     # The client's tracking_uri is not honored. Instead MlflowClient.create_model_version()
     # seems to use mlflow.tracking_uri internally to download run artifacts for UC models.
-    _logger.info(f"Importing model version '{model_name}'")
+    _logger.info(f"Importing model version with dst_source = '{dst_source}' for model '{model_name}'")
+
+    create_model_version_params = {
+        "name": model_name,
+        "source": dst_source,
+        "run_id": dst_run_id,
+        "description": src_vr.get("description"),
+        "tags": tags
+    }
+    if model_id:
+        create_model_version_params["model_id"] = model_id
+
     with MlflowTrackingUriTweak(mlflow_client):
-        dst_vr = mlflow_client.create_model_version(
-            name = model_name,
-            source = dst_source,
-            run_id = dst_run_id,
-            description = src_vr.get("description"),
-            tags = tags
-        )
+        dst_vr = mlflow_client.create_model_version(**create_model_version_params)
 
     if import_stages_and_aliases:
         for alias in src_vr.get("aliases",[]):

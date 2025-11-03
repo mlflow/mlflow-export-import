@@ -220,6 +220,7 @@ class ModelImporter(BaseModelImporter):
 
     def import_version(self, model_name, src_vr, dst_run_id):
         dst_run = self.mlflow_client.get_run(dst_run_id)
+        model_id = None
         if "models" in src_vr["source"]:
             model_id = dst_run.outputs.model_outputs[0].model_id
             dst_source = _get_logged_model_artifact_path(model_id)
@@ -232,7 +233,8 @@ class ModelImporter(BaseModelImporter):
             src_vr = src_vr,
             dst_run_id = dst_run_id,
             dst_source = dst_source,
-            import_source_tags = self.import_source_tags
+            import_source_tags = self.import_source_tags,
+            model_id = model_id
         )
 
 
