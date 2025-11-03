@@ -23,6 +23,7 @@ from mlflow_export_import.common import utils, io_utils
 from mlflow_export_import.client.client_utils import create_mlflow_client
 from mlflow_export_import.bulk.export_models import export_models
 from mlflow_export_import.bulk.export_experiments import export_experiments
+from mlflow_export_import.common.version_utils import has_prompt_support
 
 ALL_STAGES = "Production,Staging,Archived,None"
 
@@ -73,6 +74,25 @@ def export_all(
         notebook_formats = notebook_formats,
         use_threads = use_threads
     )
+
+    # Export prompts if supported by MLflow version
+    res_prompts = None
+    if has_prompt_support():
+        try:
+            from mlflow_export_import.bulk.export_prompts import export_prompts
+            _logger.info("Exporting prompts...")
+            res_prompts = export_prompts(
+                output_dir = os.path.join(output_dir, "prompts"),
+                prompt_names = None,  # Export all prompts
+                use_threads = use_threads,
+                mlflow_client = mlflow_client
+            )
+        except Exception as e:
+            _logger.warning(f"Failed to export prompts: {e}")
+            res_prompts = {"error": str(e)}
+    else:
+        _logger.info(f"Skipping prompt export - not supported in MLflow {mlflow.__version__}")
+
     duration = round(time.time() - start_time, 1)
     info_attr = {
         "options": {
@@ -86,7 +106,8 @@ def export_all(
         "status": {
             "duration": duration,
             "models": res_models,
-            "experiments": res_exps
+            "experiments": res_exps,
+            "prompts": res_prompts
         }
     }
     io_utils.write_export_file(output_dir, "manifest.json", __file__, {}, info_attr)
