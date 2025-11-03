@@ -28,6 +28,8 @@ Notes:
 |               | [import-logged-models](#Import-logged-models) | [code](mlflow_export_import/bulk/import_logged_models.py)        | Imports logged models from a directory                                                                                     |
 | Trace         | [export-traces](#Export-traces)               | [code](mlflow_export_import/bulk/export_traces.py)               | Export several (or all) traces to a directory                                                                              |
 |               | [import-traces](#Import-traces)               | [code](mlflow_export_import/bulk/import_traces.py)               | Imports traces from a directory                                                                                            |
+| Prompt        | [export-prompts](#Export-prompts)             | [code](mlflow_export_import/bulk/export_prompts.py)              | Export prompts from the MLflow Prompt Registry (MLflow 2.21.0+).                                                           |
+|               | [import-prompts](#Import-prompts)             | [code](mlflow_export_import/bulk/import_prompts.py)              | Imports prompts to the MLflow Prompt Registry. |   
 
 ## All MLflow Objects Tools
 
@@ -75,9 +77,51 @@ export-all --output-dir out
 `import-all` imports all exported MLflow objects.
 Since the exported output directory is the same structure for both `export-all` and `export-models`, this script calls [import-models](#Import-registered-models).
 
+#### Usage
+```
+import-all --help
+
+Options:
+  --input-dir TEXT               Input directory.  [required]
+  --delete-model BOOLEAN         If the model exists, first delete the model
+                                 and all its versions.  [default: False]
+  --delete-prompt BOOLEAN        If the prompt exists, first delete the prompt
+                                 and all its versions.  [default: False]
+  --import-permissions BOOLEAN   Import Databricks permissions using the HTTP
+                                 PATCH method.  [default: False]
+  --experiment-rename-file TEXT  File with experiment names replacements:
+                                 comma-delimited line such as
+                                 'old_name,new_name'.
+  --model-rename-file TEXT       File with registered model names
+                                 replacements: comma-delimited line such as
+                                 'old_name,new_name'.
+  --import-source-tags BOOLEAN   Import source information for registered
+                                 model and its versions ad tags in destination
+                                 object.  [default: False]
+  --use-src-user-id BOOLEAN      Set the destination user field to the source
+                                 user field.  Only valid for open source
+                                 MLflow.  When importing into Databricks, the
+                                 source user field is ignored since it is
+                                 automatically picked up from your Databricks
+                                 access token.  There is no MLflow API
+                                 endpoint to explicity set the user_id for Run
+                                 and Registered Model.  [default: False]
+  --use-threads BOOLEAN          Process in parallel using threads.  [default:
+                                 False]
+```
+
 #### Examples
+
+##### Import all objects
 ```
 import-all --input-dir out
+```
+
+##### Import with model deletion (if model exists, delete it first)
+```
+import-all \
+  --input-dir out \
+  --delete-model True
 ```
 
 ## Registered Models
@@ -491,3 +535,89 @@ Options:
 import-traces \
     --input-dir exported_traces
 ```
+
+
+ 
+## Prompts
+ 
+Export/import prompts from the MLflow Prompt Registry (MLflow 2.21.0+).
+ 
+**Notes:** 
+* Prompt Registry support requires MLflow 2.21.0 or higher. The export/import will be skipped with a warning message if the MLflow version doesn't support prompts.
+* **Version handling**: MLflow 3.0+ uses efficient pagination to export all prompt versions. MLflow 2.21-2.x uses iterative discovery with early stopping (stops after 3 consecutive missing versions).
+ 
+### Export prompts
+ 
+Export prompts from the MLflow Prompt Registry to a directory.
+ 
+Source: [export_prompts.py](mlflow_export_import/bulk/export_prompts.py).
+ 
+#### Usage
+ 
+```
+export-prompts --help
+ 
+Options:
+  --output-dir TEXT        Output directory.  [required]
+  --prompts TEXT           Prompt names: 'all' for all prompts, comma-delimited
+                          list (e.g., 'prompt1,prompt2'), or file path ending
+                          with '.txt' containing prompt names (one per line).
+                          [required]
+  --use-threads BOOLEAN    Use multithreading for export.  [default: False]
+```
+ 
+#### Examples
+ 
+##### Export all prompts
+```
+export-prompts \
+  --output-dir out/prompts \
+  --prompts all
+```
+ 
+##### Export specific prompts
+```
+export-prompts \
+  --output-dir out/prompts \
+  --prompts my-prompt-1,my-prompt-2
+```
+
+##### Export prompts from filename
+```
+export-prompts \
+  --output-dir out/prompts \
+  --prompts my-prompts.txt
+```
+
+where `my-prompts.txt` is:
+```
+my-prompt-1
+my-prompt-2
+```
+ 
+### Import prompts
+ 
+Import prompts to the MLflow Prompt Registry from a directory.
+ 
+Source: [import_prompts.py](mlflow_export_import/bulk/import_prompts.py).
+ 
+#### Usage
+ 
+```
+import-prompts --help
+ 
+Options:
+  --input-dir TEXT         Input directory containing exported prompts.  [required]
+  --delete-prompt BOOLEAN  Delete existing prompt before importing.  [default: False]
+  --use-threads BOOLEAN    Use multithreading for import.  [default: False]
+```
+ 
+#### Examples
+ 
+```
+import-prompts --input-dir out/prompts
+```
+ 
+**Notes:** 
+* Prompts are imported with their original names and version numbers are preserved.
+* All versions of each prompt are exported and imported to maintain complete version history.

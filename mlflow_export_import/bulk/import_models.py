@@ -68,10 +68,16 @@ def import_models(
         verbose,
         use_threads
     )
+    
     duration = round(time.time()-start_time, 1)
-    dct = { "duration": duration, "experiments_import": exp_info, "models_import": model_res }
+    dct = { 
+        "duration": duration, 
+        "experiments_import": exp_info, 
+        "models_import": model_res
+    }
     _logger.info("\nImport report:")
     _logger.info(f"{json.dumps(dct,indent=2)}\n")
+    return dct
 
 
 def _flatten_run_info_map(exp_run_info_map):
