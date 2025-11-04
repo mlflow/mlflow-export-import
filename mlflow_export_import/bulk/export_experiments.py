@@ -35,6 +35,7 @@ def export_experiments(
         export_deleted_runs = False,
         notebook_formats = None,
         use_threads = False,
+        logged_models_filter = None,
         mlflow_client = None
     ):
     """
@@ -91,7 +92,8 @@ def export_experiments(
                 export_results,
                 run_start_time,
                 export_deleted_runs,
-                run_ids
+                run_ids,
+                logged_models_filter
             )
             futures.append(future)
     duration = round(time.time() - start_time, 1)
@@ -150,7 +152,7 @@ def export_experiments(
 
 
 def _export_experiment(mlflow_client, exp_id_or_name, output_dir, export_permissions, notebook_formats, export_results,
-        run_start_time, export_deleted_runs, run_ids):
+        run_start_time, export_deleted_runs, run_ids, logged_models_filter):
     ok_runs = -1; failed_runs = -1
     exp_name = exp_id_or_name
     try:
@@ -166,7 +168,8 @@ def _export_experiment(mlflow_client, exp_id_or_name, output_dir, export_permiss
             run_start_time = run_start_time,
             export_deleted_runs = export_deleted_runs,
             notebook_formats = notebook_formats,
-            mlflow_client = mlflow_client
+            mlflow_client = mlflow_client,
+            logged_models_filter = logged_models_filter
         )
         duration = round(time.time() - start_time, 1)
         result = {

@@ -67,7 +67,8 @@ def export_models(
         export_permissions = export_permissions,
         export_deleted_runs = export_deleted_runs,
         notebook_formats = notebook_formats,
-        use_threads = use_threads
+        use_threads = use_threads,
+        logged_models_filter = exps_and_runs if not export_all_runs else None
     )
     res_models = _export_models(
         mlflow_client,

@@ -27,23 +27,26 @@ Last updated: _2024-05-10_
 
 ### MLflow Export Import scenarios
 
-|Source tracking server | Destination tracking server | Note |
-|-------|------------|---|
-| Open source | Open source | common |
+|Source tracking server | Destination tracking server | Note        |
+|-------|------------|-------------|
+| Open source | Open source | common      |
 | Open source | Databricks | less common |
-| Databricks | Databricks |common |
-| Databricks | Open source | rare |
+| Databricks | Databricks | common      |
+| Databricks | Open source | rare        |
+| Open source | AWS SageMaker MLflow | less common |
+| AWS SageMaker MLflow | AWS SageMaker MLflow | common      |
 
 ### MLflow Objects
 
 These are the MLflow objects and their attributes that can be exported.
 
-| Object | REST | Python | SQL |
-|----|---|---|--|
-| Run | [link]( https://mlflow.org/docs/latest/rest-api.html#run) | [link](https://mlflow.org/docs/latest/python_api/mlflow.entities.html#mlflow.entities.Run) | [link](https://github.com/amesar/mlflow-resources/blob/master/database_schemas/schema_mlflow_2.0.1.sql#L166) |
-| Experiment | [link](https://mlflow.org/docs/latest/rest-api.html#mlflowexperiment) | [link](https://mlflow.org/docs/latest/python_api/mlflow.entities.html#mlflow.entities.Experiment) | [link](https://github.com/amesar/mlflow-resources/blob/master/database_schemas/schema_mlflow_2.0.1.sql#L37) |
+| Object | REST     | Python                                                                                                                | SQL |
+|----|----------|-----------------------------------------------------------------------------------------------------------------------|--|
+| Run | [link]( https://mlflow.org/docs/latest/rest-api.html#run) | [link](https://mlflow.org/docs/latest/python_api/mlflow.entities.html#mlflow.entities.Run)                            | [link](https://github.com/amesar/mlflow-resources/blob/master/database_schemas/schema_mlflow_2.0.1.sql#L166) |
+| Experiment | [link](https://mlflow.org/docs/latest/rest-api.html#mlflowexperiment) | [link](https://mlflow.org/docs/latest/python_api/mlflow.entities.html#mlflow.entities.Experiment)                     | [link](https://github.com/amesar/mlflow-resources/blob/master/database_schemas/schema_mlflow_2.0.1.sql#L37) |
 | Registered Model | [link](https://mlflow.org/docs/latest/rest-api.html#registeredmodel) | [link](https://mlflow.org/docs/latest/python_api/mlflow.entities.html#mlflow.entities.model_registry.RegisteredModel) | [link](https://github.com/amesar/mlflow-resources/blob/master/database_schemas/schema_mlflow_2.0.1.sql#L152) |
-| Registered Model Version | [link](https://mlflow.org/docs/latest/rest-api.html#modelversion) | [link](https://mlflow.org/docs/latest/python_api/mlflow.entities.html#mlflow.entities.model_registry.ModelVersion) | [link](https://github.com/amesar/mlflow-resources/blob/master/database_schemas/schema_mlflow_2.0.1.sql#L102) |
+| Registered Model Version | [link](https://mlflow.org/docs/latest/rest-api.html#modelversion) | [link](https://mlflow.org/docs/latest/python_api/mlflow.entities.html#mlflow.entities.model_registry.ModelVersion)    | [link](https://github.com/amesar/mlflow-resources/blob/master/database_schemas/schema_mlflow_2.0.1.sql#L102) |
+| Logged Model | [link](https://github.com/mlflow/mlflow/blob/v3.0.0/mlflow/protos/service.proto#L612) | [link](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.entities.html#mlflow.entities.LoggedModel)                                                                                                              | |
 
 MLflow Export Import provides rudimentary capabilities for tracking lineage of the imported Mlflow objects
 by having the option save the original MLflow object attributes in the imported target environment.

@@ -148,6 +148,11 @@ def model_version_to_dict(version):
     for k,v in utils.strip_underscores(version).items():
         if k == "aliases": # type is google._upb._message.RepeatedScalarContainer
             dct[k] = [ str(x) for x in v ]
+        elif k == "deployment_job_state":
+            if hasattr(v, "__dict__"):
+                dct[k] = utils.strip_underscores(v)
+            else:
+                dct[k] = str(v)
         else:
             if k == "creation_time":  # Wot!
                 k = "creation_timestamp"
@@ -178,6 +183,19 @@ def get_registered_model(mlflow_client, model_name, get_permissions=False):
     """
     Get registered model and optionally its permissions.
     """
+    # Use native client for SageMaker MLflow
+    if _is_sagemaker(mlflow_client):
+        model = mlflow_client.get_registered_model(model_name)
+        aliases_list = [{"version": v, "alias": a} for a, v in model.aliases.items()] if model.aliases else []
+        return {
+            "name": model.name,
+            "creation_timestamp": model.creation_timestamp,
+            "last_updated_timestamp": model.last_updated_timestamp,
+            "description": model.description,
+            "tags": model.tags,
+            "aliases": aliases_list,
+        }
+
     http_client = create_http_client(mlflow_client, model_name)
     if get_permissions and utils.calling_databricks():
         if is_unity_catalog_model(model_name):
@@ -213,3 +231,10 @@ def update_model_permissions(mlflow_client, dbx_client, model_name, perms):
             ws_permissions_utils.update_permissions(dbx_client, perms, "registered-model", model_name, model_id)
     else:
         _logger.info(f"No permissions to update for registered model '{model_name}'")
+
+def _is_sagemaker(mlflow_client):
+    try:
+        creds = mlflow_client._tracking_client.store.get_host_creds()
+        return "experiments.sagemaker" in creds.host
+    except:
+        return False

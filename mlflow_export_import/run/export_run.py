@@ -20,6 +20,7 @@ from mlflow_export_import.common import io_utils
 from mlflow_export_import.common.timestamp_utils import adjust_timestamps, format_seconds
 from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client
 from mlflow_export_import.notebook.download_notebook import download_notebook
+from mlflow_export_import.logged_model.export_logged_model import export_logged_model
 
 from mlflow.utils.mlflow_tags import MLFLOW_DATABRICKS_NOTEBOOK_PATH
 MLFLOW_DATABRICKS_NOTEBOOK_REVISION_ID = "mlflow.databricks.notebookRevisionID" # NOTE: not in mlflow/utils/mlflow_tags.py
@@ -34,7 +35,8 @@ def export_run(
         skip_download_run_artifacts = False,
         notebook_formats = None,
         raise_exception = False,
-        mlflow_client = None
+        mlflow_client = None,
+        export_logged_models = False
     ):
     """
     :param run_id: Run ID.
@@ -43,6 +45,7 @@ def export_run(
     :param notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
     :param raise_exception: Raise an exception instead of just logging error and returning None.
     :param mlflow_client: MLflow client.
+    :param export_logged_models: Export logged models.
     :return: Run or None if the run was not exported due to export_deleted_runs or errors.
     """
 
@@ -73,8 +76,34 @@ def export_run(
             "params": run.data.params,
             "metrics": _get_metrics_with_steps(mlflow_client, run),
             "tags": tags,
-            "inputs": _inputs_to_dict(run.inputs)
+            "inputs": {
+                "dataset_inputs": _inputs_to_dict(run.inputs),
+            },
         }
+
+        if hasattr(run, "outputs"):
+            mlflow_attr["inputs"]["model_inputs"] = [utils.strip_underscores(model) for model in run.inputs.model_inputs]
+            mlflow_attr["outputs"] = { "model_outputs": [utils.strip_underscores(model) for model in run.outputs.model_outputs]}
+
+            if export_logged_models:
+
+                # Export Run model inputs
+                for logged_model in run.inputs.model_inputs:
+                    export_logged_model(
+                        model_id=logged_model.model_id,
+                        output_dir=os.path.join(output_dir, logged_model.model_id),
+                        mlflow_client=mlflow_client
+                    )
+
+                # Export Run model outputs
+                for logged_model in run.outputs.model_outputs:
+                    export_logged_model(
+                        model_id=logged_model.model_id,
+                        output_dir=os.path.join(output_dir, logged_model.model_id),
+                        mlflow_client=mlflow_client
+                    )
+
+
         io_utils.write_export_file(output_dir, "run.json", __file__, mlflow_attr)
         fs = _fs.get_filesystem(".")
 
@@ -167,7 +196,8 @@ def main(run_id, output_dir, notebook_formats):
     export_run(
         run_id = run_id,
         output_dir = output_dir,
-        notebook_formats = utils.string_to_list(notebook_formats)
+        notebook_formats = utils.string_to_list(notebook_formats),
+        export_logged_models = True
     )
 
 

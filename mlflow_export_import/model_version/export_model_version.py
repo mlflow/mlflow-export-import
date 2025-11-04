@@ -10,6 +10,7 @@ from mlflow_export_import.client.client_utils import create_mlflow_client, creat
 from mlflow_export_import.common import utils, io_utils, model_utils
 from mlflow_export_import.common.timestamp_utils import adjust_timestamps, format_seconds
 from mlflow_export_import.run.export_run import export_run
+from mlflow_export_import.logged_model.export_logged_model import export_logged_model
 from mlflow_export_import.common.click_options import (
     opt_model,
     opt_output_dir,
@@ -80,6 +81,13 @@ def export_model_version(
     info_attr = {}
     if export_version_model:
         _export_version_model(mlflow_client, output_dir, vr, vr_dct, info_attr, export_version_model, vrm_model_artifact_path)
+
+    if "models" in vr.source:
+        export_logged_model(
+            model_id = vr.source.split('models:/')[1],
+            output_dir = os.path.join(output_dir, vr.run_id),
+            mlflow_client=mlflow_client
+        )
 
     adjust_timestamps(vr_dct, ["creation_timestamp", "last_updated_timestamp"])
     mlflow_attr = { "model_version": vr_dct}

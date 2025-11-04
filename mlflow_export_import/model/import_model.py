@@ -26,7 +26,9 @@ from mlflow_export_import.client.client_utils import create_mlflow_client, creat
 from mlflow_export_import.run.import_run import import_run
 from mlflow_export_import.bulk import rename_utils
 
+from mlflow_export_import.model.model_utils import _extract_model_id, _get_logged_model_artifact_path
 from mlflow_export_import.model_version.import_model_version import _import_model_version
+from mlflow_export_import.logged_model.import_logged_model import import_logged_model
 
 
 _logger = utils.getLogger(__name__)
@@ -189,8 +191,6 @@ class ModelImporter(BaseModelImporter):
         _logger.info(f"      run_id:           {run_id}")
         _logger.info(f"      run_artifact_uri: {run_artifact_uri}")
         _logger.info(f"      source:           {source}")
-        model_artifact = _extract_model_path(source, run_id)
-        _logger.info(f"      model_artifact:   {model_artifact}")
 
         dst_run, _ = import_run(
             input_dir = run_dir,
@@ -198,20 +198,34 @@ class ModelImporter(BaseModelImporter):
             import_source_tags = self.import_source_tags,
             mlflow_client = self.mlflow_client
         )
+
         dst_run_id = dst_run.info.run_id
         run = self.mlflow_client.get_run(dst_run_id)
+
+        ## Import Logged model specific to run
+        if "models" in vr["source"]:
+            model_id = _extract_model_id(vr["source"])
+            import_logged_model(
+                input_dir = os.path.join(input_dir, model_id),
+                experiment_name = experiment_name,
+                run_id = dst_run.info.run_id,
+                mlflow_client = self.mlflow_client,
+            )
+
         _logger.info( "    Destination run - imported run:")
         _logger.info(f"      run_id: {dst_run_id}")
         _logger.info(f"      run_artifact_uri: {run.info.artifact_uri}")
-        source = _path_join(run.info.artifact_uri, model_artifact)
-        _logger.info(f"      source:           {source}")
         return dst_run_id
 
 
     def import_version(self, model_name, src_vr, dst_run_id):
         dst_run = self.mlflow_client.get_run(dst_run_id)
-        model_path = _extract_model_path(src_vr["source"], src_vr["run_id"])
-        dst_source = f"{dst_run.info.artifact_uri}/{model_path}"
+        if "models" in src_vr["source"]:
+            model_id = dst_run.outputs.model_outputs[0].model_id
+            dst_source = _get_logged_model_artifact_path(model_id)
+        else:
+            model_path = _extract_model_path(src_vr["source"], src_vr["run_id"])
+            dst_source = f"{dst_run.info.artifact_uri}/{model_path}"
         return _import_model_version(
             mlflow_client = self.mlflow_client,
             model_name = model_name,
@@ -280,9 +294,13 @@ class BulkModelImporter(BaseModelImporter):
 
     def import_version(self, model_name, src_vr, dst_run_id):
         src_run_id = src_vr["run_id"]
-        model_path = _extract_model_path(src_vr["source"], src_run_id) # get path to model artifact
-        dst_artifact_uri = self.run_info_map[src_run_id].artifact_uri
-        dst_source = f"{dst_artifact_uri}/{model_path}"
+        if "models" in src_vr["source"]: # 3.x logged models
+            model_id = self.mlflow_client.get_run(dst_run_id).outputs.model_outputs[0].model_id
+            dst_source = _get_logged_model_artifact_path(model_id)
+        else:
+            model_path = _extract_model_path(src_vr["source"], src_run_id)  # get path to model artifact
+            dst_artifact_uri = self.run_info_map[src_run_id].artifact_uri
+            dst_source = f"{dst_artifact_uri}/{model_path}"
         return _import_model_version(
             mlflow_client = self.mlflow_client,
             model_name = model_name,
