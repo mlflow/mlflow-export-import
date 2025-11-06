@@ -1,0 +1,86 @@
+{
+  "system": {
+    "package_version": "1.0.0",
+    "script": "export_evaluation_dataset.py",
+    "export_file_version": "2",
+    "export_time": 1730000000,
+    "_export_time": "2024-10-27 00:00:00",
+    "mlflow_version": "3.5.1",
+    "mlflow_tracking_uri": "http://localhost:5000",
+    "platform": {
+      "python_version": "3.11.0",
+      "system": "Darwin",
+      "processor": "arm"
+    },
+    "user": "user"
+  },
+  "mlflow": {
+    "evaluation_dataset": {
+      "dataset_id": "def456",
+      "name": "iris-classification-eval",
+      "experiment_ids": ["3"],
+      "tags": {
+        "purpose": "classification-evaluation",
+        "version": "2.0",
+        "domain": "iris-classification"
+      },
+      "source": {
+        "type": "dataset",
+        "uri": "file:///data/iris_test.csv"
+      },
+      "schema": {
+        "inputs": [
+          {"name": "sepal_length", "type": "double"},
+          {"name": "sepal_width", "type": "double"},
+          {"name": "petal_length", "type": "double"},
+          {"name": "petal_width", "type": "double"}
+        ],
+        "targets": [
+          {"name": "species", "type": "string"}
+        ]
+      },
+      "records": [
+        {
+          "inputs": {
+            "sepal_length": 5.1,
+            "sepal_width": 3.5,
+            "petal_length": 1.4,
+            "petal_width": 0.2
+          },
+          "targets": {
+            "species": "setosa"
+          }
+        },
+        {
+          "inputs": {
+            "sepal_length": 7.0,
+            "sepal_width": 3.2,
+            "petal_length": 4.7,
+            "petal_width": 1.4
+          },
+          "targets": {
+            "species": "versicolor"
+          }
+        },
+        {
+          "inputs": {
+            "sepal_length": 6.3,
+            "sepal_width": 3.3,
+            "petal_length": 6.0,
+            "petal_width": 2.5
+          },
+          "targets": {
+            "species": "virginica"
+          }
+        }
+      ],
+      "profile": {
+        "num_records": 3,
+        "num_inputs": 4,
+        "num_targets": 1
+      },
+      "create_time": 1730000100000,
+      "_create_time": "2024-10-27 00:01:40"
+    }
+  }
+}

@@ -96,7 +96,8 @@ def _get_prompt_safe(prompt_name, prompt_version):
         import mlflow.genai
         if hasattr(mlflow.genai, 'load_prompt'):
             return mlflow.genai.load_prompt(prompt_name, prompt_version)
-    except (ImportError, AttributeError, Exception):
+    except (ImportError, AttributeError):
+        # Only catch import/attribute errors, not runtime errors like "prompt not found"
         pass
     
     # Try MLflow client approach (works with 2.21+)
@@ -104,14 +105,14 @@ def _get_prompt_safe(prompt_name, prompt_version):
         client = mlflow.MlflowClient()
         if hasattr(client, 'get_prompt_version'):
             return client.get_prompt_version(prompt_name, prompt_version)
-    except (ImportError, AttributeError, Exception):
+    except (ImportError, AttributeError):
         pass
     
     # Try top-level functions (deprecated but may work)
     try:
         if hasattr(mlflow, 'load_prompt'):
             return mlflow.load_prompt(prompt_name, prompt_version)
-    except (ImportError, AttributeError, Exception):
+    except (ImportError, AttributeError):
         pass
     
     raise Exception(f"No compatible prompt loading API found in MLflow {mlflow.__version__}. Ensure prompt registry is supported.")
