@@ -31,6 +31,7 @@ def import_all(
         input_dir,
         delete_model,
         delete_prompt = False,
+        delete_dataset = False,
         import_permissions = False,
         import_source_tags = False,
         use_src_user_id = False,
@@ -41,8 +42,8 @@ def import_all(
         mlflow_client = None
     ):
     """
-    Import all MLflow objects: models, experiments, runs, and prompts.
-    This delegates to import_models() and then adds prompt import on top.
+    Import all MLflow objects: models, experiments, runs, prompts, and evaluation datasets.
+    This delegates to import_models(), import_prompts(), and import_evaluation_datasets().
     """
     mlflow_client = mlflow_client or create_mlflow_client()
     
@@ -81,8 +82,31 @@ def import_all(
             _logger.warning(f"Failed to import prompts: {e}")
             prompt_res = {"error": str(e)}
     
-    # Add prompts to the report
+    # Import evaluation datasets if they exist (returns dict with status)
+    evaluation_datasets_res = None
+    evaluation_datasets_dir = os.path.join(input_dir, "evaluation_datasets")
+    if os.path.exists(evaluation_datasets_dir):
+        try:
+            from mlflow_export_import.bulk.import_evaluation_datasets import import_evaluation_datasets
+            _logger.info("Importing evaluation datasets...")
+            evaluation_datasets_res = import_evaluation_datasets(
+                input_dir = evaluation_datasets_dir,
+                delete_dataset = delete_dataset,
+                use_threads = use_threads,
+                mlflow_client = mlflow_client
+            )
+            # Log if unsupported but don't fail
+            if evaluation_datasets_res and "unsupported" in evaluation_datasets_res:
+                _logger.warning(f"Evaluation datasets not supported in MLflow {evaluation_datasets_res.get('mlflow_version')}")
+            elif evaluation_datasets_res and "error" in evaluation_datasets_res:
+                _logger.warning(f"Failed to import evaluation datasets: {evaluation_datasets_res['error']}")
+        except Exception as e:
+            _logger.warning(f"Failed to import evaluation datasets: {e}")
+            evaluation_datasets_res = {"error": str(e)}
+    
+    # Add prompts and evaluation datasets to the report
     models_result["prompts_import"] = prompt_res
+    models_result["evaluation_datasets_import"] = evaluation_datasets_res
     _logger.info("\nImport-all report:")
     _logger.info(f"{json.dumps(models_result, indent=2)}\n")
 
@@ -95,6 +119,11 @@ def import_all(
     type=bool,
     default=False
 )
+@click.option("--delete-evaluation-dataset",
+    help="Delete existing evaluation datasets before importing.",
+    type=bool,
+    default=False
+)
 @opt_import_permissions
 @opt_experiment_rename_file
 @opt_model_rename_file
@@ -103,7 +132,7 @@ def import_all(
 @opt_use_threads
 @opt_verbose
 
-def main(input_dir, delete_model, delete_prompt,
+def main(input_dir, delete_model, delete_prompt, delete_evaluation_dataset,
         import_permissions,
         experiment_rename_file,
         model_rename_file,
@@ -120,6 +149,7 @@ def main(input_dir, delete_model, delete_prompt,
         input_dir = input_dir,
         delete_model = delete_model,
         delete_prompt = delete_prompt,
+        delete_dataset = delete_evaluation_dataset,
         import_permissions = import_permissions,
         experiment_renames = rename_utils.get_renames(experiment_rename_file),
         model_renames = rename_utils.get_renames(model_rename_file),
