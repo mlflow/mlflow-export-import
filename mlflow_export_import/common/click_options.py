@@ -283,3 +283,31 @@ def opt_request_id(function):
         required=True
     )(function)
     return function
+
+# == evaluation datasets
+
+def opt_evaluation_datasets(function):
+    function = click.option("--evaluation-datasets",
+        help="Evaluation dataset names: 'all' for all datasets, comma-delimited list (e.g., 'dataset1,dataset2'), \
+or file path ending with '.txt' containing dataset names (one per line).",
+        type=str,
+        required=True
+    )(function)
+    return function
+
+def opt_evaluation_datasets_experiment_ids(function):
+    function = click.option("--experiment-ids",
+        help="Comma-separated list of experiment IDs to filter datasets. Only used when --evaluation-datasets is 'all'.",
+        type=str,
+        required=False
+    )(function)
+    return function
+
+def opt_delete_evaluation_dataset(function):
+    function = click.option("--delete-evaluation-dataset",
+        help="Delete existing evaluation dataset before importing.",
+        type=bool,
+        default=False,
+        show_default=True
+    )(function)
+    return function

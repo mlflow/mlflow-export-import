@@ -24,6 +24,7 @@ from mlflow_export_import.client.client_utils import create_mlflow_client
 from mlflow_export_import.bulk.export_models import export_models
 from mlflow_export_import.bulk.export_experiments import export_experiments
 from mlflow_export_import.bulk.export_prompts import export_prompts
+from mlflow_export_import.bulk.export_evaluation_datasets import export_evaluation_datasets
 
 ALL_STAGES = "Production,Staging,Archived,None"
 
@@ -58,7 +59,7 @@ def export_all(
         use_threads = use_threads
     )
 
-    # Only import those experiments not exported by above export_models()
+    # Only export those experiments not exported by above export_models()
     exported_exp_names = res_models["experiments"]["experiment_names"]
     all_exps = SearchExperimentsIterator(mlflow_client)
     all_exp_names = [ exp.name for exp in all_exps ]
@@ -94,6 +95,26 @@ def export_all(
         _logger.warning(f"Failed to export prompts: {e}")
         res_prompts = {"error": str(e)}
 
+    # Export evaluation datasets (returns dict with status)
+    res_datasets = None
+    try:
+        _logger.info("Exporting evaluation datasets...")
+        res_datasets = export_evaluation_datasets(
+            output_dir = os.path.join(output_dir, "evaluation_datasets"),
+            dataset_names = None,  # Export all datasets
+            experiment_ids = None,
+            use_threads = use_threads,
+            mlflow_client = mlflow_client
+        )
+        # Log if unsupported but don't fail
+        if res_datasets and "unsupported" in res_datasets:
+            _logger.warning(f"Evaluation datasets not supported in MLflow {res_datasets.get('mlflow_version')}")
+        elif res_datasets and "error" in res_datasets:
+            _logger.warning(f"Failed to export evaluation datasets: {res_datasets['error']}")
+    except Exception as e:
+        _logger.warning(f"Failed to export evaluation datasets: {e}")
+        res_datasets = {"error": str(e)}
+
     duration = round(time.time() - start_time, 1)
     info_attr = {
         "options": {
@@ -108,7 +129,8 @@ def export_all(
             "duration": duration,
             "models": res_models,
             "experiments": res_exps,
-            "prompts": res_prompts
+            "prompts": res_prompts,
+            "evaluation_datasets": res_datasets
         }
     }
     io_utils.write_export_file(output_dir, "manifest.json", __file__, {}, info_attr)

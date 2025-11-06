@@ -55,15 +55,32 @@ def import_prompts(
         else:
             results = _import_prompts_sequential(prompt_dirs, mlflow_client, delete_prompt)
         
-        # Summary
-        successful = [r for r in results if r is not None]
-        failed = len(results) - len(successful)
+        # Summary - categorize results
+        successful = []
+        skipped = []
+        failed = []
+        
+        for result in results:
+            if result is None:
+                failed.append(result)
+            elif isinstance(result, tuple) and len(result) == 2:
+                name, version = result
+                if version is None:
+                    skipped.append(name)
+                else:
+                    successful.append(name)
+            else:
+                successful.append(result)
         
         summary = {
             "total_prompts": len(prompt_dirs),
             "successful_imports": len(successful),
-            "failed_imports": failed
+            "skipped_imports": len(skipped),
+            "failed_imports": len(failed)
         }
+        
+        if skipped:
+            _logger.info(f"Skipped {len(skipped)} existing prompts: {', '.join(skipped)}")
         
         # Write summary
         summary_path = os.path.join(input_dir, "import_summary.json")
