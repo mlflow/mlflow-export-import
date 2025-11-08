@@ -113,8 +113,8 @@ def import_run(
                     model_type="output",
                     step=model["step"],
                 )
-
-        mlflow_client.set_terminated(run_id, RunStatus.to_string(RunStatus.FINISHED))
+        default_status = RunStatus.to_string(RunStatus.FINISHED)
+        mlflow_client.set_terminated(run_id, src_run_dct.get("info", default_status).get("status", default_status))
         run = mlflow_client.get_run(run_id)
         if src_run_dct["info"]["lifecycle_stage"] == LifecycleStage.DELETED:
             mlflow_client.delete_run(run.info.run_id)

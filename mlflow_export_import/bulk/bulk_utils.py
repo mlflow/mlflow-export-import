@@ -1,7 +1,9 @@
-from mlflow_export_import.common.iterators import SearchRegisteredModelsIterator
-from mlflow_export_import.common.iterators import SearchExperimentsIterator
-from mlflow_export_import.common.iterators import SearchLoggedModelsIterator
-
+from mlflow_export_import.common.iterators import (
+    SearchRegisteredModelsIterator,
+    SearchExperimentsIterator,
+    SearchLoggedModelsIterator,
+    SearchTracesIterator
+)
 
 
 def _get_list(names, func_list):
@@ -36,3 +38,6 @@ def get_model_names(mlflow_client, model_names):
 
 def get_logged_models(mlflow_client, experiment_ids):
     return list(SearchLoggedModelsIterator(mlflow_client, experiment_ids))
+
+def get_traces(mlflow_client, experiment_ids, run_id):
+    return list(SearchTracesIterator(mlflow_client, experiment_ids, run_id))

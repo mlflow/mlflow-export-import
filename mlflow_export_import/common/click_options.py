@@ -275,3 +275,11 @@ def opt_import_model_version(function):
         show_default=True
     )(function)
     return function
+
+def opt_request_id(function):
+    function = click.option("--request-id",
+        help="Request ID.",
+        type=str,
+        required=True
+    )(function)
+    return function

@@ -67,6 +67,10 @@ setup(
             "export-logged-model = mlflow_export_import.logged_model.export_logged_model:main",
             "import-logged-models = mlflow_export_import.bulk.import_logged_models:main",
             "import-logged-model = mlflow_export_import.logged_model.import_logged_model:main",
+            "export-traces = mlflow_export_import.bulk.export_traces:main",
+            "import-traces = mlflow_export_import.bulk.import_traces:main",
+            "export-trace = mlflow_export_import.trace.export_trace:main",
+            "import-trace = mlflow_export_import.trace.import_trace:main",
          ]
       }
 )

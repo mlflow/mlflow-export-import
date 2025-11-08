@@ -11,20 +11,22 @@ See sample JSON export files [here](README_export_format.md#sample-export-json-f
 
 ### Tools
 
-| MLflow Object | Documentation                                           | Code                                                               |
-|-----|---------------------------------------------------------|--------------------------------------------------------------------|
-| Registered Model | [export-model](#export-registered-model)                | [code](mlflow_export_import/model/export_model.py)                 |
-|     | [import-model](#import-registered-model)                | [code](mlflow_export_import/model/import_model.py)                 |
-| Model Version | [export-model-version](#export-model-version)           | [code](mlflow_export_import/model_version/export_model_version.py) |
-|     | [import-model-version](#import-model-version)           | [code](mlflow_export_import/model_version/import_model_version.py) |
-|     | [copy-model-version](README_copy.md#copy-model-version) | [code](mlflow_export_import/copy/copy_model_version.py)            |
-| Experiment | [export-experiment](#export-experiment)                 | [code](mlflow_export_import/experiment/export_experiment.py)       |
-|     | [import-experiment](#import-experiment)                 | [code](mlflow_export_import/experiment/import_experiment.py)       |
-| Run | [export-run](#export-run)                               | [code](mlflow_export_import/run/export_run.py)                     |
-|     | [import-run](#import-run)                               | [code](mlflow_export_import/run/import_run.py)                     |
-|     | [copy-run](README_copy.md#copy-run)                     | [code](mlflow_export_import/copy/copy_run.py)                      |
-| Logged Model | [export-logged-model](#export-logged-model)             | [code](mlflow_export_import/logged_model/export_logged_model.py)   |
-| | [import-logged-model](#import-logged-model) | [code](mlflow_export_import/logged_model/import_logged_model.py)   |
+| MLflow Object | Documentation                                         | Code                                                             |
+|-----|-------------------------------------------------------|------------------------------------------------------------------|
+| Registered Model | [export-model](#export-registered-model)              | [code](mlflow_export_import/model/export_model.py)               |
+|     | [import-model](#import-registered-model)              | [code](mlflow_export_import/model/import_model.py)               |
+| Model Version | [export-model-version](#export-model-version)         | [code](mlflow_export_import/model_version/export_model_version.py) |
+|     | [import-model-version](#import-model-version)         | [code](mlflow_export_import/model_version/import_model_version.py) |
+|     | [copy-model-version](README_copy.md#copy-model-version) | [code](mlflow_export_import/copy/copy_model_version.py)          |
+| Experiment | [export-experiment](#export-experiment)               | [code](mlflow_export_import/experiment/export_experiment.py)     |
+|     | [import-experiment](#import-experiment)               | [code](mlflow_export_import/experiment/import_experiment.py)     |
+| Run | [export-run](#export-run)                             | [code](mlflow_export_import/run/export_run.py)                   |
+|     | [import-run](#import-run)                             | [code](mlflow_export_import/run/import_run.py)                   |
+|     | [copy-run](README_copy.md#copy-run)                   | [code](mlflow_export_import/copy/copy_run.py)                    |
+| Logged Model | [export-logged-model](#export-logged-model)           | [code](mlflow_export_import/logged_model/export_logged_model.py) |
+| | [import-logged-model](#import-logged-model)           | [code](mlflow_export_import/logged_model/import_logged_model.py) |
+| Trace | [export-trace](#export-trace)                         | [code](mlflow_export_import/trace/export_trace.py)               |
+|| [import-trace](#import-trace)                         |  [code](mlflow_export_import/trace/import_trace.py)              |
 
 ## Experiment Tools
 
@@ -539,4 +541,46 @@ The run will be created for the logged models if associated to import metrics, d
 import-logged-model \ 
     --input-dir exported-logged-model \
     --experiment-name logged-model
+```
+
+## Traces Tools
+
+### Export Trace
+Export a Trace to a directory. Accepts request id(trace id)
+
+#### Usage
+```
+ export-trace --help
+ 
+Options:
+  --request-id TEXT  Request ID.  [required]
+  --output-dir TEXT  Output directory.  [required]
+  --help             Show this message and exit.
+```
+#### Example
+
+```
+export-trace \ 
+    --request-id 821b21beaf2045b9afe6d4d4ae59c029 \
+    --output-dir out
+```
+
+### Import Trace
+Imports a trace from a directory. Reads the manifest file to import the trace to an experiment
+
+#### Usage
+```
+ import-trace --help
+ 
+Options:
+  --input-dir TEXT        Input directory.  [required]
+  --experiment-name TEXT  Destination experiment name.  [required]
+  --help                  Show this message and exit.
+```
+#### Example
+
+```
+import-trace \ 
+    --input-dir exported_trace \
+    --experiment-name trace
 ```

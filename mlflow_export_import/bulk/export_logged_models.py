@@ -51,6 +51,10 @@ def export_logged_models(
 
     logged_models = get_logged_models(mlflow_client, experiment_ids)
 
+    if len(logged_models) == 0:
+        _logger.info(f"No logged models found for experiment ids {experiment_ids}")
+        return ok_logged_models, failed_logged_models
+
     if logged_models_filter:
         logged_models = [logged_model for logged_model in logged_models
                          if logged_model.source_run_id in logged_models_filter.get(str(logged_model.experiment_id), [])]
