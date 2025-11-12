@@ -3,6 +3,7 @@ from setuptools import setup, find_packages
 CORE_REQUIREMENTS = [
     "mlflow-skinny[databricks]",
     "databricks-cli==0.18.0",
+    "packaging>=20.0",        # For version parsing and compatibility
     "pandas>=1.5.2",
     "tabulate==0.9.0",
     "wheel"
