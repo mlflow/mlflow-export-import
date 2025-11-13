@@ -28,6 +28,8 @@ Notes:
 |               | [import-logged-models](#Import-logged-models) | [code](mlflow_export_import/bulk/import_logged_models.py)        | Imports logged models from a directory                                                                                     |
 | Trace         | [export-traces](#Export-traces)               | [code](mlflow_export_import/bulk/export_traces.py)               | Export several (or all) traces to a directory                                                                              |
 |               | [import-traces](#Import-traces)               | [code](mlflow_export_import/bulk/import_traces.py)               | Imports traces from a directory                                                                                            |
+| Prompt        | [export-prompts](#Export-prompts)             | [code](mlflow_export_import/bulk/export_prompts.py)              | Export prompts from the MLflow Prompt Registry (MLflow 2.21.0+).                                                           |
+|               | [import-prompts](#Import-prompts)             | [code](mlflow_export_import/bulk/import_prompts.py)              | Imports prompts to the MLflow Prompt Registry.
 
 ## All MLflow Objects Tools
 
@@ -491,3 +493,67 @@ Options:
 import-traces \
     --input-dir exported_traces
 ```
+
+
+ 
+## Prompts
+ 
+Export/import prompts from the MLflow Prompt Registry (MLflow 2.21.0+).
+ 
+**Note:** Prompt Registry support requires MLflow 2.21.0 or higher. The export/import will be skipped with a warning message if the MLflow version doesn't support prompts.
+ 
+### Export prompts
+ 
+Export prompts from the MLflow Prompt Registry to a directory.
+ 
+Source: [export_prompts.py](mlflow_export_import/bulk/export_prompts.py).
+ 
+#### Usage
+ 
+```
+export-prompts --help
+ 
+Options:
+  --output-dir TEXT        Output directory.  [required]
+  --prompt-names TEXT      Comma-separated list of prompt names to export. If
+                          not specified, exports all prompts.
+  --use-threads BOOLEAN    Use multithreading for export.  [default: False]
+```
+ 
+#### Examples
+ 
+##### Export all prompts
+```
+export-prompts --output-dir out/prompts
+```
+ 
+##### Export specific prompts
+```
+export-prompts \
+  --output-dir out/prompts \
+  --prompt-names my-prompt-1,my-prompt-2
+```
+ 
+### Import prompts
+ 
+Import prompts to the MLflow Prompt Registry from a directory.
+ 
+Source: [import_prompts.py](mlflow_export_import/bulk/import_prompts.py).
+ 
+#### Usage
+ 
+```
+import-prompts --help
+ 
+Options:
+  --input-dir TEXT       Input directory containing exported prompts.  [required]
+  --use-threads BOOLEAN  Use multithreading for import.  [default: False]
+```
+ 
+#### Examples
+ 
+```
+import-prompts --input-dir out/prompts
+```
+ 
+**Note:** Prompts are imported with their original names. Tags and commit messages may be skipped if the target environment has permission restrictions.

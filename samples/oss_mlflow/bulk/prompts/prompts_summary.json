@@ -1,0 +1,22 @@
+{
+  "system": {
+    "package_version": "1.0.0",
+    "script": "export_prompts.py",
+    "export_file_version": "2",
+    "export_time": 1730000000,
+    "_export_time": "2024-10-27 00:00:00",
+    "mlflow_version": "3.1.4",
+    "mlflow_tracking_uri": "http://localhost:5000",
+    "platform": {
+      "python_version": "3.9.6",
+      "system": "Darwin",
+      "processor": "arm"
+    },
+    "user": "user"
+  },
+  "mlflow": {
+    "total_prompts": 1,
+    "successful_exports": 1,
+    "failed_exports": 0
+  }
+}

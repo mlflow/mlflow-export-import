@@ -26,6 +26,7 @@ from mlflow_export_import.client.client_utils import create_mlflow_client
 from mlflow_export_import.model.import_model import BulkModelImporter
 from mlflow_export_import.bulk.import_experiments import import_experiments
 from mlflow_export_import.bulk import rename_utils
+from mlflow_export_import.common.version_utils import has_prompt_support
 
 _logger = utils.getLogger(__name__)
 
@@ -68,8 +69,31 @@ def import_models(
         verbose,
         use_threads
     )
+    # Import prompts if they exist and are supported
+    prompt_res = None
+    prompts_dir = os.path.join(input_dir, "prompts")
+    if os.path.exists(prompts_dir) and has_prompt_support():
+        try:
+            from mlflow_export_import.bulk.import_prompts import import_prompts
+            _logger.info("Importing prompts...")
+            prompt_res = import_prompts(
+                input_dir = prompts_dir,
+                use_threads = use_threads,
+                mlflow_client = mlflow_client
+            )
+        except Exception as e:
+            _logger.warning(f"Failed to import prompts: {e}")
+            prompt_res = {"error": str(e)}
+    elif os.path.exists(prompts_dir):
+        _logger.info(f"Skipping prompt import - not supported in MLflow {mlflow.__version__}")
+    
     duration = round(time.time()-start_time, 1)
-    dct = { "duration": duration, "experiments_import": exp_info, "models_import": model_res }
+    dct = { 
+        "duration": duration, 
+        "experiments_import": exp_info, 
+        "models_import": model_res,
+        "prompts_import": prompt_res
+    }
     _logger.info("\nImport report:")
     _logger.info(f"{json.dumps(dct,indent=2)}\n")
 

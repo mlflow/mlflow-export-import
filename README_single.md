@@ -27,6 +27,8 @@ See sample JSON export files [here](README_export_format.md#sample-export-json-f
 | | [import-logged-model](#import-logged-model)           | [code](mlflow_export_import/logged_model/import_logged_model.py) |
 | Trace | [export-trace](#export-trace)                         | [code](mlflow_export_import/trace/export_trace.py)               |
 || [import-trace](#import-trace)                         |  [code](mlflow_export_import/trace/import_trace.py)              |
+| Prompt | [export-prompt](#export-prompt) | [code](mlflow_export_import/prompt/export_prompt.py) |
+|  | [import-prompt](#import-prompt) | [code](mlflow_export_import/prompt/import_prompt.py) |
 
 ## Experiment Tools
 
@@ -583,4 +585,67 @@ Options:
 import-trace \ 
     --input-dir exported_trace \
     --experiment-name trace
+```
+
+## Prompt Tools
+
+Export and import prompts from the MLflow Prompt Registry (MLflow 2.21.0+).
+
+**Note:** Prompt Registry support requires MLflow 2.21.0 or higher.
+
+### Export Prompt
+
+Export a single prompt version to a directory.
+
+Source: [export_prompt.py](mlflow_export_import/prompt/export_prompt.py).
+
+#### Usage
+
+```
+export-prompt --help
+
+Options:
+  --prompt-name TEXT     Name of the prompt to export.  [required]
+  --prompt-version TEXT  Version of the prompt to export.  [required]
+  --output-dir TEXT      Output directory.  [required]
+```
+
+#### Example
+
+```
+export-prompt \
+  --prompt-name my-greeting-prompt \
+  --prompt-version 1 \
+  --output-dir out
+```
+
+### Import Prompt
+
+Import a prompt from an exported directory.
+
+Source: [import_prompt.py](mlflow_export_import/prompt/import_prompt.py).
+
+#### Usage
+
+```
+import-prompt --help
+
+Options:
+  --input-dir TEXT    Input directory containing exported prompt.  [required]
+  --prompt-name TEXT  Optional new name for the imported prompt. If not
+                     specified, uses original name.
+```
+
+#### Examples
+
+##### Import with original name
+```
+import-prompt --input-dir out
+```
+
+##### Import with new name
+```
+import-prompt \
+  --input-dir out \
+  --prompt-name my-new-prompt-name
 ```
