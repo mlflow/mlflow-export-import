@@ -296,6 +296,7 @@ class BulkModelImporter(BaseModelImporter):
 
     def import_version(self, model_name, src_vr, dst_run_id):
         src_run_id = src_vr["run_id"]
+        model_id = None
         if "models" in src_vr["source"]: # 3.x logged models
             model_id = self.mlflow_client.get_run(dst_run_id).outputs.model_outputs[0].model_id
             dst_source = _get_logged_model_artifact_path(model_id)
@@ -309,7 +310,8 @@ class BulkModelImporter(BaseModelImporter):
             src_vr = src_vr,
             dst_run_id = dst_run_id,
             dst_source = dst_source,
-            import_source_tags = self.import_source_tags
+            import_source_tags = self.import_source_tags,
+            model_id=model_id
         )
 
 

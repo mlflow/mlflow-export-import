@@ -108,12 +108,13 @@ def _get_span_params(span_data):
 
 
 def _write_trace_id_to_run(request_metadata, output_dir, trace_id, experiment_id):
-    if request_metadata.get("mlflow.sourceRun") and f"{experiment_id}/runs" in output_dir:
+    if request_metadata.get("mlflow.sourceRun") and "traces" in output_dir:
         run_id = request_metadata["mlflow.sourceRun"]
-        run_path = output_dir[:output_dir.index("traces")]
-        path = _fs.mk_local_path(os.path.join(run_path, "runs", run_id, 'run.json'))
-        root_dct = io_utils.read_file(path)
-        mlflow_dct = io_utils.get_mlflow(root_dct)
-
-        mlflow_dct.setdefault("traces", []).append(trace_id)
-        io_utils.write_file(path, root_dct)
+        run_path = output_dir[:output_dir.rfind("traces")]
+        run_json_path = _fs.mk_local_path(os.path.join(run_path, "runs", run_id, 'run.json'))
+        
+        if os.path.exists(run_json_path):
+            root_dct = io_utils.read_file(run_json_path)
+            mlflow_dct = io_utils.get_mlflow(root_dct)
+            mlflow_dct.setdefault("traces", []).append(trace_id)
+            io_utils.write_file(run_json_path, root_dct)

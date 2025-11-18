@@ -20,6 +20,7 @@ from mlflow_export_import.trace.trace_data_importer import (
     _import_assessments
 )
 from mlflow_export_import.trace.trace_utils import _try_parse_json, _get_span_attributes
+from mlflow_export_import.common.version_utils import has_trace_support
 
 _logger = utils.getLogger(__name__)
 
@@ -36,6 +37,10 @@ def import_trace(
     :param run_id: Run Id
     :param mlflow_client: Mlflow client
     """
+    if not has_trace_support():
+        _logger.warning(f"Traces are not supported in this MLflow version {mlflow.__version__} (requires 2.14+).")
+        return {"unsupported": True, "mlflow_version": mlflow.__version__}
+
     mlflow_client = mlflow_client or create_mlflow_client()
 
     exp = mlflow_utils.set_experiment(mlflow_client, None, experiment_name)

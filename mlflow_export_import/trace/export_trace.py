@@ -21,6 +21,7 @@ from mlflow_export_import.trace.trace_utils import (
     _extract_span,
     _write_trace_id_to_run
 )
+from mlflow_export_import.common.version_utils import has_trace_support
 
 _logger = utils.getLogger(__name__)
 
@@ -34,6 +35,10 @@ def export_trace(
     :param output_dir: Output directory
     :param mlflow_client: Mlflow client
     """
+    if not has_trace_support():
+        _logger.warning(f"Traces are not supported in this MLflow version {mlflow.__version__} (requires 2.14+).")
+        return {"unsupported": True, "mlflow_version": mlflow.__version__}
+
     mlflow_client = mlflow_client or create_mlflow_client()
     experiment_id = None
     start_time = time.time()

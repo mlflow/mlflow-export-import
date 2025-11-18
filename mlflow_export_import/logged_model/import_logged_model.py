@@ -4,7 +4,8 @@ Imports a logged model from a directory
 
 import os
 import click
-from mlflow.entities import Metric, RunStatus
+import mlflow
+from mlflow.entities import RunStatus
 
 from mlflow_export_import.common import utils, mlflow_utils, io_utils
 from mlflow_export_import.common import filesystem as _fs
@@ -16,6 +17,7 @@ from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.client.client_utils import create_mlflow_client
 from mlflow_export_import.logged_model.logged_model_utils import update_logged_model_mlmodel_data
 from mlflow_export_import.logged_model.logged_model_importer import _import_inputs, _log_metrics
+from mlflow_export_import.common.version_utils import has_logged_model_support
 
 _logger = utils.getLogger(__name__)
 
@@ -38,6 +40,10 @@ def import_logged_model(
     :param step: Step to add Logged Model to run.
     :param mlflow_client: MLflow client.
     """
+    if not has_logged_model_support():
+        _logger.warning(f"Logged models are not supported in this MLflow version {mlflow.__version__} (requires 3.0+).")
+        return {"unsupported": True, "mlflow_version": mlflow.__version__}
+
     mlflow_client = mlflow_client or create_mlflow_client()
 
     _logger.info(f"Importing logged model from '{input_dir}'")

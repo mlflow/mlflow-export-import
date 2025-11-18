@@ -11,6 +11,7 @@ from mlflow_export_import.trace.trace_utils import (
     _get_span_attributes,
     _get_span_params
 )
+from mlflow_export_import.common.version_utils import has_assessments_support
 
 
 def _import_span_data(dst_trace_id, dst_root_span_id, src_root_span_id, src_graph, src_span_map, mlflow_client):
@@ -79,7 +80,7 @@ def _add_span_events(dst_child_span, span_events):
             ))
 
 def _import_assessments(assessments, trace_id, src_dst_span_map):
-    if version.parse(mlflow.__version__) >= version.parse("3.4.0"):
+    if has_assessments_support() and assessments:
         for assessment in assessments:
 
             assessment_input = {

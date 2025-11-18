@@ -29,6 +29,9 @@ def has_logged_model_support():
     """LoggedModel entity - first-class model objects (3.0.0+)."""
     return get_mlflow_version() >= version.parse("3.0.0")
 
+def has_assessments_support():
+    """Assessments entity - first-class model objects (3.2.0+)."""
+    return get_mlflow_version() >= version.parse("3.2.0")
 
 def has_evaluation_dataset_support():
     """Evaluation datasets stored in experiments (3.4.0+)."""
