@@ -3,6 +3,7 @@ from setuptools import setup, find_packages
 CORE_REQUIREMENTS = [
     "mlflow-skinny[databricks]",
     "databricks-cli==0.18.0",
+    "packaging>=20.0",        # For version parsing and compatibility
     "pandas>=1.5.2",
     "tabulate==0.9.0",
     "wheel"
@@ -43,7 +44,7 @@ setup(
     entry_points = {
         "console_scripts": [
             "export-all = mlflow_export_import.bulk.export_all:main",
-            "import-all = mlflow_export_import.bulk.import_models:main",
+            "import-all = mlflow_export_import.bulk.import_all:main",
             "export-models = mlflow_export_import.bulk.export_models:main",
             "import-models = mlflow_export_import.bulk.import_models:main",
             "export-run = mlflow_export_import.run.export_run:main",
@@ -71,6 +72,10 @@ setup(
             "import-traces = mlflow_export_import.bulk.import_traces:main",
             "export-trace = mlflow_export_import.trace.export_trace:main",
             "import-trace = mlflow_export_import.trace.import_trace:main",
+            "export-prompt = mlflow_export_import.prompt.export_prompt:main",
+            "import-prompt = mlflow_export_import.prompt.import_prompt:main",
+            "export-prompts = mlflow_export_import.bulk.export_prompts:main",
+            "import-prompts = mlflow_export_import.bulk.import_prompts:main"
          ]
       }
 )
