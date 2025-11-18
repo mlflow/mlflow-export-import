@@ -16,6 +16,7 @@ from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.common import utils, io_utils, mlflow_utils
 from mlflow_export_import.bulk.bulk_utils import get_logged_models, get_experiment_ids
 from mlflow_export_import.logged_model.export_logged_model import export_logged_model
+from mlflow_export_import.common.version_utils import has_logged_model_support
 
 _logger = utils.getLogger(__name__)
 
@@ -33,6 +34,10 @@ def export_logged_models(
     :param logged_models_filter: Filter logged models based on run ids to experiments.
     :param mlflow_client: Mlflow client
     """
+    if not has_logged_model_support():
+        _logger.warning(f"Logged models are not supported in this MLflow version {mlflow.__version__} (requires 3.0+).")
+        return {"unsupported": True, "mlflow_version": mlflow.__version__}
+
     mlflow_client = mlflow_client or mlflow.MlflowClient()
 
     if isinstance(experiment_ids, str):

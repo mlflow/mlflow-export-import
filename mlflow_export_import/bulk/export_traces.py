@@ -15,6 +15,7 @@ from mlflow_export_import.common import MlflowExportImportException
 from mlflow_export_import.bulk.bulk_utils import get_experiment_ids, get_traces
 from mlflow_export_import.common import utils, mlflow_utils, io_utils
 from mlflow_export_import.trace.export_trace import export_trace
+from mlflow_export_import.common.version_utils import has_trace_support
 
 _logger = utils.getLogger(__name__)
 
@@ -32,6 +33,9 @@ def export_traces(
     :param run_id: Run id to filter during search
     :param mlflow_client: Mlflow client
     """
+    if not has_trace_support():
+        _logger.warning(f"Traces are not supported in this MLflow version {mlflow.__version__} (requires 2.14+).")
+        return {"unsupported": True, "mlflow_version": mlflow.__version__}
 
     mlflow_client = mlflow_client or mlflow.MlflowClient()
     if isinstance(experiment_ids, str):

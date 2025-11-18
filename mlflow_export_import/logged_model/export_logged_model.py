@@ -19,6 +19,7 @@ from mlflow_export_import.common.click_options import (
     opt_output_dir
 )
 from mlflow_export_import.common.timestamp_utils import format_seconds
+from mlflow_export_import.common.version_utils import has_logged_model_support
 
 _logger = utils.getLogger(__name__)
 
@@ -32,6 +33,9 @@ def export_logged_model(
     :param output_dir: Output directory
     :param mlflow_client: MLflow client
     """
+    if not has_logged_model_support():
+        _logger.warning(f"Logged models are not supported in this MLflow version {mlflow.__version__} (requires 3.0+).")
+        return {"unsupported": True, "mlflow_version": mlflow.__version__}
 
     mlflow_client = mlflow_client or create_mlflow_client()
     start_time = time.time()

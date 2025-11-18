@@ -12,6 +12,7 @@ from mlflow_export_import.common.click_options import (
 )
 from mlflow_export_import.common import utils, io_utils
 from mlflow_export_import.logged_model.import_logged_model import import_logged_model
+from mlflow_export_import.common.version_utils import has_logged_model_support
 
 _logger = utils.getLogger(__name__)
 
@@ -23,6 +24,10 @@ def import_logged_models(
     :param input_dir: Source Logged models directory
     :param mlflow_client: Mlflow client
     """
+    if not has_logged_model_support():
+        _logger.warning(f"Logged models are not supported in this MLflow version {mlflow.__version__} (requires 3.0+).")
+        return {"unsupported": True, "mlflow_version": mlflow.__version__}
+
     mlflow_client = mlflow_client or mlflow.MlflowClient()
     dct = io_utils.read_file_mlflow(os.path.join(input_dir, "logged_models.json"))
     exps = dct["experiments"]

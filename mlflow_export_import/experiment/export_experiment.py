@@ -21,6 +21,7 @@ from mlflow_export_import.common.iterators import SearchRunsIterator
 from mlflow_export_import.common import utils, io_utils, mlflow_utils
 from mlflow_export_import.common import ws_permissions_utils
 from mlflow_export_import.common.timestamp_utils import fmt_ts_millis, utc_str_to_millis
+from mlflow_export_import.common.version_utils import has_trace_support, has_logged_model_support
 from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client
 from mlflow_export_import.run.export_run import export_run
 from mlflow_export_import.bulk import (
@@ -106,7 +107,7 @@ def export_experiment(
     mlflow_attr = { "experiment": exp_dct , "runs": ok_run_ids }
 
     # Export Logged Models
-    if version.parse(mlflow.__version__) >= version.parse("3.0.0"):
+    if has_logged_model_support:
         ok_logged_models, failed_logged_models = export_logged_models.export_logged_models(
             experiment_ids = [exp.experiment_id],
             output_dir = os.path.join(output_dir, "logged_models"),
@@ -118,7 +119,7 @@ def export_experiment(
         mlflow_attr["logged_models"] = ok_logged_models
 
     # Export traces
-    if version.parse(mlflow.__version__) >= version.parse("2.14.0"):
+    if has_trace_support:
         ok_traces, failed_traces = export_traces.export_traces(
             experiment_ids=[exp.experiment_id],
             output_dir=os.path.join(output_dir, "traces"),

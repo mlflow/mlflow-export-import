@@ -4,6 +4,7 @@ Imports an experiment to a directory.
 
 import os
 import click
+from mlflow.entities import RunStatus
 
 from mlflow_export_import.common.click_options import (
     opt_experiment_name,
@@ -121,6 +122,10 @@ def import_experiment(
                     step = model['step'],
                 )
                 imported_logged_models.append(model['model_id'])
+
+        # in logged models after logging the metrics, run status is changing back to Finished. So setting the status again.
+        default_status = RunStatus.to_string(RunStatus.FINISHED)
+        mlflow_client.set_terminated(dst_run_id, src_run_dct.get("info", default_status).get("status", default_status))
 
         # Import traces associated to the run
         if src_run_dct.get("traces"):
