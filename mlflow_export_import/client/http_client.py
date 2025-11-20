@@ -1,6 +1,7 @@
 from abc import abstractmethod, ABCMeta
 import os
 import json
+from requests.auth import HTTPBasicAuth
 import requests
 import click
 from mlflow_export_import.common import MlflowExportImportException
@@ -96,11 +97,14 @@ class HttpClient(BaseHttpClient):
         self.host = host
         self.api_uri = os.path.join(host, api_name)
         self.token = token
+        user = os.environ.get("MLFLOW_TRACKING_USERNAME")
+        password = os.environ.get("MLFLOW_TRACKING_PASSWORD")
+        self.auth = HTTPBasicAuth(user, password) if user and password else None
 
 
     def _get(self, resource, params=None):
         uri = self._mk_uri(resource)
-        rsp = requests.get(uri, headers=self._mk_headers(), data=params, timeout=_TIMEOUT)
+        rsp = requests.get(uri, headers=self._mk_headers(), data=params, auth=self.auth, timeout=_TIMEOUT)
         return self._check_response(rsp, params)
 
 
@@ -151,7 +155,7 @@ class HttpClient(BaseHttpClient):
 
     def _delete(self, resource):
         uri = self._mk_uri(resource)
-        rsp = requests.delete(uri, headers=self._mk_headers(), timeout=_TIMEOUT)
+        rsp = requests.delete(uri, headers=self._mk_headers(), auth=self.auth, timeout=_TIMEOUT)
         return self._check_response(rsp)
 
     def delete(self, resource):
@@ -163,7 +167,7 @@ class HttpClient(BaseHttpClient):
 
     def _mutator(self, method, resource, data=None):
         uri = self._mk_uri(resource)
-        rsp = method(uri, headers=self._mk_headers(), data=data, timeout=_TIMEOUT)
+        rsp = method(uri, headers=self._mk_headers(), data=data, auth=self.auth, timeout=_TIMEOUT)
         return self._check_response(rsp)
 
 
