@@ -55,4 +55,6 @@ def _create_default_log_config(output_path=None, log_format=None):
         handlers = cfg["root"]["handlers"]
         handlers.remove("file")
 
+    os.makedirs(os.path.dirname(cfg["handlers"]["file"]["filename"]), exist_ok=True)
+
     return cfg
