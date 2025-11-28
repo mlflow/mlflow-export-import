@@ -75,7 +75,11 @@ setup(
             "export-prompt = mlflow_export_import.prompt.export_prompt:main",
             "import-prompt = mlflow_export_import.prompt.import_prompt:main",
             "export-prompts = mlflow_export_import.bulk.export_prompts:main",
-            "import-prompts = mlflow_export_import.bulk.import_prompts:main"
+            "import-prompts = mlflow_export_import.bulk.import_prompts:main",
+            "export-evaluation-dataset = mlflow_export_import.evaluation_dataset.export_evaluation_dataset:main",
+            "import-evaluation-dataset = mlflow_export_import.evaluation_dataset.import_evaluation_dataset:main",
+            "export-evaluation-datasets = mlflow_export_import.bulk.export_evaluation_datasets:main",
+            "import-evaluation-datasets = mlflow_export_import.bulk.import_evaluation_datasets:main"
          ]
       }
 )
