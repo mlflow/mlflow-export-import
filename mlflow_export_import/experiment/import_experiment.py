@@ -139,7 +139,7 @@ def import_experiment(
                 imported_traces.append(trace_id)
 
     ## Importing the logged models that are not part of run
-    if "logged_models" in mlflow_dct:
+    if mlflow_dct.get("logged_models"):
         remaining_logged_models = set(mlflow_dct["logged_models"]) - set(imported_logged_models)
         for model_id in remaining_logged_models:
             import_logged_model(
