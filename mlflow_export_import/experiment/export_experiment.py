@@ -107,7 +107,7 @@ def export_experiment(
     mlflow_attr = { "experiment": exp_dct , "runs": ok_run_ids }
 
     # Export Logged Models
-    if has_logged_model_support:
+    if has_logged_model_support():
         ok_logged_models, failed_logged_models = export_logged_models.export_logged_models(
             experiment_ids = [exp.experiment_id],
             output_dir = os.path.join(output_dir, "logged_models"),
@@ -119,7 +119,7 @@ def export_experiment(
         mlflow_attr["logged_models"] = ok_logged_models
 
     # Export traces
-    if has_trace_support:
+    if has_trace_support():
         ok_traces, failed_traces = export_traces.export_traces(
             experiment_ids=[exp.experiment_id],
             output_dir=os.path.join(output_dir, "traces"),
