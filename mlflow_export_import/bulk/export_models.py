@@ -36,6 +36,8 @@ def export_models(
         export_latest_versions = False,
         export_all_runs = False,
         export_permissions = False,
+        run_start_time = None,
+        until = None,
         export_deleted_runs = False,
         export_version_model = False,
         notebook_formats = None,
@@ -65,6 +67,8 @@ def export_models(
         experiments = exps_to_export,
         output_dir = out_dir,
         export_permissions = export_permissions,
+        run_start_time = run_start_time,
+        until = until,
         export_deleted_runs = export_deleted_runs,
         notebook_formats = notebook_formats,
         use_threads = use_threads,
@@ -183,13 +187,15 @@ def _export_models(
 @opt_export_all_runs
 @opt_stages
 @opt_export_permissions
+@opt_run_start_time
+@opt_until
 @opt_export_deleted_runs
 @opt_export_version_model
 @opt_notebook_formats
 @opt_use_threads
 
 def main(models, output_dir, stages, export_latest_versions, export_all_runs,
-        export_permissions, export_deleted_runs, export_version_model,
+        export_permissions, run_start_time, until, export_deleted_runs, export_version_model,
         notebook_formats, use_threads
     ):
     _logger.info("Options:")
@@ -202,6 +208,8 @@ def main(models, output_dir, stages, export_latest_versions, export_all_runs,
         export_latest_versions = export_latest_versions,
         export_all_runs = export_all_runs,
         export_permissions = export_permissions,
+        run_start_time = run_start_time,
+        until = until,
         export_deleted_runs = export_deleted_runs,
         export_version_model = export_version_model,
         notebook_formats = utils.string_to_list(notebook_formats),

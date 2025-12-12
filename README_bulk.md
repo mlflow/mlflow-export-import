@@ -54,7 +54,12 @@ Options:
                                   Production, Staging, Archived and None.
                                   Mututally exclusive with option --versions.
   --run-start-time TEXT           Only export runs started after this UTC time
-                                  (inclusive). Format: YYYY-MM-DD.
+                                  (inclusive). Format: YYYY-MM-DD or
+                                  YYYY-MM-DD HH:MM:SS.
+  --until TEXT                    Only export runs started before this UTC time
+                                  (exclusive). Use with --run-start-time to
+                                  define a time window. Format: YYYY-MM-DD or
+                                  YYYY-MM-DD HH:MM:SS.
   --export-deleted-runs BOOLEAN   Export deleted runs.  [default: False] 
   --export-version-model BOOLEAN  Export registered model version's 'cached'
                                   MLflow model.  [default: False] 
@@ -326,6 +331,9 @@ Options:
                                  False]
   --run-start-time TEXT          Only export runs started after this UTC time
                                  (inclusive). Format: YYYY-MM-DD.
+  --until TEXT                   Only export runs started before this UTC time
+                                 (exclusive). Use with --run-start-time to
+                                 define a time window. Format: YYYY-MM-DD.
   --export-deleted-runs BOOLEAN  Export deleted runs.  [default: False]
   --notebook-formats TEXT        Databricks notebook formats. Values are
                                  SOURCE, HTML, JUPYTER or DBC (comma
@@ -377,6 +385,36 @@ Exporting experiment: {'name': '/Users/me@my.com/keras_mnist', 'id': 'e090757fcb
 1770/1770 runs succesfully exported
 Duration: 103.6 seonds
 ```
+
+##### Export experiments with time window (daily/monthly)
+```
+export-experiments \
+  --experiments sklearn_wine,keras_mnist \
+  --output-dir out \
+  --run-start-time 2024-01-01 \
+  --until 2024-04-01
+```
+
+This exports only runs from specified experiments that started between 2024-01-01 (inclusive) and 2024-04-01 (exclusive), allowing for incremental migrations in time-bounded chunks.
+
+##### Export experiments with time window (hourly chunks)
+```
+# Export first 4 hours of a specific day
+export-experiments \
+  --experiments all \
+  --output-dir out/2024-01-01_00-04 \
+  --run-start-time "2024-01-01 00:00:00" \
+  --until "2024-01-01 04:00:00"
+
+# Export next 4 hours
+export-experiments \
+  --experiments all \
+  --output-dir out/2024-01-01_04-08 \
+  --run-start-time "2024-01-01 04:00:00" \
+  --until "2024-01-01 08:00:00"
+```
+
+This allows very granular control for large tracking servers, enabling exports in small time chunks (hours or even minutes).
 
 ### Import experiments
 

@@ -30,13 +30,20 @@ def fmt_ts_seconds(seconds, as_utc=_default_as_utc):
 
 def utc_str_to_millis(sdt):
     """ Convert UTC string to epoch milliseconds. """
-    return utc_str_to_seconds(sdt) * 1000
+    return int(utc_str_to_seconds(sdt) * 1000)
 
 
 def utc_str_to_seconds(sdt):
     """ Convert UTC string to epoch seconds. """
+    from datetime import timezone
     dt = datetime.fromisoformat(sdt)
-    seconds = (dt - datetime(1970, 1, 1)).total_seconds()
+    # If datetime is naive (no timezone), treat it as local time
+    if dt.tzinfo is None:
+        # Convert to timestamp using local timezone
+        seconds = dt.timestamp()
+    else:
+        # If timezone-aware, convert to UTC and get timestamp
+        seconds = dt.timestamp()
     return seconds
 
 
