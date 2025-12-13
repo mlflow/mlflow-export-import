@@ -184,7 +184,7 @@ def test_filter_run_with_until_only(mlflow_context):
         mlflow_client = mlflow_context.client_src,
         experiment_id_or_name = exp1.name,
         output_dir = mlflow_context.output_dir,
-        until = until_time
+        runs_until = until_time
     )
     
     dst_exp_name = mk_dst_experiment_name(exp1.name)
@@ -227,7 +227,7 @@ def test_filter_run_with_start_and_until(mlflow_context):
         experiment_id_or_name = exp1.name,
         output_dir = mlflow_context.output_dir,
         run_start_time = run_start_time,
-        until = until_time
+        runs_until = until_time
     )
     
     dst_exp_name = mk_dst_experiment_name(exp1.name)
@@ -260,7 +260,7 @@ def test_filter_run_time_window_no_results(mlflow_context):
         experiment_id_or_name = exp1.name,
         output_dir = mlflow_context.output_dir,
         run_start_time = run_start_time,
-        until = until_time
+        runs_until = until_time
     )
     
     dst_exp_name = mk_dst_experiment_name(exp1.name)
