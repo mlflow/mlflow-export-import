@@ -45,10 +45,22 @@ def export_models(
         mlflow_client = None
     ):
     """
-    :param: model_names: Can be either:
+    :param model_names: Can be either:
       - Filename (ending with '.txt') containing list of model names
       - List of model names
       - String with comma-delimited model names such as 'model1,model2'
+    :param output_dir: Output directory
+    :param stages: Stages to export (comma separated). Default is all stages.
+    :param export_latest_versions: Export latest model versions instead of all versions
+    :param export_all_runs: Export all runs of experiment or just runs associated with model versions
+    :param export_permissions: Export Databricks permissions
+    :param run_start_time: Only export runs started after this UTC time (inclusive). Format: YYYY-MM-DD or YYYY-MM-DD HH:MM:SS
+    :param until: Only export runs started before this UTC time (exclusive). Format: YYYY-MM-DD or YYYY-MM-DD HH:MM:SS
+    :param export_deleted_runs: Export deleted runs
+    :param export_version_model: Export version's cached MLflow model
+    :param notebook_formats: Databricks notebook formats to export (comma separated)
+    :param use_threads: Process in parallel using threads
+    :param mlflow_client: MLflow client
     :return: Dictionary of summary information
     """
 

@@ -51,7 +51,7 @@ Options:
   --run-start-time TEXT          Only export runs started after this UTC time
                                  (inclusive). Format: YYYY-MM-DD or 
                                  YYYY-MM-DD HH:MM:SS.
-  --until TEXT                   Only export runs started before this UTC time
+  --runs-until TEXT                   Only export runs started before this UTC time
                                  (exclusive). Use with --run-start-time to
                                  define a time window. Format: YYYY-MM-DD or
                                  YYYY-MM-DD HH:MM:SS.
@@ -103,7 +103,7 @@ export-experiment \
   --experiment sklearn-wine \
   --output-dir out \
   --run-start-time 2024-01-01 \
-  --until 2024-02-01
+  --runs-until 2024-02-01
 ```
 
 This exports all runs that started between 2024-01-01 (inclusive) and 2024-02-01 (exclusive).
@@ -115,14 +115,14 @@ export-experiment \
   --experiment sklearn-wine \
   --output-dir out/chunk1 \
   --run-start-time "2024-01-01 00:00:00" \
-  --until "2024-01-01 04:00:00"
+  --runs-until "2024-01-01 04:00:00"
 
 # Export runs from next 4 hours
 export-experiment \
   --experiment sklearn-wine \
   --output-dir out/chunk2 \
   --run-start-time "2024-01-01 04:00:00" \
-  --until "2024-01-01 08:00:00"
+  --runs-until "2024-01-01 08:00:00"
 ```
 
 This allows incremental exports in smaller time chunks (e.g., 4-hour intervals).
