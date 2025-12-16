@@ -18,9 +18,14 @@ def create_http_client(mlflow_client, model_name=None):
 def create_dbx_client(mlflow_client):
     """
     Create Databricks HTTP client from MlflowClient.
+    Returns None if not using Databricks backend.
     """
-    creds = mlflow_client._tracking_client.store.get_host_creds()
-    return DatabricksHttpClient(creds.host, creds.token)
+    try:
+        creds = mlflow_client._tracking_client.store.get_host_creds()
+        return DatabricksHttpClient(creds.host, creds.token)
+    except AttributeError:
+        # FileStore or other non-Databricks backend - return None
+        return None
 
 
 def create_mlflow_client():

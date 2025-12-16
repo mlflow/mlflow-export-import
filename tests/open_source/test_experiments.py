@@ -164,6 +164,118 @@ def _fmt_utc_time_now():
     return datetime.now(timezone.utc).strftime(TS_FORMAT)
 
 
+# == Test until filter
+
+def test_filter_run_with_until_only(mlflow_context):
+    """Test exporting runs with only until parameter - should export runs before the specified time"""
+    init_output_dirs(mlflow_context.output_dir)
+    exp1, run1a = create_simple_run(mlflow_context.client_src)
+    run1a = mlflow_context.client_src.get_run(run1a.info.run_id)
+    
+    # Sleep and get current time
+    time.sleep(2)
+    until_time = _fmt_utc_time_now()
+    time.sleep(2)
+    
+    # Create second run after until time
+    _create_simple_run(mlflow_context.client_src)
+    
+    export_experiment(
+        mlflow_client = mlflow_context.client_src,
+        experiment_id_or_name = exp1.name,
+        output_dir = mlflow_context.output_dir,
+        runs_until = until_time
+    )
+    
+    dst_exp_name = mk_dst_experiment_name(exp1.name)
+    
+    import_experiment(
+        mlflow_client = mlflow_context.client_dst,
+        experiment_name = dst_exp_name,
+        input_dir = mlflow_context.output_dir
+    )
+    
+    exp2 = mlflow_context.client_dst.get_experiment_by_name(dst_exp_name)
+    runs2 = mlflow_context.client_dst.search_runs(exp2.experiment_id)
+    assert 1 == len(runs2), f"Expected 1 run, got {len(runs2)}"
+
+
+def test_filter_run_with_start_and_until(mlflow_context):
+    """Test exporting runs with both run_start_time and until - should export runs within the window"""
+    init_output_dirs(mlflow_context.output_dir)
+    
+    # Create first run (before time window)
+    exp1, run1 = create_simple_run(mlflow_context.client_src)
+    run1 = mlflow_context.client_src.get_run(run1.info.run_id)
+    
+    time.sleep(2)
+    run_start_time = _fmt_utc_time_now()
+    time.sleep(2)
+    
+    # Create second run (within time window)
+    _create_simple_run(mlflow_context.client_src)
+    
+    time.sleep(2)
+    until_time = _fmt_utc_time_now()
+    time.sleep(2)
+    
+    # Create third run (after time window)
+    _create_simple_run(mlflow_context.client_src)
+    
+    export_experiment(
+        mlflow_client = mlflow_context.client_src,
+        experiment_id_or_name = exp1.name,
+        output_dir = mlflow_context.output_dir,
+        run_start_time = run_start_time,
+        runs_until = until_time
+    )
+    
+    dst_exp_name = mk_dst_experiment_name(exp1.name)
+    
+    import_experiment(
+        mlflow_client = mlflow_context.client_dst,
+        experiment_name = dst_exp_name,
+        input_dir = mlflow_context.output_dir
+    )
+    
+    exp2 = mlflow_context.client_dst.get_experiment_by_name(dst_exp_name)
+    runs2 = mlflow_context.client_dst.search_runs(exp2.experiment_id)
+    assert 1 == len(runs2), f"Expected 1 run within time window, got {len(runs2)}"
+
+
+def test_filter_run_time_window_no_results(mlflow_context):
+    """Test exporting runs with a time window that contains no runs - should export 0 runs"""
+    init_output_dirs(mlflow_context.output_dir)
+    
+    # Create run
+    exp1, run1 = create_simple_run(mlflow_context.client_src)
+    run1 = mlflow_context.client_src.get_run(run1.info.run_id)
+    
+    # Define time window in the past (before any runs)
+    run_start_time = _fmt_utc_time_before(10)
+    until_time = _fmt_utc_time_before(5)
+    
+    export_experiment(
+        mlflow_client = mlflow_context.client_src,
+        experiment_id_or_name = exp1.name,
+        output_dir = mlflow_context.output_dir,
+        run_start_time = run_start_time,
+        runs_until = until_time
+    )
+    
+    dst_exp_name = mk_dst_experiment_name(exp1.name)
+    
+    import_experiment(
+        mlflow_client = mlflow_context.client_dst,
+        experiment_name = dst_exp_name,
+        input_dir = mlflow_context.output_dir
+    )
+    
+    exp2 = mlflow_context.client_dst.get_experiment_by_name(dst_exp_name)
+    runs2 = mlflow_context.client_dst.search_runs(exp2.experiment_id)
+    assert 0 == len(runs2), f"Expected 0 runs for empty time window, got {len(runs2)}"
+
+
 # == Test export of multiple runs
 
 def test_exp_with_multiple_runs(mlflow_context):

@@ -49,7 +49,12 @@ Options:
   --export-permissions BOOLEAN   Export Databricks permissions.  [default:
                                  False]
   --run-start-time TEXT          Only export runs started after this UTC time
-                                 (inclusive). Format: YYYY-MM-DD.
+                                 (inclusive). Format: YYYY-MM-DD or 
+                                 YYYY-MM-DD HH:MM:SS.
+  --runs-until TEXT                   Only export runs started before this UTC time
+                                 (exclusive). Use with --run-start-time to
+                                 define a time window. Format: YYYY-MM-DD or
+                                 YYYY-MM-DD HH:MM:SS.
   --export-deleted-runs BOOLEAN  Export deleted runs.  [default: False]
   --check-nested-runs BOOLEAN    Check if run in the 'run-ids' option is a
                                  parent of nested runs and export all the
@@ -91,6 +96,36 @@ export-experiment \
   --run-ids 1eea5a4f49184781947d6761b7207b25 \
   --check-nested-runs True 
 ```
+
+##### Export runs within a specific time window (daily):
+```
+export-experiment \
+  --experiment sklearn-wine \
+  --output-dir out \
+  --run-start-time 2024-01-01 \
+  --runs-until 2024-02-01
+```
+
+This exports all runs that started between 2024-01-01 (inclusive) and 2024-02-01 (exclusive).
+
+##### Export runs within a specific time window (hourly chunks):
+```
+# Export runs from first 4 hours of the day
+export-experiment \
+  --experiment sklearn-wine \
+  --output-dir out/chunk1 \
+  --run-start-time "2024-01-01 00:00:00" \
+  --runs-until "2024-01-01 04:00:00"
+
+# Export runs from next 4 hours
+export-experiment \
+  --experiment sklearn-wine \
+  --output-dir out/chunk2 \
+  --run-start-time "2024-01-01 04:00:00" \
+  --runs-until "2024-01-01 08:00:00"
+```
+
+This allows incremental exports in smaller time chunks (e.g., 4-hour intervals).
 
 #### Databricks export examples
 

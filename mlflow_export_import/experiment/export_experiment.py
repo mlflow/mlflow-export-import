@@ -14,6 +14,7 @@ from mlflow_export_import.common.click_options import (
     opt_notebook_formats,
     opt_export_permissions,
     opt_run_start_time,
+    opt_until,
     opt_export_deleted_runs,
     opt_check_nested_runs
 )
@@ -39,6 +40,7 @@ def export_experiment(
         run_ids = None,
         export_permissions = False,
         run_start_time = None,
+        runs_until = None,
         export_deleted_runs = False,
         check_nested_runs = False,
         notebook_formats = None,
@@ -53,7 +55,8 @@ def export_experiment(
     :param: export_deleted_runs - Export deleted runs.
     :param: check_nested_runs - Check if run in the 'run-ids' option is a parent of nested runs and 
         export all the nested runs.
-    :param: run_start_time - Only export runs started after this UTC time (inclusive). Format: YYYY-MM-DD.
+    :param: run_start_time - Only export runs started after this UTC time (inclusive). Format: YYYY-MM-DD or YYYY-MM-DD HH:MM:SS.
+    :param: runs_until - Only export runs started before this UTC time (exclusive). Format: YYYY-MM-DD or YYYY-MM-DD HH:MM:SS.
     :param: notebook_formats: List of notebook formats to export. Values are SOURCE, HTML, JUPYTER or DBC.
     :param: logged_models_filter: filter based on run_ids under experiment
     :param: mlflow_client: MLflow client.
@@ -63,8 +66,11 @@ def export_experiment(
     dbx_client = create_dbx_client(mlflow_client)
 
     run_start_time_str = run_start_time
+    runs_until_str = runs_until
     if run_start_time:
         run_start_time = utc_str_to_millis(run_start_time)
+    if runs_until:
+        runs_until = utc_str_to_millis(runs_until)
 
     exp = mlflow_utils.get_experiment(mlflow_client, experiment_id_or_name)
     msg = { "name": exp.name, "id": exp.experiment_id,
@@ -81,8 +87,16 @@ def export_experiment(
             runs = nested_runs_utils.get_nested_runs(mlflow_client, runs) # 
     else:
         kwargs = {}
+        filters = []
         if run_start_time:
-            kwargs["filter"] = f"start_time > {run_start_time}"
+            filters.append(f"start_time > {run_start_time}")
+        if runs_until:
+            filters.append(f"start_time < {runs_until}")
+        # Note: " AND ".join() works correctly for both single and multiple filters
+        # Single filter: " AND ".join(["a"]) returns "a"
+        # Multiple filters: " AND ".join(["a", "b"]) returns "a AND b"
+        if filters:
+            kwargs["filter"] = " AND ".join(filters)
         if export_deleted_runs:
             from mlflow.entities import ViewType
             kwargs["view_type"] = ViewType.ALL
@@ -90,7 +104,7 @@ def export_experiment(
 
     for run in runs:
         _export_run(mlflow_client, run, output_dir, ok_run_ids, failed_run_ids,
-            run_start_time, run_start_time_str, export_deleted_runs, notebook_formats)
+            run_start_time, run_start_time_str, runs_until, runs_until_str, export_deleted_runs, notebook_formats)
         num_runs_exported += 1
 
     info_attr = {
@@ -147,15 +161,20 @@ def export_experiment(
 def _export_run(mlflow_client, run, output_dir,
         ok_run_ids, failed_run_ids,
         run_start_time, run_start_time_str,
+        runs_until, runs_until_str,
         export_deleted_runs, notebook_formats
     ):
-    if run_start_time and run.info.start_time < run_start_time:
+    # Skip runs outside the time window
+    if (run_start_time and run.info.start_time < run_start_time) or (runs_until and run.info.start_time >= runs_until):
         msg = {
             "run_id": {run.info.run_id},
             "experiment_id": {run.info.experiment_id},
-            "start_time": fmt_ts_millis(run.info.start_time),
-            "run_start_time": run_start_time_str
+            "start_time": fmt_ts_millis(run.info.start_time)
         }
+        if run_start_time and run.info.start_time < run_start_time:
+            msg["run_start_time"] = run_start_time_str
+        if runs_until and run.info.start_time >= runs_until:
+            msg["runs_until"] = runs_until_str
         _logger.info(f"Not exporting run: {msg}")
         return
     is_success = export_run(
@@ -199,11 +218,12 @@ def _get_runs(mlflow_client, run_ids, exp, failed_run_ids):
 @opt_run_ids
 @opt_export_permissions
 @opt_run_start_time
+@opt_until
 @opt_export_deleted_runs
 @opt_check_nested_runs
 @opt_notebook_formats
 
-def main(experiment, output_dir, run_ids, export_permissions, run_start_time, export_deleted_runs, check_nested_runs, notebook_formats):
+def main(experiment, output_dir, run_ids, export_permissions, run_start_time, runs_until, export_deleted_runs, check_nested_runs, notebook_formats):
     _logger.info("Options:")
     for k,v in locals().items():
         _logger.info(f"  {k}: {v}")
@@ -217,6 +237,7 @@ def main(experiment, output_dir, run_ids, export_permissions, run_start_time, ex
         run_ids = run_ids,
         export_permissions = export_permissions,
         run_start_time = run_start_time,
+        runs_until = runs_until,
         export_deleted_runs = export_deleted_runs,
         check_nested_runs = check_nested_runs,
         notebook_formats = utils.string_to_list(notebook_formats)
