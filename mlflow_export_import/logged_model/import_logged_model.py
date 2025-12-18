@@ -18,6 +18,7 @@ from mlflow_export_import.client.client_utils import create_mlflow_client
 from mlflow_export_import.logged_model.logged_model_utils import update_logged_model_mlmodel_data
 from mlflow_export_import.logged_model.logged_model_importer import _import_inputs, _log_metrics
 from mlflow_export_import.common.version_utils import has_logged_model_support
+from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client
 
 _logger = utils.getLogger(__name__)
 
@@ -48,7 +49,8 @@ def import_logged_model(
 
     _logger.info(f"Importing logged model from '{input_dir}'")
 
-    exp = mlflow_utils.set_experiment(mlflow_client, None, experiment_name)
+    dbx_client = create_dbx_client(mlflow_client)
+    exp = mlflow_utils.set_experiment(mlflow_client, dbx_client, experiment_name)
     src_logged_model_path = os.path.join(input_dir, "logged_model.json")
     src_logged_model_dct = io_utils.read_file_mlflow(src_logged_model_path)
     logged_model = None
