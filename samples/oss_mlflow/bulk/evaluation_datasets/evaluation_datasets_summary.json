@@ -1,0 +1,32 @@
+{
+  "system": {
+    "package_version": "1.0.0",
+    "script": "export_evaluation_datasets.py",
+    "export_file_version": "2",
+    "export_time": 1730000000,
+    "_export_time": "2024-10-27 00:00:00",
+    "mlflow_version": "3.5.1",
+    "mlflow_tracking_uri": "http://localhost:5000",
+    "platform": {
+      "python_version": "3.11.0",
+      "system": "Darwin",
+      "processor": "arm"
+    },
+    "user": "user"
+  },
+  "mlflow": {
+    "total_datasets": 2,
+    "successful_exports": 2,
+    "failed_exports": 0,
+    "datasets": [
+      {
+        "name": "wine-quality-eval",
+        "dataset_id": "abc123"
+      },
+      {
+        "name": "iris-classification-eval",
+        "dataset_id": "def456"
+      }
+    ]
+  }
+}

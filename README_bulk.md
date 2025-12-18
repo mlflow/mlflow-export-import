@@ -30,6 +30,8 @@ Notes:
 |               | [import-traces](#Import-traces)               | [code](mlflow_export_import/bulk/import_traces.py)               | Imports traces from a directory                                                                                            |
 | Prompt        | [export-prompts](#Export-prompts)             | [code](mlflow_export_import/bulk/export_prompts.py)              | Export prompts from the MLflow Prompt Registry (MLflow 2.21.0+).                                                           |
 |               | [import-prompts](#Import-prompts)             | [code](mlflow_export_import/bulk/import_prompts.py)              | Imports prompts to the MLflow Prompt Registry. |   
+| Evaluation Dataset | [export-evaluation-datasets](#Export-evaluation-datasets) | [code](mlflow_export_import/bulk/export_evaluation_datasets.py) | Export GenAI evaluation datasets (MLflow 3.4.0+). |
+|               | [import-evaluation-datasets](#Import-evaluation-datasets) | [code](mlflow_export_import/bulk/import_evaluation_datasets.py) | Imports GenAI evaluation datasets. |
 
 ## All MLflow Objects Tools
 
@@ -659,3 +661,92 @@ import-prompts --input-dir out/prompts
 **Notes:** 
 * Prompts are imported with their original names and version numbers are preserved.
 * All versions of each prompt are exported and imported to maintain complete version history.
+* If a prompt with the same name already exists, it will be skipped with a warning to preserve version numbers. Use `--delete-prompt True` to replace existing prompts.
+
+
+## Evaluation Datasets
+
+Export/import GenAI evaluation datasets from the MLflow tracking server (MLflow 3.4.0+).
+
+**Note:** Evaluation dataset support requires MLflow 3.4.0 or higher and a SQL-based tracking backend (SQLite, PostgreSQL, MySQL). FileStore is not supported. The export/import will be skipped with a warning message if the MLflow version doesn't support evaluation datasets or if using FileStore.
+
+### Export evaluation datasets
+
+Export evaluation datasets to a directory.
+
+Source: [export_evaluation_datasets.py](mlflow_export_import/bulk/export_evaluation_datasets.py).
+
+#### Usage
+
+```
+export-evaluation-datasets --help
+
+Options:
+  --output-dir TEXT              Output directory.  [required]
+  --evaluation-datasets TEXT     Evaluation dataset names: 'all' for all datasets, 
+                                comma-delimited list (e.g., 'dataset1,dataset2'), 
+                                or file path ending with '.txt' containing dataset 
+                                names (one per line).  [required]
+  --experiment-ids TEXT    Comma-separated list of experiment IDs to filter
+                          datasets. Only used when --evaluation-datasets is 'all'.
+  --use-threads BOOLEAN    Use multithreading for export.  [default: False]
+```
+
+#### Examples
+
+##### Export all evaluation datasets
+```
+export-evaluation-datasets \
+  --output-dir out/evaluation_datasets \
+  --evaluation-datasets all
+```
+
+##### Export specific evaluation datasets
+```
+export-evaluation-datasets \
+  --output-dir out/evaluation_datasets \
+  --evaluation-datasets wine-quality-eval,iris-classification-eval
+```
+
+##### Export all evaluation datasets for specific experiments
+```
+export-evaluation-datasets \
+  --output-dir out/evaluation_datasets \
+  --evaluation-datasets all \
+  --experiment-ids 1,2,3
+```
+
+**Note:** `--experiment-ids` only filters when `--evaluation-datasets` is set to 'all'. If you specify specific dataset names, `--experiment-ids` is ignored.
+
+### Import evaluation datasets
+
+Import evaluation datasets from a directory.
+
+Source: [import_evaluation_datasets.py](mlflow_export_import/bulk/import_evaluation_datasets.py).
+
+#### Usage
+
+```
+import-evaluation-datasets --help
+
+Options:
+  --input-dir TEXT                      Input directory containing exported evaluation datasets.  [required]
+  --delete-evaluation-dataset BOOLEAN   Delete existing evaluation dataset before importing.  [default: False]
+  --use-threads BOOLEAN                 Use multithreading for import.  [default: False]
+```
+
+#### Examples
+
+##### Import evaluation datasets
+```
+import-evaluation-datasets --input-dir out/evaluation_datasets
+```
+
+##### Import with evaluation dataset deletion (if dataset exists, delete it first)
+```
+import-evaluation-datasets \
+  --input-dir out/evaluation_datasets \
+  --delete-evaluation-dataset True
+```
+
+**Note:** If an evaluation dataset with the same name already exists, it will be skipped with a warning. Use `--delete-evaluation-dataset True` to replace existing datasets.
