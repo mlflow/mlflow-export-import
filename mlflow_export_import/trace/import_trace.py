@@ -21,6 +21,7 @@ from mlflow_export_import.trace.trace_data_importer import (
 )
 from mlflow_export_import.trace.trace_utils import _try_parse_json, _get_span_attributes
 from mlflow_export_import.common.version_utils import has_trace_support
+from mlflow_export_import.client.client_utils import create_mlflow_client, create_dbx_client
 
 _logger = utils.getLogger(__name__)
 
@@ -43,7 +44,8 @@ def import_trace(
 
     mlflow_client = mlflow_client or create_mlflow_client()
 
-    exp = mlflow_utils.set_experiment(mlflow_client, None, experiment_name)
+    dbx_client = create_dbx_client(mlflow_client)
+    exp = mlflow_utils.set_experiment(mlflow_client, dbx_client, experiment_name)
     src_trace_path = os.path.join(input_dir, "trace.json")
     src_trace_dct = io_utils.read_file_mlflow(src_trace_path)
 
