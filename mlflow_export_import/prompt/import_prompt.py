@@ -117,18 +117,33 @@ def import_prompt(
             delete_prompt_util(mlflow_client, final_prompt_name)
         
         # Create prompt in destination
+        # Note: If prompt exists, register_prompt will fail - we catch this to preserve version numbers
         _logger.debug(f"Creating prompt '{final_prompt_name}' with template: {prompt_info.get('template', '')[:50]}...")
-        imported_prompt = _create_prompt_safe(
-            name=final_prompt_name,
-            template=prompt_info.get("template", ""),
-            tags=prompt_info.get("tags", {}),
-            commit_message=prompt_info.get("commit_message"),
-            mlflow_client=mlflow_client
-        )
-        
-        if imported_prompt is None:
-            _logger.error(f"Failed to create prompt '{final_prompt_name}' - _create_prompt_safe returned None")
-            return None
+        try:
+            imported_prompt = _create_prompt_safe(
+                name=final_prompt_name,
+                template=prompt_info.get("template", ""),
+                tags=prompt_info.get("tags", {}),
+                commit_message=prompt_info.get("commit_message"),
+                mlflow_client=mlflow_client
+            )
+            
+            if imported_prompt is None:
+                _logger.error(f"Failed to create prompt '{final_prompt_name}' - _create_prompt_safe returned None")
+                return None
+                
+        except Exception as e:
+            error_msg = str(e)
+            # Check if it's a duplicate error - skip to preserve version numbers
+            if "already exists" in error_msg.lower() or "duplicate" in error_msg.lower() or "RESOURCE_ALREADY_EXISTS" in error_msg:
+                _logger.warning(
+                    f"Prompt '{final_prompt_name}' already exists - skipping import "
+                    f"to preserve version numbers. Use --delete-prompt to replace."
+                )
+                return (final_prompt_name, None)
+            else:
+                # Re-raise if it's not a duplicate error
+                raise
         
         _logger.info(f"Successfully imported prompt: {final_prompt_name}")
         return final_prompt_name, imported_prompt.version if hasattr(imported_prompt, 'version') else "1"

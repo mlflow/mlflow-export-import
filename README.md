@@ -49,6 +49,7 @@ These are the MLflow objects and their attributes that can be exported.
 | Logged Model | [link](https://github.com/mlflow/mlflow/blob/v3.0.0/mlflow/protos/service.proto#L612) | [link](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.entities.html#mlflow.entities.LoggedModel)                                                                                                              | |
 | Trace | [link](https://github.com/mlflow/mlflow/blob/v2.14.0/mlflow/protos/service.proto#L459) | [link](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.entities.html#mlflow.entities.Trace) | |
 | Prompt | [link](https://mlflow.org/docs/latest/llms/prompt-engineering/index.html) | [link](https://mlflow.org/docs/latest/python_api/mlflow.genai.html) | - |
+| Evaluation Dataset | [link](https://mlflow.org/docs/latest/genai/index.html) | [link](https://mlflow.org/docs/latest/python_api/mlflow.genai.html) | - |
 
 MLflow Export Import provides rudimentary capabilities for tracking lineage of the imported Mlflow objects
 by having the option save the original MLflow object attributes in the imported target environment.

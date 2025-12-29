@@ -29,6 +29,8 @@ See sample JSON export files [here](README_export_format.md#sample-export-json-f
 || [import-trace](#import-trace)                         |  [code](mlflow_export_import/trace/import_trace.py)              |
 | Prompt | [export-prompt](#export-prompt) | [code](mlflow_export_import/prompt/export_prompt.py) |
 |  | [import-prompt](#import-prompt) | [code](mlflow_export_import/prompt/import_prompt.py) |
+| Evaluation Dataset | [export-evaluation-dataset](#export-evaluation-dataset) | [code](mlflow_export_import/evaluation_dataset/export_evaluation_dataset.py) |
+|  | [import-evaluation-dataset](#import-evaluation-dataset) | [code](mlflow_export_import/evaluation_dataset/import_evaluation_dataset.py) |
 
 ## Experiment Tools
 
@@ -683,4 +685,77 @@ import-prompt --input-dir out
 import-prompt \
   --input-dir out \
   --prompt-name my-new-prompt-name
+```
+
+
+## Evaluation Dataset Tools
+
+Export and import GenAI evaluation datasets (MLflow 3.4.0+).
+
+**Note:** Evaluation dataset support requires MLflow 3.4.0 or higher and a SQL-based tracking backend (SQLite, PostgreSQL, MySQL). FileStore is not supported.
+
+### Export Evaluation Dataset
+
+Export a single evaluation dataset to a directory.
+
+Source: [export_evaluation_dataset.py](mlflow_export_import/evaluation_dataset/export_evaluation_dataset.py).
+
+#### Usage
+
+```
+export-evaluation-dataset --help
+
+Options:
+  --dataset-name TEXT  Name of the evaluation dataset to export (mutually exclusive with --dataset-id).
+  --dataset-id TEXT    ID of the evaluation dataset to export (mutually exclusive with --dataset-name).
+  --output-dir TEXT    Output directory.  [required]
+
+Note: Either --dataset-name or --dataset-id must be provided (mutually exclusive).
+```
+
+#### Examples
+
+##### Export by dataset name
+```
+export-evaluation-dataset \
+  --dataset-name wine-quality-eval \
+  --output-dir out
+```
+
+##### Export by dataset ID
+```
+export-evaluation-dataset \
+  --dataset-id abc123 \
+  --output-dir out
+```
+
+### Import Evaluation Dataset
+
+Import an evaluation dataset from an exported directory.
+
+Source: [import_evaluation_dataset.py](mlflow_export_import/evaluation_dataset/import_evaluation_dataset.py).
+
+#### Usage
+
+```
+import-evaluation-dataset --help
+
+Options:
+  --input-dir TEXT     Input directory containing exported evaluation dataset.  [required]
+  --dataset-name TEXT  Optional new name for the imported dataset. If not
+                      specified, uses original name.
+```
+
+#### Examples
+
+##### Import with original name
+```
+import-evaluation-dataset --input-dir out
+```
+
+##### Import with new name
+```
+import-evaluation-dataset \
+  --input-dir out \
+  --dataset-name my-new-dataset-name
 ```
