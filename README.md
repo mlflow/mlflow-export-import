@@ -55,6 +55,32 @@ MLflow Export Import provides rudimentary capabilities for tracking lineage of t
 by having the option save the original MLflow object attributes in the imported target environment.
 See [README_governance](README_governance.md).
 
+### Amazon SageMaker MLflow Migration
+
+MLflow Export Import supports seamless migration of MLflow objects between various SageMaker MLflow environments and other MLflow tracking servers.
+
+<p align="center"><img src="diagrams/SageMaker_MLflow_App_Architecture.png" width="900" height="600"/></p>
+<p align="center">Figure 1: Migration to SageMaker MLflow App</p>
+
+<br>
+
+<p align="center"><img src="diagrams/SageMaker_MLflow_Tracking_Server.png" width="900" height="600"/></p>
+<p align="center">Figure 2: Migration to SageMaker MLflow Tracking Server</p>
+
+**Key Benefits:**
+* Compatible with SageMaker MLflow App and SageMaker MLflow Tracking Server
+* Preserves core MLflow objects (experiments, runs, metrics, params, tags, traces, logged models, evaluation datasets and registered models)
+* Supports migration from older MLflow versions (<3.0) to newer versions
+* Cross-environment portability between self-hosted and SageMaker tracking servers
+* Maintains artifact storage connections between source and destination systems
+* Enables transitions between different MLflow environments:
+  * From self-hosted MLflow to SageMaker MLflow Tracking server or SageMaker MLflow App
+  * From SageMaker MLflow Tracking Server to SageMaker MLflow Tracking Server or SageMaker MLflow App
+* Flexibility to migrate data in and out of SageMaker MLflow as needed
+
+**Sample Implementation:**
+For a complete example of SageMaker MLflow migration, see: [SageMaker MLflow Migration Sample](https://github.com/aws-samples/sample-aiops-on-amazon-sagemakerai/tree/main/operations/sagemaker-mlflow-migration)
+
 ## Tools Overview
 
 There are two dimensions to the MLflow Export Import tools:
