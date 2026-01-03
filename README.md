@@ -19,11 +19,11 @@ Last updated: _2024-05-10_
   * Enable an MLOps pipeline by promoting MLflow objects (runs, experiments or registered models) from one MLflow tracking server (Datbricks workspace) to another.
     * Copy a the best run (model) from the development to the test tracking server.
     * After the run passes tests, then promote it to the production tracking server.
-  * Share and collaborate with other data scientists in the same or another MLflow tracking server (Databricks workspace).
+  * Share and collaborate with other data scientists in the same or another MLflow tracking server (Databricks workspace, Amazon SageMaker MLflow).
     * For example, copy an experiment from one user to another.
   * Backup your MLflow objects to external storage so they can be restored if needed.
   * Disaster recovery. Save your MLflow objects to external storage so they can be replicated to another tracking server.
-  * Supports registered models in both the Databricks Workspace Model Registry and Unity Catalog Model Registry.
+  * Supports registered models in both the Databricks Workspace Model Registry, Unity Catalog Model Registry and Amazon SageMaker Studio.
 
 ### MLflow Export Import scenarios
 
