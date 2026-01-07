@@ -1,7 +1,7 @@
 from abc import abstractmethod, ABCMeta
-import os
 import json
 import requests
+from urllib.parse import urljoin
 import click
 from mlflow_export_import.common import MlflowExportImportException
 from . import USER_AGENT
@@ -94,7 +94,7 @@ class HttpClient(BaseHttpClient):
                 http_status_code=401
             )
         self.host = host
-        self.api_uri = os.path.join(host, api_name)
+        self.api_uri = urljoin(host, api_name)
         self.token = token
 
 
