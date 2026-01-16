@@ -14,7 +14,7 @@ from mlflow_export_import.common.click_options import (
     opt_notebook_formats,
     opt_export_permissions,
     opt_run_start_time,
-    opt_until,
+    opt_runs_until,
     opt_export_deleted_runs,
     opt_check_nested_runs
 )
@@ -218,7 +218,7 @@ def _get_runs(mlflow_client, run_ids, exp, failed_run_ids):
 @opt_run_ids
 @opt_export_permissions
 @opt_run_start_time
-@opt_until
+@opt_runs_until
 @opt_export_deleted_runs
 @opt_check_nested_runs
 @opt_notebook_formats

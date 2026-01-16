@@ -16,7 +16,7 @@ from mlflow_export_import.common.click_options import (
     opt_export_permissions,
     opt_notebook_formats,
     opt_run_start_time,
-    opt_until,
+    opt_runs_until,
     opt_export_deleted_runs,
     opt_use_threads
 )
@@ -219,7 +219,7 @@ class Result:
 @opt_output_dir
 @opt_export_permissions
 @opt_run_start_time
-@opt_until
+@opt_runs_until
 @opt_export_deleted_runs
 @opt_notebook_formats
 @opt_use_threads
