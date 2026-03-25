@@ -26,7 +26,7 @@ Last updated: _2023-12-19_.
 * Databricks registry URIs should be [Databricks profiles](https://docs.databricks.com/en/dev-tools/cli/profiles.html).
 * Note MLflow 2.8.0 introduced [MlflowClient.copy_model_version](https://mlflow.org/docs/latest/python_api/mlflow.client.html#mlflow.client.MlflowClient.copy_model_version). However it is only a shallow copy and does not work across external workspaces or UC metastores.
 * Source: 
-  * [Copy_Model_Version.py](mlflow_export_import/copy/Copy_Model_Version.py) - Python script
+  * [Copy_Model_Version.py](mlflow_export_import/copy/copy_model_version.py) - Python script
   * [Copy_Model_Version](databricks_notebooks/copy/Copy_Model_Version.py) - Databricks notebook
 
 Copy model version scenarios:
@@ -152,7 +152,7 @@ Options:
 
 Overview:
 * Copies a run to either the same or another tracking server (workspace).
-* Source code: [Copy_Run.py](mlflow_export_import/copy/Copy_Run.py).
+* Source code: [Copy_Run.py](mlflow_export_import/copy/copy_run.py).
 
 ### Examples
 
