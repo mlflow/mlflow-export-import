@@ -135,7 +135,7 @@ def import_prompt(
         except Exception as e:
             error_msg = str(e)
             # Check if it's a duplicate error - skip to preserve version numbers
-            if "already exists" in error_msg.lower() or "duplicate" in error_msg.lower() or "RESOURCE_ALREADY_EXISTS" in error_msg:
+            if "already exists" in error_msg.lower() or "duplicate" in error_msg.lower() or "ALREADY_EXISTS" in error_msg:
                 _logger.warning(
                     f"Prompt '{final_prompt_name}' already exists - skipping import "
                     f"to preserve version numbers. Use --delete-prompt to replace."

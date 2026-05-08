@@ -162,7 +162,7 @@ def import_evaluation_dataset(
         except Exception as e:
             error_msg = str(e)
             # Check if it's a duplicate name error - this is a fallback in case search didn't catch it
-            if "already exists" in error_msg.lower() or "duplicate" in error_msg.lower() or "RESOURCE_ALREADY_EXISTS" in error_msg:
+            if "already exists" in error_msg.lower() or "duplicate" in error_msg.lower() or "ALREADY_EXISTS" in error_msg:
                 _logger.warning(
                     f"Evaluation dataset '{final_dataset_name}' already exists - skipping import. "
                     f"Use --delete-evaluation-dataset to replace."
