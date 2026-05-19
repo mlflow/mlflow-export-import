@@ -87,10 +87,11 @@ if target_model_registry == "unity_catalog":
 
 # COMMAND ----------
 
-DATABRICKS_INSTANCE=dbutils.notebook.entry_point.getDbutils().notebook().getContext().tags().get('browserHostName').getOrElse(None)
-DATABRICKS_INSTANCE = f"https://{DATABRICKS_INSTANCE}"
+DATABRICKS_INSTANCE=dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiUrl().get()
 DATABRICKS_TOKEN = dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().getOrElse(None)
 
+cwd = os.getcwd()
+print(f"current directory is {cwd}")
 
 if cloud == "azure":
     driver_node_type = "Standard_D4ds_v5"
@@ -119,7 +120,7 @@ def create_multi_task_job_json():
                 "runtime_engine": "STANDARD"
             },
             "notebook_task": {
-                "notebook_path": "/Workspace/Users/birbal.das@databricks.com/AA_final/birnew-mlflow-export-import/databricks_notebooks/bulk/Import_Registered_Models",
+                "notebook_path": f"{cwd}/Import_Registered_Models",
                 "base_parameters": {
                     "input_dir": os.path.join(input_dir,str(i)),
                     "target_model_registry": target_model_registry,
@@ -169,3 +170,7 @@ def submit_databricks_job():
 # COMMAND ----------
 
 submit_databricks_job()
+
+# COMMAND ----------
+
+

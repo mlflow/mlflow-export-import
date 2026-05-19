@@ -1,6 +1,7 @@
 # Databricks notebook source
 import requests
 import json
+import os
 
 # COMMAND ----------
 
@@ -67,9 +68,11 @@ model_file_name
 
 # COMMAND ----------
 
-DATABRICKS_INSTANCE=dbutils.notebook.entry_point.getDbutils().notebook().getContext().tags().get('browserHostName').getOrElse(None)
-DATABRICKS_INSTANCE = f"https://{DATABRICKS_INSTANCE}"
+DATABRICKS_INSTANCE=dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiUrl().get()
 DATABRICKS_TOKEN = dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().getOrElse(None)
+
+cwd = os.getcwd()
+print(f"current directory is {cwd}")
 
 driver_node_type = "Standard_D4ds_v5"
 worker_node_type = "Standard_D4ds_v5"
@@ -90,7 +93,7 @@ def create_multi_task_job_json():
                 "runtime_engine": "STANDARD"
             },
             "notebook_task": {
-                "notebook_path": "/Workspace/Users/birbal.das@databricks.com/AA_sephora/birnew-mlflow-export-import/databricks_notebooks/bulk/Export_Registered_Models",
+                "notebook_path": f"{cwd}/Export_Registered_Models",
                 "base_parameters": {
                         "model_file_name" : model_file_name,
                         "output_dir" : output_dir,

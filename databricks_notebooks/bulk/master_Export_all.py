@@ -2,6 +2,7 @@
 import requests
 import json
 from datetime import datetime
+import os
 
 # COMMAND ----------
 
@@ -64,9 +65,15 @@ model_file_name
 
 # COMMAND ----------
 
-DATABRICKS_INSTANCE=dbutils.notebook.entry_point.getDbutils().notebook().getContext().tags().get('browserHostName').getOrElse(None)
-DATABRICKS_INSTANCE = f"https://{DATABRICKS_INSTANCE}"
+dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiUrl().get()
+
+# COMMAND ----------
+
+DATABRICKS_INSTANCE=dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiUrl().get()
 DATABRICKS_TOKEN = dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().getOrElse(None)
+
+cwd = os.getcwd()
+print(f"current directory is {cwd}")
 
 if cloud == "azure":
     driver_node_type = "Standard_D4ds_v5"
@@ -95,7 +102,7 @@ def create_multi_task_job_json():
                 "runtime_engine": "STANDARD"
             },
             "notebook_task": {
-                "notebook_path": "/Workspace/Users/birbal.das@databricks.com/AA_sephora_notebook_export_fix/birnew-mlflow-export-import/databricks_notebooks/bulk/Export_All",
+                "notebook_path": f"{cwd}/Export_All",
                 "base_parameters": {
                     "output_dir": output_dir,
                     "stages": stages,
