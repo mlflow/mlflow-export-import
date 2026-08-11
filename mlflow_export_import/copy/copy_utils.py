@@ -6,8 +6,8 @@ def get_model_name(artifact_path):
     """
     Return 'my-model' from '/foo/artifacts/my-model'
     """
-    idx = artifact_path.find("artifacts")
-    idx += len("artifacts") + 1
+    idx = artifact_path.find("artifacts/")
+    idx += len("artifacts/")
     return artifact_path[idx:]
 
 
