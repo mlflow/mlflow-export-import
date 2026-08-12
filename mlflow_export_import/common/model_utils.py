@@ -39,7 +39,7 @@ def create_model(client, model_name, model_dct, import_metadata):
         _logger.info(f"Created new registered model '{model_name}'")
         return True
     except RestException as e:
-        if e.error_code != "RESOURCE_ALREADY_EXISTS":
+        if e.error_code not in ("RESOURCE_ALREADY_EXISTS", "ALREADY_EXISTS"):
             raise e
         _logger.info(f"Registered model '{model_name}' already exists")
         return False

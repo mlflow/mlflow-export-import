@@ -19,7 +19,7 @@ def create_registered_model(client,  model_name):
         client.create_registered_model(model_name)
         return False
     except MlflowException as e: # NOTE: for non-UC is RestException
-        if e.error_code != "RESOURCE_ALREADY_EXISTS":
+        if e.error_code not in ("RESOURCE_ALREADY_EXISTS", "ALREADY_EXISTS"):
             raise
         return True
 
@@ -28,7 +28,7 @@ def create_experiment(client, experiment_name):
     try:
         return client.create_experiment(experiment_name)
     except MlflowException as e:
-        if e.error_code != "RESOURCE_ALREADY_EXISTS":
+        if e.error_code not in ("RESOURCE_ALREADY_EXISTS", "ALREADY_EXISTS"):
             raise
         experiment = client.get_experiment_by_name(experiment_name)
         return experiment.experiment_id
