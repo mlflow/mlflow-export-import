@@ -77,10 +77,10 @@ def import_logged_model(
 
         if run_id:
             _log_metrics(mlflow_client, run_id, src_logged_model_dct["metrics"], logged_model.model_id)
-            from mlflow.entities import LoggedModelOutput
+            from mlflow.entities import LoggedModelInput, LoggedModelOutput
             if model_type == "input":
                 mlflow_client.log_inputs(run_id=run_id,
-                                         models=[LoggedModelOutput(logged_model.model_id, step= step if step else 0)])
+                                         models=[LoggedModelInput(logged_model.model_id)])
             else:
                 mlflow_client.log_outputs(run_id=run_id,
                                          models=[LoggedModelOutput(logged_model.model_id, step=step if step else 0)])
