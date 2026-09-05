@@ -52,7 +52,8 @@ def _create_default_log_config(output_path=None, log_format=None):
         file_handler = cfg["handlers"]["file"]
         file_handler["filename"] = output_path
     else:
-        handlers = cfg["root"]["handlers"]
-        handlers.remove("file")
+        # Remove file handler
+        del cfg["handlers"]["file"]
+        del cfg["root"]["handlers"]["file"]
 
     return cfg
