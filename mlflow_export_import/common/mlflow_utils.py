@@ -38,7 +38,7 @@ def set_experiment(mlflow_client, dbx_client, exp_name, tags=None):
         exp = mlflow_client.get_experiment(exp_id)
         _logger.info(f"Created experiment '{exp.name}' with location '{exp.artifact_location}'")
     except RestException as ex:
-        if ex.error_code != "RESOURCE_ALREADY_EXISTS":
+        if ex.error_code not in ("RESOURCE_ALREADY_EXISTS", "ALREADY_EXISTS"):
             raise MlflowExportImportException(ex, f"Cannot create experiment '{exp_name}'")
         exp = mlflow_client.get_experiment_by_name(exp_name)
         _logger.info(f"Using existing experiment '{exp.name}' with location '{exp.artifact_location}'")
