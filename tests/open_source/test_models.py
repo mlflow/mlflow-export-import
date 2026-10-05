@@ -176,6 +176,7 @@ def _create_run(client):
 _exp_id = "1812"
 _run_id = "48cf29167ddb4e098da780f0959fb4cf"
 _local_path_base = os.path.join("dbfs:/databricks/mlflow-tracking", _exp_id, _run_id)
+_mlflow_artifacts_path_base = os.path.join("mlflow-artifacts:", _exp_id, _run_id)
 
 
 def test_extract_no_artifacts():
@@ -216,6 +217,15 @@ def test_extract_no_run_id():
     except MlflowExportImportException:
         pass
 
+def test_mlflow_artifacts_path_no_artifacts():
+    source = os.path.join(_mlflow_artifacts_path_base)
+    model_path = _extract_model_path(source, _run_id)
+    assert model_path == ""
+
+def test_mlflow_artifacts_path_extract_model():
+    source = os.path.join(_mlflow_artifacts_path_base, "model")
+    model_path = _extract_model_path(source, _run_id)
+    assert model_path == "model"
 
 # == Test that both model names are either UC model names or WS model names
 

@@ -111,7 +111,7 @@ def _import_model_version(
     ):
     start_time = time.time()
     dst_source = dst_source.replace("file://","") # OSS MLflow
-    if not (dst_source.startswith("dbfs:") or dst_source.startswith("s3:")) and not os.path.exists(dst_source):
+    if not (dst_source.startswith("dbfs:") or dst_source.startswith("s3:") or dst_source.startswith("mlflow-artifacts:")) and not os.path.exists(dst_source):
         raise MlflowExportImportException(f"'source' argument for MLflowClient.create_model_version does not exist: {dst_source}", http_status_code=404)
 
     tags = src_vr["tags"]
@@ -164,11 +164,11 @@ def _extract_model_path(source):
     :param source: 'source' field of registered model version
     :return: relative path to the model artifact
     """
-    pattern = "artifacts"
+    pattern = "artifacts/"
     idx = source.find(pattern)
     if idx == -1:
         return None
-    return source[1+idx+len(pattern):]
+    return source[idx+len(pattern):]
 
 
 def _set_source_tags_for_field(dct, tags):

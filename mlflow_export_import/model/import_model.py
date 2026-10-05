@@ -326,13 +326,13 @@ def _extract_model_path(source, run_id):
     if idx == -1:
         raise MlflowExportImportException(f"Cannot find run ID '{run_id}' in registered model version source field '{source}'", http_status_code=404)
     model_path = source[1+idx+len(run_id):]
-    pattern = "artifacts"
+    pattern = "artifacts/"
 
     idx = source.find(pattern)
     if idx == -1: # Bizarre - sometimes there is no 'artifacts' after run_id
         model_path = ""
     else:
-        model_path = source[1+idx+len(pattern):]
+        model_path = source[idx+len(pattern):]
     return model_path
 
 
