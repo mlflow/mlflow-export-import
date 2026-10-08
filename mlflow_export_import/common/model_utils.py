@@ -76,7 +76,8 @@ def list_model_versions(client, model_name, get_latest_versions=False):
         if get_latest_versions:
             return client.get_latest_versions(model_name)
         else:
-            return list(SearchModelVersionsIterator(client, filter=f"name='{model_name}'"))
+            versions = SearchModelVersionsIterator(client, filter=f"name='{model_name}'")
+            return [ client.get_model_version(vr.name, vr.version) for vr in versions ]
 
 
 def search_model_versions(client, filter):
