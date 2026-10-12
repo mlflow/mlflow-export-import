@@ -95,18 +95,18 @@ def import_run(
         if "model_inputs" in src_run_dct["inputs"] and import_logged_models:
             for model in src_run_dct["inputs"]["model_inputs"]:
                 import_logged_model(
-                    input_dir = os.path.join(input_dir, model['model_id']),
+                    input_dir = _resolve_logged_model_dir(input_dir, model['model_id']),
                     experiment_name = experiment_name,
-                    run_id = run.info_run_id,
+                    run_id = run.info.run_id,
                     mlflow_client = mlflow_client,
                     model_type = "input",
-                    step = model["step"],
+                    step = model.get("step"),
                 )
 
         if "outputs" in src_run_dct and import_logged_models:
             for model in src_run_dct["outputs"]["model_outputs"]:
                 import_logged_model(
-                    input_dir = os.path.join(input_dir, model['model_id']),
+                    input_dir = _resolve_logged_model_dir(input_dir, model['model_id']),
                     experiment_name = experiment_name,
                     run_id = run.info.run_id,
                     mlflow_client = mlflow_client,
@@ -165,6 +165,22 @@ def _upload_databricks_notebook(dbx_client, input_dir, src_run_dct, dst_notebook
         dbx_client._post("workspace/import", data)
     except MlflowExportImportException as e:
         _logger.warning(f"Cannot save notebook '{dst_notebook_path}'. {e}")
+
+
+def _resolve_logged_model_dir(run_input_dir, model_id):
+    """Locate an exported logged model regardless of which exporter produced the dump.
+
+    export-run writes the model beside the run (``<run_dir>/<model_id>``), while
+    export-experiment and export-all write it once per experiment
+    (``<experiment_dir>/logged_models/<model_id>``). Only the first layout was handled,
+    so importing a run with model inputs/outputs from an export-all dump raised
+    FileNotFoundError on logged_model.json.
+    """
+    beside_run = os.path.join(run_input_dir, model_id)
+    if os.path.exists(os.path.join(beside_run, "logged_model.json")):
+        return beside_run
+    experiment_dir = os.path.dirname(os.path.dirname(run_input_dir))
+    return os.path.join(experiment_dir, "logged_models", model_id)
 
 
 def _import_inputs(mlflow_client, src_run_dct, run_id):
