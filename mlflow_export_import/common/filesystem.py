@@ -15,7 +15,7 @@ def mk_local_path(path):
 
 
 def exists(path):
-    os.path.exists(mk_local_path(path))
+    return os.path.exists(mk_local_path(path))
 
 
 class DatabricksFileSystem():
