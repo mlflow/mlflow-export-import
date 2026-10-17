@@ -143,7 +143,7 @@ def _upload_databricks_notebook(dbx_client, input_dir, src_run_dct, dst_notebook
     notebook_name = os.path.basename(src_notebook_path)
 
     format = "source"
-    notebook_path = _fs.make_local_path(os.path.join(input_dir,"artifacts","notebooks",f"{notebook_name}.{format}"))
+    notebook_path = _fs.mk_local_path(os.path.join(input_dir,"artifacts","notebooks",f"{notebook_name}.{format}"))
     if not _fs.exists(notebook_path):
         _logger.warning(f"Source '{notebook_path}' does not exist for run_id '{run_id}'")
         return
