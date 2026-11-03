@@ -94,6 +94,17 @@ def import_prompts(
         return {"error": str(e)}
 
 
+def _prompt_dir_sort_key(dir_name):
+    """
+    Sort key for '{prompt_name}_v{version}' directories: by prompt name, then by numeric version,
+    so that 'my_prompt_v10' sorts after 'my_prompt_v2'.
+    """
+    name, sep, version = dir_name.rpartition("_v")
+    if sep and version.isdigit():
+        return (name, int(version))
+    return (dir_name, 0)
+
+
 def _find_prompt_directories(input_dir):
     """Find all prompt directories in the input directory."""
     prompt_dirs = []
@@ -103,7 +114,7 @@ def _find_prompt_directories(input_dir):
     
     # Look for directories that contain prompt.json files
     # Sort to ensure consistent ordering (important for version preservation)
-    for item in sorted(os.listdir(input_dir)):
+    for item in sorted(os.listdir(input_dir), key=_prompt_dir_sort_key):
         item_path = os.path.join(input_dir, item)
         if os.path.isdir(item_path):
             prompt_file = os.path.join(item_path, "prompt.json")
