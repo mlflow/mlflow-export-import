@@ -3,12 +3,12 @@ Tests for prompt export and import functionality.
 """
 import pytest
 import mlflow
-from mlflow_export_import.prompt.export_prompt import export_prompt
+from mlflow_export_import.prompt.export_prompt import export_prompt, _get_prompt_safe
 from mlflow_export_import.prompt.import_prompt import import_prompt
 from mlflow_export_import.bulk.export_prompts import export_prompts
 from mlflow_export_import.bulk.import_prompts import import_prompts
 from mlflow_export_import.common.version_utils import has_prompt_support
-from tests.utils_test import create_output_dir
+from tests.utils_test import create_output_dir, mk_uuid
 from tests.open_source.init_tests import mlflow_context
 
 
@@ -153,3 +153,36 @@ def test_export_specific_prompts(mlflow_context):
     assert export_result is not None
     assert export_result["successful_exports"] == 2
     assert export_result["failed_exports"] == 0
+
+
+def test_bulk_import_prompts_preserves_version_order(mlflow_context):
+    """Test bulk import keeps version numbers for prompts with 10 or more versions."""
+    mlflow.set_tracking_uri(mlflow_context.client_src.tracking_uri)
+    prompt_name = f"test_prompt_versions_{mk_uuid()}"
+    num_versions = 11
+    for j in range(1, num_versions+1):
+        _create_test_prompt(
+            mlflow_context.client_src,
+            name=prompt_name,
+            template=f"Template version {j}: {{{{var}}}}"
+        )
+
+    output_dir = f"{mlflow_context.output_dir}/prompts_versions"
+    create_output_dir(output_dir)
+    export_prompts(
+        output_dir=output_dir,
+        prompt_names=None,  # Export all versions
+        use_threads=False,
+        mlflow_client=mlflow_context.client_src
+    )
+
+    mlflow.set_tracking_uri(mlflow_context.client_dst.tracking_uri)
+    import_prompts(
+        input_dir=output_dir,
+        use_threads=False,
+        mlflow_client=mlflow_context.client_dst
+    )
+
+    for j in range(1, num_versions+1):
+        prompt = _get_prompt_safe(prompt_name, str(j))
+        assert prompt.template == f"Template version {j}: {{{{var}}}}"
